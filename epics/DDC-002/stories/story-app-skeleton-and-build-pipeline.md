@@ -3,7 +3,7 @@ type: story
 id: "story-app-skeleton-and-build-pipeline"
 epic: "DDC-002"
 title: "App skeleton and build pipeline"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
@@ -12,9 +12,9 @@ external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN
 tags: [app, build, signing, spike]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-18T10:42:53.267Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-18T10:42:53.267Z"
 ---
 
 # App skeleton and build pipeline
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -71,9 +71,103 @@ Rough until the plan gate.
 
 ## Implementation Plan
 
-<!-- Written at the work-start gate (/projectstore:story plan), AFTER studying the
-     codebase. When a spec covers this story, this is a thin route through the
-     spec's contracts: which contracts, in what order, which files. -->
+No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" (§1–§5, §8) is the design. GrammarHelper is the model for the project file, the logger and the icon set; where this plan departs from it, the reason is given.
+
+**Layout.** `app/` at the repo root:
+- `app/DeepDriveCleaner.xcodeproj/project.pbxproj`, written by hand from GrammarHelper's:
+  - objectVersion 77 with `PBXFileSystemSynchronizedRootGroup`, so a new source file never touches the project;
+  - readable fixed object ids and a shared scheme;
+  - `SWIFT_VERSION = 6`; `SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG` in Debug, which the `#if DEBUG` spike menu needs;
+  - checked with `plutil -lint` and `xcodebuild -list`.
+
+  No xcodegen or tuist is on the machine, and one more tool is not worth it for one target.
+- `app/Packages/DDCKit`: a local Swift package, Foundation only, linked through `XCLocalSwiftPackageReference` as GrammarHelper links `CorrectionCore`. All logic the acceptance criteria test lives here and runs under `swift test`, with no test host app carrying the bundle id.
+  - `CLIRunner` (an actor): serialises runs, joins a scan requested during a scan, queues a clean behind it; `Process` with stdin `/dev/null`, both pipes read concurrently, stderr split into lines; cancel sends SIGTERM.
+  - `RunOutcome`: exit codes 0 / 1 / 2 / 75 → done / error / refused / busy.
+  - `ScanReport`: reads `schema_version` first, as the CLI's own store does; anything but 1 is unreadable.
+  - `LaunchMode`: a pure `handle(event) -> [Effect]` state machine (normal, `--scheduled`, promotion on reopen, activate, further launch, notification response). A further launch reaches a running instance as a reopen event.
+  - `HelperLocator`: builds the `Contents/Helpers/deepdrivecleaner` URL explicitly and refuses it if it equals the main executable. `Bundle.url(forAuxiliaryExecutable:)` looks next to the executable, in `Contents/MacOS`, and on a case-insensitive volume finds the app itself.
+- `app/DeepDriveCleaner/`, the app target:
+  - `main.swift`: `--tick` runs `open -gjb com.smartandpoint.deepdrivecleaner --args --scheduled` and exits before any `NSApplication` exists (the ADR's Open Questions); otherwise it starts the delegate. A SwiftUI `@main`, as in GrammarHelper, cannot do this. `Info.plist` sets `NSPrincipalClass = NSApplication` and `LSUIElement`.
+  - `AppDelegate`: feeds launch arguments, `applicationShouldHandleReopen` and `applicationDidBecomeActive` to `LaunchMode` and applies the effects. A `--scheduled` instance never calls `NSApp.activate` itself, or it would promote itself.
+  - `StatusItemController`:
+    - the button sends its action on `[.leftMouseUp, .rightMouseUp]`;
+    - a left click toggles the `NSPopover`, which hosts a SwiftUI placeholder;
+    - a right click sets `statusItem.menu` (Scan now, Settings…, Quit), calls `performClick` and clears the menu in `menuDidClose`.
+
+    GrammarHelper keeps `statusItem.menu` set, which disables the button's action, so a popover would never open.
+  - `SettingsWindowController` with the login-item toggle; `LoginItem` wraps `SMAppService.mainApp`, re-reads `status` when the view appears and on activation, and offers `openSystemSettingsLoginItems()` on `.requiresApproval`. Nothing is stored in `UserDefaults`.
+  - `AppLog`: GrammarHelper's file-logger pattern, `~/Library/Logs/DeepDriveCleaner/app.log`, directory created first; every launch (with its arguments), reopen, activate and promotion is logged.
+  - `DriveGlyph.swift`: the drive outline, line and dot as CoreGraphics paths, the single source of both icons.
+  - `Assets.xcassets/AppIcon.appiconset`.
+- `app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist`, outside the synchronised folder (inside it the plist would land in Resources), copied by a Copy Files phase to `Contents/Library/LaunchAgents`, where `SMAppService.agent(plistName:)` looks.
+
+**Icons.** No ImageMagick, rsvg or Pillow are assumed. `scripts/icons/main.swift` is compiled with `DriveGlyph.swift` by `swiftc` and writes the ten AppIcon PNGs and `Contents.json` through ImageIO; the PNGs are committed. The app icon fills Apple's squircle on the 824/1024 grid, so Tahoe does not put it on a grey tile. The status item draws the glyph at runtime as an 18 pt template image. `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` makes the build write the `.icns`.
+
+**Build pipeline.**
+- `scripts/build-app.sh [--dist]`:
+  1. builds the release CLI;
+  2. `xcodebuild -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO` (all signing in the script: Xcode signing would add `get-task-allow`), then `ditto` to `build/<Config>/` and `xattr -cr`;
+  3. copies the CLI to `Contents/Helpers/`, signs it as `com.smartandpoint.deepdrivecleaner.cli`, then signs the app (hardened runtime, timestamp, no `--deep`, no entitlements) and checks the identifier and team of both.
+
+  `--dist` additionally:
+  - refuses a dirty tree and a `MARKETING_VERSION` that differs from the Cargo version;
+  - zips the app for notarization, notarizes it, and runs `stapler staple` with the retry loop of `scripts/build-dist.sh`, because the ticket can lag;
+  - runs the checks of the second criterion;
+  - zips the stapled app last, as `dist/DeepDriveCleaner-<version>.zip`.
+- `scripts/build-dist.sh` is not touched in this story. `build-app.sh` carries its own small `sign_code` and `retry` helpers. The shared `scripts/lib/release.sh` belongs to "Distribution: the 0.2.0 cask with the app", where `make dist` builds both artefacts and one rerun proves the CLI tarball unchanged.
+- Order of the two targets: `build-dist.sh` starts with `rm -rf dist`, so `make dist` runs first and `make app-dist` after it. `build-app.sh --dist` removes only its own zip. Making `app-dist` part of `dist` is the distribution story's job.
+- Makefile:
+  - `app` builds Debug and needs only `DDC_SIGN_IDENTITY`; Debug and release share the Developer ID, so one TCC identity covers both.
+  - `app-test` runs `swift test` in DDCKit.
+  - `app-dist` runs after `check` and `app-test`.
+  - `icons` regenerates the icon set.
+- `.gitignore`: `/build/`, `xcuserdata/`, `.build/`, `.swiftpm/`. The clean-tree check counts untracked files.
+
+**Tests** (Swift Testing, in DDCKit):
+- Fake CLI: a shell script written to a temp directory at test time. It logs `start/end <pid> <args>` and waits on gate files, so the tests need no sleeps and no injected clock.
+- Coalescing and ordering: one start for joined scans, the clean after the scan ends, no overlapping intervals.
+- 1 MiB of stderr, then 1 MiB of stdout, under a time limit, with the counts checked.
+- `LaunchMode`: parameterised over the four promoting events.
+- Decoding: a fixture recorded from the synthetic home of `crates/ddc-cli/tests/scan_cli.rs` (no personal paths in a public repo), plus a copy with `schema_version: 2`. The fake CLI exits 2 and 75. A drift test reads `SCHEMA_VERSION` from `crates/ddc-core/src/model.rs` through `#filePath`.
+
+**Order.**
+1. The spike app, with everything the owner's checks exercise:
+   - the project, `main.swift` with `--tick`, the delegate, the status item with Quit;
+   - `AppLog`, and `LaunchMode` with reopen handling and promotion;
+   - the `--scheduled` path: run `deepdrivecleaner scan --json`, log `full_disk_access`, quit;
+   - the embedded CLI and the agent plist, and `make app`.
+
+   Debug-only additions:
+   - a `DebugHoldSeconds` default (`defaults write com.smartandpoint.deepdrivecleaner DebugHoldSeconds 120`) keeps a `--scheduled` instance alive after its work. On a near-empty account the scan ends in under a second, and without the hold there is no running instance to reopen or promote.
+   - a Debug menu: Register agent / Unregister agent (logging `SMAppService.status`); Scan now; Probe Full Disk Access; Post test notification (`requestAuthorization`, then one notification, for the third criterion).
+   - the probe opens `~/Library/Application Support/com.apple.TCC/TCC.db` read-only, as the CLI's `full_disk_access` does, and logs the errno. `EPERM` is "no access"; `ENOENT` is "no file", and a `false` from the CLI then proves nothing.
+2. Checked here without dialogs: `swift test`, an unsigned build, the bundle layout and `Info.plist`, `codesign -dv`. Signing and notarization run in the owner's session, where keychain prompts can appear.
+3. The owner's spike, on a fresh user account where Terminal has no grant, with the app in `/Applications` and Full Disk Access granted to the app only. Results go into the Final Summary.
+   1. The probe and the Scan now item log access; a CLI scan reports `full_disk_access: true`.
+   2. Register agent, then three sub-checks, each read from `app.log`. A tick is fired with `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner.scheduler`.
+      - App quit, tick: a `--scheduled` launch whose scan reports `true`.
+      - App launched from Finder (normal mode), tick: a reopen handled as "scan if due" in that instance, no second launch, no promotion.
+      - App quit, hold set, tick, then a Finder double-click during the hold: the reopen promotes the `--scheduled` instance, and the status item appears.
+   3. Rebuild with the same bundle id and team and replace the app, both ways, recording each:
+      - `ditto` over the installed bundle;
+      - remove, then copy (what `brew upgrade` does).
+
+      After each, check that the grant holds and the next kickstart opens the new build. GrammarHelper's `CLAUDE.md` records that remove-then-copy orphaned its Accessibility grant. If it does here too, ADR Rationale 1 ("one grant that survives upgrades") does not hold for the cask: the ADR and "Distribution: the 0.2.0 cask with the app" are revised before any other story starts.
+   4. Only if step 2 fails: the `BundleProgram … --tick` fallback, re-run through step 2. Step 2 fails when `register()` throws, when the status is neither `.enabled` nor `.requiresApproval`, or when `app.log` shows no launch within 10 s of the kickstart.
+   5. Post test notification: the banner shows the app's icon.
+   A failed check sends the ADR back for revision before any other story of the epic starts.
+4. The runner, the login item, the icons and `app-dist`; the manual criteria last.
+
+**Pitfalls.**
+- Never grant or launch a copy Xcode built and ran (⌘R): TCC then stores the ad-hoc requirement, and the Developer ID build reports `full_disk_access: false` with its toggle on.
+- Only one copy with this bundle id should exist outside `build/` (`-derivedDataPath build/DerivedData` keeps Xcode's own copy there too), or `open -b` can start a stale one.
+- The runner never sets `DDC_DATA_DIR` for the CLI; that would move the CLI's logs.
+- The v0.1.0 release is published (asset, tag, tap), so `scripts/publish-release.sh`'s resume guard, which refuses a resume once files outside `packaging/homebrew/` changed, does not bind this work.
+
+**Proposed `code_refs`.**
+- Story: `app/`, `scripts/build-app.sh`, `scripts/icons/`, `Makefile`, `.gitignore`.
+- Epic DDC-002: `app/`, `scripts/build-app.sh`, `scripts/icons/`.
 
 ## Acceptance Criteria
 

@@ -57,7 +57,7 @@ The screens are modelled in the design canvas before any code.
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | planned | Spike first (Full Disk Access attribution through `open`, the scheduler agent, reopen); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
+| [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | in-progress | Spike first (Full Disk Access attribution through `open`, the scheduler agent, reopen); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
 | [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | planned | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
 | [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean; needs the counter of DDC-001 "Progress output while ddc clean runs" |
 | [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | planned | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |

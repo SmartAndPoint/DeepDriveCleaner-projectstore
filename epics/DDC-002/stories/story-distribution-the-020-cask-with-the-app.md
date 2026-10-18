@@ -37,6 +37,7 @@ DeepDriveCleaner 0.2.0 ships as one cask, `deepdrivecleaner`, with the app and t
 Rough until the plan gate.
 
 - [ ] `make dist` builds the zipped, stapled app (story "App skeleton and build pipeline") and refuses a version mismatch between Cargo and the app's `MARKETING_VERSION`
+- [ ] Extract the signing, notarization and retry helpers that `scripts/build-dist.sh` and `scripts/build-app.sh` each carry into `scripts/lib/release.sh`; one `make dist` run after the extraction shows the CLI tarball unchanged in contents, signature and notarization
 - [ ] `scripts/publish-release.sh`:
   - asset `DeepDriveCleaner-<version>.zip`;
   - checks the app's signature, team and stapled ticket, and the embedded CLI's identifier and team;

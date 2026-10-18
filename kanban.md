@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-18T10:17:45.525Z
+generated_at: 2026-10-18T10:43:40.906Z
 
 ---
 
@@ -10,7 +10,6 @@ generated_at: 2026-10-18T10:17:45.525Z
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-002/stories/story-app-skeleton-and-build-pipeline|DDC-002: App skeleton and build pipeline]] #p1
 - [ ] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|DDC-002: CLI: clean an explicit item list]] #p1
 - [ ] [[epics/DDC-002/stories/story-cli-progress-events|DDC-002: CLI: progress events]] #p2
@@ -28,6 +27,7 @@ generated_at: 2026-10-18T10:17:45.525Z
 ## In Progress
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
+- [ ] [[epics/DDC-002/stories/story-app-skeleton-and-build-pipeline|DDC-002: App skeleton and build pipeline]] #p1
 
 ## Review
 
