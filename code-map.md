@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T09:50:05.787Z
+generated_at: 2026-10-18T12:00:39.232Z
 
 ---
 
@@ -14,6 +14,7 @@ Regenerate via `/projectstore:codemap`; edit refs via `/projectstore:codemap set
 |------|-------|--------|-----------|
 | [[epics/DDC-001/epic\|DDC-001]] | Disk space cleaner CLI for developers | in-progress | `Cargo.toml`, `Makefile`, `rust-toolchain.toml`, `clippy.toml`, `rustfmt.toml`, `crates/ddc-core/`, `crates/ddc-cli/`, `docs/scan.schema.json`, `bench/` |
 | [[epics/DDC-002/epic\|DDC-002]] | Menu bar app | planned | — |
+| [[epics/DDC-003/epic\|DDC-003]] | Agent footprint | planned | — |
 
 ## Story-level refs (files each story touched)
 

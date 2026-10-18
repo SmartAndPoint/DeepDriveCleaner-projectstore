@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-18T10:17:45.525Z
+generated_at: 2026-10-18T12:00:37.115Z
 
 ---
 
@@ -20,6 +20,11 @@ generated_at: 2026-10-18T10:17:45.525Z
 - [ ] [[epics/DDC-002/stories/story-review-and-clean-window|DDC-002: Review and clean window]] #p1
 - [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
+- [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
+- [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
+- [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
+- [ ] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2
+- [ ] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1
 
 ## ToDo
 

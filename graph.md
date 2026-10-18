@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T10:17:45.705Z
+generated_at: 2026-10-18T12:00:38.270Z
 
 ---
 
@@ -16,6 +16,7 @@ full typed neighborhood, both directions, in one call.
 
 | Path | Title | Type | Status |
 |------|-------|------|--------|
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | Agent footprint: worktrees, harness data and bounded consent for agents | adr | proposed |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | Cleanup safety model: risk classes, plan and confirmation | adr | accepted |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | Menu bar app: Swift shell over the ddc CLI | adr | proposed |
 | adr/rust-core-library-and-cli-with-json-output.md | Rust core: library + CLI with JSON output | adr | accepted |
@@ -39,15 +40,29 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | planned |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | planned |
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | Signing team: parameterise TEAM_ID, then switch to SmartAndPoint | story | planned |
+| epics/DDC-003/epic.md | Agent footprint | epic | planned |
+| epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
+| epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | planned |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | planned |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 
 ## Edges
 
 | From | Kind | To |
 |------|------|----|
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
+| adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
@@ -163,3 +178,40 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | wikilink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-harness-data-rules.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/epic.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-003/epic.md | wikilink | epics/DDC-001/epic.md |
+| epics/DDC-003/epic.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
+| epics/DDC-003/epic.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/stories/story-harness-data-rules.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-harness-data-rules.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/stories/story-harness-data-rules.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |

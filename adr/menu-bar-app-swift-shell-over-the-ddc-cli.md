@@ -356,12 +356,20 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 
 The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8.
 
+## Amendments
+
+- **2026-10-18, proposed.** [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]], §5 amends §7.
+  - **What it changes.** §7 makes an explicit item list interactive consent because a person confirmed it. A list that an agent writes is not: `ddc clean --items` given together with `--agent` is a **filter** over the `--agent` policy (`safe`, plus `rebuildable` selected by default inside one project's checkouts), never a selection. A listed `review` item is skipped as `not-consented`, not removed; a per-item `permanent` is ignored. Without `--agent`, `--items` keeps the meaning this section gives it.
+  - **What bounds it.** The app's confirmation sheet stays the only caller of `clean` in the app and never passes `--agent`; the test of §7 that enforces the single caller also asserts the flag is absent.
+  - The amendment takes effect when that ADR is accepted.
+
 ## References
 
 - [[adr/rust-core-library-and-cli-with-json-output|Rust core: library + CLI with JSON output]]
 - [[adr/cleanup-safety-model-risk-classes-plan-and-confirmation|Cleanup safety model: risk classes, plan and confirmation]]
 - [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|Homebrew tap and the v0.1.0 release]]: path-keyed Full Disk Access for the 0.1.0 cask
 - [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|Progress output while ddc clean runs]]
+- [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]]: §5 amends §7
 - GrammarHelper repository: `App/AppDelegate.swift`, `App/SettingsManager.swift`, `Makefile`, `scripts/publish-release.sh`, `CLAUDE.md`
 - Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
 
