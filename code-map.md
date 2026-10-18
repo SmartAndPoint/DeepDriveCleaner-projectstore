@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T06:36:56.200Z
+generated_at: 2026-10-18T09:50:05.787Z
 
 ---
 
@@ -13,6 +13,7 @@ Regenerate via `/projectstore:codemap`; edit refs via `/projectstore:codemap set
 | Epic | Title | Status | code_refs |
 |------|-------|--------|-----------|
 | [[epics/DDC-001/epic\|DDC-001]] | Disk space cleaner CLI for developers | in-progress | `Cargo.toml`, `Makefile`, `rust-toolchain.toml`, `clippy.toml`, `rustfmt.toml`, `crates/ddc-core/`, `crates/ddc-cli/`, `docs/scan.schema.json`, `bench/` |
+| [[epics/DDC-002/epic\|DDC-002]] | Menu bar app | planned | — |
 
 ## Story-level refs (files each story touched)
 

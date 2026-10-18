@@ -1,0 +1,107 @@
+---
+type: epic
+id: "DDC-002"
+title: "Menu bar app"
+status: planned
+priority: p2
+created: 2026-10-18
+updated: 2026-10-18
+external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+tags: [app, macos, swift]
+code_refs: []
+review_status: reviewed
+reviewed_at: 2026-10-18
+---
+
+# DDC-002: Menu bar app
+
+| Field | Value |
+|---|---|
+| **Status** | planned |
+| **Priority** | p2 |
+| **Created** | 2026-10-18 |
+| **Updated** | 2026-10-18 |
+
+---
+
+## Goal
+
+`DeepDriveCleaner.app` lives in the menu bar.
+
+- **One click** shows what the latest scan found.
+- **Review and clean.** The user reviews by group or by item and cleans after a confirmation sheet that lists every item.
+- **Settings** choose which folders are scanned and which kinds of objects may be cleaned.
+- **Notifications** say when a lot can be freed or the disk is almost full, with the actions Review and Remind me tomorrow.
+- **One Full Disk Access grant**, to the app, by bundle id, covers manual and scheduled scans and survives `brew upgrade`.
+
+It ships as the `deepdrivecleaner` cask 0.2.0, for macOS 26, signed by team 8MSDJTBW2D. The one cask also keeps the `ddc` and `deepdrivecleaner` commands on the `PATH`.
+
+## Context
+
+DDC-001 shipped the terminal tool 0.1.0 as a signed, notarized cask. Two things in it point to an app:
+
+- macOS keys the CLI's Full Disk Access by its path, and every cask version has a new path, so the grant is lost on each upgrade.
+- Notifications sent through `osascript` have no actions and do not carry the app's name.
+
+The owner asked on 2026-10-18 for a menu bar app in the spirit of GrammarHelper. The how is decided in the ADR "Menu bar app: Swift shell over the ddc CLI":
+
+- a Swift shell (an `NSStatusItem` and an `NSPopover` hosting SwiftUI);
+- the CLI bundled inside the app and run as a child process with JSON in and out;
+- scheduled scans through a launch agent, registered from the app's bundle, that opens the app;
+- notifications posted by the app, with the notify rule kept in the CLI;
+- the app's confirmation sheet as the only path to cleaning.
+
+The screens are modelled in the design canvas before any code.
+
+## Stories
+
+| Story | Status | Description |
+|-------|--------|-------------|
+| [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | planned | Spike first (Full Disk Access attribution through `open`, the scheduler agent, reopen); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
+| [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | planned | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
+| [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean; needs the counter of DDC-001 "Progress output while ddc clean runs" |
+| [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | planned | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
+| [story-menu-bar-popover](./stories/story-menu-bar-popover.md) | planned | Totals by class, biggest finds, Scan now, Full Disk Access and next-scan status, empty / scanning / nothing-to-clean states, icon states with the size and the badge |
+| [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | planned | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
+| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
+| [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | planned | Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app |
+| [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | planned | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README, upgrade of the reference machine |
+| [story-signing-team-parameterise-teamid-then-switch-to-smartandpoint](./stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md) | planned | Later and independent: one TEAM_ID setting, then the SmartAndPoint organization team; costs every user one Full Disk Access re-grant and renames the developer in Login Items |
+
+## Expected Results
+
+- [ ] `brew upgrade --cask deepdrivecleaner` takes a 0.1.0 user to the app; `ddc` keeps working from the `PATH`
+- [ ] One click shows the selected and found totals from the last scan without rescanning
+- [ ] Cleaning happens only through the confirmation sheet, and the CLI's executor re-checks every item as in DDC-001
+- [ ] One Full Disk Access grant, to the app, covers manual and scheduled scans and survives upgrades
+- [ ] Notifications carry Review and Remind me tomorrow and show the app's name and icon
+- [ ] Login Items & Extensions lists the scheduled scan under DeepDriveCleaner with the app's icon; the 0.1.0 LaunchAgent is gone after the user accepts the migration
+- [ ] The app and the CLI read the same `settings.json`, and switched-off types are never selected
+
+## Dependencies
+
+- [[epics/DDC-001/epic|DDC-001: Disk space cleaner CLI for developers]]: the core, the executor and the release tooling
+- [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|Progress output while ddc clean runs]] (raised to p2): the counter "CLI: progress events" emits; a hard dependency of that story
+- [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]]
+
+## Decisions
+
+The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app: Swift shell over the ddc CLI" records them.
+
+- **Minimum macOS 26**, as GrammarHelper: current OS first. The cask says `depends_on macos: :tahoe` (ADR §3).
+- **0.2.0 is signed by the existing team 8MSDJTBW2D**: a proper app first. "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint" is a later, independent story, not a predecessor of the release. Its cost: every user grants Full Disk Access once more, because the designated requirement includes the team; and the developer name in Login Items and the background-activity banner changes to the organization's (ADR §8).
+- **The notification's second action is Remind me tomorrow**, as on the canvas. It snoozes for 24 hours; the first scheduled scan after the snooze notifies if still over the threshold, even when the repeat rule would hold it back. The snooze is kept in `notify-state.json`, written only by the CLI at the app's request (`notify snooze`), like the acknowledgement (ADR §5).
+- **One cask** for the CLI and the app (ADR §8).
+
+## Open Questions
+
+- [ ] Technical, decided at the plan gate of "CLI: clean an explicit item list": a full rescan before `--items` (about 40 s) or a scoped re-walk of the listed findings.
+
+## Related
+
+- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- GrammarHelper (the sibling menu bar app): `App/AppDelegate.swift`, `App/SettingsManager.swift`, `Makefile`, `scripts/publish-release.sh`
+
+---
+
+*Last updated: 2026-10-18*

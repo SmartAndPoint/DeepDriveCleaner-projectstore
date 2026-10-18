@@ -191,13 +191,22 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 - The rule type in `ddc-core`: risk class, removal method, marker, context confirmation, native command, owner process, list of lock files.
 - Executor: re-check, tombstone, `in-use` check, log.
 
+## Amendments
+
+- **2026-10-18, proposed.** [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]], §7 amends §5. An explicit item list, confirmed by a person in the app's confirmation sheet or named at a terminal with `ddc clean --items`, counts as interactive confirmation for each listed item, `review` and `native-only` included.
+  - **What it changes.** Until now no non-interactive call could remove a `review` item, because `--yes` refuses that class. With `--items`, a script without a TTY can move named `review` items to the Trash, and, with `permanent: true` on an item, delete them permanently.
+  - **What bounds it.** Consent is per item: a global `--permanent` with `--items` is refused, and each item's class and action must match the fresh scan, or it is skipped as changed since the scan. Everything else in §5 still applies to every item: the rescan, the re-checks and the refusals. In the app, the confirmation sheet's Clean action is the only caller of `clean`, and a test enforces it.
+  - §8 is unchanged: the background path still never calls the executor.
+  - The amendment takes effect when that ADR is accepted.
+
 ## References
 
 - [[research/where-developer-disk-space-goes-macos|Where a developer's disk space goes (macOS)]]
 - [[adr/rust-core-library-and-cli-with-json-output|Rust core: library + CLI with JSON output]]
+- [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]]
 - Cache Directory Tagging Specification (bford.info/cachedir)
 - Rust `std::fs::remove_dir_all` (CVE-2022-21658)
 
 ---
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-18*

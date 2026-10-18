@@ -4,7 +4,7 @@ id: "story-progress-output-while-ddc-clean-runs"
 epic: "DDC-001"
 title: "Progress output while ddc clean runs"
 status: planned
-priority: p3
+priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-18
@@ -23,7 +23,7 @@ plan_updated_at: null
 |---|---|
 | **Epic** | [DDC-001](../epic.md) |
 | **Status** | planned |
-| **Priority** | p3 |
+| **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
 ---
@@ -44,7 +44,7 @@ Rough until the plan gate:
 - [ ] `ddc-core`: an execution progress counter the caller shares with `exec::execute`, the way `scan::Progress` is shared with the scanner: the phase (preparing, cleaning), files walked, items processed, bytes processed, and the current item
 - [ ] `ddc-core`: `keep_markers` walks with the caller's counter instead of a throwaway `Progress::default()`, so the preparing phase moves
 - [ ] `ddc-cli`: a pure line formatter (counter snapshot → line) and a progress line on stderr while `execute` runs, only when stderr is a terminal (so a `--yes` run on a terminal shows it too), cleared before `prompt::print_result`
-- Not in this story: stopping on Ctrl-C between items. There is no signal handling today, a handler is new signal-handling code in the core's `sys` module (the only one allowed `unsafe`) or a new dependency, `execute` has no cancel flag, and a native command in the terminal's process group receives SIGINT itself. The journal records only completed actions; an interrupted item leaves a tombstone. It gets its own story if wanted.
+- Not in this story: stopping on Ctrl-C between items. There is no signal handling today, a handler is new signal-handling code in the core's `sys` module (the only one allowed `unsafe`) or a new dependency, `execute` has no cancel flag, and a native command in the terminal's process group receives SIGINT itself. The journal records only completed actions; an interrupted item leaves a tombstone. SIGTERM handling for a clean is in the DDC-002 story "CLI: clean an explicit item list".
 
 ## Implementation Plan
 
@@ -76,11 +76,12 @@ Rough until the plan gate:
 - A native command is a single item that can run for minutes: show its name rather than a frozen count.
 - The preparing phase repeats work: `cmd/clean.rs` already calls `exec::local_snapshots` (up to 30 s) before the prompt, and `execute` calls it again. Passing the earlier result in shortens the phase instead of only displaying it.
 - The criterion on the preparing phase needs a mid-run observation: a fake port (the journal or the trasher) holding the counter and reading it on its first call does it without a second thread.
-- Open: whether a future `--json` or GUI mode surfaces this progress. A counter in the core serves both; a stderr line serves only the terminal.
+- The counter is needed beyond the terminal: the DDC-002 story "CLI: progress events" emits it as `--progress json` events for the menu bar app, and depends on this story (raised from p3 to p2 for that reason on 2026-10-18). Keep the counter in the core and the stderr line in the CLI, so both read the same snapshot.
 
 ## Dependencies
 
 - [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|Safe cleanup: ddc clean]]
+- Needed by: [[epics/DDC-002/stories/story-cli-progress-events|CLI: progress events]] (DDC-002)
 
 ## Attachments
 
