@@ -457,12 +457,20 @@ Amended 2026-10-30, story "Protected by you: say what it is, and Remove Protecti
 
 The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6; the owner's icon and pause decisions of the same day are in §2, §5 and item 6 of §6; the app icon's design (2026-10-20) is in §2.
 
+## Amendments
+
+- **2026-10-18, proposed.** [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]], §5 amends §7.
+  - **What it changes.** §7 makes an explicit item list interactive consent because a person confirmed it. A list that an agent writes is not: `ddc clean --items` given together with `--agent` is a **filter** over the `--agent` policy (`safe`, plus `rebuildable` selected by default inside one project's checkouts), never a selection. A listed `review` item is skipped as `not-consented`, not removed; a per-item `permanent` is ignored. Without `--agent`, `--items` keeps the meaning this section gives it.
+  - **What bounds it.** The app's confirmation sheet stays the only caller of `clean` in the app and never passes `--agent`; the test of §7 that enforces the single caller also asserts the flag is absent.
+  - The amendment takes effect when that ADR is accepted.
+
 ## References
 
 - [[adr/rust-core-library-and-cli-with-json-output|Rust core: library + CLI with JSON output]]
 - [[adr/cleanup-safety-model-risk-classes-plan-and-confirmation|Cleanup safety model: risk classes, plan and confirmation]]
 - [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|Homebrew tap and the v0.1.0 release]]: path-keyed Full Disk Access for the 0.1.0 cask
 - [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|Progress output while ddc clean runs]]
+- [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]]: §5 amends §7
 - GrammarHelper repository: `App/AppDelegate.swift`, `App/SettingsManager.swift`, `Makefile`, `scripts/publish-release.sh`, `CLAUDE.md`
 - Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 

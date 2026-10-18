@@ -199,6 +199,11 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **What bounds it.** Consent is per item: a global `--permanent` with `--items` is refused, and each item's class and action must match the fresh scan, or it is skipped as changed since the scan. Everything else in §5 still applies to every item: the rescan (since 2026-10-24, the walk of that date's amendment), the re-checks and the refusals. In the app, the confirmation sheet's Clean action is the only caller of `clean`, and a test enforces it.
   - §8 is unchanged: the background path still never calls the executor.
   - The amendment takes effect when that ADR is accepted.
+- **2026-10-18, proposed.** [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]], §2 amends §3 and §4, §5 amends §5.
+  - **What it changes.** A linked git worktree becomes a finding (`git.worktree`), removed with `git worktree remove` as a `native` method, never `delete` or `trash`; the "no `.git` at the top level" refusal keeps protecting every other directory. For a worktree a harness created, the selection condition of §3 uses the worktree's own activity against a separate `--worktree-min-age` (2 days), plus the harness's own clean conditions: no changed or untracked files, no commits of its own, not locked, not in use. A person's own worktree is always `review`. `ddc clean --agent --project ROOT` is a new non-interactive channel: `--yes` semantics (`safe`, plus `rebuildable` selected by default) restricted to one project's checkouts for `rebuildable`, never `review`, never `native-only`, journaled with `consent: agent`.
+  - **What bounds it.** Every `--agent` action goes through the re-checks of §5 unchanged. An item list given with `--agent` is a filter, never consent: it cannot add an item the policy would not select.
+  - §8 is unchanged: the background path still never calls the executor.
+  - The amendment takes effect when that ADR is accepted.
 - **2026-10-20, decided by the owner.** Story "User data: pick your own files for the Trash" (epic DDC-002) amends §1, §2 and §5. The user's own files may enter a plan when the user picks them one by one in the app's Review window, or names them in an `--items` list, and only to the Trash.
   - **What it changes.**
     - **§1.** The `user-data` row's "never enters the plan" becomes: never by default, and an entry of a user-data folder can be picked by hand, to the Trash only.
@@ -363,6 +368,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 - [[research/where-developer-disk-space-goes-macos|Where a developer's disk space goes (macOS)]]
 - [[adr/rust-core-library-and-cli-with-json-output|Rust core: library + CLI with JSON output]]
 - [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]]
+- [[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]]
 - Cache Directory Tagging Specification (bford.info/cachedir)
 - Rust `std::fs::remove_dir_all` (CVE-2022-21658)
 
