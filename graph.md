@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T05:46:14.323Z
+generated_at: 2026-10-18T06:36:56.400Z
 
 ---
 
@@ -24,7 +24,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | Homebrew tap and the v0.1.0 release | story | in-progress |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | planned |
-| epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | in-progress |
+| epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
@@ -62,6 +62,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-ddc-scan-report.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-001/stories/story-detection-rule-catalog.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | wikilink | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | mdlink | epics/DDC-001/epic.md |

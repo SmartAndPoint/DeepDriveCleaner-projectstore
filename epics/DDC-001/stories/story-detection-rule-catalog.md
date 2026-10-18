@@ -7,7 +7,7 @@ status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-17
-updated: 2026-10-17
+updated: 2026-10-18
 external_refs: {}
 tags: [rules, safety]
 code_refs: ["crates/ddc-core/src/rules/", "crates/ddc-core/src/class.rs", "crates/ddc-core/tests/rules.rs", "crates/ddc-core/tests/common/mod.rs", "bench/make_baseline.py", "bench/check_baseline.py"]
@@ -92,7 +92,7 @@ The semantics of `ddc`: which directory is what, which risk class it belongs to 
 | `model.torch` | `.cache/torch` | `review` | `trash` |
 | `ide.jetbrains-cache` | `Library/Caches/JetBrains` | `safe` (owners: JetBrains IDEs) | `delete` |
 | `ide.jetbrains-old-data` | `Library/Application Support/JetBrains/<Product><version>` if a newer version of the same product exists | `review` | `trash` |
-| `ide.editor-cache` | `Library/Application Support/{Code,Cursor,Windsurf}/{Cache,CachedData,CachedExtensionVSIXs,GPUCache,logs}` | `safe` (owner: the application) | `delete` |
+| `ide.editor-cache` (split on 2026-10-18 into `ide.vscode-cache`, `ide.cursor-cache`, `ide.windsurf-cache`; see Addendum) | `Library/Application Support/{Code,Cursor,Windsurf}/{Cache,CachedData,CachedExtensionVSIXs,GPUCache,logs}` | `safe` (owner: the application) | `delete` |
 | `ide.workspace-storage` | `Library/Application Support/{Code,Cursor,Windsurf}/User/workspaceStorage` | `user-data` (chat history and workspace state in `state.vscdb`) | `none` |
 | `app.chrome-cache` | `Library/Caches/Google/Chrome` | `safe` (owner: Chrome) | `delete` |
 | `app.brave-cache` | `Library/Caches/BraveSoftware` | `safe` (owner: Brave) | `delete` |
@@ -181,7 +181,7 @@ Files touched: `crates/ddc-core/src/{class.rs,rules/}`, `crates/ddc-core/tests/r
 
 **Risks and follow-ups.**
 - Both errors in the coverage run were `EINTR` from the directory reader. The walker now retries `open` and `getattrlistbulk` on `EINTR` (`crates/ddc-core/src/sys/bulk.rs`); the installed binary was not rebuilt yet, because a rebuild of the unsigned binary drops its Full Disk Access grant.
-- Owner processes are matched by name only (not by bundle path); false-positive tests exist for the ambiguous names, not for every rule.
+- Owner processes are matched by name only (not by bundle path); false-positive tests exist for the ambiguous names, not for every rule. *Lifted on 2026-10-18; see Addendum.*
 - Orphaned CMake build directories (source deleted, `CMAKE_HOME_DIRECTORY` missing) are not found.
 - Private size is measured only where APFS clones are expected (uv, pnpm, bun); the "frees" total is an estimate.
 - Regenerate the baseline from a process with Full Disk Access so it no longer lists rows inside `.app` bundles.
@@ -197,6 +197,10 @@ Files touched: `crates/ddc-core/src/{class.rs,rules/}`, `crates/ddc-core/tests/r
 - APFS private size is measured only where clones are expected: uv, pnpm and bun caches; uv venvs; `node_modules` from pnpm or next to `bun.lock*` (ADR "Rust core: library + CLI with JSON output").
 - The reference machine baseline has no examples for these rules: `ide.jetbrains-old-data`, `python.tox`, `python.tool-cache`, `python.pycache` (excluded on purpose), `gradle.build`, `gradle.project-cache`, `maven.target`, `cocoapods.pods`, `generic.cachedir-tag`, `ddc.tombstone`, `toolchain.nvm`, `toolchain.pyenv`, `toolchain.rustup`, `repo.maven`, `cache.gradle`, `cache.cocoapods`, `browsers.cypress`, `xcode.device-support`, `xcode.archives`, `vm.orbstack`, `model.lmstudio`, `trash`, `user.cloud`. Only unit tests cover them, and the 90% criterion will not catch a regression in them.
 
+## Addendum (2026-10-18)
+
+The first real `ddc clean` showed the cost of matching owners by process name: macOS's `CursorUIViewService` matched `Cursor` and held back every editor cache. The story [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|Safe cleanup: ddc clean]] now matches owners by app bundle (`OwnerApp`, `rules::owns`), and splits `ide.editor-cache` into `ide.vscode-cache`, `ide.cursor-cache` and `ide.windsurf-cache`, one owner each. The catalog table above and the limitation in Technical Notes are kept as they were at close, marked where they no longer hold.
+
 ## Dependencies
 
 - [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|Workspace skeleton and parallel filesystem scanner]]
@@ -207,4 +211,4 @@ Files touched: `crates/ddc-core/src/{class.rs,rules/}`, `crates/ddc-core/tests/r
 
 ---
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-18*

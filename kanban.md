@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-18T05:46:14.131Z
+generated_at: 2026-10-18T06:36:55.912Z
 
 ---
 
@@ -18,7 +18,6 @@ generated_at: 2026-10-18T05:46:14.131Z
 ## In Progress
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
-- [ ] [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|DDC-001: Safe cleanup: ddc clean]] #p1
 
 ## Review
 
@@ -28,6 +27,7 @@ generated_at: 2026-10-18T05:46:14.131Z
 
 - [x] [[epics/DDC-001/stories/story-ddc-scan-report|DDC-001: ddc scan report]] #p1 #done
 - [x] [[epics/DDC-001/stories/story-detection-rule-catalog|DDC-001: Detection rule catalog]] #p1 #done
+- [x] [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|DDC-001: Safe cleanup: ddc clean]] #p1 #done
 - [x] [[epics/DDC-001/stories/story-scheduled-background-scan|DDC-001: Scheduled background scan]] #p2 #done
 - [x] [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|DDC-001: Workspace skeleton and parallel filesystem scanner]] #p1 #done
 
