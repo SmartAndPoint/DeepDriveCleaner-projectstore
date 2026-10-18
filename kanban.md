@@ -2,13 +2,14 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-17T15:49:33.922Z
+generated_at: 2026-10-18T05:46:14.131Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
+- [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p3
 
 ## ToDo
 
