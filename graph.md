@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-17T12:00:03.002Z
+generated_at: 2026-10-17T15:49:40.024Z
 
 ---
 
@@ -22,6 +22,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
+| epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | Homebrew tap and the v0.1.0 release | story | in-progress |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | in-progress |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
@@ -38,12 +39,14 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
+| epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-scheduled-background-scan.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
+| epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-scheduled-background-scan.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
@@ -61,6 +64,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | wikilink | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | mdlink | epics/DDC-001/epic.md |
+| epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | wikilink | epics/DDC-001/stories/story-scheduled-background-scan.md |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |

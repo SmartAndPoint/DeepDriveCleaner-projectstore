@@ -57,6 +57,7 @@ The epic is the foundation of the future Mac app: `ddc-core` and the JSON schema
 | [story-safe-cleanup-ddc-clean](./stories/story-safe-cleanup-ddc-clean.md) | in-progress | Safe cleanup `ddc clean`: plan, selection, native commands, Trash, re-check, log |
 | [story-scheduled-background-scan](./stories/story-scheduled-background-scan.md) | done | Background scan: LaunchAgent, saved report, threshold notification |
 | [story-duplicates-and-apfs-private-size](./stories/story-duplicates-and-apfs-private-size.md) | planned | Duplicates and the exact size of a clone union: duplicate search (photos, downloads) and counting by `ATTR_CMNEXT_CLONEID` when several findings are selected |
+| [story-homebrew-tap-and-the-v010-release](./stories/story-homebrew-tap-and-the-v010-release.md) | in-progress | Homebrew tap and the v0.1.0 release: signed, notarized cask in `smartandpoint/tap`, `make dist` and publish script, stable Homebrew link for the LaunchAgent, reference machine moved to the Homebrew install |
 
 ## Expected Results
 

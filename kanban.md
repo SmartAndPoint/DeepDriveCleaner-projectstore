@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-17T12:00:02.477Z
+generated_at: 2026-10-17T15:49:33.922Z
 
 ---
 
@@ -16,6 +16,7 @@ generated_at: 2026-10-17T12:00:02.477Z
 
 ## In Progress
 
+- [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|DDC-001: Safe cleanup: ddc clean]] #p1
 
 ## Review
