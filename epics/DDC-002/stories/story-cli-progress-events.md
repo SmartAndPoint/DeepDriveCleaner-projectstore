@@ -43,7 +43,7 @@ Rough until the plan gate.
 - [ ] Clean events: the preparing phase with the files walked; then item `i` of `n` with its path (or the native command's name), its outcome and the bytes processed
 - [ ] Events are throttled: at most one every 100 ms, plus a final one
 - [ ] Without `--progress json`, the terminal spinner and the progress line behave as before
-- [ ] The app side: `CLIRunner`'s stderr lines feed `ScanProgress` of "Menu bar popover", so the scanning state shows "N files read · T s" (artboard 1)
+- [ ] The app side: `CLIRunner`'s stderr lines feed `ScanProgress` of "Menu bar popover", so the scanning state shows "N files read · T s" (artboard 1), and the clean progress of "Review and clean window" (item `i` of `n`, its path or the tool's name, the bytes processed); from this story on the app passes `--progress json` to `scan` and `clean --items`
 
 ## Implementation Plan
 
@@ -61,6 +61,7 @@ Rough until the plan gate.
 - [ ] Test with an injected clock (or a fake walker that yields slowly): over a run whose events would come every 10 ms without throttling, no two emitted events are less than 100 ms apart, except the final one, and more than one event is emitted, so the test cannot pass vacuously
 - [ ] Test: without `--progress json`, a piped run writes no JSON to stderr (the assertion of "Progress output while ddc clean runs" still holds)
 - [ ] Unit test: scan progress events from a fake CLI update the popover's file count; a scan without events shows the elapsed time only
+- [ ] Unit test: clean progress events from a fake CLI move the Review window's progress to item `i` of `n` with its path; a clean without events still shows its two phases
 - [ ] `make check` passes
 
 ## Final Summary
@@ -78,6 +79,7 @@ Rough until the plan gate.
 - [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|Progress output while ddc clean runs]] (DDC-001): hard dependency, the counter
 - [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|CLI: clean an explicit item list]]
 - [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]]
+- [[epics/DDC-002/stories/story-review-and-clean-window|Review and clean window]]: the clean progress state this story feeds
 
 ## Attachments
 
