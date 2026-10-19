@@ -48,6 +48,7 @@ Rough until the plan gate.
 - [ ] Due function, shared with the popover and Settings:
   - the schedule (daily or weekly, a whole hour) and the time of the last **scheduled** scan, kept in `UserDefaults`, not `last-scan.json`;
   - a slot missed while the Mac slept is due at the next tick;
+  - with no scheduled scan recorded yet (a new install), the first tick is due; the clean-machine check of "Distribution: the 0.2.0 cask with the app" relies on it;
   - a Scan now or a terminal `ddc scan` neither moves the slot nor suppresses that day's notification;
   - a pending reminder scan (Remind me tomorrow with a weekly schedule) is due at the first tick after the snooze ends
 - [ ] `--scheduled` launch: no status item; scan if due, post a pending notification if one is waiting, quit. A reopen event while running normally: scan if due. A user launch during a scheduled scan promotes the instance (story "App skeleton and build pipeline")

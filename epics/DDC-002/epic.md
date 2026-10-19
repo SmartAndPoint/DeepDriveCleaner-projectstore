@@ -2,13 +2,13 @@
 type: epic
 id: "DDC-002"
 title: "Menu bar app"
-status: planned
+status: in-progress
 priority: p2
 created: 2026-10-18
 updated: 2026-10-18
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, macos, swift]
-code_refs: []
+code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json"]
 review_status: reviewed
 reviewed_at: 2026-10-18
 ---
@@ -17,7 +17,7 @@ reviewed_at: 2026-10-18
 
 | Field | Value |
 |---|---|
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Created** | 2026-10-18 |
 | **Updated** | 2026-10-18 |
@@ -57,8 +57,8 @@ The screens are modelled in the design canvas before any code.
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | in-progress | Spike first (Full Disk Access attribution through `open`, the scheduler agent, reopen); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
-| [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | planned | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
+| [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | in-progress | Debug spike tools (Full Disk Access probe, agent registration, test notification); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
+| [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | done | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
 | [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean; needs the counter of DDC-001 "Progress output while ddc clean runs" |
 | [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | planned | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
 | [story-menu-bar-popover](./stories/story-menu-bar-popover.md) | planned | Totals by class, biggest finds, Scan now, Full Disk Access and next-scan status, empty / scanning / nothing-to-clean states, icon states with the size and the badge |
@@ -92,10 +92,11 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 - **0.2.0 is signed by the existing team 8MSDJTBW2D**: a proper app first. "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint" is a later, independent story, not a predecessor of the release. Its cost: every user grants Full Disk Access once more, because the designated requirement includes the team; and the developer name in Login Items and the background-activity banner changes to the organization's (ADR §8).
 - **The notification's second action is Remind me tomorrow**, as on the canvas. It snoozes for 24 hours; the first scheduled scan after the snooze notifies if still over the threshold, even when the repeat rule would hold it back. The snooze is kept in `notify-state.json`, written only by the CLI at the app's request (`notify snooze`), like the acknowledgement (ADR §5).
 - **One cask** for the CLI and the app (ADR §8).
+- **The access check runs on a clean machine after the release** (2026-10-18). The app is finished on the reference machine first and dogfooded there, as GrammarHelper is, with Full Disk Access granted to DeepDriveCleaner.app and the app started from Finder, never from Terminal. Then 0.2.0 goes out through the cask, and the owner checks every access question on the work laptop: the grant belongs to the app; the CLI's console use is a capability, not the main path. That check is a criterion of "Distribution: the 0.2.0 cask with the app" and replaces the skeleton's spike on a fresh user account. The risk accepted: if a scheduled scan reports `full_disk_access: false` with the grant on the app, ADR item 5 and Rationale 1 are revised after the scheduling stories are built; the ADR has no fallback for that. Whether `SMAppService` accepts the `open` program, the question the `--tick` fallback answers, is settled earlier, on the reference machine.
 
 ## Open Questions
 
-- [ ] Technical, decided at the plan gate of "CLI: clean an explicit item list": a full rescan before `--items` (about 40 s) or a scoped re-walk of the listed findings.
+- [x] Technical, decided at the plan gate of "CLI: clean an explicit item list" (2026-10-18): the full rescan before `--items` stays. Only a whole-tree walk sees the toolchain pins (every pin file and sibling version) and the ancestor claims (a rule that would now claim a directory above an item); a scoped walk would need a second classification path. The per-item checks serve the dry run, which predicts and never replaces the rescan.
 
 ## Related
 

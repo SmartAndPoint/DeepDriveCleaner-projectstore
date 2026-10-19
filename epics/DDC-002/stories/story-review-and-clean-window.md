@@ -80,6 +80,13 @@ Rough until the plan gate.
 
 ## Technical Notes
 
+- From "CLI: clean an explicit item list":
+  - `clean --items --json` exits 0 whenever it produced a report, failed items included. After a cancel it ends by the signal (`.cancelled`) with the report on stdout. The app decodes stdout in both cases.
+  - The CLI installs its handler only after the rescan is saved. A cancel before that ends it by the signal with empty stdout. A cancel any later gives a report, possibly with every item `not-run`. So on `.cancelled` the app decodes stdout when it is not empty, and otherwise shows "cancelled, nothing was cleaned".
+  - The CLI saves its rescan before executing, so the popover rescans after every clean run, cancelled ones included.
+  - What was left undone is read from the report, never from how the process ended: `cancelled`, the `not-run` items, and an interrupted tool, which shows as a `native` outcome whose command has `success: false`. A signal that arrives after the last item started ends the CLI by the signal with a complete report and `cancelled: false`.
+  - The dry run streams one JSON line per item on stdout. `CLIRunner` (`app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift`) returns stdout only at EOF and streams only stderr lines, so showing each warning as its line arrives needs a stdout line callback.
+  - The dry run takes the shared lock and exits 75 (`.busy`) while a terminal `ddc clean` holds it, so the sheet needs a busy state. Exit 2 (`.refused`) on a list the app built is an app bug.
 - Skip reasons come from the executor (`SkipReason`), so their wording lives in one table in the app with a test that covers every variant.
 - The rescan before cleaning (about 40 s on the reference machine) shows as the first phase of the progress.
 - A dry run predicts; the clean re-checks everything again, so a prediction never replaces a check.

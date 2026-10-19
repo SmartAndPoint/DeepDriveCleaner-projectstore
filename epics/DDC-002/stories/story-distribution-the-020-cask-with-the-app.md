@@ -69,6 +69,12 @@ Rough until the plan gate.
 - [ ] Manual check: after `brew reinstall --cask deepdrivecleaner` (which quits the app), the next tick reopens the app, the scheduled scan runs, and the app's Full Disk Access grant still holds
 - [ ] Manual check: `brew uninstall --zap --cask deepdrivecleaner` leaves neither agent: `launchctl print` finds no job for either label
 - [ ] Manual check on a second Mac or a fresh user account: the downloaded app opens without a Gatekeeper warning (`spctl` accepted, Notarized Developer ID)
+- [ ] Clean-machine access check on the owner's work laptop after `brew install --cask deepdrivecleaner` (owner's decision, 2026-10-18; it replaces the spike of "App skeleton and build pipeline"). Terminal has no Full Disk Access there, and the grant goes to DeepDriveCleaner.app only. Read from the app's own status and `~/Library/Logs/DeepDriveCleaner/app.log`:
+  - before the grant the app shows no Full Disk Access; after it, a Scan now reports `full_disk_access: true`;
+  - with no scheduled scan recorded yet, so the first tick is due: with the app quit, the tick launches it with `--scheduled`, and that scan reports `true`; a launch from Finder while that scan runs (about a minute on a full home) promotes the instance; a tick while the app runs normally is a reopen, with no second instance;
+  - after `brew reinstall --cask deepdrivecleaner`, which removes the app and copies the new one, the grant still holds and the next tick opens the new app;
+  - with the notification threshold in Settings below the scan's result, the scheduled scan's notification shows the app's name and icon.
+  If a scheduled scan reports `full_disk_access: false` with the grant on the app, ADR item 5 and Rationale 1 are revised; the ADR has no fallback for that. If the grant does not survive the remove-then-copy, Rationale 1 and this cask are revised
 
 ## Final Summary
 

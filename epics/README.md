@@ -9,7 +9,7 @@ Large bodies of work broken into stories. Each epic gets its own subfolder with 
 | File | Title | Status | Date |
 |------|-------|--------|------|
 | [DDC-001](./DDC-001/epic.md) | Disk space cleaner CLI for developers | in-progress | 2026-10-17 |
-| [DDC-002](./DDC-002/epic.md) | Menu bar app | planned | 2026-10-18 |
+| [DDC-002](./DDC-002/epic.md) | Menu bar app | in-progress | 2026-10-18 |
 
 ---
 

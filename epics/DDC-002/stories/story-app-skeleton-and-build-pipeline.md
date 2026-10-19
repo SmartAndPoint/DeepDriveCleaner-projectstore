@@ -9,7 +9,7 @@ assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-18
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
-tags: [app, build, signing, spike]
+tags: [app, build, signing]
 code_refs: []
 specs: []
 started_at: "2026-10-18T10:42:53.267Z"
@@ -30,7 +30,7 @@ plan_updated_at: "2026-10-18T10:42:53.267Z"
 
 ## Description
 
-This story builds the shell every other story of the epic builds on. It starts with a spike that checks the ADR's central claims before anything else is built.
+This story builds the shell every other story of the epic builds on. It carries Debug spike tools; the ADR's attribution claims (§5) are checked on the work laptop after 0.2.0 (epic Decisions).
 
 The shell:
 - an `LSUIElement` app with its own icon, a status item, an empty popover and a right-click menu;
@@ -38,17 +38,13 @@ The shell:
 - the scheduler agent's plist in the bundle, a login item and a log file;
 - a `make` pipeline that builds, signs, notarizes, staples and zips the app.
 
-It implements §1, §2, §3, §4 and §8 of the ADR "Menu bar app: Swift shell over the ddc CLI", and verifies the attribution claims of §5. GrammarHelper's `Makefile` is the model for the pipeline.
+It implements §1, §2, §3, §4 and §8 of the ADR "Menu bar app: Swift shell over the ddc CLI", and ships the tools that check §5's attribution claims. GrammarHelper's `Makefile` is the model for the pipeline.
 
 ## Decomposition
 
 Rough until the plan gate.
 
-- [ ] **Spike, first** (it blocks every other story of the epic). A minimal app built Debug, signed with the Developer ID, launched through `open` (never from Xcode: the debugger changes attribution), on a fresh user account. It checks:
-  - a scan the app spawns reports `full_disk_access: true` with Full Disk Access granted only to the app;
-  - an `SMAppService.agent` whose program is `/usr/bin/open -gjb com.smartandpoint.deepdrivecleaner --args --scheduled` launches the quit app with `--scheduled`, and delivers a reopen event to the running app; the scan it leads to also reports `full_disk_access: true`;
-  - after the app is quit and replaced by a rebuild with the same bundle id and team, the grant holds and the next tick opens the new app;
-  - if `SMAppService` rejects the agent because its program is `/usr/bin/open`, the fallback from the ADR's Open Questions: `BundleProgram: Contents/MacOS/DeepDriveCleaner --tick`, where tick mode only runs the same `open` command and exits
+- [ ] **Spike tools** in Debug builds: Probe Full Disk Access (logs the errno), Register and Unregister Scheduler Agent, Post Test Notification, and the `DebugHoldSeconds` default that keeps a `--scheduled` instance alive. The spike's checks moved to the clean-machine check of "Distribution: the 0.2.0 cask with the app" (owner's decision, 2026-10-18, epic Decisions): the app is finished and dogfooded here first, then checked on the work laptop after the brew install
 - [ ] `app/DeepDriveCleaner.xcodeproj`: Swift, deployment target macOS 26 (ADR §3), bundle id `com.smartandpoint.deepdrivecleaner`, `LSUIElement`, hardened runtime, no sandbox; Debug builds signed with the same Developer ID as releases, so one TCC identity covers both (GrammarHelper's rule)
 - [ ] Icons:
   - an `AppIcon` asset in every macOS size (16 to 512 pt at 1x and 2x), compiled by the build into the bundle's `.icns`;
@@ -132,7 +128,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 - Decoding: a fixture recorded from the synthetic home of `crates/ddc-cli/tests/scan_cli.rs` (no personal paths in a public repo), plus a copy with `schema_version: 2`. The fake CLI exits 2 and 75. A drift test reads `SCHEMA_VERSION` from `crates/ddc-core/src/model.rs` through `#filePath`.
 
 **Order.**
-1. The spike app, with everything the owner's checks exercise:
+1. The app skeleton, with everything the access checks exercise:
    - the project, `main.swift` with `--tick`, the delegate, the status item with Quit;
    - `AppLog`, and `LaunchMode` with reopen handling and promotion;
    - the `--scheduled` path: run `deepdrivecleaner scan --json`, log `full_disk_access`, quit;
@@ -143,7 +139,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
    - a Debug menu: Register agent / Unregister agent (logging `SMAppService.status`); Scan now; Probe Full Disk Access; Post test notification (`requestAuthorization`, then one notification, for the third criterion).
    - the probe opens `~/Library/Application Support/com.apple.TCC/TCC.db` read-only, as the CLI's `full_disk_access` does, and logs the errno. `EPERM` is "no access"; `ENOENT` is "no file", and a `false` from the CLI then proves nothing.
 2. Checked here without dialogs: `swift test`, an unsigned build, the bundle layout and `Info.plist`, `codesign -dv`. Signing and notarization run in the owner's session, where keychain prompts can appear.
-3. The owner's spike, on a fresh user account where Terminal has no grant, with the app in `/Applications` and Full Disk Access granted to the app only. Results go into the Final Summary.
+3. Moved (owner's decision, 2026-10-18): the checks below run on the owner's work laptop after `brew install` of 0.2.0, as a criterion of "Distribution: the 0.2.0 cask with the app", with the release app's own status and `app.log` in place of the Debug menu. They are kept here as the list that criterion follows.
    1. The probe and the Scan now item log access; a CLI scan reports `full_disk_access: true`.
    2. Register agent, then three sub-checks, each read from `app.log`. A tick is fired with `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner.scheduler`.
       - App quit, tick: a `--scheduled` launch whose scan reports `true`.
@@ -153,10 +149,10 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
       - `ditto` over the installed bundle;
       - remove, then copy (what `brew upgrade` does).
 
-      After each, check that the grant holds and the next kickstart opens the new build. GrammarHelper's `CLAUDE.md` records that remove-then-copy orphaned its Accessibility grant. If it does here too, ADR Rationale 1 ("one grant that survives upgrades") does not hold for the cask: the ADR and "Distribution: the 0.2.0 cask with the app" are revised before any other story starts.
-   4. Only if step 2 fails: the `BundleProgram … --tick` fallback, re-run through step 2. Step 2 fails when `register()` throws, when the status is neither `.enabled` nor `.requiresApproval`, or when `app.log` shows no launch within 10 s of the kickstart.
+      After each, check that the grant holds and the next kickstart opens the new build. GrammarHelper's `CLAUDE.md` records that remove-then-copy orphaned its Accessibility grant. If it does here too, ADR Rationale 1 ("one grant that survives upgrades") does not hold for the cask: the ADR and "Distribution: the 0.2.0 cask with the app" are revised after the release.
+   4. Whether `SMAppService` accepts the `open` program is settled on the reference machine during development (the first criterion). It does not when `register()` throws, when the status is neither `.enabled` nor `.requiresApproval`, or when `app.log` shows no launch within 10 s of the kickstart; then the `BundleProgram … --tick` fallback replaces it.
    5. Post test notification: the banner shows the app's icon.
-   A failed check sends the ADR back for revision before any other story of the epic starts.
+   A failed check sends the ADR back for revision after the release.
 4. The runner, the login item, the icons and `app-dist`; the manual criteria last.
 
 **Pitfalls.**
@@ -174,7 +170,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Spike, manual check on a fresh user account with a Debug build signed with the Developer ID and launched through `open`: each check of the spike item passes. The results go into the Final Summary. If any fails, the ADR is revisited before another story of the epic starts
+- [ ] Manual check on the reference machine with the Debug build: after Register Scheduler Agent, `SMAppService` reports `.enabled` or `.requiresApproval`, and `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner.scheduler` with the app quit logs a `--scheduled` launch in `app.log`; this settles the `open` program against the `--tick` fallback. Probe Full Disk Access logs its errno and Post Test Notification posts. (The attribution checks moved to "Distribution: the 0.2.0 cask with the app", owner's decision 2026-10-18.)
 - [ ] `make app-dist` produces `DeepDriveCleaner-<version>.zip`. The app inside passes `codesign --verify --deep --strict`, `spctl --assess --type execute` (accepted, Notarized Developer ID) and `xcrun stapler validate`. The embedded CLI is signed with identifier `com.smartandpoint.deepdrivecleaner.cli` and the same team. The bundle holds the scheduler plist, and `Info.plist` names the compiled icon
 - [ ] Manual check: Finder, System Settings → Login Items & Extensions, and a test notification show the app's icon, not a generic one; the status item shows the template glyph in light and dark menu bars
 - [ ] Unit test with a fake CLI that counts its runs: two scan requests while a scan runs start one process; a clean requested during a scan starts only after the scan ends; two CLI processes never run at once
@@ -191,7 +187,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 ## Technical Notes
 
 - The CLI goes in `Contents/Helpers`, not `Contents/MacOS`: on a case-insensitive volume `deepdrivecleaner` and the main executable `DeepDriveCleaner` are the same name.
-- Attribution (ADR, Context 1): a child the app spawns is attributed to the app; an app LaunchServices launches is its own responsible process; a CLI started by launchd is its own; a CLI run from Terminal uses Terminal's grant. The spike must therefore run through `open`, and on an account where Terminal has no grant, or it proves nothing.
+- Attribution (ADR, Context 1): a child the app spawns is attributed to the app; an app LaunchServices launches is its own responsible process; a CLI started by launchd is its own; a CLI run from Terminal uses Terminal's grant. The clean check must therefore start the app through LaunchServices (Finder, `open`, the scheduler), on a Mac where Terminal has no grant, or it proves nothing.
 - GrammarHelper's login-item toggle is a `UserDefaults` bool and drifts from the system's state; do not copy it.
 - GrammarHelper's `Assets.xcassets/AppIcon.appiconset` is the model for the icon set; `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` makes the build write the `.icns`.
 - LaunchServices keeps one instance per bundle id: a user's launch while a `--scheduled` instance runs only reaches that instance, which is why promotion exists.

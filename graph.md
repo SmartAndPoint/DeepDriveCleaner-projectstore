@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T10:43:47.524Z
+generated_at: 2026-10-18T13:37:20.411Z
 
 ---
 
@@ -28,10 +28,10 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
-| epics/DDC-002/epic.md | Menu bar app | epic | planned |
+| epics/DDC-002/epic.md | Menu bar app | epic | in-progress |
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | in-progress |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | planned |
-| epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | planned |
+| epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | planned |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | planned |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | planned |
