@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-19T06:38:25.522Z
+generated_at: 2026-10-19T07:52:14.076Z
 
 ---
 
@@ -35,7 +35,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | planned |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | planned |
-| epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | planned |
+| epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | planned |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | planned |
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | Signing team: parameterise TEAM_ID, then switch to SmartAndPoint | story | planned |

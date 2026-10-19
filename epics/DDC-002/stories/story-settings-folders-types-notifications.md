@@ -64,7 +64,7 @@ Rough until the plan gate.
 - [ ] Test with a fake CLI: roots, external-volume roots and excludes edited in Settings reach the next scan through `settings.json`; the app passes no flags for them
 - [ ] Test: a folder inside an existing root, or the same folder twice, is refused with a message
 - [ ] Unit test: the schedule offers whole hours only, and the next scan it shows equals the scheduler's due function
-- [ ] Unit test: the Full Disk Access probe reports granted when a TCC.db path it is given can be opened and missing when it cannot (an injectable path, as `report::full_disk_access` reads `~/Library/Application Support/com.apple.TCC/TCC.db`)
+- [ ] Unit test: the Full Disk Access probe reports granted when a TCC.db path it is given can be opened and missing when it cannot (an injectable path, as `report::full_disk_access` reads `~/Library/Application Support/com.apple.TCC/TCC.db`) — the probe of "Menu bar popover" (`FullDiskAccessProbe`), which Settings reuses rather than adding a second one
 - [ ] Unit test: app preferences (size next to the icon, badge, working hours, the default for `review` items) persist in `UserDefaults` and never appear in `settings.json`
 
 ## Final Summary
@@ -74,6 +74,7 @@ Rough until the plan gate.
 
 ## Technical Notes
 
+- "Menu bar popover" stores the two icon preferences in `UserDefaults` as `ShowSizeNextToIcon` (off by default) and `ShowMenuBarBadge` (on by default); the General tab's switches write those keys.
 - The groups come from the CLI (`rules --json`), so a new rule appears in the right group without an app release.
 - `disabled_rules` and `min_size` hide findings from selection and totals; they do not stop the scanner from walking those folders.
 - The canvas's help under Open at login says it keeps "the daily scan running". With the scheduler agent (ADR §5) scans run without the login item; the help text says the icon only.

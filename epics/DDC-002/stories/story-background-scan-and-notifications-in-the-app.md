@@ -58,9 +58,9 @@ Rough until the plan gate.
   - actions Review (opens the Review window) and Remind me tomorrow;
   - with "Only notify during working hours" on, a decision made outside them is kept as pending in `UserDefaults` and posted at the first hourly tick inside them (`--scheduled` posts it without scanning); a newer decision replaces it;
   - after posting, `notify ack --bytes <n>`; not posted, no ack
-- [ ] Notification permission: asked for at the first normal-mode launch after the first scan, or in the migration flow; never by a `--scheduled` instance. A `--scheduled` instance that finds it not yet determined sets a flag; the next popover open surfaces it
+- [ ] Notification permission: asked for at the first normal-mode launch after the first scan, or in the migration flow; never by a `--scheduled` instance. A `--scheduled` instance that finds it not yet determined sets a flag; the next popover open surfaces it. The flag, and the offer to replace the 0.1.0 agent, show through the popover's notice slot ("Menu bar popover").
 - [ ] Remind me tomorrow: `notify snooze --until <the notifying scan's slot + 24 hours>`. The first scheduled scan after it notifies whenever it is over the threshold or low on space (story "CLI: shared settings, types and the notify decision"). With a weekly schedule the due function adds one reminder scan at the first tick after the snooze ends. If the app was quit, macOS launches it to deliver the action: it starts in normal mode, keeps its status item, and the badge clears
-- [ ] Attention badge on the status item until the Review window opens
+- [ ] A posted notification sets the attention badge built in "Menu bar popover" (`notificationPosted()`); it clears when the Review window opens
 - [ ] Migration from 0.1.0, offered and never silent:
   - on first launch, the popover offers to replace the old background scan; Settings → Permissions keeps "Old background scan found · Replace it" while `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` exists;
   - Replace it: the schedule becomes 11:00 with the old interval, daily or weekly on Mondays (the 0.1.0 agent runs at 11:30, `crates/ddc-cli/src/launchd.rs`, and the app schedules whole hours); the old threshold goes into `settings.json`; then `deepdrivecleaner schedule uninstall`, and the app's agent is registered;
@@ -77,7 +77,7 @@ Rough until the plan gate.
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Unit test: the due function for daily and weekly schedules, before, at and after the slot, and for a slot missed while asleep; a manual scan (a newer `last-scan.json`, no new scheduled-scan time) changes neither the next slot nor whether today's scheduled scan runs and may notify
+- [ ] Unit test: the due function for daily and weekly schedules, before, at and after the slot, and for a slot missed while asleep; a manual scan (a newer `last-scan.json`, no new scheduled-scan time) changes neither the next slot nor whether today's scheduled scan runs and may notify; the popover footer shows this function's next slot through the schedule seam of "Menu bar popover"
 - [ ] Unit test: with a weekly schedule, Remind me tomorrow makes the first tick after the snooze ends due (one reminder scan), and the regular weekly slot stays where it was
 - [ ] Unit test: the notification text built from a recorded threshold decision names the amount and at most three groups; from a low-disk decision, the volume
 - [ ] Unit test: a posted notification calls `notify ack` with the decision's amount; one held back by denied permission calls nothing

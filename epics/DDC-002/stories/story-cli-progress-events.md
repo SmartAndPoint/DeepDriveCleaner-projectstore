@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [cli, contract, json, ux]
 code_refs: []
@@ -43,6 +43,7 @@ Rough until the plan gate.
 - [ ] Clean events: the preparing phase with the files walked; then item `i` of `n` with its path (or the native command's name), its outcome and the bytes processed
 - [ ] Events are throttled: at most one every 100 ms, plus a final one
 - [ ] Without `--progress json`, the terminal spinner and the progress line behave as before
+- [ ] The app side: `CLIRunner`'s stderr lines feed `ScanProgress` of "Menu bar popover", so the scanning state shows "N files read · T s" (artboard 1)
 
 ## Implementation Plan
 
@@ -59,6 +60,7 @@ Rough until the plan gate.
 - [ ] Test: `clean --items` over a temp tree emits the preparing phase, then one item event per item, the last with `i` equal to `n`
 - [ ] Test with an injected clock (or a fake walker that yields slowly): over a run whose events would come every 10 ms without throttling, no two emitted events are less than 100 ms apart, except the final one, and more than one event is emitted, so the test cannot pass vacuously
 - [ ] Test: without `--progress json`, a piped run writes no JSON to stderr (the assertion of "Progress output while ddc clean runs" still holds)
+- [ ] Unit test: scan progress events from a fake CLI update the popover's file count; a scan without events shows the elapsed time only
 - [ ] `make check` passes
 
 ## Final Summary
@@ -83,4 +85,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

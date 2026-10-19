@@ -50,7 +50,7 @@ Rough until the plan gate.
   - warnings for the Trash and for local snapshots;
   - Cancel and Clean
 - [ ] Live warnings: the sheet opens at once and runs `clean --items --dry-run --json` over the listed items (no rescan); the predicted skips stream in per item ("Spotify is running · will be skipped"); Check again reruns it
-- [ ] Clean: the sheet's Clean action, and nothing else in the app, runs `clean --items --json --progress json` with exactly the confirmed items (each with its class, action and `permanent`); it shows the preparing phase and item progress; Cancel stops after the current item
+- [ ] Clean: the sheet's Clean action, and nothing else in the app, runs `clean --items --json --progress json` with exactly the confirmed items (each with its class, action and `permanent`); it shows the preparing phase and item progress; Cancel stops after the current item While the clean and its rescan run, the sheet sets the `busy` input of the icon state of "Menu bar popover", so the arc turns as on artboard 3.
 - [ ] Result: deleted, moved to the Trash, tools run, skipped and failed; free space before and after for each volume; skipped items grouped by cause (count and size per cause, the items inside), in plain language; Open journal
 
 ## Implementation Plan
@@ -68,6 +68,7 @@ Rough until the plan gate.
 - [ ] Unit test: a `review` item's `permanent` starts from the app preference and changing one item changes only that item
 - [ ] Structural test: the runner's clean operation has exactly one caller, the sheet's Clean action; notifications, the scheduler and the popover reach only the window or the sheet
 - [ ] Unit test: `user-data` and `ignored` findings cannot be selected, and `review` findings start unselected
+- [ ] Unit test: the popover's review request ("Menu bar popover": a group, the classes switched on, and whether Clean selected… asked for the sheet) seeds the window's group filter and selection, opens the confirmation sheet when asked, and the router reports the window opened so the attention badge clears
 - [ ] Test with a fake CLI (a script that replays recorded dry-run, progress and result JSON): the sheet shows the predicted skips, then the window shows the progress, then the result with skips grouped by cause; every skip reason the executor has maps to text
 - [ ] Test with a fake CLI that writes its dry-run lines with a delay: the sheet is shown before the first line arrives, and each warning appears on its item as its line arrives
 - [ ] Manual check on the reference machine: cleaning a few selected `safe` items from the window frees space, the before and after values are shown, and the journal lists exactly those items
