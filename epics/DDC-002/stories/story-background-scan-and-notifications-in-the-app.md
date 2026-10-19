@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, notifications, schedule]
 code_refs: []
@@ -106,6 +106,10 @@ Rough until the plan gate.
 - The developer name in Login Items and in the background-activity banner stays "Evgenii Konev" in 0.2.0; it becomes the organization's only after "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint".
 - Login Items lists two entries for the app: the login item and the scheduler agent.
 - The notify rule and its state file stay in Rust (`notify.rs`); the app presents the decision and asks the CLI to record it.
+- From "CLI: shared settings, types and the notify decision":
+  - `notify snooze --until` takes RFC 3339 UTC with `Z` only (`2026-10-20T09:00:00Z`); anything else exits 2.
+  - `scan --background --notify json` exits 1 with nothing on stdout when `settings.json` is malformed or none of its `roots` exists: the app shows the error and posts nothing.
+  - `volume`, `free` and `total` in the decision name the volume under 10 % free also when the snooze or the repeat rule holds the notification back; the app reads them only when `notify` is true.
 - The last scheduled scan's time is the app's own record: `last-scan.json` also changes on a manual scan or a terminal `ddc scan`, which must not move the schedule.
 
 ## Dependencies
@@ -121,4 +125,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

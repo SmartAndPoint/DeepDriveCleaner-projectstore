@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [release, homebrew, distribution]
 code_refs: []
@@ -87,6 +87,7 @@ Rough until the plan gate.
 - `uninstall quit:` runs on upgrade and reinstall too; the scheduler agent reopens the new app at the next tick, so scheduled scans continue.
 - The CLI's path becomes stable inside `/Applications`, so the grant of a CLI started by launchd (`ddc schedule install`, for people who use only the CLI) survives upgrades.
 - GrammarHelper's cask writes `depends_on macos: :tahoe`; current Homebrew reads a bare symbol as that version or later, and `brew style` decides the accepted form.
+- `settings.json` refuses unknown keys ("CLI: shared settings, types and the notify decision"), so a separately installed CLI older than the app that wrote the file exits 1 on every command until it is upgraded. The cask ships the app with its own CLI, so the two always match; the release notes say so for people who also install the CLI another way.
 - The team switch is not part of this release: "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint" is a later, independent story.
 
 ## Dependencies
@@ -105,4 +106,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

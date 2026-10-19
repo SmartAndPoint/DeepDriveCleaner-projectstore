@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, ui, cleanup]
 code_refs: []
@@ -87,6 +87,7 @@ Rough until the plan gate.
   - What was left undone is read from the report, never from how the process ended: `cancelled`, the `not-run` items, and an interrupted tool, which shows as a `native` outcome whose command has `success: false`. A signal that arrives after the last item started ends the CLI by the signal with a complete report and `cancelled: false`.
   - The dry run streams one JSON line per item on stdout. `CLIRunner` (`app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift`) returns stdout only at EOF and streams only stderr lines, so showing each warning as its line arrives needs a stdout line callback.
   - The dry run takes the shared lock and exits 75 (`.busy`) while a terminal `ddc clean` holds it, so the sheet needs a busy state. Exit 2 (`.refused`) on a list the app built is an app bug.
+- From "CLI: shared settings, types and the notify decision": the app passes no positional roots and no `--exclude` to `scan`, `clean --items` or its dry run; all three resolve them from `settings.json`. A settings change between review and clean can turn items into `changed-since-scan` or `kept`; the result screen shows them. `--items` with an `--exclude` that drops a protected folder exits 2. `ignored` (absent when false), `volumes` (absent when empty) and `Totals.ignored_count` / `ignored_bytes` (absent when 0) are optional in the scan report, so `ScanReport.swift` decodes them with `decodeIfPresent`; a strict decode fails on the first report without them.
 - Skip reasons come from the executor (`SkipReason`), so their wording lives in one table in the app with a test that covers every variant.
 - The rescan before cleaning (about 40 s on the reference machine) shows as the first phase of the progress.
 - A dry run predicts; the clean re-checks everything again, so a prediction never replaces a check.
@@ -104,4 +105,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

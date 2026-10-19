@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-18T13:37:20.411Z
+generated_at: 2026-10-19T06:38:25.522Z
 
 ---
 
@@ -33,7 +33,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | planned |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | planned |
-| epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | planned |
+| epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | planned |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | planned |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | planned |

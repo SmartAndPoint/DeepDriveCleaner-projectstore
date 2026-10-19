@@ -170,7 +170,7 @@ A scoped re-walk would therefore need a second classification path and would sti
 - The journal records an interrupted item with its failed command result and never records a not-run item; AC9 and AC10 are read that way.
 - `keep_markers` checks the cancel flag between targets.
 - The story "Progress output while ddc clean runs" also changes `execute`'s signature, so `execute` takes an options struct both can extend.
-- The app must pass the reviewed scan's roots and excludes, or every item is skipped as `changed-since-scan`.
+- The app must pass the reviewed scan's roots and excludes, or every item is skipped as `changed-since-scan`. (Superseded by "CLI: shared settings, types and the notify decision": the app passes none, and every command resolves them from `settings.json`.)
 - `clean` saves its pre-clean rescan, so the popover lists removed items until the next scan: the app rescans after a clean.
 - The dry run cannot see pins, so the real clean may skip an item the sheet predicted; the result screen lists it.
 - The dry run never runs a location probe, so "would run" may execute as the rule's fallback (a delete for uv and go, the Trash for pyenv and rustup) when the tool reports another location.

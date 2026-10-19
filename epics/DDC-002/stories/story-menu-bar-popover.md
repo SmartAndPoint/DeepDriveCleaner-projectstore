@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, ui]
 code_refs: []
@@ -86,6 +86,10 @@ Rough until the plan gate.
 
 - The popover never cleans by itself: Clean selected… only opens the confirmation sheet (ADR "Menu bar app: Swift shell over the ddc CLI", §7).
 - Totals come from the saved report; the popover does not rescan to open.
+- From "CLI: shared settings, types and the notify decision":
+  - `ignored` (absent when false), `volumes` (absent when empty) and `Totals.ignored_count` / `ignored_bytes` (absent when 0) are optional in the scan report, so `ScanReport.swift` decodes them with `decodeIfPresent`; a strict decode fails on the first report without them.
+  - The home folder's volume reports its mount point as `/System/Volumes/Data`; the popover names it as the startup disk.
+  - A malformed `settings.json`, or `roots` naming only folders that do not exist (an unplugged disk), makes every scan exit 1 naming the file, with nothing on stdout. The popover shows that error and never falls back to scanning home.
 
 ## Dependencies
 
@@ -98,4 +102,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

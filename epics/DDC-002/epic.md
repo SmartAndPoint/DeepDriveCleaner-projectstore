@@ -5,10 +5,10 @@ title: "Menu bar app"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, macos, swift]
-code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json"]
+code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "README.md"]
 review_status: reviewed
 reviewed_at: 2026-10-18
 ---
@@ -60,7 +60,7 @@ The screens are modelled in the design canvas before any code.
 | [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | in-progress | Debug spike tools (Full Disk Access probe, agent registration, test notification); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
 | [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | done | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
 | [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean; needs the counter of DDC-001 "Progress output while ddc clean runs" |
-| [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | planned | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
+| [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | done | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
 | [story-menu-bar-popover](./stories/story-menu-bar-popover.md) | planned | Totals by class, biggest finds, Scan now, Full Disk Access and next-scan status, empty / scanning / nothing-to-clean states, icon states with the size and the badge |
 | [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | planned | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
 | [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
@@ -105,4 +105,4 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-18T13:37:19.885Z
+generated_at: 2026-10-19T06:38:25.350Z
 
 ---
 
@@ -12,7 +12,6 @@ generated_at: 2026-10-18T13:37:19.885Z
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
 - [ ] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-cli-progress-events|DDC-002: CLI: progress events]] #p2
-- [ ] [[epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision|DDC-002: CLI: shared settings, types and the notify decision]] #p1
 - [ ] [[epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app|DDC-002: Distribution: the 0.2.0 cask with the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-menu-bar-popover|DDC-002: Menu bar popover]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-and-clean-window|DDC-002: Review and clean window]] #p1
@@ -40,6 +39,7 @@ generated_at: 2026-10-18T13:37:19.885Z
 - [x] [[epics/DDC-001/stories/story-scheduled-background-scan|DDC-001: Scheduled background scan]] #p2 #done
 - [x] [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|DDC-001: Workspace skeleton and parallel filesystem scanner]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|DDC-002: CLI: clean an explicit item list]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision|DDC-002: CLI: shared settings, types and the notify decision]] #p1 #done
 
 
 
