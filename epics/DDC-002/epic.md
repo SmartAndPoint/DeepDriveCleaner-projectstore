@@ -93,6 +93,10 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 - **The notification's second action is Remind me tomorrow**, as on the canvas. It snoozes for 24 hours; the first scheduled scan after the snooze notifies if still over the threshold, even when the repeat rule would hold it back. The snooze is kept in `notify-state.json`, written only by the CLI at the app's request (`notify snooze`), like the acknowledgement (ADR §5).
 - **One cask** for the CLI and the app (ADR §8).
 - **The access check runs on a clean machine after the release** (2026-10-18). The app is finished on the reference machine first and dogfooded there, as GrammarHelper is, with Full Disk Access granted to DeepDriveCleaner.app and the app started from Finder, never from Terminal. Then 0.2.0 goes out through the cask, and the owner checks every access question on the work laptop: the grant belongs to the app; the CLI's console use is a capability, not the main path. That check is a criterion of "Distribution: the 0.2.0 cask with the app" and replaces the skeleton's spike on a fresh user account. The risk accepted: if a scheduled scan reports `full_disk_access: false` with the grant on the app, ADR item 5 and Rationale 1 are revised after the scheduling stories are built; the ADR has no fallback for that. Whether `SMAppService` accepts the `open` program, the question the `--tick` fallback answers, is settled earlier, on the reference machine.
+- **Later decisions (2026-10-19)**, from "CLI: shared settings, types and the notify decision":
+  - an `--exclude` that drops a folder `settings.json` protects is confirmed with y/N naming those folders, and refused where nobody can answer (ADR §6 item 6);
+  - low disk fires for a volume only when something selected lies on it, any amount (§6 item 9);
+  - low disk is not held back by the repeat rule: every scheduled scan notifies while the disk stays almost full, until it is cleaned or snoozed, and its acknowledgement is the threshold's repeat baseline (§5, §6 item 9).
 
 ## Open Questions
 

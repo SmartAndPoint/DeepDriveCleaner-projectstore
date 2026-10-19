@@ -87,7 +87,7 @@ Rough until the plan gate.
 - [ ] Unit test with a fake `SMAppService`: every launch with scheduled scans on calls `register()`; `.requiresApproval` leaves the record unchanged; a later launch that finds `.enabled` writes it with the app's path; a failing `register()` clears it; turning scheduled scans off unregisters and clears it
 - [ ] Test with a fake CLI: a background run answered with `{"status": "skipped", "reason": "busy"}` posts nothing, and the due function still says due
 - [ ] Test with a temp home holding a 0.1.0 LaunchAgent plist, a fake CLI and a fake `SMAppService`: Replace it sets the schedule to 11:00 daily for a daily plist and 11:00 on Mondays for a weekly one, writes the threshold, calls `schedule uninstall` and registers the agent; declining changes nothing and the offer stays in Settings
-- [ ] Manual check on the reference machine with the app quit: at the next tick the app is opened with `--scheduled`, scans, posts and quits; Review opens the Review window; Remind me tomorrow posts nothing until the first scheduled scan after the snooze, which posts if still over the threshold
+- [ ] Manual check on the reference machine with the app quit: at the next tick the app is opened with `--scheduled`, scans, posts and quits; Review opens the Review window; Remind me tomorrow posts nothing until the first scheduled scan after the snooze, which posts if still over the threshold or still almost full
 - [ ] Manual check: after the first launch and the migration, System Settings → Login Items & Extensions lists the scheduled scan under "DeepDriveCleaner" with the app's icon, not under a developer name
 - [ ] Manual check after the migration: the 0.1.0 LaunchAgent is gone; `launchctl print gui/$UID/com.smartandpoint.deepdrivecleaner` finds no job and `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` does not exist
 - [ ] Manual check: after the app is quit and replaced (as `brew upgrade` does), the next tick opens the new app and the scheduled scan runs
@@ -109,7 +109,7 @@ Rough until the plan gate.
 - From "CLI: shared settings, types and the notify decision":
   - `notify snooze --until` takes RFC 3339 UTC with `Z` only (`2026-10-20T09:00:00Z`); anything else exits 2.
   - `scan --background --notify json` exits 1 with nothing on stdout when `settings.json` is malformed or none of its `roots` exists: the app shows the error and posts nothing.
-  - `volume`, `free` and `total` in the decision name the volume under 10 % free also when the snooze or the repeat rule holds the notification back; the app reads them only when `notify` is true.
+  - `volume`, `free` and `total` in the decision name the volume under 10 % free also while a snooze holds the notification back; the repeat rule never holds back low disk, so an almost full disk notifies at every scheduled scan until cleaned or snoozed; the app reads them only when `notify` is true.
 - The last scheduled scan's time is the app's own record: `last-scan.json` also changes on a manual scan or a terminal `ddc scan`, which must not move the schedule.
 
 ## Dependencies

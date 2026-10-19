@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-19
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, ui, settings]
 code_refs: []
@@ -45,7 +45,7 @@ Rough until the plan gate.
   - "Delete review items instead of moving them to the Trash", off by default
 - [ ] Folders: "Scan these folders" (default: the home folder; external volumes such as `/Volumes/Work` allowed), added and removed with a folder picker; "Never touch these folders" (excludes) and how `.ddc-keep` does the same; a root inside another root is refused
 - [ ] Types: one switch per rule group from `rules --json`, with its class, written as `disabled_rules`; "Projects count as idle after N days"; "Hide items smaller than N MB" (`min_size`). A change applies to the loaded report at once and to the next scan through `settings.json`
-- [ ] Notifications: the threshold, with the repeat rule (a fifth more, or a week) explained; "Also when the disk is almost full" (`notify_low_disk`); "Show a badge on the menu bar icon"; "Only notify during working hours" (9:00 to 19:00, weekdays)
+- [ ] Notifications: the threshold, with the repeat rule (a fifth more, or a week) explained; "Also when the disk is almost full" (`notify_low_disk`), explained as notifying at every scheduled scan while the disk stays almost full; "Show a badge on the menu bar icon"; "Only notify during working hours" (9:00 to 19:00, weekdays)
 - [ ] Permissions: Full Disk Access state from the live probe, as the popover (not the report's `full_disk_access`), with Open Privacy Settings; notification permission state; "Old background scan found · Replace it" while the 0.1.0 LaunchAgent exists (the flow is in "Background scan and notifications in the app")
 - [ ] `settings.json` is written atomically and used by the next scan
 
@@ -90,4 +90,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-19*

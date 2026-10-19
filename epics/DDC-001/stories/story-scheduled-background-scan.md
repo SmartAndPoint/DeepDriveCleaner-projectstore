@@ -7,7 +7,7 @@ status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-17
-updated: 2026-10-17
+updated: 2026-10-19
 external_refs: {}
 tags: [background, launchd]
 code_refs: ["crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/schedule.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/tests/background_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/visitor.rs"]
@@ -87,6 +87,8 @@ Files touched: `crates/ddc-core/src/{report/mod.rs,rules/visitor.rs,sys/procs.rs
 - No watchdog: a background scan that blocks keeps the shared lock, and `ddc clean` then reports that a scan or clean is running.
 - `DDC_DATA_DIR` set at install time is not passed to the job; the prompt skip matches exact paths, so `ddc scan --background <path inside Documents>` would open it (the agent never passes paths); prompt-area skips are reported with the reason `excluded`.
 
+**Superseded for low disk (2026-10-19).** In epic DDC-002 low disk is no longer held back by the repeat rule (ADR "Menu bar app: Swift shell over the ddc CLI" §6 item 9). The tests cited above are now `the_threshold_repeats_only_after_growth_or_a_week` and `message_names_the_size_the_command_and_a_full_volume`.
+
 ## Technical Notes
 
 - `osascript display notification` from a LaunchAgent is shown as coming from Script Editor; on a fresh system you may need to allow notifications for Script Editor. In the Mac app we will replace it with UserNotifications.
@@ -102,4 +104,4 @@ Files touched: `crates/ddc-core/src/{report/mod.rs,rules/visitor.rs,sys/procs.rs
 
 ---
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-19*
