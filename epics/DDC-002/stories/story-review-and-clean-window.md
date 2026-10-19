@@ -99,6 +99,8 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
 - **Deleting a `.ddc-keep` the window wrote unlocks its row** at the next rebuild.
 - **The replayed `clean-report.json`** was recorded with delete items only, so the recording never touched a real Trash. The deleted `py1/.venv` and the trashed `.ollama/models` were then added by hand, so it answers the whole list the test sends.
 - **Open for the manual check.** AppKit may not close a window while its sheet shows. The cleaning text therefore says the user can keep working, and makes no claim about closing the window.
+- **Close returns to the popover (owner, 2026-10-19).** The window's Close button, and Escape, its shortcut, close the window and open the popover under the icon, so the user lands where they came from. The title bar's close box only closes the window, as any window's does: the Close button is the window's way back, the close box is window chrome. ⌘W does nothing yet: the app has no main menu, so ⌘W, and copy and paste in the search field, wait for one (a follow-up). An already open popover stays as it is.
+- **Scans paused (owner, 2026-10-19; "Menu bar popover").** While paused, Scan again (and Scan now with no report yet) gives way to "Scans paused". The rescan after a clean still runs: it is part of the clean.
 - **Follow-up.** A finding that is itself a scan root counts in the popover's "Selected to clean", but the window and `build_plan` leave it out. It is an edge case; "Menu bar popover" can drop it from its totals.
 
 ### Placement, in order
@@ -205,6 +207,8 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
   - cleaning a few selected `safe` items from the window frees space, the before and after values are shown, and the journal lists exactly those items;
   - search, sort, the Groups/Items toggle, Check again and Reveal in Finder work
 - [ ] Manual check: Cancel during a clean stops after the current item, and the result lists what was done
+- [ ] Unit test: while scans are paused Scan again starts nothing, and a clean still asks for its rescan
+- [ ] Manual check: the Close button returns to the popover, which stays open after the window is gone
 
 ## Final Summary
 

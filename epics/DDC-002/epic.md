@@ -97,6 +97,10 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
   - an `--exclude` that drops a folder `settings.json` protects is confirmed with y/N naming those folders, and refused where nobody can answer (ADR §6 item 6);
   - low disk fires for a volume only when something selected lies on it, any amount (§6 item 9);
   - low disk is not held back by the repeat rule: every scheduled scan notifies while the disk stays almost full, until it is cleaned or snoozed, and its acknowledgement is the threshold's repeat baseline (§5, §6 item 9).
+- **Later decisions (2026-10-19)**, from the owner's first try of the app ("Menu bar popover", "Review and clean window"):
+  - the status icon has no threshold dot; a warning pictogram shows what needs the user, and the badge stays (ADR §2);
+  - Pause scans and Resume scans in the right-click menu: the icon turns grey, Scan now is off, nothing is due, and the rescan after a clean still runs (ADR §2, §5, §6 item 6);
+  - the Review window's Close button returns to the popover.
 
 ## Open Questions
 

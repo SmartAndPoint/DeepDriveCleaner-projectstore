@@ -40,7 +40,7 @@ Rough until the plan gate.
 
 - [ ] General:
   - Open at login (state from `SMAppService.status`);
-  - Scan: daily, weekly or off, at a whole hour ("Daily at 10:00"), the hour the scheduler's hourly tick can match; off unregisters the scheduler agent;
+  - Scan: daily, weekly or off, at a whole hour ("Daily at 10:00"), the hour the scheduler's hourly tick can match; off unregisters the scheduler agent; while scans are paused from the menu ("Menu bar popover") the row says so, and the schedule is kept for Resume;
   - "Show the size you can free next to the icon";
   - "Delete review items instead of moving them to the Trash", off by default
 - [ ] Folders: "Scan these folders" (default: the home folder; external volumes such as `/Volumes/Work` allowed), added and removed with a folder picker; "Never touch these folders" (excludes) and how `.ddc-keep` does the same; a root inside another root is refused

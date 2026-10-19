@@ -10,7 +10,7 @@ external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-18
+reviewed_at: 2026-10-19
 ---
 
 # Menu bar app: Swift shell over the ddc CLI
@@ -84,8 +84,8 @@ UniFFI is not used now (Alternative A).
 
 - The app delegate owns an `NSStatusItem`. Its button opens an `NSPopover` whose content is a SwiftUI view in an `NSHostingController`.
 - The Review window and the Settings window are `NSWindow`s hosting SwiftUI.
-- A right click opens a small `NSMenu`: Scan now, Settings, Quit.
-- **Icons.** The app has a real icon: an `AppIcon` asset in every macOS size, compiled into the bundle's `.icns` by the build. The status item uses a template glyph. Both are the drive outline with a line and a dot drawn on the canvas, so Finder, Login Items and notifications show the app, not a generic icon.
+- A right click opens a small `NSMenu`: Scan now, Pause scans or Resume scans (added 2026-10-19), Settings, Quit.
+- **Icons.** The app has a real icon: an `AppIcon` asset in every macOS size, compiled into the bundle's `.icns` by the build. The status item uses a template glyph; it turns grey while scans are paused, and a mark in its corner shows a warning when something needs the user, or the badge after a notification (2026-10-19). Both are the drive outline with a line and a dot drawn on the canvas, so Finder, Login Items and notifications show the app, not a generic icon.
 - `LSUIElement` is set and the activation policy is `.accessory`. The app activates while one of its windows is open.
 
 `MenuBarExtra(.window)` is rejected (Alternative B).
@@ -111,7 +111,8 @@ The deployment target is macOS 26, as GrammarHelper: current OS first (the owner
 The plist inside a signed bundle cannot carry the user's chosen time. So the tick is fixed, and one due function decides whether a scan is due. Its inputs:
 - the schedule preference: daily or weekly, at a whole hour ("Daily at 10:00" on the canvas); whole hours match the tick;
 - the time of the last **scheduled** scan, which the app keeps in `UserDefaults`. It is not `last-scan.json`: a Scan now in the popover or a `ddc scan` in the terminal neither shifts the slot nor suppresses that day's notification;
-- a pending reminder scan (Remind me tomorrow, below).
+- a pending reminder scan (Remind me tomorrow, below);
+- whether scans are paused (`ScansPaused`, from the menu; 2026-10-19). While paused nothing is due and the agent stays registered; after Resume a missed slot is due at the next tick. The rescan after a clean is part of the clean and runs while paused.
 
 A slot missed while the Mac slept is caught up at the next tick, because the last scheduled scan is then older than the slot. The popover's "next scan" is computed by the same function.
 
@@ -203,7 +204,7 @@ These changes are additive. One change is visible in the terminal: a held lock e
 
    `scan`, `clean` and the background scan read it when a flag is absent; a flag wins. One exception, decided by the owner on 2026-10-19: an `--exclude` that drops folders the file protects first names exactly those folders. `clean` asks `[y/N]` in a terminal, before the lock, and a declined answer changes nothing; it refuses (exit 2) without a terminal or with `--items`. A scan and a plain `clean --dry-run`, which change nothing, only warn. A settings root or exclude that does not exist (an unplugged disk) is skipped with a note. A malformed file is an error that names it. The app writes the file atomically. The CLI writes it only to clear a stale `scheduler` record.
 
-   Preferences only the app uses stay in its `UserDefaults`, as in GrammarHelper: the schedule, the size next to the icon, the badge, working hours, and whether `review` items are deleted instead of moved to the Trash by default in the confirmation sheet.
+   Preferences only the app uses stay in its `UserDefaults`, as in GrammarHelper: the schedule, whether scans are paused (`ScansPaused`, 2026-10-19), the size next to the icon, the badge, working hours, and whether `review` items are deleted instead of moved to the Trash by default in the confirmation sheet.
 7. **`ignored` findings.** A finding whose rule is in `disabled_rules`, or whose size is under `min_size`, gets `ignored: true` and `selected: false`. It keeps the `not_selected` it would have had, so a type switched back on can be applied at once; `ignored` takes precedence. It is not counted in the class or selected totals or in the notify decision; the report counts it apart.
 
    `not_selected` is a tagged enum, so a new reason there would bump `schema_version`. `ignored` is a new optional field and does not.
@@ -354,7 +355,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - If `SMAppService` rejects an agent plist whose program is `/usr/bin/open`, the fallback is `BundleProgram: Contents/MacOS/DeepDriveCleaner` with the argument `--tick`. In tick mode the app only runs `open -gjb com.smartandpoint.deepdrivecleaner --args --scheduled` and exits, so the scan still runs in an instance LaunchServices launched. The tick instance does this and exits before `NSApplicationMain`, with no `NSApplication` created: once AppKit registers it with LaunchServices it is the running instance of the bundle id, `open -b` would deliver a reopen to the tick process itself, and the scan would run in a process launchd started, which is what the fallback exists to avoid. Registering the agent during development shows whether `SMAppService` accepts the `open` program; the fallback is used if it does not.
 - Does `--items` need a full rescan (about 40 s), or would a scoped re-walk of the listed findings plus the executor's re-checks give the same safety? Decided at that story's plan gate (2026-10-18): the full rescan stays, because only a whole-tree walk sees the toolchain pins (`toolchain::dropped` needs every pin file and sibling version the walk found) and the ancestor claims (a rule that would now claim a directory above an item). `--exclude` is a path-prefix test and needs no walk.
 
-The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6.
+The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6; the owner's icon and pause decisions of the same day are in §2, §5 and item 6 of §6.
 
 ## References
 
