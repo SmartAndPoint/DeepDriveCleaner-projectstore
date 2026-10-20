@@ -34,7 +34,7 @@ reviewed_at: 2026-10-18
 - **Notifications** say when a lot can be freed or the disk is almost full, with the actions Review and Remind me tomorrow.
 - **One Full Disk Access grant**, to the app, by bundle id, covers manual and scheduled scans and survives `brew upgrade`.
 
-It ships as the `deepdrivecleaner` cask 0.2.0, for macOS 26, signed by team 8MSDJTBW2D. The one cask also keeps the `ddc` and `deepdrivecleaner` commands on the `PATH`.
+It ships as the `deepdrivecleaner` cask 0.2.0, for macOS 26, signed by team 8MSDJTBW2D. The one cask also keeps the `ddc` and `deepdrivecleaner` commands on the `PATH`. 0.2.0 ships what is built (the owner's decision, 2026-10-20): the popover, Review and clean, and picking the user's own files. Settings beyond Open at login, and the app's own scheduled scans and notifications, ship in 0.3.0; until then scheduled scans stay the CLI's (`ddc schedule install`).
 
 ## Context
 
@@ -65,9 +65,9 @@ The screens are modelled in the design canvas before any code.
 | [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | in-progress | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
 | [story-review-window-sorted-sidebar-select-all-and-folder-groups](./stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md) | in-progress | Sidebar tinted by class and ordered by size, Select all, folder subgroups that collapse, no repeated words on rows (design canvas board 9) |
 | [story-user-data-pick-your-own-files-for-the-trash](./stories/story-user-data-pick-your-own-files-for-the-trash.md) | in-progress | `scan` lists entries inside user-data folders; `clean --items` takes a picked entry to the Trash only; User data section and "Your own files" block in the app (safety ADR amendment 2026-10-20) |
-| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
-| [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | planned | Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app |
-| [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | planned | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README, upgrade of the reference machine |
+| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | 0.3.0. General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
+| [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | planned | 0.3.0. Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app; takes over the scheduled-tick checks of the 0.2.0 clean-machine check |
+| [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | in-progress | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README with a detailed CLI guide, `DISCLAIMER.md` and the CLI's terminal warning, upgrade of the reference machine |
 | [story-signing-team-parameterise-teamid-then-switch-to-smartandpoint](./stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md) | planned | Later and independent: one TEAM_ID setting, then the SmartAndPoint organization team; costs every user one Full Disk Access re-grant and renames the developer in Login Items |
 
 ## Expected Results

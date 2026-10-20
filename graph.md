@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-20T07:19:09.972Z
+generated_at: 2026-10-20T11:04:49.635Z
 
 ---
 
@@ -34,7 +34,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | planned |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
-| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | planned |
+| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
@@ -154,7 +154,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-menu-bar-popover.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-review-and-clean-window.md |
+| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
+| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |

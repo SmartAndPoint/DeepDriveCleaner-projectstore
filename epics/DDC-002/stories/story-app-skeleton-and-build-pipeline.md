@@ -111,7 +111,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
   - zips the app for notarization, notarizes it, and runs `stapler staple` with the retry loop of `scripts/build-dist.sh`, because the ticket can lag;
   - runs the checks of the second criterion;
   - zips the stapled app last, as `dist/DeepDriveCleaner-<version>.zip`.
-- `scripts/build-dist.sh` is not touched in this story. `build-app.sh` carries its own small `sign_code` and `retry` helpers. The shared `scripts/lib/release.sh` belongs to "Distribution: the 0.2.0 cask with the app", where `make dist` builds both artefacts and one rerun proves the CLI tarball unchanged.
+- `scripts/build-dist.sh` is not touched in this story. `build-app.sh` carries its own small `sign_code` and `retry` helpers. The shared `scripts/lib/release.sh` belongs to "Distribution: the 0.2.0 cask with the app", where `make dist` builds both artefacts and one rerun proves the CLI tarball unchanged. (Note, 2026-10-20: that story deferred the extraction to a later story; it makes `make dist` build both assets, and `make app-dist` is an alias of it.)
 - Order of the two targets: `build-dist.sh` starts with `rm -rf dist`, so `make dist` runs first and `make app-dist` after it. `build-app.sh --dist` removes only its own zip. Making `app-dist` part of `dist` is the distribution story's job.
 - Makefile:
   - `app` builds Debug and needs only `DDC_SIGN_IDENTITY`; Debug and release share the Developer ID, so one TCC identity covers both.

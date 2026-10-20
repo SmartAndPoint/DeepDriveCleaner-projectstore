@@ -238,7 +238,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
   - `app "DeepDriveCleaner.app"`;
   - `binary "#{appdir}/DeepDriveCleaner.app/Contents/Helpers/deepdrivecleaner"`, and a second `binary` to the same file with `target: "ddc"`;
   - `depends_on macos: :tahoe` (item 3) and `depends_on arch: :arm64`;
-  - `uninstall quit: "com.smartandpoint.deepdrivecleaner"`. It also runs on upgrade, and the scheduler agent reopens the new app at the next tick;
+  - `uninstall quit: "com.smartandpoint.deepdrivecleaner"`. It also runs on upgrade, and the scheduler agent reopens the new app at the next tick. (Note, 2026-10-20: 0.2.0 ships without the scheduler agent, which comes with 0.3.0, so after an upgrade nothing reopens the app before the next login or a manual open; the 0.2.0 release notes say so. Story "Distribution: the 0.2.0 cask with the app".)
   - `zap` the data, logs and preferences, with `launchctl:` for both the 0.1.0 agent and the scheduler agent.
 
   A zip, not a DMG: the cask is the install path, and a zip of a stapled app also works when downloaded by hand.
