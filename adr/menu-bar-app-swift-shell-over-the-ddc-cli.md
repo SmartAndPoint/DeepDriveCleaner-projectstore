@@ -169,7 +169,7 @@ These changes are additive. One change is visible in the terminal: a held lock e
 
 1. **`ddc clean --items <file|-> --json`.**
    - **Input.** A JSON list (`schema_version`) of items from the report the user reviewed: `path`, `dev`, `ino`, `rule`, `class`, `action` (`delete`, `trash`, `native`, `native-only`) and, for `review` items, `permanent`.
-   - **Matching.** It rescans, as every clean does (the safety ADR §5). A listed item runs only if the fresh plan finds it again with the same path, `(dev, ino)`, rule and class, and derives the same action for its `permanent`. Any mismatch skips it as `changed-since-scan`. A `review` item confirmed for the Trash can never run as a delete because a lock file appeared in the meantime.
+   - **Matching.** It rescans, as every clean does (the safety ADR §5). A listed item runs only if the fresh plan finds it again with the same path, `(dev, ino)`, rule and class, and derives the same action for its `permanent`. Any mismatch skips it as `changed-since-scan`. A `user-data` item is the exception: it is an entry of a user-data folder, matched against the fresh scan's full list of that folder's entries (the safety ADR's amendment of 2026-10-20). A `review` item confirmed for the Trash can never run as a delete because a lock file appeared in the meantime.
    - **Selection.** The list is the selection: no class filter, no default selection. `disabled_rules` never drops a listed item. The app never lists an `ignored` item (item 7).
    - **Refusals.** A global `--permanent` together with `--items`, and a malformed list, are refused with exit code 2.
    - **Output.** The execution report as JSON: the outcome per item, skip reasons, and free space before and after for each volume touched.
@@ -224,7 +224,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 **What this changes.** Until now no non-interactive call could remove a `review` item: `--yes` refuses the `review` class. With `--items`, a script without a TTY can move named `review` items to the Trash. With `permanent: true` per item, it can delete them permanently. That is the cost of a machine-readable consent channel. It is bounded by:
 
 - consent is per item: no blanket `--permanent`, and the class and action must match the fresh scan (item 6.1);
-- the executor still refuses actions the rule does not allow: `user-data`, `none`, and anything but its commands for `native-only`. It re-checks every item (§1 and §5 of the safety ADR);
+- the executor still refuses actions the rule does not allow: `user-data` (except an entry the scan lists inside a user-data folder, moved to the Trash: the safety ADR's amendment of 2026-10-20), `none`, and anything but its commands for `native-only`. It re-checks every item (§1 and §5 of the safety ADR);
 - in the app, the sheet's Clean action is the only caller of `clean`, and a test enforces this. Notifications, the scheduler and the popover can only open the Review window or the sheet.
 
 §8 of the safety ADR ("Background mode") still holds: the background path never calls the executor.

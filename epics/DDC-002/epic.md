@@ -63,6 +63,8 @@ The screens are modelled in the design canvas before any code.
 | [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | done | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
 | [story-menu-bar-popover](./stories/story-menu-bar-popover.md) | in-progress | Totals by class, biggest finds, Scan now, Full Disk Access and next-scan status, empty / scanning / nothing-to-clean states, icon states with the size and the badge |
 | [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | in-progress | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
+| [story-review-window-sorted-sidebar-select-all-and-folder-groups](./stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md) | in-progress | Sidebar tinted by class and ordered by size, Select all, folder subgroups that collapse, no repeated words on rows (design canvas board 9) |
+| [story-user-data-pick-your-own-files-for-the-trash](./stories/story-user-data-pick-your-own-files-for-the-trash.md) | planned | `scan` lists entries inside user-data folders; `clean --items` takes a picked entry to the Trash only; User data section and "Your own files" block in the app (safety ADR amendment 2026-10-20) |
 | [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
 | [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | planned | Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app |
 | [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | planned | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README, upgrade of the reference machine |
@@ -101,7 +103,10 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
   - the status icon has no threshold dot; a warning pictogram shows what needs the user, and the badge stays (ADR §2);
   - Pause scans and Resume scans in the right-click menu: the icon turns grey, Scan now is off, nothing is due, and the rescan after a clean still runs (ADR §2, §5, §6 item 6);
   - the Review window's Close button returns to the popover.
-- **Later decision (2026-10-20)**: the app icon is option B, "Class ring", from the canvas's app icon board: the drive inside a ring of the class colours (ADR §2; "App skeleton and build pipeline", Implementation Plan, Icons).
+- **Later decisions (2026-10-20)**, from the owner's try of the Review window:
+  - the app icon is option B, "Class ring", from the canvas's app icon board: the drive inside a ring of the class colours (ADR §2; "App skeleton and build pipeline", Implementation Plan, Icons);
+  - the Review window gets a sidebar tinted by class and ordered by size, a Select all row, and folder subgroups that collapse ("Review window: sorted sidebar, Select all and folder groups"; design canvas board 9);
+  - User data opens in the Review window: the user can pick their own files, and they go to the Trash only ("User data: pick your own files for the Trash"; the safety ADR's amendment of 2026-10-20).
 
 ## Open Questions
 

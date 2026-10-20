@@ -198,6 +198,32 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **What bounds it.** Consent is per item: a global `--permanent` with `--items` is refused, and each item's class and action must match the fresh scan, or it is skipped as changed since the scan. Everything else in §5 still applies to every item: the rescan, the re-checks and the refusals. In the app, the confirmation sheet's Clean action is the only caller of `clean`, and a test enforces it.
   - §8 is unchanged: the background path still never calls the executor.
   - The amendment takes effect when that ADR is accepted.
+- **2026-10-20, decided by the owner.** Story "User data: pick your own files for the Trash" (epic DDC-002) amends §1, §2 and §5. The user's own files may enter a plan when the user picks them one by one in the app's Review window, or names them in an `--items` list, and only to the Trash.
+  - **What it changes.**
+    - **§1.** The `user-data` row's "never enters the plan" becomes: never by default, and an entry of a user-data folder can be picked by hand, to the Trash only.
+    - **Entries.** An entry is a direct child (for backups, one backup folder) of a finding of `user.downloads`, `user.pictures`, `user.movies`, `user.music`, `user.ios-backups` or `user.imazing-backups`.
+    - **The `none` method** still covers the folders themselves, and every other `none` finding: messenger containers, `user.kept`, cloud folders (still not traversed) and the Trash. The executor relaxes `none` only for an entry of those six findings.
+  - **What can be picked.** An entry the fresh scan lists, unlocked: a regular file or a directory, never a symlink, another kind or a dataless entry.
+  - **Locked entries** are listed and never picked:
+    - entries managed by an app (library packages and fixed paths, from a maintained list);
+    - entries holding a `.ddc-keep`;
+    - protected folders (§6);
+    - entries holding a mount point;
+    - entries added or modified in the last 10 minutes, partial downloads, and backups that did not finish.
+  - **The marker (§2).** For these six rules, a `.ddc-keep` locks the entry that holds it, and no longer turns the whole folder into `user.kept`.
+  - **Re-checks (§5).** For these items, §5's rule-marker checks, written for directories found by rules, are replaced by:
+    - the parent is the folder, with the identity of the fresh scan's finding;
+    - the entry, opened through the parent's file descriptor, is a regular file or a directory with the listed `(dev, ino)`;
+    - the fresh scan still holds it as an unlocked entry, checked against the folder's full list of entries, not the report's top 100;
+    - every other §5 check still runs: inside the scan roots, no symlink above the parent, protected paths, in use, `.ddc-keep`. Only four are replaced: the rule-marker match, the `.git` or project-root check, the `incomplete` check and the directory-only check.
+
+    The entry runs before any finding inside it, and that finding is skipped as `inside-another-item` only when the entry went to the Trash. The new skip reasons come with a raised clean-report schema version. The in-use check does not see open files: an open file can reach the Trash, and the Trash keeps it.
+  - **What bounds it.**
+    - The action is `trash`: an `action: delete` item is skipped as `action-not-allowed`, and `permanent: true` refuses the whole list when it is read (exit 2).
+    - `--permanent` with `--items` is refused by the argument parser.
+    - `--yes` and `--class` never select user data, and nothing is picked by default.
+    - §8 is unchanged: the background path never calls the executor.
+  - **The cost accepted.** One `--items` run can send many large entries, whole device backups included, to the Trash. The Trash is the only undo, and the space comes back when the user empties it. The mitigation is in the app: no default selection, no Select all for user data, and a "Your own files" block that comes first in the confirmation sheet.
 
 ## References
 
@@ -209,4 +235,4 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-20*
