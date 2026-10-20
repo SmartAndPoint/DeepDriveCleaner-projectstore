@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-20T06:21:02.068Z
+generated_at: 2026-10-20T07:19:09.874Z
 
 ---
 
@@ -15,7 +15,6 @@ generated_at: 2026-10-20T06:21:02.068Z
 - [ ] [[epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app|DDC-002: Distribution: the 0.2.0 cask with the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
-- [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2
 
 ## ToDo
 
@@ -28,6 +27,7 @@ generated_at: 2026-10-20T06:21:02.068Z
 - [ ] [[epics/DDC-002/stories/story-menu-bar-popover|DDC-002: Menu bar popover]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-and-clean-window|DDC-002: Review and clean window]] #p1
 - [ ] [[epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups|DDC-002: Review window: sorted sidebar, Select all and folder groups]] #p2
+- [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2
 
 ## Review
 

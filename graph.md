@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-20T06:21:02.171Z
+generated_at: 2026-10-20T07:19:09.972Z
 
 ---
 
@@ -40,7 +40,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | planned |
 | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | Signing team: parameterise TEAM_ID, then switch to SmartAndPoint | story | planned |
-| epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | planned |
+| epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 
 ## Edges

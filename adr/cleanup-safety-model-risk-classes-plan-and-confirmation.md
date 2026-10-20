@@ -46,7 +46,7 @@ Every rule in the rule catalog declares a risk class and a removal method. The c
 | `safe` | cache, restored automatically | `__pycache__`, `~/.npm/_cacache`, `~/Library/Caches/pip` | selected | yes |
 | `rebuildable` | project artifact: an environment restored by installing from a lock file, or a build product restored by building | `.venv` with `pyvenv.cfg` and `uv.lock`, `node_modules` with `package-lock.json`, `target/` next to `Cargo.toml` | selected only under the conditions of item 3 | only with an explicit `--class rebuildable` |
 | `review` | expensive to restore, or not certain to be restorable | ML models, toolchain versions, data of old IDEs, artifacts without a lock file, `build/` without a reliable marker | **not selected** | no, interactive only |
-| `user-data` | user data | photos, videos, backups, downloads, messengers, cloud folders | **never enters the plan** | — |
+| `user-data` | user data | photos, videos, backups, downloads, messengers, cloud folders | **never enters the plan** (amended 2026-10-20: an entry the user picks, to the Trash only) | — |
 
 Removal methods:
 
@@ -56,15 +56,15 @@ Removal methods:
 | `delete` | directory removal via a tombstone (item 5) | `safe`, `rebuildable` with effective class `rebuildable` |
 | `trash` | move to the Trash (`NSFileManager.trashItem`, no AppleScript) | `review` by default, including `rebuildable` downgraded to `review` (item 3); `--permanent` replaces it with `delete` |
 | `native-only` | **only** the native command, and only when the daemon is running; otherwise a report line with instructions. Only commands that delete neither containers nor volumes are allowed, and only with an explicit target: `docker --context desktop-linux builder prune -f`, `docker --context desktop-linux image prune -f` (no `-a`; if that context does not exist, instructions only), `podman image prune -f`. Space is freed inside the VM image (`Docker.raw`), and `statfs` may not change until the runtime shrinks the image; the plan line says so. `system prune` of any runtime is forbidden: it deletes stopped containers together with their data | VMs and stateful containers: Docker Desktop, podman, colima, lima, OrbStack, Rancher Desktop |
-| `none` | report only | `user-data`, Trash |
+| `none` | report only | `user-data` (amended 2026-10-20: picked entries go to the Trash), Trash |
 
-For `native-only`, removing a directory or a file is forbidden: the executor itself checks the plan's action against the rule's method and refuses (`action-not-allowed`) if the plan asks for something the rule does not allow — `delete`/`trash` for `native-only`, any action for `user-data` and `none`. The plan is not treated as trusted input: a GUI or another client of the core can build it. The plan line for a native command names the command and what it deletes.
+For `native-only`, removing a directory or a file is forbidden: the executor itself checks the plan's action against the rule's method and refuses (`action-not-allowed`) if the plan asks for something the rule does not allow — `delete`/`trash` for `native-only`, any action for `user-data` and `none` (amended 2026-10-20: `trash` for a picked entry of the five user-data folders, see Amendments). The plan is not treated as trusted input: a GUI or another client of the core can build it. The plan line for a native command names the command and what it deletes.
 
 ### 2. Rule priority
 
 The walk goes top-down; for each directory, the decision is made in order, and the first match wins:
 
-1. exclusions: `--exclude PATH`, a `.ddc-keep` file in the directory or in any of its ancestors inside the scan root → a finding with class `user-data` and the label "protected by user". The presence of `<dir>/.ddc-keep` is checked before each directory is read (`faccessat`), so a marker inside a known path (`~/.cache/uv/.ddc-keep`) also takes effect. If `.ddc-keep` is found anywhere inside an already claimed subtree (`node_modules/foo/.ddc-keep`), the whole finding becomes `user-data` "protected by user": partial removal is not supported; cloud regions (`~/Library/CloudStorage`, `~/Library/Mobile Documents`) and dataless directories are not walked;
+1. exclusions: `--exclude PATH`, a `.ddc-keep` file in the directory or in any of its ancestors inside the scan root → a finding with class `user-data` and the label "protected by user". The presence of `<dir>/.ddc-keep` is checked before each directory is read (`faccessat`), so a marker inside a known path (`~/.cache/uv/.ddc-keep`) also takes effect. If `.ddc-keep` is found anywhere inside an already claimed subtree (`node_modules/foo/.ddc-keep`), the whole finding becomes `user-data` "protected by user" (amended 2026-10-20 for the user's own folders: see Amendments): partial removal is not supported; cloud regions (`~/Library/CloudStorage`, `~/Library/Mobile Documents`) and dataless directories are not walked;
 2. known-path rules: an exact match of the absolute path (`~/.cache/uv`, `~/Library/Caches/pip`, …), only inside the scan roots. They are checked before the directory is read, so they do not trigger TCC prompts in other apps' regions. An exact path is more specific than any name-based rule;
 3. a directory that is an **ancestor** of a path from the known-path rules (for example, `~/.cargo/registry` for `~/.cargo/registry/cache`) is never claimed whole — it is only walked into;
 4. specialized rules (directory name + context: `pyvenv.cfg`, `package.json` in the parent, `Cargo.toml`, etc.);
@@ -94,7 +94,7 @@ The project root is the nearest ancestor of the finding that has `.git` (a direc
 - A scan takes a shared file lock, a cleanup takes an exclusive one (`flock` on `<data-dir>/lock`). A background scan skips the run when the lock is held.
 - The data directory (`last-scan.json`, the lock) and the log directory are set by `--data-dir` / `DDC_DATA_DIR`; by default `~/Library/Application Support/DeepDriveCleaner` and `~/Library/Logs/DeepDriveCleaner`. Tests always pass a temporary directory.
 
-Before each action, the executor re-checks the finding (protection against TOCTOU and against "same path, different directory"):
+Before each action, the executor re-checks the finding (protection against TOCTOU and against "same path, different directory"; amended 2026-10-20: an entry of the user's own folders gets its own checks, see Amendments):
 
 - the path exists and is a directory, not a symlink;
 - the `(dev, ino)` of the finding and of its parent match the values recorded during the scan; otherwise skip with reason `changed-since-scan`;
@@ -201,23 +201,27 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 - **2026-10-20, decided by the owner.** Story "User data: pick your own files for the Trash" (epic DDC-002) amends §1, §2 and §5. The user's own files may enter a plan when the user picks them one by one in the app's Review window, or names them in an `--items` list, and only to the Trash.
   - **What it changes.**
     - **§1.** The `user-data` row's "never enters the plan" becomes: never by default, and an entry of a user-data folder can be picked by hand, to the Trash only.
-    - **Entries.** An entry is a direct child (for backups, one backup folder) of a finding of `user.downloads`, `user.pictures`, `user.movies`, `user.music`, `user.ios-backups` or `user.imazing-backups`.
-    - **The `none` method** still covers the folders themselves, and every other `none` finding: messenger containers, `user.kept`, cloud folders (still not traversed) and the Trash. The executor relaxes `none` only for an entry of those six findings.
+    - **Entries.** An entry is a direct child (for backups, one backup folder) of a finding of `user.downloads`, `user.pictures`, `user.movies`, `user.music` or `user.ios-backups`. `user.imazing-backups` stays report only until its layout is checked.
+    - **The `none` method** still covers the folders themselves, and every other `none` finding: messenger containers, iMazing backups, `user.kept` and the Trash. The cloud folders are a skip, not a finding: still not traversed. The executor relaxes `none` only for an entry of those five findings.
   - **What can be picked.** An entry the fresh scan lists, unlocked: a regular file or a directory, never a symlink, another kind or a dataless entry.
   - **Locked entries** are listed and never picked:
     - entries managed by an app (library packages and fixed paths, from a maintained list);
-    - entries holding a `.ddc-keep`;
+    - entries holding a `.ddc-keep`, or excluded, or holding an exclude (lock "kept");
     - protected folders (§6);
     - entries holding a mount point;
-    - entries added or modified in the last 10 minutes, partial downloads, and backups that did not finish.
-  - **The marker (§2).** For these six rules, a `.ddc-keep` locks the entry that holds it, and no longer turns the whole folder into `user.kept`.
+    - entries added or modified within 10 minutes of the scan's start (either side; the dry run measures against its own start; with neither time readable, locked), partial downloads, and backups that did not finish (a missing `Status.plist` counts as not finished).
+  - **The marker and excludes (§2), by folder kind.**
+    - A `.ddc-keep` directly in a folder, or an exclude of the folder or above it, still makes the whole folder `user.kept`.
+    - In the four folders the scan claims whole (Pictures, Movies, Music, iPhone and iPad backups), an exclude anywhere inside still makes the whole folder `user.kept`. A `.ddc-keep` below the folder's top now locks the entry that holds it, and no longer turns the whole folder into `user.kept`. This is the one change to §2.
+    - Downloads is a region and is unchanged: a direct child folder with a marker at its top, or an excluded one, is its own `user.kept` finding; a `user.kept` finding deeper inside an entry locks that entry. An excluded file, which the scan's exclude does not claim, is listed locked "kept".
+    - For an entry the lock is checked before §5's marker walk, so a marker in or at an entry, or an exclude at or in a Downloads entry, is `entry-locked` (kept), in the clean and in the dry run. A Downloads folder that became a `user.kept` finding this way is `entry-locked` too, not `not-an-entry`. In the four folders the scan claims whole, an exclude anywhere inside keeps the whole folder, so its entries are skipped as `kept`.
   - **Re-checks (§5).** For these items, §5's rule-marker checks, written for directories found by rules, are replaced by:
-    - the parent is the folder, with the identity of the fresh scan's finding;
+    - the parent is the folder, with the identity of the fresh scan's finding, and the item's rule is that folder's rule;
     - the entry, opened through the parent's file descriptor, is a regular file or a directory with the listed `(dev, ino)`;
     - the fresh scan still holds it as an unlocked entry, checked against the folder's full list of entries, not the report's top 100;
     - every other §5 check still runs: inside the scan roots, no symlink above the parent, protected paths, in use, `.ddc-keep`. Only four are replaced: the rule-marker match, the `.git` or project-root check, the `incomplete` check and the directory-only check.
 
-    The entry runs before any finding inside it, and that finding is skipped as `inside-another-item` only when the entry went to the Trash. The new skip reasons come with a raised clean-report schema version. The in-use check does not see open files: an open file can reach the Trash, and the Trash keeps it.
+    The entry runs before any finding inside it, and that finding is skipped as `inside-another-item` only when the entry went to the Trash; if the entry was skipped or failed, it runs. The new skip reasons come with a raised clean-report schema version. The in-use check does not see open files: an open file can reach the Trash, and the Trash keeps it.
   - **What bounds it.**
     - The action is `trash`: an `action: delete` item is skipped as `action-not-allowed`, and `permanent: true` refuses the whole list when it is read (exit 2).
     - `--permanent` with `--items` is refused by the argument parser.
