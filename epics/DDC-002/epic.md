@@ -5,7 +5,7 @@ title: "Menu bar app"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-19
+updated: 2026-10-20
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, macos, swift]
 code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "README.md"]
@@ -101,6 +101,7 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
   - the status icon has no threshold dot; a warning pictogram shows what needs the user, and the badge stays (ADR §2);
   - Pause scans and Resume scans in the right-click menu: the icon turns grey, Scan now is off, nothing is due, and the rescan after a clean still runs (ADR §2, §5, §6 item 6);
   - the Review window's Close button returns to the popover.
+- **Later decision (2026-10-20)**: the app icon is option B, "Class ring", from the canvas's app icon board: the drive inside a ring of the class colours (ADR §2; "App skeleton and build pipeline", Implementation Plan, Icons).
 
 ## Open Questions
 
@@ -113,4 +114,4 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-20*

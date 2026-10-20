@@ -7,7 +7,7 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-20
 external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
 tags: [app, build, signing]
 code_refs: []
@@ -98,7 +98,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
   - `Assets.xcassets/AppIcon.appiconset`.
 - `app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist`, outside the synchronised folder (inside it the plist would land in Resources), copied by a Copy Files phase to `Contents/Library/LaunchAgents`, where `SMAppService.agent(plistName:)` looks.
 
-**Icons.** No ImageMagick, rsvg or Pillow are assumed. `scripts/icons/main.swift` is compiled with `DriveGlyph.swift` by `swiftc` and writes the ten AppIcon PNGs and `Contents.json` through ImageIO; the PNGs are committed. The app icon fills Apple's squircle on the 824/1024 grid, so Tahoe does not put it on a grey tile. The status item draws the glyph at runtime as an 18 pt template image. `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` makes the build write the `.icns`.
+**Icons.** No ImageMagick, rsvg or Pillow are assumed. `scripts/icons/main.swift` is compiled with `DriveGlyph.swift` by `swiftc` and writes the ten AppIcon PNGs and `Contents.json` through ImageIO; the PNGs are committed. The app icon fills Apple's squircle on the 824/1024 grid, so Tahoe does not put it on a grey tile. Its design is option B, "Class ring", of the canvas's app icon board (owner, 2026-10-20): the white drive on a dark tile (#1C2026), inside a ring of the four class colours tuned for the dark tile, from the top, clockwise: safe #34B37A, rebuildable #4C86E8, review #E08A2C, user data #8E9299. These values live in `scripts/icons/main.swift` only; they are not `ReportClassStyle`'s. It replaced the first blue tile. The status item draws the glyph at runtime as an 18 pt template image. `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` makes the build write the `.icns`.
 
 **Build pipeline.**
 - `scripts/build-app.sh [--dist]`:
@@ -205,4 +205,4 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 
 ---
 
-*Last updated: 2026-10-18*
+*Last updated: 2026-10-20*

@@ -10,7 +10,7 @@ external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-19
+reviewed_at: 2026-10-20
 ---
 
 # Menu bar app: Swift shell over the ddc CLI
@@ -85,7 +85,7 @@ UniFFI is not used now (Alternative A).
 - The app delegate owns an `NSStatusItem`. Its button opens an `NSPopover` whose content is a SwiftUI view in an `NSHostingController`.
 - The Review window and the Settings window are `NSWindow`s hosting SwiftUI.
 - A right click opens a small `NSMenu`: Scan now, Pause scans or Resume scans (added 2026-10-19), Settings, Quit.
-- **Icons.** The app has a real icon: an `AppIcon` asset in every macOS size, compiled into the bundle's `.icns` by the build. The status item uses a template glyph; it turns grey while scans are paused, and a mark in its corner shows a warning when something needs the user, or the badge after a notification (2026-10-19). Both are the drive outline with a line and a dot drawn on the canvas, so Finder, Login Items and notifications show the app, not a generic icon.
+- **Icons.** The app has a real icon: an `AppIcon` asset in every macOS size, compiled into the bundle's `.icns` by the build. The status item uses a template glyph; it turns grey while scans are paused, and a mark in its corner shows a warning when something needs the user, or the badge after a notification (2026-10-19). Both are the drive outline with a line and a dot drawn on the canvas, so Finder, Login Items and notifications show the app, not a generic icon. The app icon sets the drive inside a ring of the four class colours, tuned for its dark tile (option B, "Class ring", owner, 2026-10-20).
 - `LSUIElement` is set and the activation policy is `.accessory`. The app activates while one of its windows is open.
 
 `MenuBarExtra(.window)` is rejected (Alternative B).
@@ -355,7 +355,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - If `SMAppService` rejects an agent plist whose program is `/usr/bin/open`, the fallback is `BundleProgram: Contents/MacOS/DeepDriveCleaner` with the argument `--tick`. In tick mode the app only runs `open -gjb com.smartandpoint.deepdrivecleaner --args --scheduled` and exits, so the scan still runs in an instance LaunchServices launched. The tick instance does this and exits before `NSApplicationMain`, with no `NSApplication` created: once AppKit registers it with LaunchServices it is the running instance of the bundle id, `open -b` would deliver a reopen to the tick process itself, and the scan would run in a process launchd started, which is what the fallback exists to avoid. Registering the agent during development shows whether `SMAppService` accepts the `open` program; the fallback is used if it does not.
 - Does `--items` need a full rescan (about 40 s), or would a scoped re-walk of the listed findings plus the executor's re-checks give the same safety? Decided at that story's plan gate (2026-10-18): the full rescan stays, because only a whole-tree walk sees the toolchain pins (`toolchain::dropped` needs every pin file and sibling version the walk found) and the ancestor claims (a rule that would now claim a directory above an item). `--exclude` is a path-prefix test and needs no walk.
 
-The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6; the owner's icon and pause decisions of the same day are in §2, §5 and item 6 of §6.
+The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6; the owner's icon and pause decisions of the same day are in §2, §5 and item 6 of §6; the app icon's design (2026-10-20) is in §2.
 
 ## References
 
@@ -368,4 +368,4 @@ The owner's questions (minimum macOS, the notification's second action, the sign
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-20*
