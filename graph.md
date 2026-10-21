@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-20T11:04:49.635Z
+generated_at: 2026-10-20T14:18:21.608Z
 
 ---
 
@@ -36,6 +36,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | planned |
@@ -108,6 +109,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-and-clean-window.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
@@ -120,6 +122,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-and-clean-window.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
@@ -160,6 +163,10 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-menu-bar-popover.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | wikilink | epics/DDC-002/stories/story-cli-progress-events.md |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | wikilink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | wikilink | epics/DDC-002/stories/story-review-and-clean-window.md |
 | epics/DDC-002/stories/story-review-and-clean-window.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-and-clean-window.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-review-and-clean-window.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |

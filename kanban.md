@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-20T10:51:04.398Z
+generated_at: 2026-10-20T14:18:21.511Z
 
 ---
 
@@ -26,6 +26,7 @@ generated_at: 2026-10-20T10:51:04.398Z
 - [ ] [[epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app|DDC-002: Distribution: the 0.2.0 cask with the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-menu-bar-popover|DDC-002: Menu bar popover]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-and-clean-window|DDC-002: Review and clean window]] #p1
+- [ ] [[epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open|DDC-002: Release 0.2.1: the Review window in the Dock, and skip what a running process holds open]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups|DDC-002: Review window: sorted sidebar, Select all and folder groups]] #p2
 - [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2
 

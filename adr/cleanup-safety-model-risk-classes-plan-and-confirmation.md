@@ -10,7 +10,7 @@ external_refs: {}
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-17
+reviewed_at: 2026-10-20
 ---
 
 # Cleanup safety model: risk classes, plan and confirmation
@@ -79,7 +79,7 @@ A `rebuildable` item is selected in the plan only if all four conditions hold:
 - the finding does not lie inside a top-level hidden directory of `$HOME` (`~/.vscode/extensions/…`, `~/.local/pipx/…`, `~/.local/share/nvim/lazy/…`, `~/.opencode/…`) or inside `~/Library`: there, project artifacts (environments and build products) belong to applications and tools, and such findings get `review`;
 - for **environments** (venv, `node_modules`, `Pods`), the project has a manifest **and** a lock file (`uv.lock`/`poetry.lock`/`requirements*.txt`/`Pipfile.lock`; `package-lock.json`/`pnpm-lock.yaml`/`yarn.lock`/`bun.lock*`; `Podfile.lock`). Without a lock file, the rule downgrades the class to `review`. For **build products** (`target/`, Gradle `build/`, CMake build), a manifest is enough: their contents do not depend on a lock file;
 - there is an unambiguous activity signal (item 4), and it is older than `--min-age` (14 days by default). No signal means the project is considered active;
-- the finding's path is not in use by a running process (item 5).
+- the finding's path is not in use by a running process (item 5; enforced at execution only, see the 0.2.1 amendment).
 
 ### 4. Project activity
 
@@ -103,7 +103,7 @@ Before each action, the executor re-checks the finding (protection against TOCTO
 - the finding was read completely: if it contained unreadable directories or another filesystem was mounted inside it, removal is rejected (`incomplete`);
 - after the rename to a tombstone and before the Trash or the fallback, `(dev, ino)` is checked once more through the same parent descriptor (a tool probe can run between the check and the action);
 - there is no `.ddc-keep` in the finding (at any depth) or in its ancestors inside the scan root;
-- the path is not in use by a process: no process of the current user has, inside the finding, its executable path (the first string of the `sysctl(KERN_PROCARGS2)` buffer — the path passed to `execve`, before symlink resolution: `.venv/bin/python` is a symlink to an interpreter outside the venv), a command-line argument, its working directory (`proc_pidinfo(PROC_PIDVNODEPATHINFO)`) or a `VIRTUAL_ENV`/`CONDA_PREFIX` environment variable. A relative executable path and relative arguments are first joined with the process's working directory (`./.venv/bin/python app.py`). If a path is relative and the working directory cannot be determined, all plan findings whose name matches the first component of the relative path are blocked (`./.venv/bin/python` → all `.venv`), with reason `in-use-unknown-cwd`. Otherwise skip with reason `in-use`;
+- the path is not in use by a process: no process of the current user has, inside the finding, its executable path (the first string of the `sysctl(KERN_PROCARGS2)` buffer — the path passed to `execve`, before symlink resolution: `.venv/bin/python` is a symlink to an interpreter outside the venv), a command-line argument, its working directory (`proc_pidinfo(PROC_PIDVNODEPATHINFO)`) or a `VIRTUAL_ENV`/`CONDA_PREFIX` environment variable. A relative executable path and relative arguments are first joined with the process's working directory (`./.venv/bin/python app.py`). If a path is relative and the working directory cannot be determined, all plan findings whose name matches the first component of the relative path are blocked (`./.venv/bin/python` → all `.venv`), with reason `in-use-unknown-cwd`. Otherwise skip with reason `in-use` (amended 2026-10-20 for 0.2.1: open files count for `delete` and `native` items, `native-only` items are exempt; see Amendments);
 - for rules with an owner process (for example, `Spotify` for its cache), that process is not running.
 
 Removal (`delete`): the directory is first renamed to `<name>.ddc-deleting-<time>` with `renameat` relative to the parent descriptor already verified by `(dev, ino)` (a single operation), then removed without following symlinks. On `EACCES`, the executor adds `u+w` to directories inside the finding and retries. An interrupted removal leaves a tombstone, which the next scan finds as `safe`.
@@ -221,13 +221,20 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
     - the fresh scan still holds it as an unlocked entry, checked against the folder's full list of entries, not the report's top 100;
     - every other §5 check still runs: inside the scan roots, no symlink above the parent, protected paths, in use, `.ddc-keep`. Only four are replaced: the rule-marker match, the `.git` or project-root check, the `incomplete` check and the directory-only check.
 
-    The entry runs before any finding inside it, and that finding is skipped as `inside-another-item` only when the entry went to the Trash; if the entry was skipped or failed, it runs. The new skip reasons come with a raised clean-report schema version. The in-use check does not see open files: an open file can reach the Trash, and the Trash keeps it.
+    The entry runs before any finding inside it, and that finding is skipped as `inside-another-item` only when the entry went to the Trash; if the entry was skipped or failed, it runs. The new skip reasons come with a raised clean-report schema version. The in-use check does not see open files: an open file can reach the Trash, and the Trash keeps it. (Note, 2026-10-20, 0.2.1: the check now sees open files for `delete` and `native` items; a move to the Trash still never counts them. See the amendment for story "Release 0.2.1".)
   - **What bounds it.**
     - The action is `trash`: an `action: delete` item is skipped as `action-not-allowed`, and `permanent: true` refuses the whole list when it is read (exit 2).
     - `--permanent` with `--items` is refused by the argument parser.
     - `--yes` and `--class` never select user data, and nothing is picked by default.
     - §8 is unchanged: the background path never calls the executor.
   - **The cost accepted.** One `--items` run can send many large entries, whole device backups included, to the Trash. The Trash is the only undo, and the space comes back when the user empties it. The mitigation is in the app: no default selection, no Select all for user data, and a "Your own files" block that comes first in the confirmation sheet.
+- **2026-10-20, decided by the owner (0.2.1).** Story "Release 0.2.1: the Review window in the Dock, and skip what a running process holds open" (epic DDC-002) amends §5's in-use check. Cause: a clean from the 0.2.0 app waited the full 600 s `NATIVE_TIMEOUT` on `uv cache clean`, because long-running `uv run` processes held uv's cache lock through an open file in `~/.cache/uv`, which the check did not see.
+  - **Open files count.** For an item removed by deletion (`delete`) or by a tool's own command with a fallback (`native`), a process of the current user that has a file open inside the finding (`proc_pidinfo(PROC_PIDLISTFDS)`, `proc_pidfdinfo(PROC_PIDFDVNODEPATHINFO)`, vnode files only) puts the item under `in-use`, as its executable, arguments and working directory already do. A hit is confirmed by reading that one process's files again after about 250 ms, so a passing reader such as a Spotlight worker does not block the item. Before each `native` command the open files are read again for that item, since a long clean reaches it minutes after it started. Every in-use reason, the path-based ones included, names the process, or its app when it lives in an app bundle.
+  - **A move to the Trash never counts open files**, as the user-data amendment says: the Trash keeps an open file working. This covers `trash` items, `review` items to the Trash and picked user-data entries.
+  - **`native-only` items are exempt from the whole in-use check**, the path-based part included. Their runtime's daemon lives inside the finding by design (Docker Desktop's `com.docker.backend` runs with its working directory in `~/Library/Containers/com.docker.docker`), its prune commands are what knows what is in use, and the executor never removes their files itself (§1). Until 0.2.1 the working-directory check skipped Docker's prune whenever Docker ran.
+  - **The scan's default selection does not consult processes**; only the clean does, at execution and in its dry run.
+  - **Tool commands** may carry environment variables; `cache.uv` sets `UV_LOCK_TIMEOUT=10`, so a lock taken after the check fails in seconds (uv 0.9.16 and later; older uv ignores it and `NATIVE_TIMEOUT` stays the bound). `uv cache clean --force` is never used.
+  - The clean report's schema version is unchanged: no new skip reason.
 
 ## References
 
