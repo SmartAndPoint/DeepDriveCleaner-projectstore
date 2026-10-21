@@ -6,7 +6,7 @@ status: proposed
 date: 2026-10-18
 authors: ["Evgenii Konev"]
 tags: [app, macos, swift, architecture]
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 supersedes: null
 superseded_by: null
 review_status: reviewed
@@ -364,7 +364,7 @@ The owner's questions (minimum macOS, the notification's second action, the sign
 - [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|Homebrew tap and the v0.1.0 release]]: path-keyed Full Disk Access for the 0.1.0 cask
 - [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|Progress output while ddc clean runs]]
 - GrammarHelper repository: `App/AppDelegate.swift`, `App/SettingsManager.swift`, `Makefile`, `scripts/publish-release.sh`, `CLAUDE.md`
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

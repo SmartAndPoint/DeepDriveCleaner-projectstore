@@ -256,7 +256,7 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
 
 ## Attachments
 
-- Design canvas, board 9: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas, board 9: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

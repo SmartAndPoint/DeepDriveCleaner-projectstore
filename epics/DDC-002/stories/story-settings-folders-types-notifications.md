@@ -7,8 +7,8 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-19
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+updated: 2026-10-21
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, settings]
 code_refs: []
 specs: []
@@ -33,6 +33,70 @@ plan_updated_at: null
 This story is artboard 7 of the design canvas: the General, Folders, Types, Notifications and Permissions tabs.
 
 What the CLI also reads is stored in `settings.json` (story "CLI: shared settings, types and the notify decision"), so a scan from the terminal and a scan from the app use the same folders and types. Preferences only the app uses stay in its `UserDefaults`.
+
+### Revision after the owner's review (2026-10-21)
+
+Artboard 10 of the design canvas ("Settings, revised") replaces artboard 7. Its tabs are General, Folders, Schedule, Automation, Types and Permissions. The old tabs map to the new ones:
+- General's Scan row moves to Schedule.
+- Notifications (threshold, low disk, working hours) moves to Automation, under "Notify me when".
+- The badge and the size next to the icon stay in General.
+
+The Decomposition and ACs below still describe artboard 7 until the plan gate re-cuts them.
+
+The window is an `NSTabViewController` with `tabStyle = .toolbar`, and the window title is the pane's name. A SwiftUI `TabView` in an `NSWindow` would draw segments, not toolbar tabs.
+
+The owner decided four things.
+
+**1. Automatic cleaning, strict variant.** "After a scheduled scan" offers three choices:
+- Notify me (the default);
+- Clean download caches automatically, then notify me;
+- Only show it in the menu bar.
+
+The automatic choice has these limits:
+- **What it cleans.** Only `safe` groups marked Auto in Types. Auto is on by default only for caches a package manager downloads again: npm, pnpm, yarn, bun, pip, Poetry, Homebrew and CocoaPods.
+- **Groups have to split first.** Today `rules --json` puts all of these in one group with Cargo, uv, Go, Gradle (`crates/ddc-core/src/rules/listing.rs`, `GROUPS`), and Types has one switch per group. So `GROUPS` splits that group into "Package downloads" and "Toolchain caches" (Cargo, uv, Go modules and build cache, Gradle), as artboard 10 draws them. Auto is then stored per group in `settings.json`.
+- **What stays off by default.** These are `safe` too:
+  - Toolchain caches, which an offline build needs;
+  - IDE caches, because of re-indexing;
+  - Xcode builds and project build caches, which are rebuilt by compute;
+  - browser and app caches: they carry `owners`, so a running browser makes them skip as in use most of the day.
+- **When it runs.** Only when it frees at least N GiB, counted as private bytes. Anything in use is skipped, as in 0.2.1.
+
+Before any code it needs amendments:
+- the safety ADR: §8 ("the background path contains no call to the cleanup executor") and its Alternative A;
+- the menu bar ADR: §7 (the sheet's Clean is the only caller of a clean, which `ContractTests.cleanHasOneOwner` enforces) and §5 (a scheduled instance lives about a minute).
+
+It also needs:
+- how a promoted scheduled instance shows the running clean with Stop;
+- the "cleaned" notification's category and what `notify ack` records;
+- the rescan after the clean.
+
+It has its own story: "Automatic cleaning of download caches after a scheduled scan" (DDC-002). This story only draws the Automation tab and stores the choice.
+
+**2. Exclude with two modes.**
+- "Count, never clean" is today's `excludes` (`user.kept`, still read and sized).
+- "Skip entirely" is new: the folder is not read. It needs:
+  - an additive optional `skips` in `settings.json`;
+  - a `--skip` flag;
+  - the report's skipped reason, so Review says "not scanned";
+  - a line in safety ADR §2 item 1.
+
+  The `--exclude` confirmation of menu bar ADR §6 item 6 does not apply to a skip.
+
+  This story owns that CLI change. `ContractTests.settingsKeys` checks the new key against `Settings`.
+
+**3. Protected folders, simplified.** There is no per-folder Allow…; a scheduled scan without Full Disk Access skips every prompting area anyway (`crates/ddc-cli/src/cmd/background.rs`).
+- **Without Full Disk Access,** Folders shows one banner with Open Privacy Settings. Below it is a "Not readable" list: the folders the last foreground scan reported in `inaccessible`, each with Open Privacy Settings.
+- **With Full Disk Access,** only a confirmation line.
+- **iCloud Drive** is never walked, so it is never listed.
+
+**4. Schedule tab.** It holds:
+- Scan automatically;
+- Daily or Weekly, with the day and a whole hour;
+- Pause, the same `ScansPaused` as the popover;
+- Next scan, from the due function of "Background scan and notifications in the app": "Today" or "Tomorrow" at the slot, and "Within the hour" after a missed slot or a Resume.
+
+The decomposition below is re-cut at the plan gate.
 
 ## Decomposition
 
@@ -87,8 +151,8 @@ Rough until the plan gate.
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-21*

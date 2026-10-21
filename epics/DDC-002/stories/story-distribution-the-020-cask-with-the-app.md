@@ -8,7 +8,7 @@ priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-20
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [release, homebrew, distribution, disclaimer]
 code_refs: []
 specs: []
@@ -132,7 +132,7 @@ The public texts about Full Disk Access (README, release notes, caveats) say the
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

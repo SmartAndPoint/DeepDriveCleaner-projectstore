@@ -7,8 +7,8 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-19
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+updated: 2026-10-21
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [cli, contract, json, ux]
 code_refs: []
 specs: []
@@ -33,6 +33,34 @@ plan_updated_at: null
 The app shows a scan's and a clean's progress from the CLI's machine-readable events. This story adds `--progress json` (§6 item 3 of the ADR "Menu bar app: Swift shell over the ddc CLI").
 
 The clean's counter is built by the DDC-001 story "Progress output while ddc clean runs". This story only emits it as JSON, and cannot start before that story is done.
+
+### Revision after the design review (2026-10-21)
+
+Artboard 11 of the design canvas ("Clean progress") draws the determinate left-to-right bar the owner asked for, in place of the sliding one. Reviewing it fixed what the events must carry.
+
+**The clean's real sequence** is waiting → preparing → cleaning → stopping (`ReviewModel.Phase`); `.preparing` covers the CLI's rescan and then its keep-marker walk.
+- Step 1, "Checking again", is that phase, with two counters. The rescan counts files read against the last report's `totals.files`, an estimate if the roots changed. The `keep_markers` walk counts files walked against the listed findings' `files`. Today that walk takes a throwaway `Progress::default()` (`crates/ddc-core/src/exec/mod.rs:445`), so it must report into the clean's progress.
+- Step 2 is the item loop.
+
+**Each item event carries:**
+- `i` of `n`;
+- its path, or the tool's name;
+- `action` and `outcome`;
+- its `bytes`.
+
+An item's bytes count as processed whatever the outcome; the app adds "· N skipped".
+
+**The bar.**
+- **Basis:** bytes processed, with items as the alternative.
+- **Item in flight:** shown as a striped segment, because there is no progress inside an item.
+- **Native-only item:** takes its share of items, never bytes. Its space is not in the total (safety ADR §5), and the sheet says that what Docker frees inside its disk image is not counted. The bar's byte total therefore leaves native-only items out. Today `Confirmation.bytes` and `selectedReclaimable` include them (`Confirmation.swift:64`, `ReviewModel.swift:333`), so the sheet's header total changes with this story, or the bar never reaches 100 %.
+
+**Stop.**
+- Between file items, the clean stops after the current one.
+- A running native tool is interrupted: SIGTERM goes to its process group (story "CLI: clean an explicit item list"). The sheet says so while a tool runs.
+- The button reads Stop, with Esc (story "HIG pass: keyboard, colour, empty states and menus").
+
+The Decomposition and ACs below are re-cut at the plan gate to carry these: per-item `action`, `outcome` and `bytes`, and the two counters of the preparing phase in the schema and in the `clean --items` AC.
 
 ## Decomposition
 
@@ -83,8 +111,8 @@ Rough until the plan gate.
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-21*

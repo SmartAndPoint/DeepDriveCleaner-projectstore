@@ -8,7 +8,7 @@ priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-18
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [cli, contract, json, cleanup]
 code_refs: ["crates/ddc-cli/Cargo.toml", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/exit.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/scan_cli.rs", "crates/ddc-core/src/plan.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/rules/classify.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/src/scan/mod.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/sys/signals.rs", "crates/ddc-core/tests/clean_items.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/common/", "docs/clean.schema.json"]
 specs: []
@@ -264,7 +264,7 @@ A scoped re-walk would therefore need a second classification path and would sti
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

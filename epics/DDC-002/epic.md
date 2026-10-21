@@ -5,8 +5,8 @@ title: "Menu bar app"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-20
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+updated: 2026-10-21
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, macos, swift]
 code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "README.md"]
 review_status: reviewed
@@ -20,7 +20,7 @@ reviewed_at: 2026-10-18
 | **Status** | in-progress |
 | **Priority** | p2 |
 | **Created** | 2026-10-18 |
-| **Updated** | 2026-10-18 |
+| **Updated** | 2026-10-21 |
 
 ---
 
@@ -59,16 +59,19 @@ The screens are modelled in the design canvas before any code.
 |-------|--------|-------------|
 | [story-app-skeleton-and-build-pipeline](./stories/story-app-skeleton-and-build-pipeline.md) | in-progress | Debug spike tools (Full Disk Access probe, agent registration, test notification); Xcode project for macOS 26, app icon and menu bar glyph, status item and popover shell, one runner that serialises CLI runs, CLI in `Contents/Helpers`, login item, `make app` / `make app-dist` |
 | [story-cli-clean-an-explicit-item-list](./stories/story-cli-clean-an-explicit-item-list.md) | done | `clean --items` with class, action and per-item `permanent`; `--json` report; `--dry-run` preflight; SIGTERM for clean with native-child forwarding; exit codes 0 / 1 / 2 / 75 |
-| [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean; needs the counter of DDC-001 "Progress output while ddc clean runs" |
+| [story-cli-progress-events](./stories/story-cli-progress-events.md) | planned | `--progress json` events for scan and clean, and the clean sheet's determinate bar (board 11: preparing with rescan and keep-marker counters, items by bytes, in-flight stripe); needs the counter of DDC-001 "Progress output while ddc clean runs" |
 | [story-cli-shared-settings-types-and-the-notify-decision](./stories/story-cli-shared-settings-types-and-the-notify-decision.md) | done | `settings.json`, `ignored` findings (types, minimum size), `rules --json`, `volumes`, `--notify json`, `notify ack` / `notify snooze`, `schedule install` and the app's scheduler record |
 | [story-menu-bar-popover](./stories/story-menu-bar-popover.md) | in-progress | Totals by class, biggest finds, Scan now, Full Disk Access and next-scan status, empty / scanning / nothing-to-clean states, icon states with the size and the badge |
 | [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | in-progress | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
 | [story-review-window-sorted-sidebar-select-all-and-folder-groups](./stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md) | in-progress | Sidebar tinted by class and ordered by size, Select all, folder subgroups that collapse, no repeated words on rows (design canvas board 9) |
 | [story-user-data-pick-your-own-files-for-the-trash](./stories/story-user-data-pick-your-own-files-for-the-trash.md) | in-progress | `scan` lists entries inside user-data folders; `clean --items` takes a picked entry to the Trash only; User data section and "Your own files" block in the app (safety ADR amendment 2026-10-20) |
-| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | 0.3.0. General, Folders (external volumes, never-touch folders), Types (rule groups, idle days, minimum size), Notifications (low disk, badge, working hours), Permissions (Replace it) |
+| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | planned | 0.3.0. Board 10 (2026-10-21): toolbar tabs General, Folders (always scan; exclude as count-never-clean or skip; not-readable folders), Schedule, Automation (notify, automatic cleaning as a choice, menu bar only), Types (with Auto), Permissions |
 | [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | planned | 0.3.0. Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app; takes over the scheduled-tick checks of the 0.2.0 clean-machine check |
 | [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | in-progress | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README with a detailed CLI guide, `DISCLAIMER.md` and the CLI's terminal warning, upgrade of the reference machine |
 | [story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open](./stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md) | in-progress | 0.2.1. The app in the Dock and Cmd-Tab with a main menu while a window is open; items held open by a running process skipped as in use instead of a tool's command waiting out its timeout |
+| [story-hig-pass-keyboard-colour-empty-states-and-menus](./stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md) | in-progress | Next after 0.2.1. HIG audit fixes and the popover that opened inactive on a second Mac: Esc/Return in the Review filter, Stop with Esc, system accent through an `AccentColor` asset, dark-mode warning ink, `ContentUnavailableView`, the missing standard menus, title-case wording, 12/24-hour time, Reduce Motion |
+| [story-automatic-cleaning-of-download-caches-after-a-scheduled-scan](./stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md) | planned | Owner's choice of 2026-10-21, strict variant: after a scheduled scan, clean the Package downloads groups marked Auto, above a floor, skipping what is in use; waits for safety ADR §8 / Alternative A and menu bar ADR §5 / §7 amendments |
+| [story-review-window-clean-only-the-selection-in-this-group](./stories/story-review-window-clean-only-the-selection-in-this-group.md) | in-progress | Board 12, variant B (owner, 2026-10-21): "Clean N from <group>…" at the end of the group's Select all row opens the confirmation with only that group's selected items; ships with the HIG pass |
 | [story-signing-team-parameterise-teamid-then-switch-to-smartandpoint](./stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md) | planned | Later and independent: one TEAM_ID setting, then the SmartAndPoint organization team; costs every user one Full Disk Access re-grant and renames the developer in Login Items |
 
 ## Expected Results
@@ -115,7 +118,7 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 
 ## Related
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 - GrammarHelper (the sibling menu bar app): `App/AppDelegate.swift`, `App/SettingsManager.swift`, `Makefile`, `scripts/publish-release.sh`
 
 ---

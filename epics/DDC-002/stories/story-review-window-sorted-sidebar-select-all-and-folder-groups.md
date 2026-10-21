@@ -163,7 +163,7 @@ New `ReviewGroupsTests.swift`, with builders in `ReviewSupport.swift`; one test 
 
 - The grouping is pure: DDCKit computes the subgroups and rows from `ReviewItems`, so every case is a unit test, and the view only draws them.
 - The `app-owned` note comes from the core (`rules/classify.rs`, `app_owned`) through the report's `notes`; `CleanWording.note` already words it.
-- Design: board 9 of the design canvas (https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3); the board's sizes are illustrative.
+- Design: board 9 of the design canvas (https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV); the board's sizes are illustrative.
 
 ## Dependencies
 
@@ -171,7 +171,7 @@ New `ReviewGroupsTests.swift`, with builders in `ReviewSupport.swift`; one test 
 
 ## Attachments
 
-- Design canvas, board 9: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas, board 9: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

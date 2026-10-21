@@ -8,7 +8,7 @@ priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-19
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui]
 code_refs: []
 specs: []
@@ -143,7 +143,7 @@ No spec covers this story; the design is the ADR "Menu bar app: Swift shell over
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

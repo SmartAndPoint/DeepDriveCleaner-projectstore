@@ -7,8 +7,8 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-19
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+updated: 2026-10-21
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, cleanup]
 code_refs: []
 specs: []
@@ -99,6 +99,11 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
 - **Deleting a `.ddc-keep` the window wrote unlocks its row** at the next rebuild.
 - **The replayed `clean-report.json`** was recorded with delete items only, so the recording never touched a real Trash. The deleted `py1/.venv` and the trashed `.ollama/models` were then added by hand, so it answers the whole list the test sends.
 - **Open for the manual check.** AppKit may not close a window while its sheet shows. The cleaning text therefore says the user can keep working, and makes no claim about closing the window.
+- **Stop, and Esc in the filter (2026-10-21).** "HIG pass: keyboard, colour, empty states and menus" (DDC-002) changes some of the names and keys used here:
+  - **Stop.** The cleaning sheet's Cancel becomes Stop and gets Esc. The ACs here that say Cancel mean that button.
+  - **Title case.** Buttons and menu items move to title-style capitalization: "Reveal in Finder" is now "Show in Finder", "Check again" is "Check Again", and "Protect this folder" is "Protect This Folder…". The ACs here mean those.
+  - **Esc.** It still closes the window as decided below. The exception is a filter field holding text: there Esc clears it first.
+  - **Return.** While the filter holds text, Return stays in the field.
 - **Close returns to the popover (owner, 2026-10-19).** The window's Close button, and Escape, its shortcut, close the window and open the popover under the icon, so the user lands where they came from. The title bar's close box only closes the window, as any window's does: the Close button is the window's way back, the close box is window chrome. ⌘W does nothing yet: the app has no main menu, so ⌘W, and copy and paste in the search field, wait for one (a follow-up). An already open popover stays as it is.
 - **Scans paused (owner, 2026-10-19; "Menu bar popover").** While paused, Scan again (and Scan now with no report yet) gives way to "Scans paused". The rescan after a clean still runs: it is part of the clean.
 - **Follow-up.** A finding that is itself a scan root counts in the popover's "Selected to clean", but the window and `build_plan` leave it out. It is an edge case; "Menu bar popover" can drop it from its totals.
@@ -241,8 +246,8 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-21*

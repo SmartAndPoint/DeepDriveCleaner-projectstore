@@ -8,7 +8,7 @@ priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-19
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [cli, contract, json, settings, notifications]
 code_refs: ["README.md", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cmd/notify.rs", "crates/ddc-cli/src/cmd/rules.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/cmd/schedule.rs", "crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/background_cli.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/notify_cli.rs", "crates/ddc-cli/tests/rules_cli.rs", "crates/ddc-cli/tests/settings_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/exec/preflight.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/model.rs", "crates/ddc-core/src/notify.rs", "crates/ddc-core/src/plan.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/volumes.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/settings.rs", "crates/ddc-core/tests/notify.rs", "crates/ddc-core/tests/report.rs", "crates/ddc-core/tests/rules.rs", "crates/ddc-core/tests/settings.rs", "docs/notify.schema.json", "docs/rules.schema.json", "docs/scan.schema.json", "docs/settings.schema.json"]
 specs: []
@@ -327,7 +327,7 @@ No spec covers this story. Its contract is §5 and §6 items 5–9 of the ADR "M
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 

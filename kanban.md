@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-20T14:18:21.511Z
+generated_at: 2026-10-21T11:04:45.619Z
 
 ---
 
@@ -14,6 +14,7 @@ generated_at: 2026-10-20T14:18:21.511Z
 - [ ] [[epics/DDC-002/stories/story-cli-progress-events|DDC-002: CLI: progress events]] #p2
 - [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
+- [ ] [[epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan|DDC-002: Automatic cleaning of download caches after a scheduled scan]] #p3
 
 ## ToDo
 
@@ -29,6 +30,8 @@ generated_at: 2026-10-20T14:18:21.511Z
 - [ ] [[epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open|DDC-002: Release 0.2.1: the Review window in the Dock, and skip what a running process holds open]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups|DDC-002: Review window: sorted sidebar, Select all and folder groups]] #p2
 - [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2
+- [ ] [[epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus|DDC-002: HIG pass: keyboard, colour, empty states and menus]] #p2
+- [ ] [[epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group|DDC-002: Review window: clean only the selection in this group]] #p2
 
 ## Review
 

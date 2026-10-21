@@ -8,7 +8,7 @@ priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
 updated: 2026-10-20
-external_refs: {design_canvas: "https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3"}
+external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, build, signing]
 code_refs: []
 specs: []
@@ -201,7 +201,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 
 ## Attachments
 
-- Design canvas: https://claude.ai/artifact/W1nniwb2fkg8BX8ReznPN3
+- Design canvas: https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV
 
 ---
 
