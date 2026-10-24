@@ -106,7 +106,7 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
   - low disk is not held back by the repeat rule: every scheduled scan notifies while the disk stays almost full, until it is cleaned or snoozed, and its acknowledgement is the threshold's repeat baseline (§5, §6 item 9).
 - **Later decisions (2026-10-19)**, from the owner's first try of the app ("Menu bar popover", "Review and clean window"):
   - the status icon has no threshold dot; a warning pictogram shows what needs the user, and the badge stays (ADR §2);
-  - Pause scans and Resume scans in the right-click menu: the icon turns grey, Scan now is off, nothing is due, and the rescan after a clean still runs (ADR §2, §5, §6 item 6);
+  - Pause scans and Resume scans in the right-click menu: the icon turns grey, Scan now is off, nothing is due, and the rescan after a clean still runs (ADR §2, §5, §6 item 6; once story "Faster clean: re-check only what the selection needs" lands, no scan runs after a clean that wrote the report);
   - the Review window's Close button returns to the popover.
 - **Later decisions (2026-10-20)**, from the owner's try of the Review window:
   - the app icon is option B, "Class ring", from the canvas's app icon board: the drive inside a ring of the class colours (ADR §2; "App skeleton and build pipeline", Implementation Plan, Icons);
@@ -115,7 +115,7 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 
 ## Open Questions
 
-- [x] Technical, decided at the plan gate of "CLI: clean an explicit item list" (2026-10-18): the full rescan before `--items` stays. Only a whole-tree walk sees the toolchain pins (every pin file and sibling version) and the ancestor claims (a rule that would now claim a directory above an item); a scoped walk would need a second classification path. The per-item checks serve the dry run, which predicts and never replaces the rescan.
+- [x] Technical, decided at the plan gate of "CLI: clean an explicit item list" (2026-10-18): the full rescan before `--items` stays. Only a whole-tree walk sees the toolchain pins (every pin file and sibling version) and the ancestor claims (a rule that would now claim a directory above an item); a scoped walk would need a second classification path. The per-item checks serve the dry run, which predicts and never replaces the rescan. Revisited 2026-10-24 (story "Faster clean: re-check only what the selection needs"): the full rescan stays only for lists that need the whole tree; the other lists take a pruned walk with the same classification path (the safety ADR's amendment of that date).
 
 ## Related
 

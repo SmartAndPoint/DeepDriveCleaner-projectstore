@@ -89,6 +89,7 @@ The project root is the nearest ancestor of the finding that has `.git` (a direc
 
 - `ddc scan` only reads.
 - `ddc clean` **always rescans** and builds the plan from the fresh scan, shows it (what, how much is allocated, how much it frees — the total is `~` (an estimate; `≥` on an individual finding is shown by `ddc scan`, where the private size is measured and noticeably smaller than allocated); for `native-only` the space is freed inside the VM image and is not included in the total — and how it is removed) and waits for confirmation. `--dry-run` prints the plan and exits.
+- **Amended 2026-10-24** (story "Faster clean: re-check only what the selection needs", see Amendments): a clean of an explicit item list (`--items`) re-checks its items with a walk pruned to what their verdicts need the walk to have visited, and walks the whole home only when the list needs it. The terminal's `ddc clean` without `--items` always rescans, as above.
 - `--class` is repeatable and works as a filter (`--class safe --class rebuildable`). `--yes`, non-interactively, removes only items **selected by default**, and only from the classes listed in `--class` (default `safe`). With `--yes`, class `review` in `--class` is not accepted (error). `review` and `native-only` always require interactive confirmation.
 - The scan root itself is never removed: `ddc clean ~/.cache/uv` refuses; you need to scan the parent.
 - A scan takes a shared file lock, a cleanup takes an exclusive one (`flock` on `<data-dir>/lock`). A background scan skips the run when the lock is held.
@@ -184,7 +185,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
 **Negative / trade-offs**:
 - Every rule needs manual classification, a marker and a method; new ecosystems are added in code.
-- The rescan in `clean` costs time (seconds to tens of seconds).
+- The rescan in `clean` costs time (seconds to tens of seconds). Once the amendment of 2026-10-24 lands, it is paid only by the terminal's `ddc clean` and by an `--items` list that needs the whole tree.
 - Projects without a lock file and with unknown activity are never selected automatically; they have to be picked by hand.
 
 **What changes in code / process**:
@@ -195,7 +196,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
 - **2026-10-18, proposed.** [[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]], §7 amends §5. An explicit item list, confirmed by a person in the app's confirmation sheet or named at a terminal with `ddc clean --items`, counts as interactive confirmation for each listed item, `review` and `native-only` included.
   - **What it changes.** Until now no non-interactive call could remove a `review` item, because `--yes` refuses that class. With `--items`, a script without a TTY can move named `review` items to the Trash, and, with `permanent: true` on an item, delete them permanently.
-  - **What bounds it.** Consent is per item: a global `--permanent` with `--items` is refused, and each item's class and action must match the fresh scan, or it is skipped as changed since the scan. Everything else in §5 still applies to every item: the rescan, the re-checks and the refusals. In the app, the confirmation sheet's Clean action is the only caller of `clean`, and a test enforces it.
+  - **What bounds it.** Consent is per item: a global `--permanent` with `--items` is refused, and each item's class and action must match the fresh scan, or it is skipped as changed since the scan. Everything else in §5 still applies to every item: the rescan (since 2026-10-24, the walk of that date's amendment), the re-checks and the refusals. In the app, the confirmation sheet's Clean action is the only caller of `clean`, and a test enforces it.
   - §8 is unchanged: the background path still never calls the executor.
   - The amendment takes effect when that ADR is accepted.
 - **2026-10-20, decided by the owner.** Story "User data: pick your own files for the Trash" (epic DDC-002) amends §1, §2 and §5. The user's own files may enter a plan when the user picks them one by one in the app's Review window, or names them in an `--items` list, and only to the Trash.
@@ -235,6 +236,36 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **The scan's default selection does not consult processes**; only the clean does, at execution and in its dry run.
   - **Tool commands** may carry environment variables; `cache.uv` sets `UV_LOCK_TIMEOUT=10`, so a lock taken after the check fails in seconds (uv 0.9.16 and later; older uv ignores it and `NATIVE_TIMEOUT` stays the bound). `uv cache clean --force` is never used.
   - The clean report's schema version is unchanged: no new skip reason.
+- **2026-10-24, decided by the owner on 2026-10-21.** Story "Faster clean: re-check only what the selection needs" (epic DDC-002) amends §5's rescan for an explicit item list. Cause: a clean of two small caches from the app waited about 29 s before its first action. The wait is attributed to the full rescan, because a full scan of the same home took 37 s; the story times each step before the change.
+  - **Rule scope.** Every rule declares what its verdict needs the walk to have visited, in a field matched exhaustively, so no rule exists without one. A path a rule stats or reads on its own does not count, because the pruned walk makes the same call: a sibling lock file, the `CMAKE_HOME_DIRECTORY` of a `CMakeCache.txt`, `~/.nvm/alias/default`. The scopes:
+    - `Item`: the item, its parent and its ancestors (almost every rule);
+    - `Siblings`: also the other children of its parent (`ide.jetbrains-old-data`, whose newest sibling is kept);
+    - `Tree`: files anywhere in the scan roots. These are `toolchain.nvm`, `toolchain.pyenv` and `toolchain.rustup`: their versions are protected by pin files in any project, and with one claimed version or none, every version is kept (none is a finding).
+  - **Which walk.**
+    - **The full walk, as before:** a list holding a `Tree` item. Two more cases take it for reasons other than safety:
+      - a run with no readable report of the current schema, because the CLI edits that report after the clean ([[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]], §6 item 1);
+      - a list with an item whose ancestor cannot be read (found in the walk's errors). This is a conservative choice: the full walk cannot read that ancestor either, and the item ends `changed-since-scan`.
+    - **The pruned walk, for any other list:** the same rule visitor, classification and plan as the full walk, over the listed items, their ancestors up to the scan root, and the siblings of a `Siblings` item with their subtrees. A picked user-data entry's folder is listed with times, so the entry is still checked against the folder's full list of entries (amendment of 2026-10-20).
+    - A claimed ancestor makes the walker measure that ancestor's whole subtree, because the walker's hooks are off inside a claim. For a picked entry of Pictures, Movies, Music or the device backups that ancestor is its folder, claimed whole by design. Downloads is a region whose hooks stay on, so its other entries are pruned. For any other item the claim refuses it anyway, and the story's plan gate decides whether the walk stops there.
+    - A listed item outside the current scan roots, or with a rule the catalog lacks, is refused as today and needs no walk.
+    - There is one classification path: the pruned walk only skips directories.
+  - **Why it sees what the full walk sees:**
+    - a new claim above an item is seen on the way down through its ancestors;
+    - name-with-sibling matchers stat the parent, and content matchers read inside the item;
+    - excludes are path prefixes;
+    - a keep marker inside an item is found by the marker walk, and one at or above it by the guard at the moment of acting;
+    - a lock file or `.git` that changes the class or the project root lies in an ancestor;
+    - a hard link with a link outside the item counts as shared in both walks: the full walk sees the other link, the pruned walk sees fewer links than `nlink`;
+    - "inside another item" compares the list with itself.
+
+    What a pruned walk cannot see, a file anywhere else, is exactly what makes a rule `Tree`.
+  - **Unchanged:**
+    - the matching of a listed item against the plan: path, `(dev, ino)`, rule, class, action;
+    - the per-item re-checks before each action, and the refusals;
+    - the terminal's `ddc clean`, `--yes`, and §8.
+  - **The cost accepted.** A rule's scope is a claim made in code: a future rule that reads outside its item but is declared `Item` would be judged on a partial view. Two things guard against it: the exhaustive field, and equivalence tests in which the pruned and the full re-check agree for every rule of the catalog, for each kind of change after the scan. A test checks the scope sets against `toolchain::dropped`, the one place that consumes whole-walk state, and fails when they differ. An equivalence test fails if `ide.jetbrains-old-data` gains a second anchor, which would make `Siblings` insufficient.
+  - **Gained besides.** A terminal `clean --items` of caches no longer reads Downloads, Pictures or the device backups, so it no longer makes macOS ask for access to them.
+  - The amendment takes effect when the story's code lands.
 
 ## References
 

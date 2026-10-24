@@ -62,7 +62,7 @@ It also covers the states with no report yet, a scan running, nothing worth clea
   - the menu item reads "Pause scans" or "Resume scans";
   - while paused, every Scan now is off and says why: the popover's footer shows "Scans paused" with Resume, the right-click item reads "Scan now (paused)" and is off, and the Review window's Scan again gives way to "Scans paused"; a scheduled launch scans nothing;
   - a scan already running finishes;
-  - the rescan after a clean runs while paused: it is part of the clean (`PopoverModel.scanAfterClean()`);
+  - the rescan after a clean runs while paused: it is part of the clean (`PopoverModel.scanAfterClean()`). Once story "Faster clean: re-check only what the selection needs" lands, no scan runs after a clean that wrote the report: the CLI leaves it current; after a crash the app still rescans (note, 2026-10-24);
   - Review and its clean stay available: they are the user's own act, behind a confirmation;
   - the 0.1.0 LaunchAgent runs on its own and is not paused (the offer to replace it is in "Background scan and notifications in the app")
 - [ ] The two icon preferences in `UserDefaults`: `ShowSizeNextToIcon` off by default (owner, 2026-10-19: next to the icon the reclaimable amount read as a second total beside "Selected to clean"), `ShowMenuBarBadge` on; the Settings story adds their switches
@@ -107,7 +107,7 @@ No spec covers this story; the design is the ADR "Menu bar app: Swift shell over
   - the badge on and off, the warning over the badge.
 
   The size label is the reclaimable amount, unchanged by the class switches.
-- [ ] Unit test: Pause turns Scan now off with no runner call, survives a relaunch (a new model on the same defaults), and makes a scheduled launch scan nothing; the rescan after a clean still runs; Resume turns Scan now back on
+- [ ] Unit test: Pause turns Scan now off with no runner call, survives a relaunch (a new model on the same defaults), and makes a scheduled launch scan nothing; the rescan after a clean still runs (until story "Faster clean: re-check only what the selection needs" lands; then no scan runs after a clean that wrote the report, note of 2026-10-24); Resume turns Scan now back on
 - [ ] Unit test: each warning cause follows its source: a failed scan shows the warning until its notice is dismissed or the next scan starts; a busy lock shows its notice and no warning
 - [ ] Unit test: the footer's and the icon's Full Disk Access state follow the probe, not the report: a report with `full_disk_access: true` and a probe that fails shows Full Disk Access as missing; the probe, given a path, reports granted for a readable file and missing for a missing or unreadable one; a report with `full_disk_access: false` and a probe that succeeds shows the footer as granted and the summary's without-access note
 - [ ] Unit test: the footer's next scan is the schedule seam's next slot, written as today, tomorrow or a weekday at the hour, and "Scheduled scans off" when there is none

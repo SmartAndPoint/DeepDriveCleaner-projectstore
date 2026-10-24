@@ -61,10 +61,10 @@ The owner chose two changes on 2026-10-21 ("1 и 2"):
    - a lock file or `.git` that changes the item's class or its project root;
    - for an item of a `KnownChildren` rule, its siblings, which decide whether it is a finding at all.
 
-   It uses **one classification path**: the same rule visitor, classification and `plan_listed` as today, run over a walk pruned to those directories. A picked entry of a user-data folder also gets its folder listed with times, so its `EntryIndex` exists as it does after a full walk. Any doubt falls back to the full walk: an unreadable ancestor, a rule whose scope is unknown, or no readable report.
+   It uses **one classification path**: the same rule visitor, classification and `plan_listed` as today, run over a walk pruned to those directories. A picked entry of a user-data folder also gets its folder listed with times, so its `EntryIndex` exists as it does after a full walk. Two cases fall back to the full walk without a safety reason: an unreadable ancestor, and no readable report. A rule the catalog lacks is refused as `rule-mismatch` without a walk; the scope field is exhaustive, so no rule's scope is unknown.
 
    The per-item checks before each action stay as they are.
-2. **No second scan after the clean.** The CLI leaves `last-scan.json` describing the disk after the clean (section below), and the app runs no scan of its own after a clean.
+2. **No second scan after the clean.** The CLI leaves `last-scan.json` describing the disk after the clean (section below), and the app runs no scan of its own after a clean that wrote it. After a crash that followed the `cleaning` event, it still rescans, as today.
 
 These options were weighed and set aside for now:
 - **Re-checking through the FSEvents history**, rescanning only the directories changed since the scan: the fastest, but it needs the walk's state persisted between runs. It is the most complex option.
@@ -88,7 +88,7 @@ Every total of the report has a rule: scanned bytes, files, directories, unowned
 
 **What stays.** In the pruned case `generated_at` stays the previous report's, so the popover's "last scan" age and `ddc schedule status` do not claim a fresh scan of the whole home. The app's "Cleaned just now" lock then lasts until the next real scan; the cleaned findings are gone from the file anyway. `duration_ms` and `ddc_version` stay the previous report's too. In the full-walk case all three are the rescan's, as for any full scan.
 
-**When it is written.** Once, after the clean, in both the scoped and the full-walk case: today's full walk writes it before the first action, and that moves too. After a cooperative cancel it is written with what was done, and the not-run items stay. A crash or SIGKILL leaves the file from before the clean.
+**When it is written.** Once, after the clean, in both the scoped and the full-walk case: today's full walk writes it before the first action, and that moves too. After a cooperative cancel it is written with what was done, and the not-run items stay. A crash or SIGKILL leaves the file from before the clean, and the app rescans as today when it saw the `cleaning` event.
 
 **The signal that acting begins.** The app can no longer read anything from the file's date. The CLI writes the `cleaning` phase event of story "CLI: progress events" to stderr, flushed, under `--progress json`. It writes it after the journal is open and the signal handler installed, immediately before `exec::execute`, so an exit before that point (such as "cannot open the action journal") is "Nothing was touched". Only the phase events (`preparing`, `cleaning`) are brought forward here, without counters, in a first `docs/progress.schema.json` that "CLI: progress events" extends. `--progress json` is accepted by `clean` as a whole, the terminal's included, with phase events only.
 
@@ -133,7 +133,7 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 - [ ] Equivalence tests over synthetic homes covering every rule in the catalog: the pruned and the full re-check give the same outcome for every listed item, for each change of AC 4.
 - [ ] CLI: the `preparing` and `cleaning` phase events under `--progress json`, with a first `docs/progress.schema.json` holding the phase events only; `last-scan.json` edited after the clean, per the section above.
 - [ ] App:
-  - drop the rescan after a clean;
+  - drop the rescan after a clean that wrote the report; keep it after a crash that followed the `cleaning` event;
   - read the phase and "nothing touched" from the event;
   - reload the report when the clean ends (`PopoverModel.refresh` skips it during a clean today);
   - rewrite the crash tests.
@@ -165,7 +165,7 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
   - has lost a picked entry from its folder's contents, together with the findings inside it.
 
   `generated_at` is the previous report's in the pruned case and the rescan's in the full-walk case; the same holds after a cancel.
-- [ ] **AC 7.** The app starts no scan after a clean, and its sheet moves from preparing to cleaning on the CLI's `cleaning` event. A crash after the event points to the journal; a refusal, or a crash before the event, says "Nothing was touched" (DDCKit tests). On the CLI side, `clean --items --progress json` on a temporary tree writes `preparing` then `cleaning` to stderr, each flushed, with `cleaning` before the first journal entry; without `--progress json`, stderr carries no JSON (test).
+- [ ] **AC 7.** The app starts no scan after a clean that wrote the report (after a crash that followed the `cleaning` event it rescans, as today), and its sheet moves from preparing to cleaning on the CLI's `cleaning` event. A crash after the event points to the journal; a refusal, or a crash before the event, says "Nothing was touched" (DDCKit tests). On the CLI side, `clean --items --progress json` on a temporary tree writes `preparing` then `cleaning` to stderr, each flushed, with `cleaning` before the first journal entry; without `--progress json`, stderr carries no JSON (test).
 - [ ] **AC 8.** The terminal's `ddc clean` still rescans the whole home before its plan (test).
 - [ ] **AC 9.** On the reference machine, with the app log's times (manual check by the owner):
   - a clean of caches only re-checks its items in under 1 s;

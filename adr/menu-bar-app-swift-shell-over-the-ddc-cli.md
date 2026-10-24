@@ -112,7 +112,7 @@ The plist inside a signed bundle cannot carry the user's chosen time. So the tic
 - the schedule preference: daily or weekly, at a whole hour ("Daily at 10:00" on the canvas); whole hours match the tick;
 - the time of the last **scheduled** scan, which the app keeps in `UserDefaults`. It is not `last-scan.json`: a Scan now in the popover or a `ddc scan` in the terminal neither shifts the slot nor suppresses that day's notification;
 - a pending reminder scan (Remind me tomorrow, below);
-- whether scans are paused (`ScansPaused`, from the menu; 2026-10-19). While paused nothing is due and the agent stays registered; after Resume a missed slot is due at the next tick. The rescan after a clean is part of the clean and runs while paused.
+- whether scans are paused (`ScansPaused`, from the menu; 2026-10-19). While paused nothing is due and the agent stays registered; after Resume a missed slot is due at the next tick. The rescan after a clean is part of the clean and runs while paused. (Amended 2026-10-24, story "Faster clean: re-check only what the selection needs": the app runs no scan after a clean that wrote `last-scan.json`, §6 item 1; after a crash that followed the `cleaning` event it still rescans, while paused too. The clean's own re-check runs while paused.)
 
 A slot missed while the Mac slept is caught up at the next tick, because the last scheduled scan is then older than the slot. The popover's "next scan" is computed by the same function.
 
@@ -169,21 +169,42 @@ These changes are additive. One change is visible in the terminal: a held lock e
 
 1. **`ddc clean --items <file|-> --json`.**
    - **Input.** A JSON list (`schema_version`) of items from the report the user reviewed: `path`, `dev`, `ino`, `rule`, `class`, `action` (`delete`, `trash`, `native`, `native-only`) and, for `review` items, `permanent`.
-   - **Matching.** It rescans, as every clean does (the safety ADR §5). A listed item runs only if the fresh plan finds it again with the same path, `(dev, ino)`, rule and class, and derives the same action for its `permanent`. Any mismatch skips it as `changed-since-scan`. A `user-data` item is the exception: it is an entry of a user-data folder, matched against the fresh scan's full list of that folder's entries (the safety ADR's amendment of 2026-10-20). A `review` item confirmed for the Trash can never run as a delete because a lock file appeared in the meantime.
+   - **Matching.** It rescans, as every clean does (the safety ADR §5; amended 2026-10-24, see "Re-check walk" below). A listed item runs only if the fresh plan finds it again with the same path, `(dev, ino)`, rule and class, and derives the same action for its `permanent`. Any mismatch skips it as `changed-since-scan`. A `user-data` item is the exception: it is an entry of a user-data folder, matched against the fresh scan's full list of that folder's entries (the safety ADR's amendment of 2026-10-20). A `review` item confirmed for the Trash can never run as a delete because a lock file appeared in the meantime.
    - **Selection.** The list is the selection: no class filter, no default selection. `disabled_rules` never drops a listed item. The app never lists an `ignored` item (item 7).
    - **Refusals.** A global `--permanent` together with `--items`, and a malformed list, are refused with exit code 2.
    - **Output.** The execution report as JSON: the outcome per item, skip reasons, and free space before and after for each volume touched.
+   - **Re-check walk** (amended 2026-10-24, story "Faster clean: re-check only what the selection needs"). The "fresh plan" above comes from the walk prescribed by the safety ADR's amendment of 2026-10-24:
+     - pruned to the listed items, their ancestors and, for a `Siblings` rule, their siblings;
+     - the whole tree when the list holds a `Tree` item, when an item's ancestor cannot be read, or when no report of the current schema is on disk.
+   - **The report after the clean** (amended 2026-10-24). The CLI writes `last-scan.json` once, after the clean:
+     - in the pruned case, by editing the report on disk under its lock, whichever scan wrote it;
+     - in the full-walk case, by editing the rescan's.
+
+     The app runs no scan after a clean that wrote it. After a crash, or an exit before the write (a journal write failure mid-run), the file is the one from before the clean and lists what was removed. The app then rescans, as today, when it saw the `cleaning` event.
+
+     What the edited report holds:
+     - A deleted item leaves, with its bytes, files and directories in every total.
+     - A trashed item leaves. When it lies on the home volume and the report holds the `trash` finding, its bytes, files and directories move to that finding; otherwise it counts as deleted. A picked user-data entry also leaves its folder's contents, with the findings inside it.
+     - An item a tool cleaned is measured again and the difference subtracted. Skipped, failed and not-run items stay.
+     - In the pruned case `generated_at`, `duration_ms` and `ddc_version` stay the previous report's; in the full-walk case they are the rescan's.
+     - After a cooperative cancel the file is written with what was done. A crash leaves the report from before the clean.
 2. **`ddc clean --items … --dry-run --json`** gives the confirmation sheet its live warnings, such as "Spotify is running · will be skipped". It does **not** rescan. It runs the executor's per-item re-checks against the listed items only:
    - identity: the path still has the listed `(dev, ino)`;
    - class and action, derived again from the rule and the project's lock file;
    - kept (`.ddc-keep` in the item or above it, an exclude), in use, owner running, protected.
 
-   It walks no unlisted tree. Results stream on stdout, one JSON line per item as its checks finish, then a summary line, so the sheet opens at once and the warnings fill in. Each line says would delete, would trash, would run a command, or would skip with its reason (`owner-running`, `in-use`, `changed-since-scan`, …). It renames, deletes and trashes nothing and runs no native command. The real clean still rescans and re-checks everything (item 1).
+   It walks no unlisted tree. Results stream on stdout, one JSON line per item as its checks finish, then a summary line, so the sheet opens at once and the warnings fill in. Each line says would delete, would trash, would run a command, or would skip with its reason (`owner-running`, `in-use`, `changed-since-scan`, …). It renames, deletes and trashes nothing and runs no native command. The real clean still re-checks everything with item 1's walk (amended 2026-10-24: pruned unless the list needs the whole tree).
 3. **Progress.** `--progress json` writes newline-delimited events to stderr:
    - scan: files, directories and bytes so far;
    - clean: the preparing phase, then item `i` of `n` with its path and outcome.
 
    The core counter belongs to the DDC-001 story "Progress output while ddc clean runs", which this depends on.
+
+   Amended 2026-10-24, story "Faster clean: re-check only what the selection needs": the `cleaning` phase event is written to stderr, flushed, after the journal is open and the signal handler installed, immediately before `exec::execute`. The executor's own preparation (the local-snapshot count, the keep-marker walk of the chosen items, the process snapshot) runs after it. The event therefore means the CLI may touch files from now on, not that the first action has started; a crash in that preparation points to the journal although nothing was done. Story "CLI: progress events", whose preparing phase today ends after the keep-marker walk, decides whether the event moves into the executor when its counters land. The app reads two things from it, through the runner's live stderr stream and never from a bounded tail or the report file's date:
+   - the switch from preparing to cleaning;
+   - after a crash, whether anything may have been touched: event seen, the journal lists what was done; not seen, nothing was touched.
+
+   `--progress json` is accepted by `clean` as a whole, with the phase events (`preparing`, `cleaning`) only until story "CLI: progress events" adds the counters and item events; a first `docs/progress.schema.json` holds them. The app ignores lines on that stream that are not JSON, such as warnings or "stopping after the current item".
 4. **Cancellation.**
    - A scan needs no handler: SIGTERM ends the process, and `last-scan.json` is only ever replaced atomically at the end.
    - A clean installs a handler for SIGINT and SIGTERM (in the core's `sys` module, or through `signal-hook`) that sets a cooperative flag checked by `exec::execute` between items.
@@ -325,7 +346,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - Notifications have actions and show the app's name and icon.
 
 **Negative / trade-offs**:
-- Every clean still rescans first: about 40 s on the reference machine, shown as progress.
+- Every clean still rescans first: about 40 s on the reference machine, shown as progress. (Amended 2026-10-24, story "Faster clean: re-check only what the selection needs": only the terminal's `ddc clean` and a list that needs the whole tree, which is one of these: a list holding a toolchain version (`toolchain.nvm`, `toolchain.pyenv`, `toolchain.rustup`), a list with an item whose ancestor cannot be read, or a run with no readable report. Any other list re-checks only its items and what lies above and beside them.)
 - The scheduler wakes the app once an hour to check whether a scan is due.
 - Login Items lists two entries for the app: the login item and the scheduler agent.
 - `brew uninstall` without `--zap` leaves both background items in Login Items until macOS drops them; the README says so.
@@ -344,7 +365,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
   - `scan --background --notify json`, `notify ack` and `notify snooze`;
   - `schedule install` respecting the `scheduler` record, and adding `AssociatedBundleIdentifiers` when run from inside the app.
 - Cask: `app` plus `binary` from the bundle, `depends_on macos`, `uninstall quit:`, `zap launchctl:` for both agents.
-- Safety ADR §5: dated amendment pointing here.
+- Safety ADR §5: dated amendment pointing here, and a second one of 2026-10-24 (story "Faster clean: re-check only what the selection needs").
 
 **Implementation notes**:
 - **Pipes.** The app reads the CLI's stdout and stderr concurrently. A full 64 KiB pipe would deadlock a CLI that writes to the other one.
@@ -353,7 +374,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 ## Open Questions
 
 - If `SMAppService` rejects an agent plist whose program is `/usr/bin/open`, the fallback is `BundleProgram: Contents/MacOS/DeepDriveCleaner` with the argument `--tick`. In tick mode the app only runs `open -gjb com.smartandpoint.deepdrivecleaner --args --scheduled` and exits, so the scan still runs in an instance LaunchServices launched. The tick instance does this and exits before `NSApplicationMain`, with no `NSApplication` created: once AppKit registers it with LaunchServices it is the running instance of the bundle id, `open -b` would deliver a reopen to the tick process itself, and the scan would run in a process launchd started, which is what the fallback exists to avoid. Registering the agent during development shows whether `SMAppService` accepts the `open` program; the fallback is used if it does not.
-- Does `--items` need a full rescan (about 40 s), or would a scoped re-walk of the listed findings plus the executor's re-checks give the same safety? Decided at that story's plan gate (2026-10-18): the full rescan stays, because only a whole-tree walk sees the toolchain pins (`toolchain::dropped` needs every pin file and sibling version the walk found) and the ancestor claims (a rule that would now claim a directory above an item). `--exclude` is a path-prefix test and needs no walk.
+- Does `--items` need a full rescan (about 40 s), or would a scoped re-walk of the listed findings plus the executor's re-checks give the same safety? Decided at that story's plan gate (2026-10-18): the full rescan stays, because only a whole-tree walk sees the toolchain pins (`toolchain::dropped` needs every pin file and sibling version the walk found) and the ancestor claims (a rule that would now claim a directory above an item). `--exclude` is a path-prefix test and needs no walk. Revisited on 2026-10-24, after the owner's decision of 2026-10-21 (story "Faster clean: re-check only what the selection needs"): the full rescan stays only for lists that need the whole tree. Both reasons above still hold. The pins make the toolchain rules `Tree`, and an ancestor claim is seen because the pruned walk passes through every ancestor with the same rule visitor. The objection to a second classification path does not apply: the pruned walk reuses the visitor, the classification and the plan unchanged. See the safety ADR's amendment of 2026-10-24.
 
 The owner's questions (minimum macOS, the notification's second action, the signing team for 0.2.0, one cask) were decided on 2026-10-18 and are recorded in items 3, 5 and 8. The 2026-10-19 decisions (the exclude confirmation, the per-volume low-disk gate, low disk outside the repeat rule) are in §5 and in items 6 and 9 of §6; the owner's icon and pause decisions of the same day are in §2, §5 and item 6 of §6; the app icon's design (2026-10-20) is in §2.
 

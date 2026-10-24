@@ -50,7 +50,7 @@ This story is artboards 4 to 6 of the design canvas. The user browses what was f
 - [ ] Live warnings: the sheet opens at once and runs `clean --items --dry-run --json` over the listed items (no rescan); the predicted skips stream in per item ("Spotify is running · will be skipped"); Check again reruns it
 - [ ] Clean: the sheet's Clean action, and nothing else in the app, runs `clean --items <file> --json` with exactly the confirmed items (each with its class, action and `permanent`). It shows two phases:
   - the preparing phase (the CLI's rescan), with the elapsed time;
-  - the cleaning phase, which starts when the CLI saves its rescan to `last-scan.json`.
+  - the cleaning phase, which starts when the CLI saves its rescan to `last-scan.json` (changes with story "Faster clean: re-check only what the selection needs"; note of 2026-10-24 under decision 8).
 
   Item `i` of `n`, the current path and the bytes processed arrive with "CLI: progress events", which feeds the same progress state and adds `--progress json`. Cancel stops after the current item; a clean still waiting behind another run never starts. While the clean and the popover's rescan after it run, the sheet sets the `busy` input of the icon state of "Menu bar popover", so the arc turns as on artboard 3.
 - [ ] Result: deleted, moved to the Trash, tools run, skipped and failed; free space before and after for each volume; skipped items grouped by cause (count and size per cause, the items inside), in plain language; Open journal
@@ -82,6 +82,13 @@ Plan from the `projectstore:planner` pass (2026-10-19). No spec covers the story
    - **Unchanged.** The CLI never reached its first item: "Nothing was touched", and no rescan. This covers exit 75, exit 2, and a cancel or a crash while preparing.
    - **Changed.** Items may be gone (`.crashed`, exit 1 from a journal write failure mid-run, or a cancel after the save but before the handler): "It stopped before it could report; the journal lists what was done", with Show the journal on the CLI's `actions.jsonl` (`<data>/logs` with `DDC_DATA_DIR`, else `~/Library/Logs/DeepDriveCleaner`), and a rescan.
    - **The rule.** The popover rescans after a clean only when the CLI saved its rescan or printed a report.
+
+   **Note, 2026-10-24.** Story "Faster clean: re-check only what the selection needs" changes decisions 1, 7 and 8 when its code lands:
+   - the CLI writes `last-scan.json` after the clean, not before its first item;
+   - the switch to cleaning, and "Nothing was touched" after a crash, come from the CLI's `cleaning` phase event on stderr instead of the file's date;
+   - no scan runs after a clean that wrote the report; after a crash that followed the `cleaning` event, the app still rescans.
+
+   Until then, this section describes the code.
 9. **Settings changed while the window is open.** The window reads `settings.json` itself.
    - **When the rows are rebuilt.** With the current settings, on every request from the popover, after Done, whenever the file's date changed when the window becomes key, and just before the sheet opens. A type switched off in Settings therefore leaves the selection at once, and the sheet captures under the current settings.
    - **The open sheet.** It shows the items it captured. At Clean, the payload is checked once more against the current settings, and an item a settings change made ignored since then is left out, so the app never lists an ignored item (ADR §6 item 1).
@@ -105,7 +112,7 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
   - **Esc.** It still closes the window as decided below. The exception is a filter field holding text: there Esc clears it first.
   - **Return.** While the filter holds text, Return stays in the field.
 - **Close returns to the popover (owner, 2026-10-19).** The window's Close button, and Escape, its shortcut, close the window and open the popover under the icon, so the user lands where they came from. The title bar's close box only closes the window, as any window's does: the Close button is the window's way back, the close box is window chrome. ⌘W does nothing yet: the app has no main menu, so ⌘W, and copy and paste in the search field, wait for one (a follow-up). An already open popover stays as it is.
-- **Scans paused (owner, 2026-10-19; "Menu bar popover").** While paused, Scan again (and Scan now with no report yet) gives way to "Scans paused". The rescan after a clean still runs: it is part of the clean.
+- **Scans paused (owner, 2026-10-19; "Menu bar popover").** While paused, Scan again (and Scan now with no report yet) gives way to "Scans paused". The rescan after a clean still runs: it is part of the clean. (Changes with story "Faster clean: re-check only what the selection needs"; note of 2026-10-24 under decision 8)
 - **Follow-up.** A finding that is itself a scan root counts in the popover's "Selected to clean", but the window and `build_plan` leave it out. It is an edge case; "Menu bar popover" can drop it from its totals.
 
 ### Placement, in order
