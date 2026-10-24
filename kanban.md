@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-21T11:04:45.619Z
+generated_at: 2026-10-22T04:46:27.365Z
 
 ---
 
@@ -15,6 +15,7 @@ generated_at: 2026-10-21T11:04:45.619Z
 - [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
 - [ ] [[epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan|DDC-002: Automatic cleaning of download caches after a scheduled scan]] #p3
+- [ ] [[epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs|DDC-002: Faster clean: re-check only what the selection needs]] #p2
 
 ## ToDo
 
