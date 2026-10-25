@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-22T04:46:27.591Z
+generated_at: 2026-10-24T20:32:14.318Z
 
 ---
 
@@ -24,7 +24,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | Homebrew tap and the v0.1.0 release | story | in-progress |
-| epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | planned |
+| epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | in-progress |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
@@ -33,7 +33,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | planned |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | planned |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
-| epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | planned |
+| epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | in-progress |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | planned |

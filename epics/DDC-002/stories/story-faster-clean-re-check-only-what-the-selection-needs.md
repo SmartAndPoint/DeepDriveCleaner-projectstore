@@ -90,13 +90,15 @@ Every total of the report has a rule: scanned bytes, files, directories, unowned
 
 **When it is written.** Once, after the clean, in both the scoped and the full-walk case: today's full walk writes it before the first action, and that moves too. After a cooperative cancel it is written with what was done, and the not-run items stay. A crash or SIGKILL leaves the file from before the clean, and the app rescans as today when it saw the `cleaning` event.
 
-**The signal that acting begins.** The app can no longer read anything from the file's date. The CLI writes the `cleaning` phase event of story "CLI: progress events" to stderr, flushed, under `--progress json`. It writes it after the journal is open and the signal handler installed, immediately before `exec::execute`, so an exit before that point (such as "cannot open the action journal") is "Nothing was touched". Only the phase events (`preparing`, `cleaning`) are brought forward here, without counters, in a first `docs/progress.schema.json` that "CLI: progress events" extends. `--progress json` is accepted by `clean` as a whole, the terminal's included, with phase events only.
+**The signal that acting begins.** (Superseded in part 2026-10-25, see the note below.) The app can no longer read anything from the file's date. The CLI writes the `cleaning` phase event of story "CLI: progress events" to stderr, flushed, under `--progress json`. It writes it after the journal is open and the signal handler installed, immediately before `exec::execute`, so an exit before that point (such as "cannot open the action journal") is "Nothing was touched". Only the phase events (`preparing`, `cleaning`) are brought forward here, without counters, in a first `docs/progress.schema.json` that "CLI: progress events" extends. `--progress json` is accepted by `clean` as a whole, the terminal's included, with phase events only.
 
 The app reads both of its signals from that event:
 - the switch from preparing to cleaning;
 - after a crash: event seen → "the journal lists what was done"; not seen → "Nothing was touched".
 
 A crash between the event and the first action errs on the safe side: it points to the journal although nothing was done.
+
+**Note, 2026-10-25.** Story "CLI: progress events" comes first. At its plan gate it moved the `cleaning` event into the executor, after the executor's own preparation and immediately before the first action. It also creates `docs/progress.schema.json` with the full event stream. This story uses both as they are; it no longer brings phase events forward.
 
 The app takes the event from the runner's live `stderrLine` callback, never from `Result.stderrTail`, a bounded tail that warnings or "stopping after the current item" can push it out of. The signal does not survive an app relaunch during a clean. That is acceptable: quitting cancels the clean and waits for the CLI (`prepareToQuit` in `CleanRun.swift`), as today, and the app never resumes watching a clean it did not start.
 
@@ -131,7 +133,7 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 - [ ] Core: give every rule a scope, matched exhaustively (`Item`, `Siblings` or `Tree`), so a new cross-tree rule cannot be missed silently; a list holding a `Tree` rule takes the full walk.
 - [ ] Core: the pruned walk, a visitor wrapper that skips any directory that is not an ancestor of, inside, or a sibling-for-`KnownChildren` of a listed item. It reuses the rule visitor, classification and `plan_listed` unchanged, and builds the `EntryIndex` of a picked entry's folder.
 - [ ] Equivalence tests over synthetic homes covering every rule in the catalog: the pruned and the full re-check give the same outcome for every listed item, for each change of AC 4.
-- [ ] CLI: the `preparing` and `cleaning` phase events under `--progress json`, with a first `docs/progress.schema.json` holding the phase events only; `last-scan.json` edited after the clean, per the section above.
+- [ ] CLI: `last-scan.json` edited after the clean, per the section above. The phase events and `docs/progress.schema.json` come from "CLI: progress events" (note of 2026-10-25).
 - [ ] App:
   - drop the rescan after a clean that wrote the report; keep it after a crash that followed the `cleaning` event;
   - read the phase and "nothing touched" from the event;
@@ -193,14 +195,14 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 - **The keep-marker walk** (`keep_markers`, `crates/ddc-core/src/exec/mod.rs`) walks every chosen item inside `execute`, seconds before acting. If the pruned walk supplies the markers instead, they are taken a little earlier. This is safe because the guard checks a marker at the item and above at the moment of acting; only markers deep inside come from the walk. Otherwise both walks stay, and their cost is bounded by the items' size.
 - **The app's signals today** (`CleanRun.swift`): it watches the modification time of `last-scan.json` to switch from preparing to cleaning, and reads "nothing was touched" from an unchanged file. `CleanRunTests` encodes both, including a crash after the save. `PopoverModel.refresh` does not reload the report during a clean.
 - **The journal cannot be the crash signal.** An entry is appended after each outcome, so a crash during the first item's rename leaves it unchanged.
-- **"CLI: progress events".** Its preparing counter is "files read against the last report's `totals.files`". After this story, the denominator is the listed items' files (plus `KnownChildren` siblings) in the pruned case, and `totals.files` only in the full-walk case. That story also depends on DDC-001 "Progress output while ddc clean runs", still planned, which is why the phase events are brought forward here.
+- **"CLI: progress events".** Its preparing counter is "files read against the last report's `totals.files`". After this story, the denominator is the listed items' files (plus `KnownChildren` siblings) in the pruned case, and `totals.files` only in the full-walk case. That story's event and schema are used as they are (note of 2026-10-25); its preparing denominator changes here.
 - `ddc schedule status` reads the report's `generated_at` and selected reclaimable bytes; both stay meaningful in an edited report.
 
 ## Dependencies
 
 - The ADR amendments above.
 - "CLI: clean an explicit item list" (DDC-002): the `--items` contract this story changes.
-- "CLI: progress events" (DDC-002): its phase events, brought forward here without counters; its preparing denominator changes.
+- "CLI: progress events" (DDC-002): its `cleaning` event and `docs/progress.schema.json`, used as they are (note of 2026-10-25); its preparing denominator changes here.
 - "Review and clean window" and "Menu bar popover" (DDC-002): their text about the rescan after a clean.
 
 ## Attachments
