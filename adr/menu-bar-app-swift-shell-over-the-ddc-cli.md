@@ -10,7 +10,7 @@ external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2P
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-20
+reviewed_at: 2026-10-25
 ---
 
 # Menu bar app: Swift shell over the ddc CLI
@@ -175,16 +175,16 @@ These changes are additive. One change is visible in the terminal: a held lock e
    - **Output.** The execution report as JSON: the outcome per item, skip reasons, and free space before and after for each volume touched.
    - **Re-check walk** (amended 2026-10-24, story "Faster clean: re-check only what the selection needs"). The "fresh plan" above comes from the walk prescribed by the safety ADR's amendment of 2026-10-24:
      - pruned to the listed items, their ancestors and, for a `Siblings` rule, their siblings;
-     - the whole tree when the list holds a `Tree` item, when an item's ancestor cannot be read, or when no report of the current schema is on disk.
+     - the whole tree when the list holds a `Tree` item, when an item's ancestor cannot be read, or when no report of the current schema is on disk; added 2026-10-25, also when the report on disk cannot be read or was scanned from other roots or another home (`ddc scan ~/Code`).
    - **The report after the clean** (amended 2026-10-24). The CLI writes `last-scan.json` once, after the clean:
      - in the pruned case, by editing the report on disk under its lock, whichever scan wrote it;
      - in the full-walk case, by editing the rescan's.
 
-     The app runs no scan after a clean that wrote it. After a crash, or an exit before the write (a journal write failure mid-run), the file is the one from before the clean and lists what was removed. The app then rescans, as today, when it saw the `cleaning` event.
+     The app runs no scan after a clean that wrote it; the clean report says so in `last_scan_saved` (added 2026-10-25: written only by `clean --items`, false when the write failed, absent from an older CLI, which the app reads as false). After a crash, or an exit before the write (a journal write failure mid-run), the file is the one from before the clean and lists what was removed. The app then rescans, as today, when it saw the `cleaning` event.
 
      What the edited report holds:
      - A deleted item leaves, with its bytes, files and directories in every total.
-     - A trashed item leaves. When it lies on the home volume and the report holds the `trash` finding, its bytes, files and directories move to that finding; otherwise it counts as deleted. A picked user-data entry also leaves its folder's contents, with the findings inside it.
+     - A trashed item leaves. When it lies on the home volume and the report holds the `trash` finding, its bytes, files and directories move to that finding; otherwise it counts as deleted. A picked user-data entry also leaves its folder's contents, with the findings inside it. Added 2026-10-25 at the story's plan gate: a picked folder moves its bytes only, since its files and directories are not known; the findings inside it leave without moving bytes, which the entry's bytes already hold.
      - An item a tool cleaned is measured again and the difference subtracted. Skipped, failed and not-run items stay.
      - In the pruned case `generated_at`, `duration_ms` and `ddc_version` stay the previous report's; in the full-walk case they are the rescan's.
      - After a cooperative cancel the file is written with what was done. A crash leaves the report from before the clean.
@@ -348,7 +348,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - Notifications have actions and show the app's name and icon.
 
 **Negative / trade-offs**:
-- Every clean still rescans first: about 40 s on the reference machine, shown as progress. (Amended 2026-10-24, story "Faster clean: re-check only what the selection needs": only the terminal's `ddc clean` and a list that needs the whole tree, which is one of these: a list holding a toolchain version (`toolchain.nvm`, `toolchain.pyenv`, `toolchain.rustup`), a list with an item whose ancestor cannot be read, or a run with no readable report. Any other list re-checks only its items and what lies above and beside them.)
+- Every clean still rescans first: about 40 s on the reference machine, shown as progress. (Amended 2026-10-24, story "Faster clean: re-check only what the selection needs": only the terminal's `ddc clean` and a list that needs the whole tree, which is one of these: a list holding a toolchain version (`toolchain.nvm`, `toolchain.pyenv`, `toolchain.rustup`), a list with an item whose ancestor cannot be read, or a run with no readable report; added 2026-10-25, a report scanned from other roots or another home counts as no report. Any other list re-checks only its items and what lies above and beside them.)
 - The scheduler wakes the app once an hour to check whether a scan is due.
 - Login Items lists two entries for the app: the login item and the scheduler agent.
 - `brew uninstall` without `--zap` leaves both background items in Login Items until macOS drops them; the README says so.

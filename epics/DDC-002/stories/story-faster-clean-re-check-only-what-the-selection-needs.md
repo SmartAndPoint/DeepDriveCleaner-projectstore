@@ -3,18 +3,18 @@ type: story
 id: "story-faster-clean-re-check-only-what-the-selection-needs"
 epic: "DDC-002"
 title: "Faster clean: re-check only what the selection needs"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-21
-updated: 2026-10-24
+updated: 2026-10-25
 external_refs: {}
 tags: [cli, app, safety, performance]
-code_refs: []
+code_refs: ["README.md", "app/DeepDriveCleaner/AppDelegate.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanTimings.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanTimingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReviewSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/clean-report.json", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/exec/report.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-core/src/report/after_clean.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/toolchain.rs", "crates/ddc-core/src/scan/mod.rs", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/tests/after_clean.rs", "crates/ddc-core/tests/recheck.rs", "crates/ddc-core/tests/common/fixtures.rs", "docs/clean.schema.json", "docs/progress.schema.json"]
 specs: []
-started_at: null
+started_at: "2026-10-25T09:17:22.397Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-25T09:17:22.397Z"
 ---
 
 # Faster clean: re-check only what the selection needs
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -61,7 +61,7 @@ The owner chose two changes on 2026-10-21 ("1 и 2"):
    - a lock file or `.git` that changes the item's class or its project root;
    - for an item of a `KnownChildren` rule, its siblings, which decide whether it is a finding at all.
 
-   It uses **one classification path**: the same rule visitor, classification and `plan_listed` as today, run over a walk pruned to those directories. A picked entry of a user-data folder also gets its folder listed with times, so its `EntryIndex` exists as it does after a full walk. Two cases fall back to the full walk without a safety reason: an unreadable ancestor, and no readable report. A rule the catalog lacks is refused as `rule-mismatch` without a walk; the scope field is exhaustive, so no rule's scope is unknown.
+   It uses **one classification path**: the same rule visitor, classification and `plan_listed` as today, run over a walk pruned to those directories. A picked entry of a user-data folder also gets its folder listed with times, so its `EntryIndex` exists as it does after a full walk. Three cases fall back to the full walk without a safety reason: an unreadable ancestor, no readable report, and a report of other roots or another home (the third added 2026-10-25, gate decision 10a). A rule the catalog lacks is refused as `rule-mismatch` without a walk; the scope field is exhaustive, so no rule's scope is unknown.
 
    The per-item checks before each action stay as they are.
 2. **No second scan after the clean.** The CLI leaves `last-scan.json` describing the disk after the clean (section below), and the app runs no scan of its own after a clean that wrote it. After a crash that followed the `cleaning` event, it still rescans, as today.
@@ -72,7 +72,7 @@ These options were weighed and set aside for now:
 
 ### `last-scan.json` after a clean
 
-**Which file.** The CLI edits the report on disk, under its exclusive lock, whichever scan wrote it: the one the user reviewed, or a newer one from a scheduled or terminal scan in between. With no report of the current schema it takes the full walk and writes a fresh report, as today.
+**Which file.** The CLI edits the report on disk, under its exclusive lock, whichever scan wrote it: the one the user reviewed, or a newer one from a scheduled or terminal scan in between. With no report of the current schema, or none of the clean's roots and home (gate decision 10a), it takes the full walk and writes a fresh report, as today.
 
 **Per outcome:**
 
@@ -82,7 +82,8 @@ These options were weighed and set aside for now:
 | Trashed | The item leaves. When the report holds the `trash` finding (`~/.Trash`) and the item lies on the home volume, its bytes, files and directories move to that finding: the scanned total does not drop and the `review` class grows. Otherwise the item left the scan roots (the Trash of another volume, or a home outside the roots) and is treated as deleted. |
 | Run by its tool | The item is measured again and the difference subtracted. |
 | Skipped, failed, not run | The item stays as it was. |
-| Picked user-data entry | The entry leaves its folder's `contents` (entries, or the rest count and bytes). The folder finding shrinks by its bytes, and the findings inside the entry leave with it. Its bytes follow the Trashed rule. |
+| Picked user-data entry | The entry leaves its folder's `contents` (entries, or the rest count and bytes). The folder finding shrinks by the entry's bytes less those of the findings inside it, which the folder never counted. Those findings leave the list without moving any bytes: the entry's bytes hold them. The entry's bytes follow the Trashed rule once. Its files and directories are not known, so the scanned totals keep them until the next full scan (gate decision 6). |
+| A finding inside a listed Downloads entry, deleted or trashed | Besides the rule of its outcome, that entry's `bytes` and `findings` shrink, or the folder's `rest_bytes` when the entry is in the rest (gate decision 6). |
 
 Every total of the report has a rule: scanned bytes, files, directories, unowned bytes, per-class count, bytes and selected figures, and the volume's free space (taken from the clean's own `statfs`).
 
@@ -105,7 +106,7 @@ The app takes the event from the runner's live `stderrLine` callback, never from
 ### Scope
 
 - The terminal's `ddc clean`, with or without `--yes`, keeps the full walk and its order.
-- Story "Automatic cleaning of download caches after a scheduled scan" uses `clean --yes` with `--group` and assumes a rescan after it. It is re-read when this story lands; it is not changed here.
+- Story "Automatic cleaning of download caches after a scheduled scan" uses `clean --yes` with `--group` and assumes a rescan after it. It is re-read when this story lands; its design is not changed here, and it gets a dated note.
 - Lock semantics do not change: a clean holds the exclusive lock, a scan the shared one.
 
 ### This story waits for ADR amendments before any code
@@ -128,27 +129,86 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 
 ## Decomposition
 
-- [ ] Time each step before the first action in the app log or behind a debug flag: rescan, keep-marker walk, local snapshots, process snapshot. This confirms the rescan is the 29 s before changing it. If another step is the cost, it becomes its own story and AC 9 is re-cut.
-- [ ] Amend the ADRs and the texts listed above; critic.
-- [ ] Core: give every rule a scope, matched exhaustively (`Item`, `Siblings` or `Tree`), so a new cross-tree rule cannot be missed silently; a list holding a `Tree` rule takes the full walk.
-- [ ] Core: the pruned walk, a visitor wrapper that skips any directory that is not an ancestor of, inside, or a sibling-for-`KnownChildren` of a listed item. It reuses the rule visitor, classification and `plan_listed` unchanged, and builds the `EntryIndex` of a picked entry's folder.
-- [ ] Equivalence tests over synthetic homes covering every rule in the catalog: the pruned and the full re-check give the same outcome for every listed item, for each change of AC 4.
-- [ ] CLI: `last-scan.json` edited after the clean, per the section above. The phase events and `docs/progress.schema.json` come from "CLI: progress events" (note of 2026-10-25).
-- [ ] App:
+- [x] Time each step before the first action in the app log: the re-check, and the rest up to the `cleaning` event (the keep-marker walk, local snapshots, process snapshot), bracketed. AC 9's manual check reads it (gate decision 7, which moved this measurement after the change). If another step is the cost, it becomes its own story and AC 9 is re-cut. Done: `CleanTimings.swift`, logged by `CleanRun.swift`; the follow-up waits for AC 9.
+- [x] Amend the ADRs and the texts listed above; critic. Amendments of 2026-10-24, dated notes of 2026-10-25; critic approved on the third pass, 2026-10-25.
+- [x] Core: give every rule a scope, matched exhaustively (`Item`, `Siblings` or `Tree`), so a new cross-tree rule cannot be missed silently; a list holding a `Tree` rule takes the full walk.
+- [x] Core: the pruned walk, a visitor wrapper that skips any directory that is not an ancestor of, inside, or a sibling-for-`KnownChildren` of a listed item. It reuses the rule visitor, classification and `plan_listed` unchanged, and builds the `EntryIndex` of a picked entry's folder.
+- [x] Equivalence tests over synthetic homes covering every rule in the catalog: the pruned and the full re-check give the same outcome for every listed item, for each change of AC 4.
+- [x] CLI: `last-scan.json` edited after the clean, per the section above. The phase events and `docs/progress.schema.json` come from "CLI: progress events" (note of 2026-10-25).
+- [x] App:
   - drop the rescan after a clean that wrote the report; keep it after a crash that followed the `cleaning` event;
   - read the phase and "nothing touched" from the event;
   - reload the report when the clean ends (`PopoverModel.refresh` skips it during a clean today);
   - rewrite the crash tests.
-- [ ] README and release notes.
+- [x] README and release notes.
 
 ## Implementation Plan
 
+Planned 2026-10-25 with the planner, after "CLI: progress events" (DDC-002) landed in 0.2.3. No spec covers it. The binding "how" is the safety ADR's amendment of 2026-10-24 (rule scope, which walk to take, why the pruned walk sees what the full walk sees) and the menu bar ADR §5 and §6 items 1 to 3, with the note of 2026-10-25.
+
+### Decisions taken at this gate
+
+1. **A claim on an ancestor stops measuring there.** The walker asks a new `Visitor::prunes(dir)` before it opens any directory, inside claims too, so a claim above a listed item no longer makes the walker measure the claim's whole subtree: a `.ddc-keep` in `~/Code`, the Downloads region, or the folders claimed whole by design (Pictures, Movies, Music, the device backups), whose unpicked entries are not read. The item is refused as the full walk refuses it: under a claimed ancestor, `plan_listed` decides from the claim existing at the ancestor and the item not being its own finding, never from the claim's size. One reason can differ. When a claim appeared above the item after the scan and a keep marker sits in another of that claim's subtrees, the full walk turns the claim into `user.kept` and refuses the item `kept`, while the pruned walk does not read that subtree and refuses it `changed-since-scan`. Both refuse. In the user's own folders a marker locks only the entry that holds it (amendment of 2026-10-20), so a picked entry is decided the same either way. The equivalence tests compare whole plans and expect that one pair. The re-check report's partial sizes never reach `last-scan.json` (decision 6). AC 1 then holds as written. The safety ADR's sentence that a picked entry's folder is "claimed whole by design", so measured whole, gets a dated note.
+2. **Pruned directories are their own count.** `WalkOutput.pruned` counts them; they never count in `skipped`, `skipped_total`, `errors`, an owner, an entry or a root. A listed item's `incomplete` still comes only from its own subtree, which is never pruned. No `SkipReason` variant is added, so the scan schema does not change.
+3. **Both walks stay.** The pruned re-check refuses an item with a keep marker inside at plan time; the executor's own keep-marker walk stays as the backstop for markers added in the seconds since, and the `walk markers` step of "CLI: progress events" stays. Revisit only if the timings (decision 7) show the marker walk matters.
+4. **AC 1 observes the reader.** The re-check takes a `&dyn DirReader`, the seam `scan::walk_with_reader` and the counting reader in `tests/clean_items.rs` already use. A counting visitor would not see reads inside claims. The counting reader forwards `read_with_times`, or picked entries would come back without times and read as `recent`.
+5. **A tool-cleaned item is measured again** after `execute`, under the same exclusive lock, by walking that item alone as the scan measures a finding (clones included). Gone: it counts as deleted. No event is written for it: nothing follows `cleaning` but `items` and `item`. So the sheet stays at 100 % while a large tool-cleaned folder (a Go module cache) is walked again; that is accepted.
+6. **The edited report.** In the pruned case the CLI edits the report it read under its lock; in the full-walk case, the rescan's report. Per outcome, as the section above says, with these rules and additions:
+   - **Whose figures.** The edit subtracts the report's own figures, never the re-check's: a deleted or trashed finding leaves with the `bytes`, `files` and `dirs` the report holds for it; a picked entry listed in `entries` leaves with the report's `bytes` for it, one in the rest with the clean's measured bytes; a tool-cleaned item changes the totals by the report's bytes, files and directories minus the re-measured ones, which may be negative. Every subtraction stops at zero, so an entry that grew since the scan never wraps a total. An item the report does not hold (a newer scan's report, written in between) edits nothing and moves nothing to the `trash` finding. A picked entry not among its folder's `entries` is taken as one of its rest: an entry the plan accepts existed when that report's scan read the folder.
+   - a finding inside a listed Downloads entry that is deleted or trashed also shrinks that entry's `bytes` and `findings`, or the folder's `rest_bytes` when the entry is in the rest;
+   - a listed finding skipped as `inside-another-item` leaves with the trashed entry that held it: that rule comes before "Skipped stays";
+   - a picked entry's folder shrinks by the entry's bytes less those of the findings inside it, which the folder never counted; those findings leave without moving any bytes, and the `trash` finding gains the entry's bytes once;
+   - a picked folder's files and directories are not known (neither the clean's result nor the report's entry carries them), so the scanned `files` and `dirs` keep them until the next full scan; a picked file is one file and no directory; its bytes follow the Trashed rule;
+   - with no `trash` finding in the report (an empty or never scanned `~/.Trash`), a trashed item counts as deleted, and the Trash reads low until the next full scan;
+   - `large_files`, `inaccessible` and `skipped` lines at or under a removed path leave, and `errors_total` and `skipped_total` drop by as many. Both lists hold at most 10 000 lines, so past that the totals stay high until the next full scan;
+   - every finding-derived total (per class count, bytes and selected figures, selected and reclaimable bytes, the ignored figures) is recomputed with the scan's own code, and `ignored` and `selected` are recomputed only for findings whose bytes changed (a tool-cleaned item, the `trash` finding, a folder that lost an entry; such a folder can drop under `min_size` and leave Review until the next scan, as a full scan would decide); `unowned_bytes` stays;
+   - the free space of each volume the clean measured is its `free_after`, by mount point; the other volumes keep theirs.
+   The edited report drifts from the disk in those few figures until the next full scan replaces it.
+7. **Timing step 1 moves to AC 9's check.** The owner asked on 2026-10-25 for the planned work to be finished without waiting for the owner, and the measurements happen only on the reference machine. The evidence already points at the rescan: the same home's full scan took 37 s right after a clean that waited 29 s before its first action, and that clean ran one. So the app logs one timing line per clean from the events it now receives (requested, process started, `preparing`, the re-check's final tick, `cleaning`, and the marker walk, whose ticks come at most 100 ms apart, so its length is known to about 100 ms), timed on the runner's reader thread. AC 9's manual check reads it. If the re-check is fast and the remainder is not, the remainder becomes its own story and AC 9 is re-cut.
+8. **The app learns from the clean report that the file was written.** `CleanReport` gains `last_scan_saved`, an optional field, so the clean schema keeps version 2 under the `model.rs` rule. It is written only by `clean --items`; the terminal's `ddc clean` prints no clean report. Absent, it reads as false: an older CLI. The file's date is what this story stops reading.
+9. **A failed write** of `last-scan.json` after the clean prints `ddc: warning: cannot save the scan report: …`, reports `last_scan_saved: false`, and exits as usual; the app then rescans. It rescans too when the report says saved but the app cannot read the file. A signal during the re-check ends the CLI before any write (its handler is installed after the re-check), so the file from before stays; the full walk's report is no longer written before the clean.
+10. **An unreadable ancestor** falls back to the full walk inside the CLI, with a fresh counter and the previous report's file count as its estimate; the app's reducer already takes the larger counter.
+10a. **A report of other roots** takes the full walk too, for no safety reason. `ddc scan ~/Code` writes a report of `~/Code` alone; editing it would leave the app showing that report after a clean of the whole home. So a report whose `home` or `scan_roots` differ from the clean's counts as no report, and so does one that cannot be read. The roots are compared as the walker normalizes them: canonical, sorted, nested roots dropped, so their order does not matter. The full walk then has no estimate: the other report's file count says nothing about the clean's roots. The safety ADR's list of full-walk cases and menu bar ADR §6 item 1 get a dated note.
+11. **One release, one change to `clean_items.rs`.** All parts land before the next release, 0.2.4. The pruned re-check and the report edit change `clean_items.rs` together: today's write of the re-check report before the clean goes in the same change, so no build ever saves a pruned walk's partial report.
+
+### Route
+
+**Part 0: the timing line** (decision 7). `CleanTimings.swift` in DDCKit, a pure value fed with the events and the instants they arrived at; `CleanRun.swift` stamps them in the `stderrLine` and `onStart` closures and logs `clean timings: …` when the run ends.
+
+**Part 1: rule scope and the pruned re-check.**
+- `rules/mod.rs`: `pub enum Scope { Item, Siblings, Tree }` and `Rule.scope`; `catalog.rs`: `Item` by default, `Tree` on `toolchain.nvm`, `toolchain.pyenv` and `toolchain.rustup`, `Siblings` on `ide.jetbrains-old-data`. A unit test ties the `Tree` and `Siblings` sets to `toolchain::dropped`, and a catalog test requires every `KnownChildren` rule to be `Siblings` or `Tree`.
+- `scan/mod.rs` and `scan/walker.rs`: the `prunes` hook (default false), checked at the top of `visit()`, and the `pruned` counter (decision 2).
+- `report/mod.rs`: the scan pipeline moves into one internal function that takes a reader and an optional reach; `scan`, `scan_with` and `scan_with_entries` keep their signatures and readers. The sort, the finding-derived totals and the ignored rule become shared helpers for Part 2.
+- `report/recheck.rs` (new): `walk_for(list, catalog, previous)` matches `rule.scope` exhaustively; `Reach` holds the listed paths, their ancestors and the parents of `Siblings` items in hash sets, O(depth) per directory; a `Pruned` visitor wraps the rule visitor and delegates every hook, so classification, `contents::attach` and `plan_listed` are unchanged; `same_roots(report, env, opts)` filters the report read, so a report of other roots or another home reaches `walk_for` as none (decision 10a); `pruned(…)` returns the report and the entry index, or `UnreadableAncestor`; `expected_files` sums the listed findings' files and, for a `Siblings` item, its sibling findings'.
+- `progress.rs`: the doc of `files_expected` for `recheck`; `docs/progress.schema.json` regenerated, version unchanged.
+- `cmd/clean_items.rs`, landing with Part 2 in one change (decision 11): read the report once under the lock, choose the walk, run it under `walk recheck`, fall back on `UnreadableAncestor` (decision 10).
+
+**Part 2: `last-scan.json` after the clean.**
+- `report/after_clean.rs` (new): `remeasure` (decision 5) and `edit` (decision 6), pure over the report.
+- `exec/report.rs`: `last_scan_saved`; `docs/clean.schema.json` regenerated.
+- `cmd/clean_items.rs`: no write before the clean; after `execute`, re-measure the tool-cleaned items, edit, write, then print the clean report (decisions 8, 9). The same after a cooperative cancel.
+- `README.md`: the `clean --items` paragraph and the `last-scan.json` row.
+
+**Part 3: the app.**
+- `CleanReport.swift`: `lastScanSaved`.
+- `PopoverModel.swift`: `reloadReport()`, which loads the file also during a clean.
+- `ReviewModel.swift`: `reloadReport` in place of `pollInterval`; `AppDelegate.swift` wires it.
+- `CleanRun.swift`: the modification-date watcher and the baseline go; the crash rule is the `cleaning` event alone; a saved report is reloaded with no scan; otherwise the rescan runs as today.
+- Tests: `FakeCLI` writes its report after `clean-go`; the flow, cancel and crash tests are rewritten; the copy of step 1 may change.
+- `docs/releases/0.2.4.md`.
+
+**Unchanged.** The terminal's `ddc clean` keeps its full rescan before its plan (AC 8). The story "Automatic cleaning of download caches after a scheduled scan" uses that path, so its assumption of a rescan still holds; it gets a dated note.
+
+**Tests.** AC 1, 2 and 5 in `tests/recheck.rs` with the counting reader; AC 4 and 5 iterate the catalog through a fixture table lifted from `tests/rules.rs` into `tests/common/`, keeping its "no fixture for rule" failure, one test per change of AC 4, each asserting `plan_listed` of the pruned and of the full re-check are equal; AC 6 in `tests/after_clean.rs` and `tests/user_data.rs`, each also checking the totals against the shared helper; AC 3, 6 and 8 at the CLI; AC 7 in `CleanRunTests`, `PopoverModelTests` and the three CLI tests of "CLI: progress events" that already cover the event.
+
+**Pitfalls.** The schema staleness tests (progress and clean schemas change; `model.rs` doc comments must not); `ContractTests.cleanHasOneOwner` (one `.clean` token in `CleanRun.swift`); `structure.rs`; the README test of option names; `disallowed_methods` in tests (a file disappearing is a rename to a holding directory); the equality oracle needs the `Pruned` visitor to delegate `wants_private`; a `Tree` item never takes the pruned walk.
+
 ## Acceptance Criteria
 
-- [ ] **AC 1.** With no `Tree` rule in the list, `clean --items` opens no directory outside the listed items, their ancestors, and the siblings of a `KnownChildren` item with their subtrees. A test asserts the opened set on a synthetic home with a large unrelated tree. An unreadable ancestor falls back to the full walk (test).
-- [ ] **AC 2.** With a `toolchain.nvm`, `toolchain.pyenv` or `toolchain.rustup` item in the list, it walks the whole tree, and a pin file added after the scan protects that version (test).
-- [ ] **AC 3.** A list with no report of the current schema on disk takes the full walk and writes a fresh report (test).
-- [ ] **AC 4.** After the scan, each of these changes gives the listed item the same outcome as the full rescan gives today (tests):
+- [x] **AC 1.** With no `Tree` rule in the list, `clean --items` opens no directory outside the listed items, their ancestors, and the siblings of a `KnownChildren` item with their subtrees. A test asserts the opened set on a synthetic home with a large unrelated tree. An unreadable ancestor falls back to the full walk (test). — evidence: `crates/ddc-core/tests/recheck.rs` `the_pruned_recheck_opens_only_the_items_their_ancestors_and_a_siblings_family` (counting reader), `an_unreadable_ancestor_sends_the_recheck_to_the_full_walk`; `crates/ddc-cli/tests/clean_items_cli.rs` `a_pruned_clean_edits_the_report_it_read`, `an_unreadable_ancestor_takes_the_full_walk`; reviewer 2026-10-25
+- [x] **AC 2.** With a `toolchain.nvm`, `toolchain.pyenv` or `toolchain.rustup` item in the list, it walks the whole tree, and a pin file added after the scan protects that version (test). — evidence: `crates/ddc-core/tests/recheck.rs` `a_toolchain_item_takes_the_full_walk_and_a_new_pin_protects_its_version` (nvm, pyenv, rustup)
+- [x] **AC 3.** A list with no report of the current schema on disk, a report that cannot be read, or one of other scan roots or another home (gate decision 10a), takes the full walk and writes a fresh report (test). — evidence: `crates/ddc-cli/tests/clean_items_cli.rs` `without_a_report_of_these_roots_the_clean_walks_the_whole_home` (none, unreadable, other roots); `crates/ddc-core/tests/recheck.rs` `only_a_report_of_the_same_roots_and_home_is_edited`, `no_report_to_edit_takes_the_full_walk`
+- [x] **AC 4.** After the scan, each of these changes gives the listed item the same outcome as the full rescan gives today (tests):
   - a keep marker in, at or above the item;
   - an exclude at, above or below it;
   - a new claim above it, for each matcher kind: known paths, known children, name with siblings, contains-file, `CACHEDIR.TAG`, `.app` suffix;
@@ -157,18 +217,25 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
   - the item swapped (`dev`, `ino`);
   - a project manifest appearing inside;
   - `.git` appearing above;
-  - a picked user-data entry that became another rule's finding, or holds a keep marker.
-- [ ] **AC 5.** The equivalence tests pass for every rule in the catalog.
-- [ ] **AC 6.** After a clean, `last-scan.json` (tests):
+  - a picked user-data entry that became another rule's finding, or holds a keep marker;
+  - the one case whose reason may differ (gate decision 1): a claim that appeared above the item, with a keep marker in another of its subtrees, is refused `kept` by the full re-check and `changed-since-scan` by the pruned one.
+
+  Evidence: `crates/ddc-core/tests/recheck.rs`, one test per change, each comparing the whole plans: `a_keep_marker_in_at_or_above_the_item`, `an_exclude_at_above_or_below_the_item`, `a_claim_above_the_item_for_each_matcher_kind`, `a_content_claim_appearing_above_the_item`, `a_lock_file_appearing_or_disappearing`, `a_sibling_version_added_or_removed` (toolchain items always take the full walk), `the_item_swapped_a_manifest_inside_or_git_above`, `a_picked_entry_that_became_a_finding_or_holds_a_keep_marker`, `a_new_claim_with_a_marker_elsewhere_refuses_the_item_for_another_reason`.
+- [x] **AC 5.** The equivalence tests pass for every rule in the catalog. — evidence: `crates/ddc-core/tests/recheck.rs` `every_rule_unchanged_is_planned_alike_and_runs` and every `each_rule` test iterate `RULES` through `crates/ddc-core/tests/common/fixtures.rs` (`rule_fixture`, which fails on a rule without a fixture); `make check` 2026-10-25
+- [x] **AC 6.** After a clean, `last-scan.json` (tests):
   - lists no deleted item, and its totals dropped by that item's bytes, files and directories;
   - lists no trashed item, with its bytes moved to the `trash` finding;
   - shows a tool-cleaned item at its new size;
   - leaves skipped and not-run items as they were;
-  - has lost a picked entry from its folder's contents, together with the findings inside it.
+  - has lost a picked entry from its folder's contents, together with the findings inside it; the folder's bytes dropped by the entry's less those findings', and the scanned total is unchanged when the entry went to the `trash` finding;
+  - has lost a deleted or trashed finding inside a listed Downloads entry from that entry's `bytes` and `findings`, or from the folder's rest;
+  - is unchanged for an item the report does not hold, and never wraps a total below zero for an entry that grew since the scan.
 
   `generated_at` is the previous report's in the pruned case and the rescan's in the full-walk case; the same holds after a cancel.
-- [ ] **AC 7.** The app starts no scan after a clean that wrote the report (after a crash that followed the `cleaning` event it rescans, as today), and its sheet moves from preparing to cleaning on the CLI's `cleaning` event. A crash after the event points to the journal; a refusal, or a crash before the event, says "Nothing was touched" (DDCKit tests). On the CLI side, `clean --items --progress json` on a temporary tree writes `preparing` then `cleaning` to stderr, each flushed, with `cleaning` before the first journal entry; without `--progress json`, stderr carries no JSON (test).
-- [ ] **AC 8.** The terminal's `ddc clean` still rescans the whole home before its plan (test).
+
+  Evidence: `crates/ddc-core/tests/after_clean.rs` (10 tests, one per bullet, each checking the finding-derived totals against an independent recount); `crates/ddc-cli/tests/clean_items_cli.rs` `a_pruned_clean_edits_the_report_it_read`, `a_tool_cleaned_item_is_saved_at_its_new_size`, `sigterm_or_sighup_during_a_tool_ends_the_tool_and_ddc_with_the_report` (saved after a cancel, `generated_at` kept).
+- [x] **AC 7.** The app starts no scan after a clean that wrote the report (after a crash that followed the `cleaning` event it rescans, as today), and its sheet moves from preparing to cleaning on the CLI's `cleaning` event. A crash after the event points to the journal; a refusal, or a crash before the event, says "Nothing was touched". A clean report with `last_scan_saved: false`, none after the event, or a saved report the app cannot read, rescans as today (DDCKit tests). On the CLI side, `clean --items --progress json` on a temporary tree writes `preparing` then `cleaning` to stderr, each flushed, with `cleaning` before the first journal entry; without `--progress json`, stderr carries no JSON (test). — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift` `flow`, `events`, `crashAfterCleaningEvent`, `crashBeforeCleaningEvent`, `notSavedRescans`, `cancelRunning`, `refusedBeforeTouching`; `PopoverModelTests.reloadAfterClean`; `ContractTests.cleanContracts`; `crates/ddc-cli/tests/clean_items_cli.rs` `a_clean_emits_its_phases_walks_and_items_in_order`, `cleaning_is_on_stderr_before_the_first_action`, `without_the_flag_no_event_reaches_stderr`; `make app-test` 142 passed
+- [x] **AC 8.** The terminal's `ddc clean` still rescans the whole home before its plan (test). — evidence: `crates/ddc-cli/tests/clean_cli.rs` `the_terminal_clean_still_rescans_the_whole_home`
 - [ ] **AC 9.** On the reference machine, with the app log's times (manual check by the owner):
   - a clean of caches only re-checks its items in under 1 s;
   - the whole time before the first action stays under 3 s.
@@ -177,7 +244,7 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 
 ## Technical Notes
 
-- **The full walk and its reason:** `crates/ddc-cli/src/cmd/clean_items.rs`, "The full rescan: only a whole-tree walk sees toolchain pins and new claims above an item". It writes `last-scan.json` before `plan_listed` and `execute`.
+- **The full walk and its reason** (before this story): `crates/ddc-cli/src/cmd/clean_items.rs`, "The full rescan: only a whole-tree walk sees toolchain pins and new claims above an item". It writes `last-scan.json` before `plan_listed` and `execute`.
 - **Cross-tree inputs today.**
   - `toolchain::dropped` (`crates/ddc-core/src/rules/toolchain.rs`): `toolchain.nvm`, `toolchain.pyenv` and `toolchain.rustup` need `Pins` (`crates/ddc-core/src/rules/visitor.rs`), read from pin files anywhere outside a claimed artifact. With one claimed version or none, every version is dropped, so the siblings matter too.
   - `ide.jetbrains-old-data` needs only its siblings.
@@ -190,8 +257,8 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
   - Project activity only feeds the default selection, which `plan_listed` does not read. What matters above an item is the lock file (class) and `.git` (project root).
 - **User-data entries** (`plan_listed`'s entry path, `contents::attach`). The `EntryIndex` comes from the walker listing the folder with times and measuring its children. The dry run's item walk is markers-only and cannot see an entry that became another rule's finding.
 - **Pruned-walk caveats.**
-  - A claim on an ancestor makes the walker measure that ancestor's whole subtree, because the walker's hooks are off inside claims. Examples: a `.ddc-keep` in `~/Code`, or the Downloads region that lists entries. The plan gate decides whether to stop descent there or to take the full walk.
-  - Pruned directories raise the root's `skipped` counts. They must not read as `incomplete` for a listed item; only the item's own counts matter.
+  - (Superseded 2026-10-25 by gate decision 1: the walk stops there.) A claim on an ancestor makes the walker measure that ancestor's whole subtree, because the walker's hooks are off inside claims. Examples: a `.ddc-keep` in `~/Code`, or the Downloads region that lists entries. The plan gate decides whether to stop descent there or to take the full walk.
+  - (Superseded 2026-10-25 by gate decision 2: they count nowhere.) Pruned directories raise the root's `skipped` counts. They must not read as `incomplete` for a listed item; only the item's own counts matter.
 - **The keep-marker walk** (`keep_markers`, `crates/ddc-core/src/exec/mod.rs`) walks every chosen item inside `execute`, seconds before acting. If the pruned walk supplies the markers instead, they are taken a little earlier. This is safe because the guard checks a marker at the item and above at the moment of acting; only markers deep inside come from the walk. Otherwise both walks stay, and their cost is bounded by the items' size.
 - **The app's signals today** (`CleanRun.swift`): it watches the modification time of `last-scan.json` to switch from preparing to cleaning, and reads "nothing was touched" from an unchanged file. `CleanRunTests` encodes both, including a crash after the save. `PopoverModel.refresh` does not reload the report during a clean.
 - **The journal cannot be the crash signal.** An entry is appended after each outcome, so a crash during the first item's rename leaves it unchanged.
@@ -211,4 +278,4 @@ Each amendment is reviewed by the critic. The text that encodes the rescan, all 
 
 ---
 
-*Last updated: 2026-10-24*
+*Last updated: 2026-10-25*

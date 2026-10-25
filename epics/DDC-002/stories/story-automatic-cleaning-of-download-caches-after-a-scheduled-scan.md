@@ -7,7 +7,7 @@ status: planned
 priority: p3
 assignee: "Evgenii Konev"
 created: 2026-10-21
-updated: 2026-10-21
+updated: 2026-10-25
 external_refs: {}
 tags: [app, safety, background]
 code_refs: []
@@ -84,6 +84,7 @@ Rough until the ADR amendments are accepted.
 ## Technical Notes
 
 - **Owners.** Browser and app caches carry `owners`, so they are skipped while their app runs. That is why they are not Auto by default.
+- **Note of 2026-10-25, from "Faster clean: re-check only what the selection needs" (DDC-002).** A clean with `--items` now edits `last-scan.json` after it runs and says so in its report, and the app then runs no scan. This story's path is `clean --yes`, which that story leaves alone: it still rescans before its plan, saves no report after the clean, and so the App step's rescan after the clean still holds. If the `--group` clean here gets `--json`, this story decides whether it edits the report too.
 - **Where "never cleans" is restated.** Besides safety ADR §8, the rule that the background path never cleans appears in the safety ADR's 2026-10-18 and 2026-10-20 amendments and in the last line of menu bar ADR §7. The amendments must update all of them, so no contradiction is left.
 
 ## Dependencies

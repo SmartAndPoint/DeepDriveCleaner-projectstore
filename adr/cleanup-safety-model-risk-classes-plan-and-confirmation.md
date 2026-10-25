@@ -10,7 +10,7 @@ external_refs: {}
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-20
+reviewed_at: 2026-10-25
 ---
 
 # Cleanup safety model: risk classes, plan and confirmation
@@ -242,11 +242,14 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
     - `Siblings`: also the other children of its parent (`ide.jetbrains-old-data`, whose newest sibling is kept);
     - `Tree`: files anywhere in the scan roots. These are `toolchain.nvm`, `toolchain.pyenv` and `toolchain.rustup`: their versions are protected by pin files in any project, and with one claimed version or none, every version is kept (none is a finding).
   - **Which walk.**
-    - **The full walk, as before:** a list holding a `Tree` item. Two more cases take it for reasons other than safety:
+    - **The full walk, as before:** a list holding a `Tree` item. Two more cases take it for reasons other than safety (three since 2026-10-25):
       - a run with no readable report of the current schema, because the CLI edits that report after the clean ([[adr/menu-bar-app-swift-shell-over-the-ddc-cli|Menu bar app: Swift shell over the ddc CLI]], §6 item 1);
       - a list with an item whose ancestor cannot be read (found in the walk's errors). This is a conservative choice: the full walk cannot read that ancestor either, and the item ends `changed-since-scan`.
+      - added 2026-10-25 at the story's plan gate: a report on disk whose `home` or `scan_roots` differ from the clean's, or one that cannot be read. `ddc scan ~/Code` writes a report of `~/Code` alone, and editing it would leave the app showing that report after a clean of the whole home.
     - **The pruned walk, for any other list:** the same rule visitor, classification and plan as the full walk, over the listed items, their ancestors up to the scan root, and the siblings of a `Siblings` item with their subtrees. A picked user-data entry's folder is listed with times, so the entry is still checked against the folder's full list of entries (amendment of 2026-10-20).
     - A claimed ancestor makes the walker measure that ancestor's whole subtree, because the walker's hooks are off inside a claim. For a picked entry of Pictures, Movies, Music or the device backups that ancestor is its folder, claimed whole by design. Downloads is a region whose hooks stay on, so its other entries are pruned. For any other item the claim refuses it anyway, and the story's plan gate decides whether the walk stops there.
+
+      Decided 2026-10-25 at that plan gate: the walk stops there. The walker asks the pruning check before it opens any directory, inside a claim too. A claimed ancestor's other subtrees are therefore not read, and neither are the unpicked entries of Pictures, Movies, Music or the device backups. Their folder is still listed with times, so a picked entry is checked against the folder's full list of entries. Under a claimed ancestor the plan decides from the claim existing at the ancestor and the item not being its own finding, never from the claim's size, so the item is refused as the full walk refuses it. One reason can differ: when a claim appeared above the item after the scan and a keep marker sits in another of its subtrees, the full walk refuses the item `kept` (the marker turned the claim into `user.kept`), the pruned walk `changed-since-scan`. In the user's own folders a marker locks only the entry holding it (amendment of 2026-10-20), so a picked entry is decided the same either way. The pruned walk's partial sizes never reach `last-scan.json`: in the pruned case the CLI edits the report it read before the clean.
     - A listed item outside the current scan roots, or with a rule the catalog lacks, is refused as today and needs no walk.
     - There is one classification path: the pruned walk only skips directories.
   - **Why it sees what the full walk sees:**
@@ -277,4 +280,4 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-25*
