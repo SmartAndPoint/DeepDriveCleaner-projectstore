@@ -10,7 +10,7 @@ created: 2026-10-18
 updated: 2026-10-25
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [cli, contract, json, ux]
-code_refs: []
+code_refs: ["README.md", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanProgress.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/Confirmation.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ProgressEvent.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CLIRunnerTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ProgressTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RealCLIDryRunTests.swift", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/scan_cli.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/progress.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-core/src/store.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/progress.rs", "docs/progress.schema.json"]
 specs: []
 started_at: "2026-10-24T20:32:04.261Z"
 closed_at: null
@@ -64,12 +64,12 @@ The Decomposition and ACs below are re-cut at the plan gate to carry these: per-
 
 ## Decomposition
 
-- [ ] Core contract: `crates/ddc-core/src/progress.rs` with `PROGRESS_SCHEMA_VERSION` and the event types; `docs/progress.schema.json` generated from them, with a staleness test.
-- [ ] Core hook: `ExecEvents` in `ExecOptions`, called once before the first action, and once per item after its journal record (at once for a `not-run` item, which is never journaled).
-- [ ] Core: `store::last_scan_files`, the previous report's file count, read before the rescan replaces it.
-- [ ] CLI: `--progress json` on `scan` and `clean`; the mode (off, terminal line, JSON); the throttle; the emitter; the hook's sink.
-- [ ] CLI: `scan`, `clean` and `clean --items` wired; README.
-- [ ] DDCKit:
+- [x] Core contract: `crates/ddc-core/src/progress.rs` with `PROGRESS_SCHEMA_VERSION` and the event types; `docs/progress.schema.json` generated from them, with a staleness test.
+- [x] Core hook: `ExecEvents` in `ExecOptions`, called once before the first action, and once per item after its journal record (at once for a `not-run` item, which is never journaled).
+- [x] Core: `store::last_scan_files`, the previous report's file count, read before the rescan replaces it.
+- [x] CLI: `--progress json` on `scan` and `clean`; the mode (off, terminal line, JSON); the throttle; the emitter; the hook's sink.
+- [x] CLI: `scan`, `clean` and `clean --items` wired; README.
+- [x] DDCKit:
   - the event decoder;
   - the clean progress reducer;
   - the runner keeps event lines out of its stderr tail;
@@ -77,9 +77,9 @@ The Decomposition and ACs below are re-cut at the plan gate to carry these: per-
   - `CleanRun` passes `--progress json` and switches the phase on the `cleaning` event;
   - `native-only` items leave "frees about" and the bar's byte total (decision 2);
   - `FakeCLI` replays recorded stderr lines for `clean` (an event file played before `clean-go`, and a crash variant that plays `phase cleaning` first).
-- [ ] App: the sheet's two steps and the determinate bar (artboard 11).
-- [ ] Menu bar ADR §6 item 3: a dated note that the `cleaning` event moved into the executor (decided at this gate).
-- [ ] Tests; `make check` and `make app-test`; critic, then reviewer.
+- [x] App: the sheet's two steps and the determinate bar (artboard 11).
+- [x] Menu bar ADR §6 item 3: a dated note that the `cleaning` event moved into the executor (decided at this gate).
+- [x] Tests; `make check` and `make app-test`; critic, then reviewer.
 
 ## Implementation Plan
 

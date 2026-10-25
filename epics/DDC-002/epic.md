@@ -5,10 +5,10 @@ title: "Menu bar app"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-21
+updated: 2026-10-25
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, macos, swift]
-code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "README.md"]
+code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "docs/progress.schema.json", "README.md"]
 review_status: reviewed
 reviewed_at: 2026-10-18
 ---
