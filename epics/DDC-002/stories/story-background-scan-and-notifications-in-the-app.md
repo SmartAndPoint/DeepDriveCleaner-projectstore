@@ -10,7 +10,7 @@ created: 2026-10-18
 updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, notifications, schedule]
-code_refs: []
+code_refs: ["README.md", "scripts/build-app.sh", "app/DeepDriveCleaner.xcodeproj/project.pbxproj", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/DebugMenu.swift", "app/DeepDriveCleaner/PermissionsSettingsView.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SystemAgentService.swift", "app/DeepDriveCleaner/SystemNotifications.swift", "app/DeepDriveCleaner/main.swift", "app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist", "app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler-open.plist", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/LaunchMode.swift", "app/Packages/DDCKit/Sources/DDCKit/LegacyAgent.swift", "app/Packages/DDCKit/Sources/DDCKit/NotificationText.swift", "app/Packages/DDCKit/Sources/DDCKit/NotifyReport.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanDue.swift", "app/Packages/DDCKit/Sources/DDCKit/Schedule.swift", "app/Packages/DDCKit/Sources/DDCKit/ScheduledWork.swift", "app/Packages/DDCKit/Sources/DDCKit/SchedulerAgent.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ScheduledScanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift"]
 specs: []
 started_at: "2026-10-28T03:23:01.141Z"
 closed_at: null
@@ -41,34 +41,34 @@ This story is artboards 2 and 3 of the design canvas, and the migration from 0.1
 
 Rough until the plan gate.
 
-- [ ] Scheduler agent, self-healing (ADR §5):
+- [x] Scheduler agent, self-healing (ADR §5):
   - at every launch with scheduled scans on, call `register()` for `com.smartandpoint.deepdrivecleaner.scheduler` (idempotent), which also recovers an agent approved later or dropped when `brew` replaced the bundle;
   - write the `scheduler` record to `settings.json` whenever the status is `.enabled`; clear it only when scheduled scans are off (and unregister) or registration fails; `.requiresApproval` leaves it as it is;
   - the Settings state follows `SMAppService.status`
-- [ ] Due function, shared with the popover and Settings:
+- [x] Due function, shared with the popover and Settings:
   - the schedule (daily or weekly, a whole hour) and the time of the last **scheduled** scan, kept in `UserDefaults`, not `last-scan.json`;
   - a slot missed while the Mac slept is due at the next tick;
   - with no scheduled scan recorded yet (a new install), the first tick is due; the clean-machine check of "Distribution: the 0.2.0 cask with the app" relies on it;
   - a Scan now or a terminal `ddc scan` neither moves the slot nor suppresses that day's notification;
   - a pending reminder scan (Remind me tomorrow with a weekly schedule) is due at the first tick after the snooze ends
-- [ ] `--scheduled` launch: no status item; scan if due, post a pending notification if one is waiting, quit. A reopen event while running normally: scan if due, and bring windows forward only when the app is active. Promotion on a user launch during a scheduled scan is already built (`LaunchMode`)
-- [ ] Background scan through the runner: `scan --background --notify json`; `{"status": "skipped", "reason": "busy"}` (exit 0) posts nothing and leaves the scan due for the next tick
-- [ ] Read the preferences that "Settings: folders, types, notifications" stores (2026-10-28):
+- [x] `--scheduled` launch: no status item; scan if due, post a pending notification if one is waiting, quit. A reopen event while running normally: scan if due, and bring windows forward only when the app is active. Promotion on a user launch during a scheduled scan is already built (`LaunchMode`)
+- [x] Background scan through the runner: `scan --background --notify json`; `{"status": "skipped", "reason": "busy"}` (exit 0) posts nothing and leaves the scan due for the next tick
+- [x] Read the preferences that "Settings: folders, types, notifications" stores (2026-10-28):
   - the `Schedule*` keys (`ScheduleEnabled`, on by default, daily at 10:00; `ScheduleRepeat`, `ScheduleWeekday`, `ScheduleHour`);
   - `AfterScheduledScan`: `notify`, or `menuBarOnly`, which posts nothing and only sets the badge (subject to `ShowMenuBarBadge`);
   - `NotifyWorkingHoursOnly`.
 
   Fill that story's seams: `nextScan`, `SchedulerControl`, and the Permissions rows.
-- [ ] Notifications, only from scheduled scans:
+- [x] Notifications, only from scheduled scans:
   - text from the decision: the amount and at most three groups, or the volume that is almost full (artboard 2); never an offer to clean directly;
   - actions Review (opens the Review window) and Remind me tomorrow;
   - with "Only notify during working hours" on, a decision made outside them is kept as pending in `UserDefaults` and posted at the first hourly tick inside them (`--scheduled` posts it without scanning); a newer decision replaces it;
   - after posting, `notify ack --bytes <n>`; not posted, no ack
-- [ ] Notification permission: asked for at the first normal-mode launch after the first scan, or in the migration flow; never by a `--scheduled` instance. A `--scheduled` instance that finds it not yet determined sets a flag; the next popover open surfaces it. The flag, and the offer to replace the 0.1.0 agent, show through the popover's notice slot ("Menu bar popover").
-- [ ] Remind me tomorrow: `notify snooze --until <the schedule hour on the day after the tap>` (B7). The first scheduled scan after it notifies whenever it is over the threshold or low on space (story "CLI: shared settings, types and the notify decision"). With a weekly schedule the due function adds one reminder scan at the first tick after the snooze ends. If the app was quit, macOS launches it to deliver the action: it starts in normal mode, keeps its status item, and the badge clears
-- [ ] A posted notification sets the attention badge built in "Menu bar popover" (`notificationPosted()`); it clears when the Review window opens
-- [ ] Pause from "Menu bar popover" (`ScansPaused`): the due function reports nothing due while paused, so a scheduled launch or a reopen scans nothing, and the footer shows "Scans paused" instead of a next scan. After Resume a missed slot is due at the next tick (the agent's hourly launch or a reopen), not at Resume, and until then the footer shows "Next scan within the hour", never a slot in the past. A pending working-hours notification still posts while paused: it reports a scan already made
-- [ ] Migration from 0.1.0, offered and never silent:
+- [x] Notification permission: asked for at the first normal-mode launch after the first scan, or in the migration flow; never by a `--scheduled` instance. A `--scheduled` instance that finds it not yet determined sets a flag; the next popover open surfaces it. The flag, and the offer to replace the 0.1.0 agent, show through the popover's notice slot ("Menu bar popover").
+- [x] Remind me tomorrow: `notify snooze --until <the schedule hour on the day after the tap>` (B7). The first scheduled scan after it notifies whenever it is over the threshold or low on space (story "CLI: shared settings, types and the notify decision"). With a weekly schedule the due function adds one reminder scan at the first tick after the snooze ends. If the app was quit, macOS launches it to deliver the action: it starts in normal mode, keeps its status item, and the badge clears
+- [x] A posted notification sets the attention badge built in "Menu bar popover" (`notificationPosted()`); it clears when the Review window opens
+- [x] Pause from "Menu bar popover" (`ScansPaused`): the due function reports nothing due while paused, so a scheduled launch or a reopen scans nothing, and the footer shows "Scans paused" instead of a next scan. After Resume a missed slot is due at the next tick (the agent's hourly launch or a reopen), not at Resume, and until then the footer shows "Next scan within the hour", never a slot in the past. A pending working-hours notification still posts while paused: it reports a scan already made
+- [x] Migration from 0.1.0, offered and never silent:
   - while `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` exists, the popover offers to replace the old background scan until the offer is dismissed, and Settings → Permissions keeps "Old background scan found · Replace It". This covers agents from 0.1.0 and from a 0.2.x `ddc schedule install`;
   - while that plist exists, the app neither registers its agent nor runs scheduled scans (B1);
   - Replace it: the schedule becomes 11:00 with the old interval, daily or weekly on Mondays (the 0.1.0 agent runs at 11:30, `crates/ddc-cli/src/launchd.rs`, and the app schedules whole hours); the old threshold goes into `settings.json`; then `deepdrivecleaner schedule uninstall`, and the app's agent is registered;
@@ -159,35 +159,35 @@ Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story. No
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Unit test: the due function for daily and weekly schedules, before, at and after the slot, and for a slot missed while asleep; a manual scan (a newer `last-scan.json`, no new scheduled-scan time) changes neither the next slot nor whether today's scheduled scan runs and may notify; the popover footer shows this function's next slot through the schedule seam of "Menu bar popover"
-- [ ] Unit test: with a weekly schedule, Remind me tomorrow makes the first tick after the snooze ends due (one reminder scan), and the regular weekly slot stays where it was
-- [ ] Unit test: the notification text built from a recorded threshold decision names the amount and at most three groups; from a low-disk decision, the volume
-- [ ] Unit test: a posted notification calls `notify ack` with the decision's amount; one held back by denied permission calls nothing
-- [ ] Unit test: a decision at 22:00 with working hours on is not posted, is kept as pending, and is posted at the 09:00 tick of the next working day and acknowledged then; a newer decision before 09:00 replaces it
-- [ ] Unit test: a `--scheduled` run that finds notification permission not determined requests nothing, sets the flag, drops the decision and sends no ack; the next popover open shows the request; a normal-mode launch after the first scan asks once
-- [ ] Unit test: with permission denied, the decision is dropped with no ack and the badge is set (B8)
-- [ ] Unit test: the footer wording for a due date at or before now reads "within the hour"; while the legacy plist exists, nothing is due and the footer says to replace the old background scan
-- [ ] Unit test: turning scheduled scans off clears the reminder and the pending notification (B9)
-- [ ] Unit test: Remind Me Tomorrow anchors on the tap (B7):
+- [x] Unit test: the due function for daily and weekly schedules, before, at and after the slot, and for a slot missed while asleep; a manual scan (a newer `last-scan.json`, no new scheduled-scan time) changes neither the next slot nor whether today's scheduled scan runs and may notify; the popover footer shows this function's next slot through the schedule seam of "Menu bar popover" — evidence: `ScheduledScanTests.swift` `dueFunction`, `manualScanKeepsTheSlot` (commit dad390e)
+- [x] Unit test: with a weekly schedule, Remind me tomorrow makes the first tick after the snooze ends due (one reminder scan), and the regular weekly slot stays where it was — evidence: `ScheduledScanTests.swift` `weeklyReminder`, `catchUpKeepsReminder` (commit dad390e)
+- [x] Unit test: the notification text built from a recorded threshold decision names the amount and at most three groups; from a low-disk decision, the volume — evidence: `ScheduledScanTests.swift` `notificationText` (commit dad390e)
+- [x] Unit test: a posted notification calls `notify ack` with the decision's amount; one held back by denied permission calls nothing — evidence: `ScheduledScanTests.swift` `ackAndDenied` (commit dad390e)
+- [x] Unit test: a decision at 22:00 with working hours on is not posted, is kept as pending, and is posted at the 09:00 tick of the next working day and acknowledged then; a newer decision before 09:00 replaces it — evidence: `ScheduledScanTests.swift` `workingHours`, `pendingPostsWhilePaused` (commit dad390e)
+- [x] Unit test: a `--scheduled` run that finds notification permission not determined requests nothing, sets the flag, drops the decision and sends no ack; the next popover open shows the request; a normal-mode launch after the first scan asks once — evidence: `ScheduledScanTests.swift` `permissionNotDetermined` (commit dad390e)
+- [x] Unit test: with permission denied, the decision is dropped with no ack and the badge is set (B8) — evidence: `ScheduledScanTests.swift` `ackAndDenied` (commit dad390e)
+- [x] Unit test: the footer wording for a due date at or before now reads "within the hour"; while the legacy plist exists, nothing is due and the footer says to replace the old background scan — evidence: `ScheduledScanTests.swift` `footerWording` (commit dad390e)
+- [x] Unit test: turning scheduled scans off clears the reminder and the pending notification (B9) — evidence: `ScheduledScanTests.swift` `offClears` (commit dad390e)
+- [x] Unit test: Remind Me Tomorrow anchors on the tap (B7) — evidence: `ScheduledScanTests.swift` `remindAnchorsOnTheTap` (commit dad390e):
   - a daily 10:00 schedule tapped at 10:05 snoozes until 10:00 the next day;
   - a notification held by working hours and posted Monday 09:00, tapped at 09:05, snoozes until Tuesday 10:00;
   - a tap three days after posting snoozes until 10:00 on the day after the tap.
-- [ ] Unit test with a fake `SMAppService`: every launch with scheduled scans on calls `register()`; `.requiresApproval` leaves the record unchanged; a later launch that finds `.enabled` writes it with the app's path; a failing `register()` clears it; turning scheduled scans off unregisters and clears it
-- [ ] Test with a fake CLI: a background run answered with `{"status": "skipped", "reason": "busy"}` posts nothing, and the due function still says due
-- [ ] Test with a temp home holding a 0.1.0 LaunchAgent plist, a fake CLI and a fake `SMAppService`:
+- [x] Unit test with a fake `SMAppService`: every launch with scheduled scans on calls `register()`; `.requiresApproval` leaves the record unchanged; a later launch that finds `.enabled` writes it with the app's path; a failing `register()` clears it; turning scheduled scans off unregisters and clears it — evidence: `ScheduledScanTests.swift` `agentHeals` (commit dad390e)
+- [x] Test with a fake CLI: a background run answered with `{"status": "skipped", "reason": "busy"}` posts nothing, and the due function still says due — evidence: `ScheduledScanTests.swift` `busy` (commit dad390e)
+- [x] Test with a temp home holding a 0.1.0 LaunchAgent plist, a fake CLI and a fake `SMAppService` — evidence: `ScheduledScanTests.swift` `replaceIt`, `migrationRefusals`, `legacyRead` (commit dad390e):
   - Replace It sets the schedule to 11:00 daily for a daily plist, and to 11:00 on Mondays for a weekly one;
   - it writes the threshold, calls `schedule uninstall` and registers the agent;
   - a failed uninstall changes nothing (no schedule, threshold or registration) and keeps the offer;
   - declining changes nothing but hides the popover offer, and the offer stays in Settings;
   - while the plist exists, no launch registers the app's agent, and a reopen scans nothing (B1);
   - the fake uninstall removes the plist, and the schedule and threshold still come from what it held.
-- [ ] Unit test with a fake `SMAppService`:
+- [x] Unit test with a fake `SMAppService` — evidence: `ScheduledScanTests.swift` `fallback` (commit dad390e):
   - a refused primary plist leads to registering the fallback plist;
   - when both are refused, the record is cleared and the notice names Login Items and `ddc schedule install` (B6).
-- [ ] Unit test: the tick's arguments are `["-gj", <bundle path>, "--args", "--scheduled"]`, from a pure DDCKit function that `main.swift` uses.
-- [ ] Unit test: with "Only show it in the menu bar", a scheduled scan over the threshold posts nothing, sends no ack and sets the badge (B3).
-- [ ] Unit test: the bundled scheduler plist is `BundleProgram Contents/MacOS/DeepDriveCleaner` with `ProgramArguments ["DeepDriveCleaner", "--tick"]` (B6), and its label is the agent label the app registers.
-- [ ] Contract test: no DDCKit source imports `UserNotifications` or `ServiceManagement`.
+- [x] Unit test: the tick's arguments are `["-gj", <bundle path>, "--args", "--scheduled"]`, from a pure DDCKit function that `main.swift` uses — evidence: `ScheduledScanTests.swift` `tickArguments` (commit dad390e)
+- [x] Unit test: with "Only show it in the menu bar", a scheduled scan over the threshold posts nothing, sends no ack and sets the badge (B3) — evidence: `ScheduledScanTests.swift` `menuBarOnly` (commit dad390e)
+- [x] Unit test: the bundled scheduler plist is `BundleProgram Contents/MacOS/DeepDriveCleaner` with `ProgramArguments ["DeepDriveCleaner", "--tick"]` (B6), and its label is the agent label the app registers — evidence: `ScheduledScanTests.swift` `bundledPlists` (commit dad390e)
+- [x] Contract test: no DDCKit source imports `UserNotifications` or `ServiceManagement` — evidence: `ContractTests.swift` `noSystemFrameworks` (commit dad390e)
 - [ ] Manual check on the reference machine with the app quit: at the next tick (`app.log` shows `--tick`, then a `--scheduled` launch) the app is opened with `--scheduled`, scans, posts and quits, with no Dock icon and no change of focus; Review opens the Review window; Remind me tomorrow posts nothing until the first scheduled scan after the snooze, which posts if still over the threshold or still almost full
 - [ ] Manual check: after the first launch and the migration, System Settings → Login Items & Extensions lists the scheduled scan under "DeepDriveCleaner" with the app's icon, not under a developer name
 - [ ] Manual check after the migration: the 0.1.0 LaunchAgent is gone; `launchctl print gui/$UID/com.smartandpoint.deepdrivecleaner` finds no job and `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` does not exist

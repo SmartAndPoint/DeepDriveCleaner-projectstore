@@ -144,6 +144,7 @@ Scans keep running while the app is quit and after `brew upgrade`: `uninstall qu
 - **The agent's program.** The bundled agent runs the app binary with `--tick`, the fallback in Open Questions, and `--tick` opens the app by its own bundle path. `SMAppService` documents bundle programs, so Login Items is expected to attribute the agent to the app rather than to `/usr/bin/open`. The first manual check of the 0.3.0 release confirms it. If the bundle program is refused, the app falls back at runtime to a second bundled plist that runs `/usr/bin/open`.
 - **When the migration offer shows.** It shows whenever the legacy plist exists and the offer has not been dismissed, not only at the first launch. This covers agents installed by 0.1.0 and by a 0.2.x `ddc schedule install`.
 - **No second scheduler.** While that plist exists, the app neither registers its agent nor runs scheduled scans, so two schedulers never run together.
+- **Remind me tomorrow** is anchored on the tap, not on the notifying scan. `<time>` below is the schedule hour on the calendar day after the tap. A notification held back by working hours, or tapped days later in Notification Center, still means "tomorrow".
 
 **Migration from 0.1.0** is offered, never silent. While the legacy plist exists (see the note above), the popover offers to replace the CLI's background scan. The same offer stays in Settings → Permissions ("Old background scan found · Replace it") for as long as `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` exists. Replacing it:
 
