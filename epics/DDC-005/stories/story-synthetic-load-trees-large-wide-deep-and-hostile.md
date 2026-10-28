@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, testing, performance, load]
-code_refs: [".config/nextest.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**"]
+code_refs: [".config/nextest.toml", "Cargo.toml", "Makefile", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**"]
 specs: []
 started_at: 2026-10-28
 closed_at: null
@@ -48,7 +48,7 @@ Profiles (each is a shape real disks have):
 | `names` | Unicode NFC/NFD pairs, case pairs, spaces, newlines and control characters, names that look like flags. At build time the generator probes the filesystem: normalization- and case-insensitivity, and whether it accepts invalid UTF-8 (APFS refuses it with `EILSEQ`). It records the results in the manifest's `fs_caps` and expects only the names that exist. Invalid UTF-8 is built only where the filesystem accepts it (Linux, DDC-007) |
 | `hostile` | unreadable folders, plus a mutator thread that deletes, renames and creates entries while a scan runs |
 | `system-root` | a fake data volume root (`Users`, `Library`, `private/var/folders`, `Applications`) for `ddc disk --system-root` |
-| `mixed` | all of the above, weighted like the reference machine's home |
+| `mixed` | every profile but `system-root` (its own root layout) and `hostile` (it changes while scanned), weighted like the reference machine's home |
 
 Size tiers: S = 10⁴ entries (fast gate), M = 10⁵ (CI), L = 10⁶ (nightly and manual), XL = 10⁷ (manual).
 
@@ -65,7 +65,7 @@ Size tiers: S = 10⁴ entries (fast gate), M = 10⁵ (CI), L = 10⁶ (nightly an
   - Keep markers are planted by the `projects` profile, not derived from the catalog.
   - Each branch of the model has a fixture: a monorepo (lock file in the git root, one package edited today, one idle, a venv whose `requirements-dev.txt` sits in the package only), a CMake build folder with no project around it (unknown activity, not selected), app-owned artifacts under a dot folder and under `Library` in the home (Review), and a `.git` in the home that does not make the home a project root.
 - [x] Sizes are the same on every filesystem. Payload files are exactly 4096·k bytes long, with non-zero content. Marker files whose content a matcher reads (`CACHEDIR.TAG`, `CMakeCache.txt`, `pyvenv.cfg`, toolchain pins) are padded to exactly 4096 bytes with trailing newlines (every parser of these files skips blank lines or trims). Everything else is empty. Symlink targets stay under 60 bytes, which ext4 stores without a block (DDC-007). The tree root, after `canonicalize()`, is padded to a fixed length of 160 bytes, so path lengths, the `PATH_MAX` boundary and the order of findings are the same on every machine.
-- [x] Home. Most catalog rules are anchored at the home folder (`Catalog::builtin(home)`). Each profile's description names the home its manifest assumes: none (content-matched project rules only) or a fake home inside the tree (`<tree>/Users/load` for `users`; `mixed` and `system-root` follow in step 2). `verify` passes it to the scan through `Env::with_paths`; a profile without a home gets an empty folder beside the tree. Home-anchored findings are expected only when the profile provides a home. It is never the real home.
+- [x] Home. Most catalog rules are anchored at the home folder (`Catalog::builtin(home)`). Each profile's description names the home its manifest assumes: none (content-matched project rules only) or a fake home inside the tree (`<tree>/Users/load` for `users` and `mixed`, `<tree>/System/Volumes/Data/Users/load` for `system-root`). `verify` passes it to the scan through `Env::with_paths`; a profile without a home gets an empty folder beside the tree. Home-anchored findings are expected only when the profile provides a home. It is never the real home.
 - [x] Modification times are backdated by the description (older than the default `min_age` of 14 days where a finding is expected, newer where it is not), so the expected plan is exact.
 - [ ] Safety guard, by filesystem identity, not by path prefix. Two target kinds are allowed:
   - M and above on macOS: a volume the generator mounted itself. Before the first write it calls `statfs` on the target and checks that `f_mntfromname` equals the device `hdiutil attach -plist` returned.
@@ -81,9 +81,15 @@ Size tiers: S = 10⁴ entries (fast gate), M = 10⁵ (CI), L = 10⁶ (nightly an
   - writes `.metadata_never_index` and `.fseventsd/no_log` at the root, so Spotlight and fseventsd do not index millions of entries;
   - detaches and deletes it afterwards.
 - [ ] Generation time per tier is recorded. L must build in ≤ 5 min on the reference machine. Otherwise the tier is cached as an image.
-- [x] A test in the fast gate: S-size trees of every profile generate identically for the same seed and the same `fs_caps` (the manifest hash is stable). Only `names` depends on `fs_caps`.
-- [ ] Golden check. `make golden-record` and `make golden-check`: for every S profile except `hostile`, run `scan --json`, `rules --json` and `disk --json` (on `system-root`) with a fixed `HOME` and `--data-dir`. Normalise `generated_at`, `duration_ms`, idle days and the tree root (replaced by a placeholder, since `$TMPDIR` differs per user and machine), store the outputs under `bench/golden/`, and diff. The golden of `names` is keyed by its `fs_caps`. This is the behaviour-preservation check DDC-006's refactors and DDC-007's move and catalog split use.
-- [ ] `hostile`: the mutator deletes, renames and creates filler inside a dedicated `churn/` folder while a scan runs, and the scan finishes. The filler matches no rule. A rename or a re-creation under the same name shows up as `Changed` (counted in `skipped_total`), not as vanished. An entry that vanishes between listing and reading is counted in the walk's `vanished` and makes its owning finding `incomplete`. It is not an error and does not abort the scan. A deterministic test wraps the directory reader (`scan::walk_with_reader`) to delete an entry just before it is read, and asserts that count.
+- [x] A test in the fast gate: S-size trees of every profile generate identically for the same seed and the same `fs_caps` (the manifest hash is stable). Only `names`, and `mixed` through its `names` part, depend on `fs_caps`.
+- [x] Golden check. `make golden-record` and `make golden-check`: for every S profile except `hostile`, run `scan --json` and `disk --json` (on `system-root`) with a fixed `HOME` and `--data-dir`, and `rules --json` once (the catalog does not depend on the tree). Normalise what differs between runs and machines, store the outputs under `bench/golden/`, and diff:
+  - times: `generated_at`, `duration_ms`, `as_of`, idle days, and a `last_activity` other than the fixed old date (it becomes `<build>`; the old date stays verbatim);
+  - the run's folder (replaced by `<run>`, since `$TMPDIR` differs per user and machine);
+  - inode numbers, and device numbers as `<tree-dev>` or `<other-dev>`, so crossing a device still shows;
+  - the build: `ddc_version`; the machine: `volumes`, `container`, `full_disk_access`, and in `not_counted` what the Data volume holds besides the tree (`bytes`, `data_volume_bytes`; `counted_bytes` and `holds` stay).
+
+  It preserves walk and rule behaviour: the CLI runs with an empty `PATH`, so tool-backed areas of `disk` (snapshots, simulators, Homebrew) are not exercised, and the plan is checked through each finding's `selected` and removal here and through `verify`'s manifest comparison, not a golden `clean --dry-run`. The goldens of `names` and of `mixed` (which holds a `names` part) are keyed by their `fs_caps` (`scan-cini.json` on APFS); they exist for APFS only, so DDC-007 records its file systems' variants before its gate can pass. This is the behaviour-preservation check DDC-006's refactors and DDC-007's move and catalog split use.
+- [x] `hostile`: the mutator deletes, renames and creates filler inside a dedicated `churn/` folder while a scan runs, and the scan finishes. The filler matches no rule. A folder replaced under the same name (renamed away and re-created) shows up as `Changed` (counted in `skipped_total`), not as vanished; one renamed away and not replaced is vanished. An entry that vanishes between listing and reading is counted in the walk's `vanished` and makes its owning finding `incomplete`. It is not an error and does not abort the scan. A deterministic test wraps the directory reader (`scan::walk_with_reader`) to delete an entry just before it is read, to report one as gone between listing and metadata, and to replace a folder under the same name, and asserts the `vanished` and `skipped_total` counts. Locked folders are counted once as a folder and an error, their contents unseen, and make their finding `incomplete`; the manifest models them (`Desc::lock`). Running as root would read them anyway: the manifest assumes an unprivileged user (CI runs as `runner`; root containers are DDC-007's).
 
 ## Implementation Plan
 
@@ -115,6 +121,14 @@ Planned with `projectstore:planner` on 2026-10-28. Three commits; the first is u
      - A `ddc-loadgen clean` subcommand removes the generator's own `ddc-load-*` folders, by the guard's identity rule (only those holding its marker); the golden targets call it afterwards, so the gate leaves nothing in `$TMPDIR`.
    - A pinned S hash per profile in `tests/determinism.rs`, so an unintended change to the generator fails before the golden check does.
    - The seeded-change test.
+
+   Done in `54336bb`, reviewed with `projectstore:reviewer`. Changes from the plan:
+   - The golden tests are ordinary tests, not ignored: they run in `nextest`, so in `gate-fast` before every commit as well as in `make gate`, in the load test group. `make golden-check` runs only them. The load group (generator tests and golden) took about 50 s of wall time on 4 threads on the reference machine.
+   - Test trees are removed on drop (`target::Scratch`, which first gives back the permissions `hostile` took), not by `clean` afterwards: `clean` cannot tell an abandoned tree from one a run in another worktree is using. `ddc-loadgen clean` and `make loadgen-clean` stay for trees left by manual `mktemp` runs and killed processes. Nothing in the gate runs it; what a killed run leaves stays until someone does. No test yet asserts that a dropped `hostile` or `deep-path-max` tree is gone (step 3).
+   - `mixed` weights `projects` 35, `users` 20, `wide` 10, `wide-root` 8, `deep` 10, `deep-path-max` 5, `links` 7, `names` 5. It leaves out `system-root` (its own root layout) and `hostile` (it changes while scanned), so its golden stays exact.
+   - `deep-path-max` builds chains of `node_modules/x/x…` in a project, each level with a file; at S the manifest expects 12 errors, one per chain, and every finding `incomplete`. The builder raises the open-file limit through `sys::rlimit`.
+   - The seeded change switches `python.venv` off in `settings.json`, which changes the findings the way a changed rule does.
+   - The golden set is 2.4 MB; `names` alone is about 1.3 MB (1656 findings).
 3. **Disk image and CI load.**
    - `scripts/load-image.sh` and `make load-image PROFILE=… SIZE=M|L|XL`:
      - `hdiutil` with `-owners on`;
@@ -123,15 +137,16 @@ Planned with `projectstore:planner` on 2026-10-28. Three commits; the first is u
    - A `load` job in `gate.yml` (M) and an L `mixed` step in `nightly.yml`. L and XL times are recorded here.
    - Left from step 1's review:
      - the image check above, and the tier-to-target decision.
+   - Left from step 2: a test that a dropped `hostile` or `deep-path-max` tree is gone; M builds of `deep-path-max`, `system-root`, `hostile` and `mixed` (AC 1 has S for all eleven, M for the first seven).
 
 ## Acceptance Criteria
 
 - [ ] `ddc-loadgen` builds every profile at S and M; the same seed and the same `fs_caps` give the same manifest hash.
-- [ ] A scan of each profile's S tree except `hostile` finds exactly the manifest's expected findings and totals, and `clean --dry-run` plans exactly its expected items (asserted in the fast gate). For `hostile`, the scan completes without a panic and its findings are a subset of the manifest's static set.
-- [ ] `make golden-check` passes on an unchanged tree and fails on a seeded change to one rule (test).
-- [ ] The generator refuses a folder on the home's or the boot volume's filesystem without its marker, and a mount point whose `statfs` device does not match the attached image (tested).
+- [x] A scan of each profile's S tree except `hostile` finds exactly the manifest's expected findings and totals, and `clean --dry-run` plans exactly its expected items (asserted in the fast gate). For `hostile`, the scan completes without a panic and its findings are a subset of the manifest's static set.
+- [x] `make golden-check` passes on an unchanged tree and fails on a seeded change to one rule (test).
+- [ ] The generator refuses a folder on the home's or the boot volume's filesystem without its marker, and a mount point whose `statfs` device does not match the attached image (tested). The two refusals are tested since step 1 (`tests/guard.rs`); left open until step 3's check that the device is an image this run attached.
 - [ ] An L `mixed` tree (10⁶ entries) is generated, scanned and removed on the reference machine; times are recorded in this story.
-- [ ] Under `hostile`, a scan completes with no panic. In the deterministic reader test, vanished entries are counted as vanished and their finding is `incomplete`, not an error.
+- [x] Under `hostile`, a scan completes with no panic. In the deterministic reader test, vanished entries are counted as vanished and their finding is `incomplete`, not an error.
 
 ## Final Summary
 
