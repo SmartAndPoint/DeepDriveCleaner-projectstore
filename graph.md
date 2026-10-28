@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T11:18:44.334Z
+generated_at: 2026-10-28T11:33:19.960Z
 
 ---
 
@@ -35,6 +35,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | in-progress |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
+| epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | planned |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | in-progress |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | in-progress |
@@ -48,6 +49,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | planned |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
+| research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | Coding-agent harnesses on macOS: where their data lives and how to tell a live session | research | final |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
@@ -116,6 +118,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
@@ -135,6 +138,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
@@ -171,6 +175,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
+| epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
@@ -213,6 +219,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
+| research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/distribution-through-agents.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/distribution-through-agents.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
 | research/distribution-through-agents.md | wikilink | research/where-developer-disk-space-goes-macos.md |

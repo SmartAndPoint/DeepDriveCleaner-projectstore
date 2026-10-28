@@ -2,13 +2,14 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T11:18:44.127Z
+generated_at: 2026-10-28T11:33:09.268Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
+- [ ] [[epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view|DDC-002: Coding agents in the Whole disk view]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 
 ## ToDo
