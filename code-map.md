@@ -14,7 +14,6 @@ Regenerate via `/projectstore:codemap`; edit refs via `/projectstore:codemap set
 |------|-------|--------|-----------|
 | [[epics/DDC-001/epic\|DDC-001]] | Disk space cleaner CLI for developers | in-progress | `Cargo.toml`, `Makefile`, `rust-toolchain.toml`, `clippy.toml`, `rustfmt.toml`, `crates/ddc-core/`, `crates/ddc-cli/`, `docs/scan.schema.json`, `bench/` |
 | [[epics/DDC-002/epic\|DDC-002]] | Menu bar app | in-progress | `app/`, `scripts/build-app.sh`, `scripts/icons/`, `crates/ddc-cli/`, `crates/ddc-core/`, `docs/clean.schema.json`, `docs/scan.schema.json`, `docs/notify.schema.json`, `docs/settings.schema.json`, `docs/rules.schema.json`, `docs/progress.schema.json`, `README.md` |
-| [[epics/DDC-004/epic\|DDC-004]] | Product website and agent-first contribution guide | planned | — |
 
 ## Story-level refs (files each story touched)
 
