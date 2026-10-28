@@ -8,7 +8,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, quality, testing, performance, ci]
-code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "scripts/load-image.sh"]
+code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "scripts/load-image.sh", "bench/compare_load.py", "bench/test_compare_load.py", "bench/dhat_top.py", "bench/test_dhat_top.py", "bench/load-limits.tsv", "crates/ddc-core/src/heap.rs", "crates/ddc-core/src/sys/usage.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/exec/system.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/load_cli.rs", "crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/scanner.rs"]
 review_status: reviewed
 reviewed_at: 2026-10-28
 ---
