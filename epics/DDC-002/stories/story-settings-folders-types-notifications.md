@@ -3,18 +3,18 @@ type: story
 id: "story-settings-folders-types-notifications"
 epic: "DDC-002"
 title: "Settings: folders, types, notifications"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-21
+updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, settings]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-28T02:56:30.432Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-28T02:56:30.432Z"
 ---
 
 # Settings: folders, types, notifications
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -30,7 +30,7 @@ plan_updated_at: null
 
 ## Description
 
-This story is artboard 7 of the design canvas: the General, Folders, Types, Notifications and Permissions tabs.
+This story was first drawn as artboard 7 of the design canvas. Artboard 10 ("Settings, revised") replaced it on 2026-10-21; see the revision below.
 
 What the CLI also reads is stored in `settings.json` (story "CLI: shared settings, types and the notify decision"), so a scan from the terminal and a scan from the app use the same folders and types. Preferences only the app uses stay in its `UserDefaults`.
 
@@ -41,7 +41,7 @@ Artboard 10 of the design canvas ("Settings, revised") replaces artboard 7. Its 
 - Notifications (threshold, low disk, working hours) moves to Automation, under "Notify me when".
 - The badge and the size next to the icon stay in General.
 
-The Decomposition and ACs below still describe artboard 7 until the plan gate re-cuts them.
+The plan gate on 2026-10-28 re-cut the Decomposition and the ACs for artboard 10.
 
 The window is an `NSTabViewController` with `tabStyle = .toolbar`, and the window title is the pane's name. A SwiftUI `TabView` in an `NSWindow` would draw segments, not toolbar tabs.
 
@@ -96,40 +96,233 @@ It has its own story: "Automatic cleaning of download caches after a scheduled s
 - Pause, the same `ScansPaused` as the popover;
 - Next scan, from the due function of "Background scan and notifications in the app": "Today" or "Tomorrow" at the slot, and "Within the hour" after a missed slot or a Resume.
 
-The decomposition below is re-cut at the plan gate.
 
 ## Decomposition
 
-Rough until the plan gate.
+Re-cut at the plan gate (2026-10-28) for artboard 10.
 
-- [ ] General:
-  - Open at login (state from `SMAppService.status`);
-  - Scan: daily, weekly or off, at a whole hour ("Daily at 10:00"), the hour the scheduler's hourly tick can match; off unregisters the scheduler agent; while scans are paused from the menu ("Menu bar popover") the row says so, and the schedule is kept for Resume;
-  - "Show the size you can free next to the icon";
-  - "Delete review items instead of moving them to the Trash", off by default
-- [ ] Folders: "Scan these folders" (default: the home folder; external volumes such as `/Volumes/Work` allowed), added and removed with a folder picker; "Never touch these folders" (excludes) and how `.ddc-keep` does the same; a root inside another root is refused
-- [ ] Types: one switch per rule group from `rules --json`, with its class, written as `disabled_rules`; "Projects count as idle after N days"; "Hide items smaller than N MB" (`min_size`). A change applies to the loaded report at once and to the next scan through `settings.json`
-- [ ] Notifications: the threshold, with the repeat rule (a fifth more, or a week) explained; "Also when the disk is almost full" (`notify_low_disk`), explained as notifying at every scheduled scan while the disk stays almost full; "Show a badge on the menu bar icon"; "Only notify during working hours" (9:00 to 19:00, weekdays)
-- [ ] Permissions: Full Disk Access state from the live probe, as the popover (not the report's `full_disk_access`), with Open Privacy Settings; notification permission state; "Old background scan found · Replace it" while the 0.1.0 LaunchAgent exists (the flow is in "Background scan and notifications in the app")
-- [ ] `settings.json` is written atomically and used by the next scan
+- [ ] CLI "Skip entirely":
+  - an additive `skips` list in `settings.json`;
+  - `--skip PATH` on `scan` and `clean`, which only adds to the list;
+  - `not_scanned` in the report and one line in the terminal;
+  - the README and both schemas.
+
+  The ADR amendments are written first.
+- [ ] Core: re-cut `GROUPS` to the Types rows of artboard 10 plus "Maven and test browsers" (D2): 14 switchable rows and two fixed, 16 groups.
+- [ ] DDCKit:
+  - `SettingsFile` and `SettingsStore`, a read-modify-write that keeps every unedited key;
+  - `FolderList`, `TypesRows` and `Schedule`;
+  - the new `AppPreferences` keys;
+  - decoding of `inaccessible` and `not_scanned`;
+  - the "Not readable" list.
+- [ ] App:
+  - an `NSTabViewController` window (`.toolbar`) with the six panes General, Folders, Schedule, Automation, Types and Permissions;
+  - the seams that "Background scan and notifications in the app" fills: next scan, scheduler control, the scheduled-scan row, the migration row;
+  - the "not scanned" line in Review.
 
 ## Implementation Plan
 
-<!-- Written at the work-start gate (/projectstore:story plan), AFTER studying the
-     codebase. When a spec covers this story, this is a thin route through the
-     spec's contracts: which contracts, in what order, which files. -->
+Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story.
+
+**Owner decisions taken at the gate.** The owner delegated these on 2026-10-25 and 2026-10-28; each is recorded here so it can be overturned.
+- **D1.** "Scan automatically" is on by default, daily at 10:00, as artboard 10 draws it. "Background scan and notifications in the app" relies on "the first tick is due".
+- **D2.** `GROUPS` follows the 13 Types rows of artboard 10, plus one more row, in one contract change. The rows are: Python environments; node_modules; Build outputs; Build caches in projects; Package downloads; Toolchain caches; Maven and test browsers; Browser and app caches; IDE caches; Xcode builds; Xcode device support; Old toolchains; ML models; VM and container images. Interrupted cleanups and Your data stay as they are, which makes 16 groups.
+  - **Changed groups:**
+    - **Build outputs:** `rust.target`, `maven.target`, `gradle.build`, `cmake.build`, `cocoapods.pods`.
+    - **Build caches in projects:** `js.build-cache`, `python.pycache`, `python.tool-cache`, `gradle.project-cache`.
+    - **Package downloads:** npm, pnpm, yarn, bun, pip, Poetry, Homebrew, CocoaPods.
+    - **Toolchain caches:** Cargo, uv, Go modules, the Go build cache and Gradle, exactly the owner's 2026-10-21 list. All of them are `safe`.
+    - **Maven and test browsers** (the extra row): `repo.maven`, `browsers.playwright`, `browsers.puppeteer` and `browsers.cypress`, all `review`. They were left out of the owner's list, and putting them under a Safe row would misstate their class.
+    - **Xcode builds:** DerivedData and simulator caches.
+    - **Xcode device support:** `xcode.device-support`.
+    - **Browser and app caches:** the `app.*` rules and `generic.cachedir-tag`.
+  - Labels are data, so `RULES_SCHEMA_VERSION` stays 1.
+  - **The class chip.** A Types row shows one chip for each class among its switchable rules, in class order. Some groups were already mixed before this change:
+    - node_modules, with an orphan `review`, reads "Rebuildable · Review";
+    - IDE caches, with JetBrains old data `review`, reads "Safe · Review";
+    - Browser and app caches, with `generic.cachedir-tag` `review`, reads "Safe · Review";
+    - Python environments (`python.tox` `safe`) and VM and container images (`cache.colima` `safe`) show both classes too.
+
+    The chip states the classes as they are, and no row claims to be safer than its least safe rule.
+- **D3.** The per-group Auto flag is not stored here. The Automation pane draws "Clean download caches automatically" but disables it ("arrives in a later version"), so `auto` is never stored. The flag and its storage belong to "Automatic cleaning of download caches after a scheduled scan", which needs its ADR amendments first.
+- **D4.** "Not scanned" is a new optional report field, `not_scanned`, not a new `SkipReason`. It lists the user's skips that the walk actually stopped at, in canonical form. The visitor records them as it records keep markers, so the list is never truncated.
+  - A skip inside a claimed finding is not listed. The walk still reads that finding, and the finding is kept whole instead.
+  - The prompting areas a background scan leaves out are not listed either: they are not the user's skips.
+  - A new variant would bump the scan `schema_version`, and a 0.2.x report would read as unreadable right after an upgrade.
+  - `skipped` is truncated at `max_recorded`, so a skip could fall out of it.
+  - `skips` keeps the settings `schema_version` at 1. `deny_unknown_fields` already makes a 0.2.x CLI refuse the key and name the file, and the app omits an empty list.
+
+**Route.**
+1. **Settings and flags.**
+   - `ddc-core/src/settings.rs`:
+     - add `skips` (absolute paths, `default`, skipped when empty);
+     - `ScanFlags.skips` is a union: file skips plus flags;
+     - a missing skip is skipped with a note;
+     - the skips join `options.excludes` after the `--exclude` branch, so an exclude flag can never drop them and `dropped()` never names them;
+     - they also go into a new `ScanOptions.user_skips`;
+     - a skip that is not a directory, or cannot be canonicalised, is refused here, beside the absolute and missing checks, so every command agrees, the dry run included. The error names `--skip` or `skips`.
+2. **Scan.**
+   - `report/mod.rs` uses the canonical skips from `resolve`.
+   - The visitor receives the user's skips apart from the silent prompting areas and records the ones `before_read` stops at, in a `Mutex<Vec<PathBuf>>` like `markers`.
+   - `model.rs` gains `ScanReport.not_scanned`, built from that record.
+   - `cmd/background.rs` keeps the user's skips in their own field (`ScanOptions.user_skips`), because its struct update overwrites `skip` with the prompting areas, and only user skips are recorded.
+   - `Settings::dropped()` treats a folder that a skip covers as still protected.
+3. **Clean.**
+   - `clean --items`, both the real clean and the dry run, refuses an item at, under or above a resolved skip as `kept` before `plan_listed`, as `preflight` does for excludes.
+   - Without this the pruned re-check never sees the skipped folder, and the item would read `changed-since-scan`.
+4. **CLI.**
+   - `cli.rs`: a repeatable `--skip` on `ScanArgs` and `CleanArgs`, allowed with `--items`. Like `--exclude`, a missing path is an error.
+   - Thread it through `cmd/{scan,clean,clean_items,background}.rs`.
+   - `render.rs`: one "Not scanned:" line.
+   - README: rows in the scan, clean and Settings tables.
+   - Regenerate `docs/settings.schema.json` and `docs/scan.schema.json` with `DDC_UPDATE_SCHEMA=1`.
+5. **Groups.**
+   - `rules/listing.rs` per D2.
+   - Regenerate `Fixtures/rules.json` with `rules --json`, using a temp HOME and data dir.
+   - Update the labels in `GroupCleanTests` and `ReportSummaryTests`.
+6. **DDCKit settings.**
+   - `SettingsFile`: a Codable mirror of every Rust key, `scheduler` and `skips` included. It writes snake_case, sorted, with empty arrays and nils omitted, through `.atomic`.
+   - `SharedSettings.read` decodes through `SettingsFile` and keeps its strict checks. Skips must be absolute paths, with a `strictSettings` case.
+   - `SettingsStore` and the CLI's `clear_scheduler` both read-modify-write the file without a lock. Both writes are atomic renames, and the CLI writes only when it clears a stale record, so the cost is at worst one lost `scheduler` clear, which the next launch heals.
+   - `SettingsStore` is the app's one writer:
+     - `update` reads from disk every time;
+     - it refuses to write over a malformed or newer file;
+     - after a write it calls `PopoverModel.refresh()`, so ignored findings and the icon change at once.
+   - `ContractTests.settingsKeys` gains `skips`.
+7. **DDCKit panes' logic.**
+   - `FolderList`:
+     - the first added root writes `[home, new]`;
+     - nested, duplicate and symlinked roots are refused by resolved path;
+     - a skip or exclude at or above a root is refused;
+     - the last root cannot be removed;
+     - an exclude's mode moves its path between `excludes` and `skips`.
+   - `TypesRows`: one row per group of switchable rules, with the class chips of D2. Off means all of the group's switchable ids are in `disabled_rules`. The help text lives in the app, keyed by label, and a contract test checks that every label has one.
+   - `Schedule`: the hour is an `Int` from 0 to 23. The weekday applies only to Weekly. The status wording is "Off", "Paused", or the next-scan seam's date.
+     - While the seam returns `nil` and scheduling is on, the line is hidden.
+     - 0.3.0 ships only after "Background scan and notifications in the app" fills the seam.
+   - `AppPreferences`:
+     - setters for the size next to the icon, the badge and delete-permanently;
+     - new keys `ScheduleEnabled`, `ScheduleRepeat`, `ScheduleWeekday`, `ScheduleHour`, `AfterScheduledScan` and `NotifyWorkingHoursOnly`.
+   - Pause goes through `PopoverModel.setPaused`.
+8. **Report decoding.**
+   - `ScanReport` decodes `inaccessible` and `not_scanned`.
+   - "Not readable" is `inaccessible` collapsed to its prompting area, one row per area. A Swift mirror of `PROMPTING_AREAS` has a drift test against `background.rs`.
+   - The list is cached in `UserDefaults` (`NotReadableFolders`). It is replaced only by the app's own Scan Now result, never by a report loaded from disk, because a background scan without Full Disk Access skips those areas and its report cannot say so.
+   - The Review window shows one "Not scanned" line listing `not_scanned`.
+9. **App.**
+   - `SettingsWindowController` is an `NSTabViewController` (`.toolbar`) with one `NSHostingController` per pane. The window title follows the pane, and `show(pane:)` opens a given pane.
+   - The panes are `{General,Folders,Schedule,Automation,Types,Permissions}SettingsView.swift`.
+   - General reuses `LoginItem.swift` for Open at login (it already handles `.requiresApproval`). It also has the "Command-line tool" row: the first of `/opt/homebrew/bin/ddc` and `/usr/local/bin/ddc` that resolves into this bundle, otherwise the bundled helper's path. No process is spawned.
+   - Folders' help text says that a skip inside a cache or a project artifact keeps that whole finding.
+   - `AppDelegate` passes the model, the preferences, the store, the privacy opener and the seams.
+   - Settings opens from the existing gear, the right-click menu and ⌘,.
+   - Full Disk Access comes from `PopoverModel.fullDiskAccess`, the popover's single probe.
+   - Notification permission is read only: Settings never asks for it.
+10. **Checks.** `make check`, `make app-test`, an unsigned build, then `projectstore:reviewer`.
+
+**Seams left for "Background scan and notifications in the app":**
+- `nextScan` is the closure the popover footer already uses, and it returns `nil` until that story lands.
+- `SchedulerControl` is a no-op: the schedule choice is stored, and registering or unregistering is that story's job.
+- The "Scheduled scan" and "Old background scan found · Replace It" rows are shown only when their seam returns a value.
+
+Release 0.3.0 is not tagged before that story lands.
+
+**Pitfalls:**
+- An empty `roots` means home.
+- The visitor compares skips by equality, so a skip must be canonical (`/tmp` versus `/private/tmp`).
+- `--skip` must only add to the skips.
+- Never write app-only keys, `null` arrays or an empty `skips`.
+- Never overwrite a file the app cannot read.
+- Button and window strings are title case (`titleCase`).
+- Settings sources never name `.clean` (`cleanHasOneOwner`).
+- `min_age_days` applies from the next scan, not to the loaded report, and the help text says so.
+- `after_clean` carries the old `not_scanned` until the next scan.
 
 ## Acceptance Criteria
 
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Test: switching a type off writes its rule ids to `disabled_rules`, the loaded report marks those findings ignored at once, and the next scan marks them `ignored`; the same for the minimum size
-- [ ] Test with a fake CLI: roots, external-volume roots and excludes edited in Settings reach the next scan through `settings.json`; the app passes no flags for them
-- [ ] Test: a folder inside an existing root, or the same folder twice, is refused with a message
-- [ ] Unit test: the schedule offers whole hours only, and the next scan it shows equals the scheduler's due function
-- [ ] Unit test: the Full Disk Access probe reports granted when a TCC.db path it is given can be opened and missing when it cannot (an injectable path, as `report::full_disk_access` reads `~/Library/Application Support/com.apple.TCC/TCC.db`) — the probe of "Menu bar popover" (`FullDiskAccessProbe`), which Settings reuses rather than adding a second one
-- [ ] Unit test: app preferences (size next to the icon, badge, working hours, the default for `review` items) persist in `UserDefaults` and never appear in `settings.json`
+- [ ] Core test (`tests/settings.rs`):
+  - `skips` must be absolute;
+  - a missing skip is skipped with a note;
+  - `--skip` adds to the file's skips;
+  - an `--exclude` flag leaves the skips in force and never names them as dropped;
+  - a skip that is a file is refused by `resolve`, and the error names the skip;
+  - unknown keys are still refused;
+  - the settings `schema_version` stays 1;
+  - the committed settings schema is current.
+- [ ] Core test (`tests/report.rs`):
+  - a skipped folder is never opened: a mode-000 directory at or under it gives no `inaccessible` entry, and nothing inside it becomes a finding;
+  - `not_scanned` lists the skipped folder in canonical form, also when it was given through a symlink;
+  - a skip inside a claimed finding makes that finding `user.kept` and unselected, and is absent from `not_scanned`;
+  - a report without `not_scanned` still decodes;
+  - the scan `schema_version` stays 1;
+  - the committed scan schema is current.
+- [ ] CLI test:
+  - with `skips` in `settings.json`, `scan --json` lists the folder in `not_scanned` and the terminal prints the "Not scanned" line;
+  - `clean --items --dry-run` of an item at, under or above a skip predicts `kept`;
+  - the real `clean --items` of the same items skips them as `kept`, not `changed-since-scan`, and removes nothing;
+  - an `--exclude` flag that replaces a settings exclude covered by a skip does not name that exclude as dropped;
+  - `scan --background --notify json` applies the skips together with the prompting areas.
+- [ ] CLI test: `rules --json` gives the 16 groups of D2 in order, with these members:
+  - "Package downloads" is exactly npm, pnpm, yarn, bun, pip, Poetry, Homebrew and CocoaPods;
+  - "Toolchain caches" is exactly Cargo, uv, Go modules, Go build cache and Gradle, all `safe`;
+  - "Maven and test browsers" is exactly the Maven repository and the three test-browser rules;
+  - every rule still has a group.
+- [ ] DDCKit test: a Types row's chips are the distinct classes of its switchable rules, in class order. "Toolchain caches" reads Safe, and "node_modules" reads Rebuildable and Review.
+- [ ] DDCKit test:
+  - Settings writes `settings.json` atomically and keeps every key it did not edit, the `scheduler` record included;
+  - it omits empty lists;
+  - a malformed or newer file is never overwritten, and the pane says why;
+  - the written file passes `SharedSettings.read`.
+- [ ] DDCKit test:
+  - switching a group off writes exactly its switchable ids to `disabled_rules`, and switching it back on removes them;
+  - after the store's change hook, the popover summary marks those findings ignored with no rescan;
+  - the same holds for "Hide items smaller than".
+- [ ] DDCKit test:
+  - adding `/Volumes/Work` to the default writes `[home, /Volumes/Work]`;
+  - each of these is refused with a message: a folder inside a root, a root around an existing one, the same folder given twice or through a symlink, and a skip or exclude at or above a root;
+  - the last root cannot be removed;
+  - changing an exclude row's mode moves its path between `excludes` and `skips`.
+- [ ] Test with a fake CLI: after roots, excludes and skips are edited, Scan Now runs exactly `scan --json --progress json`, with no paths, `--exclude` or `--skip`.
+- [ ] Test with the real CLI (temp HOME and data dir; skipped without `target/debug`): a skip written by the Settings model appears in `not_scanned`, and a `node_modules` inside it is not found.
+- [ ] DDCKit test (`TempDefaults`):
+  - these app preferences persist in `UserDefaults` and never appear in `settings.json`: the size next to the icon, the badge, working hours, the after-scan choice, the schedule and delete-permanently;
+  - the icon switches change the icon state at once;
+  - the Pause switch writes `ScansPaused`, the same key as the popover's.
+- [ ] Unit test (Schedule):
+  - only whole hours can be chosen;
+  - "Scan automatically" defaults to on, daily at 10:00 (D1);
+  - the Next scan line is the seam the popover footer uses;
+  - with Scan automatically off it reads "Off…";
+  - while paused it reads "Paused…".
+- [ ] Unit test (Automation):
+  - the GiB threshold and the low-disk switch write `notify_threshold` and `notify_low_disk`;
+  - with scheduled scans off, the pane says so and is disabled;
+  - the automatic choice cannot be selected, and `auto` is never stored.
+- [ ] Unit test (Full Disk Access):
+  - the Folders banner and the Permissions row follow the popover's probe on a temp path;
+  - "Not readable" is the report's `inaccessible` collapsed to one row per prompting area;
+  - the list changes only on the app's own Scan Now result, and loading a report from disk leaves it unchanged;
+  - a drift test checks the Swift list against `PROMPTING_AREAS`.
+- [ ] DDCKit test: a report with `not_scanned` gives the Review window's "Not scanned" line, and a report without it gives none.
+- [ ] Contract tests:
+  - `settingsKeys` includes `skips`;
+  - `cleanHasOneOwner` and `titleCase` stay green;
+  - every group label has help text.
+- [ ] `make check` and `make app-test` pass.
+- [ ] Manual check:
+  - Settings opens from the gear, the right-click menu and ⌘,;
+  - the tabs are toolbar tabs, and the window title is the pane's name;
+  - the window resizes for each pane;
+  - the app shows in the Dock while the window is open;
+  - all of this in light and dark appearance.
+- [ ] Manual check:
+  - the folder picker adds an external volume;
+  - Open Privacy Settings opens Full Disk Access;
+  - a "Not readable" row opens Files and Folders.
+- [ ] Manual check: Open at login reflects System Settings.
 
 ## Final Summary
 
@@ -141,6 +334,11 @@ Rough until the plan gate.
 - "Menu bar popover" stores the two icon preferences in `UserDefaults` as `ShowSizeNextToIcon` (off by default) and `ShowMenuBarBadge` (on by default); the General tab's switches write those keys.
 - The groups come from the CLI (`rules --json`), so a new rule appears in the right group without an app release.
 - `disabled_rules` and `min_size` hide findings from selection and totals; they do not stop the scanner from walking those folders.
+- Handed to "Background scan and notifications in the app", which consumes these keys at its plan gate:
+  - `AfterScheduledScan` (`notify` or `menuBarOnly`): `menuBarOnly` posts nothing and only sets the badge;
+  - `NotifyWorkingHoursOnly`;
+  - the `Schedule*` keys.
+- From "Background scan and notifications in the app": `nextScan`, `SchedulerControl`, the scheduled-scan row and the migration row are seams here (Implementation Plan); the new `UserDefaults` schedule keys are that story's input.
 - The canvas's help under Open at login says it keeps "the daily scan running". With the scheduler agent (ADR §5) scans run without the login item; the help text says the icon only.
 
 ## Dependencies
@@ -155,4 +353,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-10-28*

@@ -10,7 +10,7 @@ external_refs: {}
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-25
+reviewed_at: 2026-10-28
 ---
 
 # Cleanup safety model: risk classes, plan and confirmation
@@ -269,6 +269,13 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **The cost accepted.** A rule's scope is a claim made in code: a future rule that reads outside its item but is declared `Item` would be judged on a partial view. Two things guard against it: the exhaustive field, and equivalence tests in which the pruned and the full re-check agree for every rule of the catalog, for each kind of change after the scan. A test checks the scope sets against `toolchain::dropped`, the one place that consumes whole-walk state, and fails when they differ. An equivalence test fails if `ide.jetbrains-old-data` gains a second anchor, which would make `Siblings` insufficient.
   - **Gained besides.** A terminal `clean --items` of caches no longer reads Downloads, Pictures or the device backups, so it no longer makes macOS ask for access to them.
   - The amendment takes effect when the story's code lands.
+- **2026-10-28, decided by the owner.** Story "Settings: folders, types, notifications" (epic DDC-002) amends §2 item 1. A folder can be excluded in one of two ways:
+  - **Count, never clean.** This is today's exclude: the folder is read and sized, and it becomes `user.kept`.
+  - **Skip entirely.** The folder is listed in `settings.json`'s new `skips`, or named with `--skip`, which only adds to that list. A skip must be a directory. The walk stops before reading it, so it is never opened. The report's new optional `not_scanned` lists the skips the walk stopped at, and the Review window shows them as not scanned.
+  - **Skips also protect.** A skip is added to the excludes as well, so a finding that holds a skipped folder is kept whole. `clean --items` refuses an item at, under or above a skip as `kept`, in the dry run and in the clean alike.
+  - **Flags cannot drop a skip.** An `--exclude` flag never removes a skip, and the settings file is the only place to delete one. For that reason the `--exclude` confirmation of the menu bar ADR §6 item 6 does not apply to skips.
+  - **Inside a claimed subtree** the walker's hooks are off, so a skip there is still read and sized. It is protected as an exclude is, the finding is kept instead, and the skip is not listed in `not_scanned`.
+  - The amendment takes effect when the story's code lands.
 
 ## References
 
@@ -280,4 +287,4 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
 ---
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-10-28*

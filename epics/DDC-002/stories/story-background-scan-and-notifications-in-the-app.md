@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-19
+updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, notifications, schedule]
 code_refs: []
@@ -53,6 +53,12 @@ Rough until the plan gate.
   - a pending reminder scan (Remind me tomorrow with a weekly schedule) is due at the first tick after the snooze ends
 - [ ] `--scheduled` launch: no status item; scan if due, post a pending notification if one is waiting, quit. A reopen event while running normally: scan if due. A user launch during a scheduled scan promotes the instance (story "App skeleton and build pipeline")
 - [ ] Background scan through the runner: `scan --background --notify json`; `{"status": "skipped", "reason": "busy"}` (exit 0) posts nothing and leaves the scan due for the next tick
+- [ ] Read the preferences that "Settings: folders, types, notifications" stores (2026-10-28):
+  - the `Schedule*` keys (`ScheduleEnabled`, on by default, daily at 10:00; `ScheduleRepeat`, `ScheduleWeekday`, `ScheduleHour`);
+  - `AfterScheduledScan`: `notify`, or `menuBarOnly`, which posts nothing and only sets the badge (subject to `ShowMenuBarBadge`);
+  - `NotifyWorkingHoursOnly`.
+
+  Fill that story's seams: `nextScan`, `SchedulerControl`, and the Permissions rows.
 - [ ] Notifications, only from scheduled scans:
   - text from the decision: the amount and at most three groups, or the volume that is almost full (artboard 2); never an offer to clean directly;
   - actions Review (opens the Review window) and Remind me tomorrow;
@@ -126,4 +132,4 @@ Rough until the plan gate.
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-28*

@@ -10,7 +10,7 @@ external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2P
 supersedes: null
 superseded_by: null
 review_status: reviewed
-reviewed_at: 2026-10-25
+reviewed_at: 2026-10-28
 ---
 
 # Menu bar app: Swift shell over the ddc CLI
@@ -227,6 +227,8 @@ These changes are additive. One change is visible in the terminal: a held lock e
 
    `scan`, `clean` and the background scan read it when a flag is absent; a flag wins. One exception, decided by the owner on 2026-10-19: an `--exclude` that drops folders the file protects first names exactly those folders. `clean` asks `[y/N]` in a terminal, before the lock, and a declined answer changes nothing; it refuses (exit 2) without a terminal or with `--items`. A scan and a plain `clean --dry-run`, which change nothing, only warn. A settings root or exclude that does not exist (an unplugged disk) is skipped with a note. A malformed file is an error that names it. The app writes the file atomically. The CLI writes it only to clear a stale `scheduler` record.
 
+   **2026-10-28, "Settings: folders, types, notifications".** The file also holds `skips`: folders that are never read. See the safety ADR's amendment of that date. `--skip` only adds to `skips`, and `--exclude` never drops them, so the exclude confirmation above does not apply to them. The app writes `skips` only when the list is not empty, and the field keeps `schema_version` 1. A 0.2.x CLI refuses the unknown key and names the file.
+
    Preferences only the app uses stay in its `UserDefaults`, as in GrammarHelper: the schedule, whether scans are paused (`ScansPaused`, 2026-10-19), the size next to the icon, the badge, working hours, and whether `review` items are deleted instead of moved to the Trash by default in the confirmation sheet.
 7. **`ignored` findings.** A finding whose rule is in `disabled_rules`, or whose size is under `min_size`, gets `ignored: true` and `selected: false`. It keeps the `not_selected` it would have had, so a type switched back on can be applied at once; `ignored` takes precedence. It is not counted in the class or selected totals or in the notify decision; the report counts it apart.
 
@@ -235,7 +237,7 @@ These changes are additive. One change is visible in the terminal: a held lock e
    `ignored` is computed at scan time. When the user changes Types or the minimum size, the app applies the same rule to the loaded report at once, and the next scan writes it.
 
    `min_size` has two meanings, kept apart. The settings value is a scan-time floor that makes findings `ignored`. The `--min-size` flag of `clean` stays a plan filter. A plan leaves out items under the larger of the two.
-8. **Rule groups.** `ddc rules --json` lists every rule id with its category, class, removal method, whether the Types tab can switch it off, and a `group` label ("Python environments", "node_modules", "Package caches", …). It is the source of the app's Types settings.
+8. **Rule groups.** `ddc rules --json` lists every rule id with its category, class, removal method, whether the Types tab can switch it off, and a `group` label ("Python environments", "node_modules", "Package downloads", …; the groups were re-cut on 2026-10-28 to match the Settings design, see "Settings: folders, types, notifications"). It is the source of the app's Types settings.
 9. **Volumes.** The report gains an optional `volumes` list: the free and total bytes of the volume of each scan root. The low-disk check applies to every scanned volume, not only the home folder's, and the notify decision names the volume. As in 0.1.0, it fires for a volume only when something selected lies on it: otherwise `ddc clean` cannot help (owner, 2026-10-19). Unlike 0.1.0, the repeat rule (a fifth more, or a week) holds back only the threshold. While a volume stays almost full with something selected on it, every scheduled scan notifies, a scan caught up after sleep included, until nothing selected is left on it or the user picks Remind me tomorrow. There is no minimum amount and no minimum gap: a few KiB selected on a full disk is enough. A 0.1.0-style agent from `ddc schedule install` repeats the same way, and `notify_low_disk: false` in `settings.json` stops it (owner, 2026-10-19).
 
 ### 7. Consent: the confirmation sheet is interactive consent
@@ -391,4 +393,4 @@ The owner's questions (minimum macOS, the notification's second action, the sign
 
 ---
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-10-28*
