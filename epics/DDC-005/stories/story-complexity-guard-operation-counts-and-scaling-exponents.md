@@ -48,6 +48,7 @@ A wall-clock limit ("scan in ≤ 60 s") catches a slow machine as readily as a s
 - [ ] `op-stats` and the memory story's `dhat-heap` both install a `#[global_allocator]`: a `compile_error!` refuses both at once.
 - [ ] The counters above at their sites. A profile of an L `mixed` scan confirms no hot path is missed.
 - [ ] Fast-gate test, in process (library calls, no harness needed): `wide-root`, `users` and `projects` at S and 4·S; the other profiles at 10³ and 4·10³ (the ratio depends on shape, not size). Assert `count(4n) / count(n) ≤ 4 · (1 + ε)` for `Linear` and the matching bound for `NLogN`.
+- [ ] A third quadratic step, found while planning the load trees and not fixed by `aa64c83`: `rules/classify.rs` `dir_has_any` reads the project root for the glob `requirements*.txt` once per venv with no lock file beside it, uncached. The `wide-root` profile (10⁴ siblings, N venvs) must show it in `dir_entries_read`. The step fires when a venv sits directly under that root (parent = project root, so `[parent, project_root]` reads it twice) and no lock file is beside it. Fix it, for example with a `dir → has_lock` memo inside one `classify` call, or by recording lock-file presence in the visitor's `on_file`; both cost O(distinct directories), unlike caching whole listings. Keep the guard as its regression test.
 - [ ] Regression tests for `aa64c83`. The counters are written on the current code first. Then, on a throwaway branch, each step is restored on its own: the per-claim scan over all finding paths, then the per-finding `last_activity` read. The guard must fail each time, naming the counter. Record both failing outputs in this story.
 - [ ] `make scaling`: reuses the memory story's harness and column order. CPU time (user + system, median of 3 runs) and peak memory at four sizes, slope fit, and a table written to `bench/scaling-<date>.tsv`. It runs on the reference machine. CI runs it at M for information only.
 - [ ] A section "Adding a counter" in the runbook "Profiling the core" from story "Memory and CPU under load: peak memory, leaks and CPU time". That story writes the runbook first.
@@ -58,6 +59,7 @@ A wall-clock limit ("scan in ≤ 60 s") catches a slow machine as readily as a s
 
 - [ ] With `op-stats` on, every profile passes the counter-ratio test at the sizes above in the fast gate, in ≤ 15 s total, or the measured time is recorded and the sizes are lowered.
 - [ ] Restoring either quadratic step of `aa64c83` alone makes the counter test fail with a message that names the counter and the measured ratio (evidence: two throwaway-branch outputs).
+- [ ] Before the `dir_has_any` fix, `wide-root` at S and 4·S fails the `dir_entries_read` ratio (the output is recorded in this story); after the fix it passes.
 - [ ] `make scaling` on M and L trees on the reference machine produces slopes ≤ 1.2 for CPU time and peak memory of scan and report, recorded in `bench/`.
 - [ ] The release binary carries no counters: `scripts/build-dist.sh` passes no `--features`, `op-stats` is not a default feature (both asserted in `ddc-cli/tests/structure.rs`), and `nm` on the dist binary finds no `op_stats` symbol.
 

@@ -57,7 +57,7 @@ Before the catalog is written, a research note records where dev disk space goes
 - [ ] Trash: freedesktop Trash via the `trash` crate, home and other-volume trash.
 - [ ] Catalog (Linux section): rules from the research note. Protected folders: the safety ADR §6 list (it already holds `~/.config`, `~/.ssh`, `~/.gnupg`, `~/.local`, `~/.cache` as protected folders, not as their contents), plus Linux-only folders: `~/.local/share/keyrings`, `~/.local/share/Trash`, `~/.pki`, browser and mail profiles (`~/.mozilla`, `~/.thunderbird`).
 - [ ] Home, data and logs: `HOME`; `$XDG_STATE_HOME/deepdrivecleaner` (default `~/.local/state/deepdrivecleaner`), through `env::Env`.
-- [ ] JSON paths: non-UTF-8 names are represented the way the schema already does for macOS. Check that the `names` load profile passes on Linux.
+- [ ] JSON paths: Linux allows names that are not UTF-8, and APFS refuses them. Today `scan --json` would fail outright on one in a reported path (a finding, a listed entry, an error or skipped path, a root or the home; a name strictly inside a claimed finding never reaches the JSON), because serde refuses to serialize a non-UTF-8 `PathBuf`. Decide how the schema represents such a name (lossy with a flag, or escaped bytes), implement it, and check that the `names` load profile, which builds invalid UTF-8 where the filesystem accepts it, passes on Linux.
 - [ ] Load thresholds per target: Linux has no bulk stat (one `statx` per entry) and musl's allocator is slow under threads. Measure, then set Linux thresholds; try `mimalloc` for musl if the S check misses by more than 2×.
 - [ ] Flip `SUPPORTED` to true for Linux and add the Linux targets to `release.yml`'s enabled list, in one commit.
 
