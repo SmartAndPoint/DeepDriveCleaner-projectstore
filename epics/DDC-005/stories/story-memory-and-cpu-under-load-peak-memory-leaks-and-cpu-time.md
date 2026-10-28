@@ -91,7 +91,7 @@ No tool runs from the harness. Three profiles (`users`, `mixed`, `system-root`) 
   Each is measured on the waiting thread's own CPU clock (`CLOCK_THREAD_CPUTIME_ID`), so other tests in the same process do not pollute it. For each, CPU time over the idle stretch is < 1% of wall time. (`OPEN_FILE_CONFIRM` in `exec/guard.rs` is one plain `sleep`, with nothing to measure.)
 - [x] `bench/load-<date>-<size>.tsv` in a fixed column order: a `#` line with the date, commit, machine model, CPU count, load average at start and end, limits mode and seed, then a header row: `profile size seed entries command run wall_ms user_ms sys_ms cpu_ms max_rss_bytes threads_max exit`. `run` writes its rows to `target/load/<size>-<profile>.tsv`; `make load` concatenates them under one `#` line into `bench/load-<date>-<size>.tsv` only for a full `enforce` run of seed 1 that judged CPU (`mode=enforce`; a busy machine writes `mode=enforce-memory`, and a merge with any such table is not `enforce`), and refuses to overwrite an existing file of that name. A `record` run (CI, or a busy reference machine) leaves its file in `target/load`; CI uploads it as a workflow artifact. `bench/compare_load.py` compares CPU time (not wall time) and peak RSS, per `(profile, size, command)` median, against the newest earlier file of the same size, and flags any metric more than 15% worse, unless the change is under 10 ms of CPU or 1 MiB of peak memory (noise on tiny runs). Its tests run in `make gate` (`make bench-test`).
 - [x] After a run, `make load` checks the owner's state by modification time only, never by listing: the data directory `~/Library/Application Support/DeepDriveCleaner` and the files in it, `~/Library/LaunchAgents` and `~/Library/Logs/DeepDriveCleaner`. A change names the path and the time, since the owner's app may scan on its own schedule meanwhile. After `clean --items`, it counts the entries in `<mount>/.Trashes/<uid>` against the clean report's trashed items. The real Trash is never read.
-- [ ] Runbook "Profiling the core" in the vault's `ops/` (`type: runbook`):
+- [x] Runbook "Profiling the core" in the vault's `ops/` (`type: runbook`):
   - flamegraph with `samply` or Instruments, on the `profiling` build;
   - heap profile with `dhat`;
   - `leaks`;
@@ -128,7 +128,7 @@ Then the runbook, reviewed by the critic.
 - [ ] Per-`(command, profile)` memory and CPU limits exist in the harness, and an M run on a quiet reference machine passes them in `enforce` mode (owner: quiet machine, for the CPU baseline). A deliberately added allocation retained per entry, at least twice the headroom (a throwaway branch that keeps a 1 KiB buffer per entry in a long-lived `Vec`), fails the memory limit.
 - [ ] The idle-point tests show < 1% CPU on the waiting thread.
 - [ ] `compare_load.py` flags a seeded 20% regression, passes an unchanged rerun, and ignores a wall-time-only change (tests).
-- [ ] The runbook "Profiling the core" exists and was reviewed by the critic.
+- [x] The runbook "Profiling the core" exists and was reviewed by the critic. — evidence: `ops/profiling-the-core.md`; critic (2026-10-29) approved after fixes, all applied (samply and xctrace runs isolated, outputs under `target/profiling`, the stale-baseline checklist widened)
 
 ## Final Summary
 
