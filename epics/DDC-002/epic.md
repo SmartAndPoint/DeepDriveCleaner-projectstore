@@ -77,6 +77,7 @@ The screens are modelled in the design canvas before any code.
 | [story-whole-disk-in-the-app](./stories/story-whole-disk-in-the-app.md) | in-progress | The report in the app: a bar of the container and one row per area, from the popover and the Review window; `ddc disk` in a lane of its own beside the runner's queue; on demand, never scheduled |
 | [story-whole-disk-free-space-with-the-owning-tool](./stories/story-whole-disk-free-space-with-the-owning-tool.md) | planned | `ddc disk free` runs `simctl runtime delete` or `brew cleanup` from a confirmed action list, with a dry-run preview; amends the safety ADR §5–§7 and the menu bar ADR §6–§7 first; never from the scheduled path |
 | [story-coding-agents-in-the-whole-disk-view](./stories/story-coding-agents-in-the-whole-disk-view.md) | planned | Owner's canvas comment, 2026-10-28: a read-only Coding agents section in the Whole disk view. `ddc disk agents --json`: per harness its folders and sizes, the live Claude Code sessions and open Codex threads; cleaning stays with DDC-003 |
+| [story-popover-the-next-scan-line-opens-the-schedule-settings](./stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md) | planned | Owner, 2026-10-28: the popover footer's "Next scan …" line becomes a link to Settings → Schedule (Permissions while the 0.1.0 agent runs); it opens a window and changes nothing |
 
 ## Expected Results
 

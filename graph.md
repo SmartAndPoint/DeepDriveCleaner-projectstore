@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T14:51:06.054Z
+generated_at: 2026-10-28T15:02:42.268Z
 
 ---
 
@@ -40,6 +40,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | in-progress |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | in-progress |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
+| epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | planned |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
@@ -146,6 +147,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-and-clean-window.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
@@ -166,6 +168,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-and-clean-window.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
@@ -215,6 +218,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-menu-bar-popover.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | wikilink | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | wikilink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |

@@ -2,13 +2,14 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T14:51:05.805Z
+generated_at: 2026-10-28T15:02:42.062Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
+- [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
