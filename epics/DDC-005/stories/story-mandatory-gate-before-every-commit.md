@@ -3,7 +3,7 @@ type: story
 id: "story-mandatory-gate-before-every-commit"
 epic: "DDC-005"
 title: "Mandatory gate before every commit"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [rust, ci, quality, git-hooks]
 code_refs: []
 specs: []
-started_at: null
+started_at: 2026-10-28
 closed_at: null
-plan_updated_at: null
+plan_updated_at: 2026-10-28
 ---
 
 # Mandatory gate before every commit
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -64,6 +64,35 @@ Later stories add their checks to these tiers: the S-size load checks and the co
 
 ## Implementation Plan
 
+Planned with `projectstore:planner` on 2026-10-28.
+
+1. `.config/tools.mk` holds the pinned tool versions: cargo-nextest 0.9.150, cargo-deny 0.20.2, cargo-machete 0.9.2, cargo-llvm-cov 0.9.1. The Makefile includes it, and CI keys its tool cache on it.
+2. `ddc-core` declares the features `op-stats` and `dhat-heap`, both empty for now, so the gate commands are already in their final form. The complexity story and the memory story fill them.
+3. The Makefile gives each step its own target, so make's `*** [target]` line names the step that failed:
+   - `fmt-check`, `clippy`, `nextest`, `doctest`, `clippy-dhat`, `doc`, `deny`, `machete`, `msrv` and `release-check`.
+   - `gate-fast` runs `require-tools`, `fmt-check`, `clippy`, `nextest` and `doctest`.
+   - `gate` runs `require-tools`, then `deny` and `machete`, then `gate-fast`, then `clippy-dhat`, `doc`, `msrv` and `release-check`.
+   - `check` is an alias of `gate-fast`.
+   - `tools`, `hooks` and `coverage` (lcov under `target/`).
+   - `ci-green` runs `scripts/ci-green.sh`.
+   - `dist` runs `ci-green`, then `gate`, then `app-test`.
+4. `.githooks/pre-commit` runs `gate-fast` and `.githooks/pre-push` runs `gate`. Both put `~/.cargo/bin` first in `PATH`, read nothing from stdin, and do not require a clean tree.
+5. `.config/nextest.toml` warns at 30 s and kills a test at 120 s. Its `ci` profile has no retries and does not fail fast.
+6. `deny.toml`:
+   - licenses MIT, Apache-2.0 and Unicode-3.0;
+   - the workspace's own crates ignored;
+   - yanked crates denied;
+   - duplicate versions warned;
+   - crates.io as the only source.
+7. Fix the four rustdoc errors that `RUSTDOCFLAGS=-D warnings` raised: two private links, a bare URL and an ambiguous `scan` link.
+8. `.github/workflows/gate.yml` runs on `macos-26` and has three jobs:
+   - `gate`: `make tools`, then `make gate`;
+   - `coverage`: `make coverage`, with the lcov file uploaded;
+   - `app`: builds the debug CLI, then runs `make app-test`.
+   
+   `nightly.yml` runs `make gate` and `make coverage` on `main` at 03:00, and has comment slots for L-size load, fuzzing and AddressSanitizer.
+9. The README's development section and AGENTS.md (outside the projectstore block) say to run `make tools` and `make hooks` once per clone, and to never use `--no-verify`.
+
 ## Acceptance Criteria
 
 - [ ] `make gate-fast` and `make gate` exist. Their timings on the reference machine are recorded in this story: `gate-fast` ≤ 60 s warm and `gate` ≤ 5 min warm, or the epic's open question is re-decided with the measured numbers.
@@ -74,6 +103,44 @@ Later stories add their checks to these tiers: the S-size load checks and the co
 - [ ] `make dist` runs the full gate first.
 
 ## Final Summary
+
+Status on 2026-10-28: commit `a68800d` is built and checked locally. It is not on GitHub yet, because the push needs the `workflow` scope on the owner's `gh` token. Reviewed by `projectstore:reviewer`, and all its findings are fixed:
+- the CI tool cache had broken `make tools`; the install now checks the binary's own version;
+- `*.profraw` is ignored;
+- `ci-green.sh` reads only push runs and splits fields on `|`;
+- `.NOTPARALLEL` is set;
+- AGENTS.md now asks for a 10-minute tool timeout on commit and push.
+
+Timings on the reference machine (10 cores):
+
+| Run | Time |
+|---|---|
+| `make check` before this story | 68 s (partly cold) |
+| `make gate` cold, including `make tools` | 170 s |
+| `make gate-fast` warm, no change | 42 s |
+| `make gate` warm, no change | 50 s |
+| `make gate-fast` after editing `ddc-core/src/lib.rs` | 78 s |
+| `make gate` after that | 97 s |
+| `make gate` after the review fixes | 85 s |
+| nextest alone | 39–41 s, 317 tests |
+
+The longest tests are four `ddc-core::recheck` tests: about 35 s each under parallel load, about 5 s each alone. They set the floor of `gate-fast`.
+
+Acceptance evidence (throwaway branch `gate-proof`, hooks installed with `-c core.hooksPath=.githooks`):
+
+| Failure | Result |
+|---|---|
+| Unformatted file | refused, `make: *** [fmt-check] Error 1` |
+| Clippy warning (`x == x`) | refused, `make: *** [clippy] Error 101` |
+| Failing test | refused, `make: *** [nextest] Error 100`, `FAIL ddc-core::recheck gate_proof_fails` |
+| Test looping forever | `TIMEOUT [120.023s] ddc-core::recheck gate_proof_hangs` |
+| `smallvec = "=1.6.0"` | `.githooks/pre-push` refused: `RUSTSEC-2021-0003`, `advisories FAILED` |
+| `html2md` (GPL-3.0+) | `.githooks/pre-push` refused: `error[rejected]: failed to satisfy license requirements` |
+| `make -n dist` | runs `scripts/ci-green.sh` first, then the full gate, then `swift test`, then `build-dist.sh` |
+
+Still open, all of it after the push: a green Gate run on `main`, a red run on a deliberately broken branch, and one nightly run by dispatch.
+
+Known gap: CLI integration tests call `env_clear()`, which drops `LLVM_PROFILE_FILE`. The CLI children's coverage is lost, and they write `*.profraw` into their working folder (now ignored). Story "Coverage floor and property tests for the safety invariants" passes the variable through.
 
 ## Technical Notes
 

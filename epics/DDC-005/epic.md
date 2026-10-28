@@ -2,7 +2,7 @@
 type: epic
 id: "DDC-005"
 title: "Production-grade Rust core: mandatory gate and load testing"
-status: planned
+status: in-progress
 priority: p1
 created: 2026-10-28
 updated: 2026-10-28
@@ -17,7 +17,7 @@ reviewed_at: 2026-10-28
 
 | Field | Value |
 |---|---|
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Created** | 2026-10-28 |
 | **Updated** | 2026-10-28 |
@@ -66,7 +66,7 @@ Decisions the epic relies on:
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | planned | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
+| [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | in-progress | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
 | [story-coverage-floor-and-property-tests-for-the-safety-invariants](./stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md) | planned | Line coverage measured and ratcheted from `main`. Property and differential tests for the safety and counting invariants. Interruption tests. Fuzz targets for the parsers |
 | [story-synthetic-load-trees-large-wide-deep-and-hostile](./stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md) | planned | A deterministic generator of 10⁴–10⁷-entry trees on a disposable disk image, with a manifest of the expected findings and plan. It refuses any target that is not on its own image |
 | [story-complexity-guard-operation-counts-and-scaling-exponents](./stories/story-complexity-guard-operation-counts-and-scaling-exponents.md) | planned | Cost counters (directory entries read, claim lookups, rule matches, allocations) under a feature, asserted linear in the gate. Scaling slopes on larger trees. Regression tests that reproduce both steps of `aa64c83` |
@@ -91,9 +91,9 @@ Implementation order: the gate, then the trees, then memory and CPU (the harness
 
 ## Open Questions
 
-- [ ] What gate time is acceptable, given agents commit many times a day? Proposal: pre-commit ≤ 60 s warm (fmt, clippy, unit and integration tests, S-size load checks), or, if that proves too slow, fmt + clippy + unit tests only, with integration and S load moved to pre-push; pre-push ≤ 5 min (adds docs, deny, machete, MSRV, leaks); coverage and M-size load in CI on every push; L size, fuzzing and AddressSanitizer nightly. Set after measuring in the gate story.
-- [ ] Should CI also run the app's `swift test`? Proposal: yes, in the same workflow, as a separate job. It is outside this epic's core scope.
-- [ ] Is the MSRV claim worth keeping? Either check `cargo +1.89 check` in the gate, or raise `rust-version` to the pinned toolchain.
+- [x] *Measured 2026-10-28, owner to confirm:* pre-commit runs the whole fast tier. That is 42 s warm, and 78 s after a core change: over the 60 s proposal, set by four slow `recheck` tests (5 s alone, 35 s under load). Pre-push takes 85–97 s warm and 170 s cold. If 78 s is too slow, speed those tests up first, before dropping integration tests from pre-commit. Original question: what gate time is acceptable, given agents commit many times a day? Proposal: pre-commit ≤ 60 s warm (fmt, clippy, unit and integration tests, S-size load checks), or, if that proves too slow, fmt + clippy + unit tests only, with integration and S load moved to pre-push; pre-push ≤ 5 min (adds docs, deny, machete, MSRV, leaks); coverage and M-size load in CI on every push; L size, fuzzing and AddressSanitizer nightly. Set after measuring in the gate story.
+- [x] Should CI also run the app's `swift test`? Decided: yes, as the `app` job in `gate.yml`, after building the debug CLI so the real-CLI tests do not skip themselves. It is outside this epic's core scope.
+- [x] Is the MSRV claim worth keeping? Decided: keep 1.89. It is the real floor: `File::try_lock` in `store.rs` needs 1.89. `make gate` checks it with `cargo +1.89 check` (`make msrv`), and that check passed on 2026-10-28. It matters for DDC-007's `cargo install` and Linux packagers.
 
 ## Related
 
