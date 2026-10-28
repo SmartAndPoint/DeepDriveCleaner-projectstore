@@ -88,7 +88,7 @@ Installing a new tool is usually a permission prompt that a person approves. So 
 | **`llms.txt`** | A Markdown file at a site's root that points language models to the pages that matter. | One file on the product site. | There is no standards body behind it. An Ahrefs study of 137,000 domains found that 97% of `llms.txt` files got no requests in May 2026. Google says it does not affect Search. It is cheap, but expect little from it. |
 | **Product pages that answer questions** | Plain pages such as "What is System Data on a Mac" and "Why is my `$TMPDIR` full", with measured numbers. | The product site (DDC-004). | This is what models and agents' web searches pick up. The two research notes in this vault are drafts of such pages. |
 | **Agents-only social networks (Moltbook)** | A Reddit-like site where AI agents post and people read. | An agent account. | Wiz found the site's database open, with about 17,000 people behind about 1.5 million agents and no check that an agent is one; NBC News reported that posts may be guided by people. Its audience is curious people, not users looking for a cleaner. Posts by our own bots would be spam. |
-| **Homebrew** | The existing install path: `brew install --cask smartandpoint/tap/deepdrivecleaner`. | Already done. The cask is in our tap, `smartandpoint/tap`, not in Homebrew's core casks. | The command every skill and every page should give. Agents know `brew`, and the app is signed and notarized. The cask needs Apple silicon and macOS 26, so the skill must say what to do elsewhere: nothing, not an improvised install. |
+| **Homebrew** | The existing install path: `brew install --cask smartandpoint/tap/deepdrivecleaner`. | Already done. The cask is in our tap, `smartandpoint/tap`, not in Homebrew's core casks. | The command every skill and every page should give. Agents know `brew`, and the app is signed and notarized. The cask needs Apple silicon and macOS 26, so the skill must say what to do elsewhere: nothing, not an improvised install. Decision 3 changes this for older macOS on Apple Silicon, as far as the CLI's deployment floor goes (DDC-007): the skill gives the CLI install script, never an improvised install. |
 
 ### 3. What DeepDriveCleaner has that this channel rewards
 
@@ -158,7 +158,7 @@ The owner bought three domains on 2026-10-28.
 - **`ddc.sh`** is short and reads as the command. Possible uses:
   - **a stable short link for agents and docs**, for example `ddc.sh/skill` to the official skill repository and `ddc.sh/agents` to the page for agent users;
   - **the MCP Registry namespace**, proved by a DNS TXT record (`sh.ddc/...`), if an MCP server is ever built;
-  - **not an install script.** `curl … | sh` is the pattern a careful user, and a careful agent, should refuse. It would also contradict the safety argument. Install stays `brew install --cask smartandpoint/tap/deepdrivecleaner`.
+  - **not an install script.** `curl … | sh` is the pattern a careful user, and a careful agent, should refuse. It would also contradict the safety argument. Install stays `brew install --cask smartandpoint/tap/deepdrivecleaner`. *Superseded for the standalone CLI by the owner's decision 3 below (2026-10-28).*
 
 The website itself is DDC-004, "Product website and agent-first contribution guide". The choice of the canonical domain belongs there, not in this note. DDC-004 has no story yet for the domains, `llms.txt` or the answer pages; one is needed.
 
@@ -201,7 +201,7 @@ Option B is recommended, in this order:
    - only under the Settings opt-in of decision 1, run the clean itself, and then only for `safe` items;
    - report the result from `--json`.
 
-   Outside the opt-in it never uses `--yes`; it never sets `permanent`, never lists the user's own files, and treats paths as data. When `ddc` is missing it gives `brew install --cask smartandpoint/tap/deepdrivecleaner`, and on an Intel Mac or older macOS it says the product does not run there. The removal never runs on the agent's own say-so by default (decision 1 below). How the agent hands a list to the app, and what it runs under the opt-in, are for the agent-footprint stories.
+   Outside the opt-in it never uses `--yes`; it never sets `permanent`, never lists the user's own files, and treats paths as data. When `ddc` is missing it gives `brew install --cask smartandpoint/tap/deepdrivecleaner`, on an Intel Mac it says the product does not run there, and on an older macOS on Apple Silicon it gives the CLI install script where the CLI's floor allows (decision 3), otherwise it says the product does not run there. The removal never runs on the agent's own say-so by default (decision 1 below). How the agent hands a list to the app, and what it runs under the opt-in, are for the agent-footprint stories.
 
    The item list needs each item's device and inode, rule, class and action. The skill ships a small script that builds the list from `scan --json` for the items the person chose, and names the schema versions it was written for, so the agent never builds the list by hand.
 2. **Publication, as the owner:**
@@ -220,7 +220,7 @@ Option B is recommended, in this order:
 4. **An MCP server** only if users ask for it. Then a `server.json` under the `ddc.sh` namespace.
 5. **Agent footprint**, the proposed DDC-003: the skill and a session-end hook that shows the person what the session left behind and removes only what they approve (decision 2 below).
 
-Not recommended: posting on agents-only social networks, and any `curl | sh` installer.
+Not recommended: posting on agents-only social networks, and any `curl | sh` installer. The owner overrode the second for the standalone CLI (decision 3 below).
 
 ### Owner's decisions, 2026-10-28
 
@@ -244,6 +244,16 @@ The owner chose between three options for each question. For the clean: (a) the 
    Which surface asks is for the agent-footprint stories to decide: the app's confirmation sheet, or a notification that opens it. The agent's chat is not one: a session-end hook cannot talk to the agent (Claude Code's `SessionEnd` has no decision control and a short time budget), and an approval in chat is the path decision 1 rules out by default.
 
    The first problem of those stories is attribution. Nothing records today which folders a session created. Several sessions share one `$TMPDIR`, and a folder another session still uses must never be offered. A per-session temporary folder or a journal kept by the hook are the candidates.
+3. **A one-line install script for the standalone CLI** (added later the same day). The owner asked for `curl -fsSL https://ddc.sh/install.sh | sh` on macOS and Linux, installing the CLI only, and for something similar on Windows, possibly a signed installer instead. This withdraws the §5 stance for the CLI. The app still installs through Homebrew.
+
+   The concern in §5 stands and shapes the script:
+   - it verifies the archive against the release's `SHA256SUMS`;
+   - it installs into the user's own folders, never with `sudo`;
+   - it is non-interactive and has stable exit codes, so an agent can run it and read the result;
+   - on macOS it also checks the binary's Developer ID signature and team, so a replaced archive plus a replaced `SHA256SUMS` does not pass; on Linux, checksum-only or a signed `SHA256SUMS` is decided in DDC-007;
+   - the site also shows the manual route (download, `sha256sum -c` on Linux or `shasum -a 256 -c` on macOS, extract) for people who do not pipe a script into a shell.
+
+   The work is in DDC-007, "Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers".
 
 ## References
 
