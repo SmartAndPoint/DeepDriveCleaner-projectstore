@@ -126,8 +126,8 @@ Then the runbook, reviewed by the critic.
 - [ ] `make load` runs on the reference machine and writes `bench/load-<date>-M.tsv` with all listed columns for every profile and command at M.
 - [ ] `leaks -atExit` reports 0 leaks for every profile at S, in `make gate` (`make leaks`), after the owner's first run on the reference machine. The nightly AddressSanitizer job is green.
 - [ ] Per-`(command, profile)` memory and CPU limits exist in the harness, and an M run on a quiet reference machine passes them in `enforce` mode (owner: quiet machine, for the CPU baseline). A deliberately added allocation retained per entry, at least twice the headroom (a throwaway branch that keeps a 1 KiB buffer per entry in a long-lived `Vec`), fails the memory limit.
-- [ ] The idle-point tests show < 1% CPU on the waiting thread.
-- [ ] `compare_load.py` flags a seeded 20% regression, passes an unchanged rerun, and ignores a wall-time-only change (tests).
+- [x] The idle-point tests show < 1% CPU on the waiting thread. — evidence: `progress::tests::{the_ticker_does_not_spin_between_ticks, json_walk_ticks_do_not_spin_while_the_count_stands, json_clean_ticks_do_not_spin_while_the_clean_waits}`, `exec::system::tests::waiting_for_a_tool_does_not_spin` (commit `b3e985e`), all passing on `fa7cff7`
+- [x] `compare_load.py` flags a seeded 20% regression, passes an unchanged rerun, and ignores a wall-time-only change (tests). — evidence: `bench/test_compare_load.py` (`test_a_seeded_20_percent_regression_is_flagged`, `test_an_unchanged_rerun_passes`, `test_a_wall_time_only_change_is_ignored`), 11 tests OK in `make bench-test`, part of `make gate` (commit `56bef23`)
 - [x] The runbook "Profiling the core" exists and was reviewed by the critic. — evidence: `ops/profiling-the-core.md`; critic (2026-10-29) approved after fixes, all applied (samply and xctrace runs isolated, outputs under `target/profiling`, the stale-baseline checklist widened)
 
 ## Final Summary
