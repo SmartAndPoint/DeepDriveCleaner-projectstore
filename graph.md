@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T09:29:03.428Z
+generated_at: 2026-10-28T10:28:47.293Z
 
 ---
 
@@ -47,7 +47,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | planned |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | planned |
-| epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | planned |
+| epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
@@ -210,6 +210,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
 | research/distribution-through-agents.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/distribution-through-agents.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |

@@ -113,6 +113,7 @@ Toolchain: rustup stable, with the version pinned in `rust-toolchain.toml`. The 
 - The repository gets `Cargo.toml` (workspace), `crates/ddc-core`, `crates/ddc-cli`, `rust-toolchain.toml`, `docs/scan.schema.json`, `bench/`.
 - Build and checks: `cargo build --release`, `cargo test`, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`. On the reference machine Homebrew Rust 1.81 comes before rustup in `PATH`, and even `~/.cargo/bin/cargo` picks up its `rustc`/`clippy-driver`. So all calls run with `PATH="$HOME/.cargo/bin:$PATH"`, and the `Makefile` sets an absolute `CARGO` and exports that `PATH`.
 - `unsafe` is allowed only in the core's `sys` module (`getattrlistbulk`, `setiopolicy_np`, `libproc`, `sysctl`, `statfs`); the rest of the code is under `unsafe_code = "deny"`. The core does not depend on terminal crates and forbids `print!`/`eprint!` through lints.
+  Amended 2026-10-28, story "Whole disk: what lies outside the home folder" (epic DDC-002): `getfsstat` joins the list, to read the mounted volumes of the startup container when `diskutil` fails.
 - Speed measurements: the median of three runs after one warm-up.
 
 ## References

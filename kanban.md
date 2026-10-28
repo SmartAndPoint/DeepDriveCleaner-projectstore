@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T09:27:33.973Z
+generated_at: 2026-10-28T10:28:47.081Z
 
 ---
 
@@ -11,7 +11,6 @@ generated_at: 2026-10-28T09:27:33.973Z
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
-- [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 
 ## ToDo
 
@@ -34,6 +33,7 @@ generated_at: 2026-10-28T09:27:33.973Z
 - [ ] [[epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs|DDC-002: Faster clean: re-check only what the selection needs]] #p2
 - [ ] [[epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus|DDC-002: HIG pass: keyboard, colour, empty states and menus]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group|DDC-002: Review window: clean only the selection in this group]] #p2
+- [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 
 ## Review
 
