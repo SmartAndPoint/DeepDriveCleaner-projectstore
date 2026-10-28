@@ -80,7 +80,7 @@ No tool runs from the harness. Three profiles (`users`, `mixed`, `system-root`) 
 - [x] Memory limit, per `(command, profile)`: peak RSS ≤ base + k bytes per entry. Base and k are measured on the reference machine from S and M runs (base from S, k from the slope between S and M), then set with 25% headroom: `make load-baseline` runs both in `record` mode and writes `bench/load-limits.tsv` with `ddc-loadgen limits`. A command with no limit fails an `enforce` run. A median passes up to its limit plus an absolute slack of 1 MiB and 20 ms, so allocator and scheduler noise on a small command cannot trip it; CPU is judged only on the median of 3 runs or more, so the single `clean --items` run is judged on memory alone and a `LOAD_REPEAT` below 3 judges no CPU. `LOAD_LIMITS=enforce` (the default of `make load`) fails over a limit; `record` (CI) writes the numbers and asserts nothing. The harness records the 1-minute load average at the start and end in the TSV header, and falls back to `record` for the CPU limit when the start value is above a quarter of the CPU count (read once before the image is created, so the run's own work does not count), so a busy machine records CPU and does not judge it. The memory limit is enforced regardless of load: peak RSS does not depend on it. The memory scaling slope (≤ 1.2) belongs to story "Complexity guard: operation counts and scaling exponents", which reuses this harness and its columns.
 - [x] Leak check: a `ddc-loadgen leaks --cli <path>` subcommand runs, for every profile at S in a marked temporary tree, `leaks -quiet -atExit -- target/release/deepdrivecleaner scan <tree> --json --data-dir <data>` (the cargo release build, not the notarized app copy, which hardened runtime keeps `leaks` out of), with the harness's cleared environment. A profile passes on exit 0, a parsed `0 leaks for 0 total leaked bytes` line and a `last-scan.json` in its data dir (the scan writes it only after a complete walk, so a scan that stopped early does not pass on leaking nothing). `leaks`' stdout and stderr are kept as `leaks-<profile>.txt` and `leaks-<profile>.stderr.txt`. `-atExit` sets `MallocStackLogging=lite`, so a leak report already carries its stacks; an exit above 1 or a missing line (a child killed by a signal) is a failure. `make leaks` runs in `make gate`, after `release-check`, reusing its release binaries; its cost (11 S builds and 11 `leaks` runs) is recorded against the epic's pre-push budget of 5 minutes. The first `make leaks` on the reference machine is the owner's run; it enters `make gate` after that run. Symbol exclusions are allowed only with a written reason; the list starts empty.
 - [x] AddressSanitizer: an `asan` job in the nightly workflow, on a dated nightly toolchain, with `RUSTFLAGS=-Zsanitizer=address`, `ASAN_OPTIONS=detect_leaks=0` (LeakSanitizer does not run on macOS) and `--target aarch64-apple-darwin` (so proc-macros are not instrumented). It runs the `sys::` unit tests of `ddc-core` and the generator's profile and hostile tests, which scan an S tree of every profile in process.
-- [ ] Heap profile: a `dhat-heap` cargo feature of `ddc-core` (`dhat` crate) with a global allocator, started first in the CLI's `main` through `ddc_core::heap::start()`, which is a no-op without the feature (`ddc-cli` cannot test a dependency's feature). It cannot be combined with `op-stats` (`compile_error!`). `make heap-profile` builds into `target/dhat` with a `profiling` cargo profile (release plus line tables), so it never replaces `target/release/deepdrivecleaner`, and writes the allocation sites of one `scan` at M (L when asked). The top 10 program points by bytes live at the global peak, and by total bytes, each divided by entries, are written into this story.
+- [x] Heap profile: a `dhat-heap` cargo feature of `ddc-core` (`dhat` crate) with a global allocator, started first in the CLI's `main` through `ddc_core::heap::start()`, which is a no-op without the feature (`ddc-cli` cannot test a dependency's feature). It cannot be combined with `op-stats` (`compile_error!`). `make heap-profile` builds into `target/dhat` with a `profiling` cargo profile (release plus line tables), so it never replaces `target/release/deepdrivecleaner`, and writes the allocation sites of one `scan` at M (L when asked). The top 10 program points by bytes live at the global peak, and by total bytes, each divided by entries, are written into this story.
 - [ ] CPU budget, per `(command, profile)`: (user + system) / entries ≤ a measured limit with headroom, the median of the repeated runs, enforced on the reference machine under the same `enforce`/`record` rule as memory. `wide-root`'s CPU limit is re-baselined when story "Complexity guard: operation counts and scaling exponents" removes its `dir_has_any` re-read (an 18 s scan at M). The committed CPU limits are provisional: measured while other work ran (load 4.9 to 12.6), so they are loose. The owner's `make load-baseline` on the quiet reference machine replaces them; this item stays open until then.
 - [x] Threads: the background scan's walk options come from one named function in `cmd/background.rs`, and a `ddc-cli` test checks it gives `threads: Some(3)`. The function runs no program, so `structure.rs::the_background_scan_runs_no_program_itself` still holds. A walker test runs `scan::walk_with_reader` with `threads: Some(3)` through a wrapping `DirReader` and counts distinct `ddc-walk-*` threads: at most 3. Low I/O priority is the LaunchAgent's job: a test checks the CLI-generated plist (`launchd.rs`) still carries `LowPriorityIO` and `Nice 10`. The app's scheduler plist is DDC-002's.
 - [x] No busy waiting at the real idle points:
@@ -142,6 +142,42 @@ Then the runbook, reviewed by the critic.
 - `dhat` records a backtrace per allocation: an instrumented scan is many times slower than the 51.6 s plain L `mixed` scan, hence M by default.
 - A clean on a generated tree goes through the real executor. Anything trashed goes to the image's `.Trashes` and leaves with the detach. Without `--local-snapshots`, the executor would run `/usr/bin/tmutil listlocalsnapshots /` (read-only, 30 s timeout) to count snapshots; the harness passes `0`.
 - If `NSFileManager` refuses to trash on the `-nobrowse` image, every trash item ends failed and the clean's pass criterion catches it.
+
+### Heap profile: `mixed` at M
+
+`make heap-profile` on 2026-10-28, commit `fa7cff7`: one `scan --json` of 100,041 entries. 7.2 MB live at the global peak (72.3 bytes per entry) and 153 MB allocated in total (1,531 bytes per entry). A site is the innermost frame in our code (`bench/dhat_top.py`); a bare `ddc_core::…` name is inlined code dhat found no line for.
+
+By bytes live at the global peak:
+
+| Bytes | Per entry | Blocks | Site |
+|---:|---:|---:|---|
+| 4,882,432 | 48.8 | 16 | `ddc-core/src/store.rs:60`: `to_vec_pretty` of the whole report for `last-scan.json` |
+| 2,239,414 | 22.4 | 14,008 | `ddc_core::report::scan_inner` (inlined) |
+| 39,368 | 0.4 | 26 | `crossbeam-epoch` (rayon's queues) |
+| 38,700 | 0.4 | 1,935 | `ddc-core/src/report/mod.rs:341`: `rfc3339` strings |
+| 23,040 | 0.2 | 10 | `crossbeam-epoch` |
+| 6,216 | 0.1 | 29,047 | `ddc-core/src/scan/walker.rs:336` |
+| 2,072 | 0.0 | 3 | `ddc-core/src/scan/walker.rs:152` |
+| 640 | 0.0 | 1 | `crossbeam-epoch` |
+| 480 | 0.0 | 3 | `ddc-core/src/env.rs:47` |
+| 320 | 0.0 | 5 | `ddc-core/src/store.rs:131` |
+
+By total bytes allocated:
+
+| Bytes | Per entry | Blocks | Site |
+|---:|---:|---:|---|
+| 41,192,112 | 411.8 | 142,326 | `ddc-core/src/report/project.rs:41`: `root.join` per project signal file |
+| 27,675,360 | 276.6 | 31,013 | `ddc-core/src/sys/bulk.rs:247`: the `EntryMeta` vector of a directory batch |
+| 23,584,557 | 235.7 | 58,035 | `ddc-core/src/scan/walker.rs:315`: `dir.join` per child directory |
+| 9,764,694 | 97.6 | 16 | `ddc-core/src/store.rs:60`: the `last-scan.json` buffer |
+| 8,048,986 | 80.5 | 28,998 | `ddc-core/src/sys/bulk.rs:94`: `CString` of each directory path |
+| 7,109,842 | 71.1 | 39,948 | `ddc-core/src/report/project.rs:47` |
+| 5,094,093 | 50.9 | 19,570 | `ddc-core/src/rules/classify.rs:132`: `dir.join(".git")` per ancestor |
+| 4,304,025 | 43.0 | 379,214 | `ddc-core/src/rules/classify.rs:156`: file names in the glob check |
+| 4,036,598 | 40.3 | 14,008 | `ddc_core::report::scan_inner` (inlined) |
+| 3,112,792 | 31.1 | 29,047 | `ddc-core/src/scan/walker.rs:336` |
+
+The global peak is the serialisation of `last-scan.json`: the whole report is pretty-printed into one buffer before the atomic write. Streaming it to the temporary file would cut up to two thirds of the peak heap. Path joins dominate the traffic (`project.rs:41`, `walker.rs:315`, `classify.rs:132`). These are notes for later work; this story changes no hot path.
 
 ## Dependencies
 
