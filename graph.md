@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T16:14:19.106Z
+generated_at: 2026-10-28T17:56:39.714Z
 
 ---
 
@@ -43,20 +43,26 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | planned |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
+| epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | Review window: after a clean, only skips that can clear stay selected | story | planned |
+| epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | Review window: Clean is not offered when every item would be skipped | story | planned |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
+| epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | planned |
+| epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | User data: move a folder's picked files to the Trash from that folder | story | planned |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | planned |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
+| epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | planned |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | Complexity guard: operation counts and scaling exponents | story | planned |
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | planned |
 | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | Load run on the reference machine, including system folders | story | planned |
-| epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | Mandatory gate before every commit | story | in-progress |
+| epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | Mandatory gate before every commit | story | done |
 | epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | Memory and CPU under load: peak memory, leaks and CPU time | story | planned |
-| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | Synthetic load trees: large, wide, deep and hostile | story | planned |
+| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | Synthetic load trees: large, wide, deep and hostile | story | in-progress |
 | epics/DDC-006/epic.md | Code shape gate: measurable conventions that guide humans and agents | epic | planned |
 | epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md | Agents and editors see violations as they write | story | planned |
 | epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md | Burn down the baseline: split long files and functions | story | planned |
@@ -150,11 +156,17 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-and-clean-window.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-whole-disk-in-the-app.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
@@ -229,16 +241,28 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-and-clean-window.md | wikilink | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/stories/story-review-and-clean-window.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/stories/story-review-and-clean-window.md | wikilink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | mdlink | epics/DDC-002/epic.md |

@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T16:14:18.897Z
+generated_at: 2026-10-28T17:56:48.314Z
 
 ---
 
@@ -10,11 +10,16 @@ generated_at: 2026-10-28T16:14:18.897Z
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
+- [ ] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1
+- [ ] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1
+- [ ] [[epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data|DDC-002: The Trash: its own row, not Your data]] #p2
+- [ ] [[epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder|DDC-002: User data: move a folder's picked files to the Trash from that folder]] #p2
+- [ ] [[epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers|DDC-002: VM images: Docker prune runs only while Docker Desktop answers]] #p1
+- [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
-- [ ] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
 - [ ] [[epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions|DDC-006: Burn down the baseline: split long files and functions]] #p2
 - [ ] [[epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons|DDC-006: Clippy at full strength: curated lints with reasons]] #p2
@@ -55,7 +60,7 @@ generated_at: 2026-10-28T16:14:18.897Z
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
-- [ ] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1
+- [ ] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1
 
 ## Review
 
@@ -70,6 +75,7 @@ generated_at: 2026-10-28T16:14:18.897Z
 - [x] [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|DDC-001: Workspace skeleton and parallel filesystem scanner]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|DDC-002: CLI: clean an explicit item list]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision|DDC-002: CLI: shared settings, types and the notify decision]] #p1 #done
+- [x] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1 #done
 
 
 
