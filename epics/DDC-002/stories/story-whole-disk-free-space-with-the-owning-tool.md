@@ -42,7 +42,7 @@ The story amends both ADRs before any code. The safety ADR currently says, in §
 
 Rough until the plan gate.
 
-- [ ] **Amendment to the safety ADR, "Cleanup safety model: risk classes, plan and confirmation".**
+- [x] **Amendment to the safety ADR, "Cleanup safety model: risk classes, plan and confirmation".**
   - **§6.** Replace the `brew cleanup` sentence: `brew cleanup` runs only as the Homebrew area's action, from a confirmation.
   - **The area action, a new kind of native action.** It is not a catalog rule, and it has no path inside the scan roots. Its guard is a location probe:
     - a runtime's `parentMountPath` must lie under `/System/Library/AssetsV2`;
@@ -50,7 +50,7 @@ Rough until the plan gate.
   - **§5.** `ddc disk free` takes the exclusive lock, because `brew cleanup` writes inside `~/Library/Caches/Homebrew`, a scan root.
   - **§7.** Every run writes an `actions.jsonl` line with the area, the action, the exact command, the bytes before and after, and the result. An area action has no `path`, `(dev, ino)`, `rule` or `class`, so this is a new line kind with a `kind` discriminator. The journal gets its own `JOURNAL_SCHEMA_VERSION`, as `clean` and `progress` have theirs; today it borrows the scan report's `SCHEMA_VERSION`, and bumping that would invalidate every `last-scan.json`.
   - **Consent.** This is a separate channel, not `--yes`, because §5 keeps `--yes` for the `safe` class without a terminal. The app passes a confirmed action list (`--actions FILE|-`), as `clean --items` does. At a terminal, a prompt asks.
-- [ ] **Amendment to the menu bar ADR, "Menu bar app: Swift shell over the ddc CLI".**
+- [x] **Amendment to the menu bar ADR, "Menu bar app: Swift shell over the ddc CLI".**
   - **§6:** the new commands `ddc disk`, `ddc disk free` and its `--dry-run`, with their schemas and exit codes.
   - **§7:** one caller per destructive call, extended to `disk free`. The caller is the Whole disk sheet's confirm button, and `ContractTests` gains a test that names it.
   - **§1:** `disk free` is a `CLIRunner` queue kind beside `clean`, never in the read-only `.disk` lane of "Whole disk in the app". It takes the ddc lock, so a Scan now during a long `brew cleanup` waits in the queue instead of failing busy. The two never run at once in the app: each button is disabled while the other's run is queued or running, because both write `last-disk.json` (amendment of 2026-10-28, story "Whole disk in the app"). From the terminal they can still overlap; then the last to finish writes `last-disk.json`, as "Whole disk: what lies outside the home folder" accepts.
@@ -65,10 +65,10 @@ Rough until the plan gate.
     - The freed bytes are measured, not assumed: the runtime's AssetsV2 folder before and after. When the runtime is gone but the folder did not shrink, the result says "runtime removed, Z GB not freed", so it never reports space that was not freed.
     - The sheet says that the runtime of the installed Xcode's SDK is downloaded again, several GB, at the next build for that simulator.
   - **Homebrew:**
-    - It runs plain `brew cleanup`, without `-s` or `--prune=all`. `brew` is found through `Env::tool_dirs()`.
-    - The dry run is `brew cleanup -n`, and the sheet lists what it would remove and the estimate.
-    - It touches mainly three places, and the sheet names them: the Cellar, the Caskroom, and `~/Library/Caches/Homebrew`. It also prunes `~/Library/Logs/Homebrew`, Homebrew's own caches and broken symlinks in its prefix.
-    - Started by the app, brew does not see the user's shell profile, such as `HOMEBREW_NO_CLEANUP_FORMULAE`. The sheet says so.
+    - It runs `brew cleanup` with no arguments, never `-s` or `--prune=all`, and with `HOMEBREW_NO_AUTOREMOVE=1`, `HOMEBREW_NO_ENV_HINTS=1` and `NO_COLOR=1`: without the first, `brew cleanup` also uninstalls formulae installed only as dependencies that nothing needs (critic, 2026-10-28). `brew` is `/opt/homebrew/bin/brew`, the Homebrew area's own, not the first on the tool path.
+    - The dry run is `brew cleanup -n` with the same environment, and the sheet lists what it would remove and the estimate.
+    - It touches mainly two places, and the sheet names them: the Cellar (old versions that are neither linked nor pinned) and `~/Library/Caches/Homebrew`. It also prunes `~/Library/Logs/Homebrew`, stale locks and broken symlinks in its prefix. It does not remove old cask versions from the Caskroom.
+    - Started by the app, brew does not see `HOMEBREW_*` variables of the user's shell profile, such as `HOMEBREW_NO_CLEANUP_FORMULAE`; Homebrew's own `brew.env` files still apply. The sheet says so.
     - Afterwards the `cache.homebrew` finding in `last-scan.json` is measured again, as a clean does (`after_clean`), and the Homebrew area in `last-disk.json` is marked stale.
   - **Running the tools:**
     - Both tools run through the existing `SystemCommands` port with `NATIVE_TIMEOUT`, 600 s, with stdin closed.
@@ -85,10 +85,10 @@ Rough until the plan gate.
 
 ## Acceptance Criteria
 
-- [ ] Both ADR amendments are accepted after a critic pass, before any code that runs an action.
-- [ ] Test (fake commands port): a confirmed list `[{action: simulator-runtime, identifier}]` runs exactly the real `simctl runtime delete <identifier>`, with no `--keep-asset` and never the shim or `xcrun`. An unknown id, a runtime with a booted device, and a runtime whose `parentMountPath` lies outside AssetsV2 are each refused before any run.
+- [x] Both ADR amendments are accepted after a critic pass, before any code that runs an action. — evidence: critic (2026-10-28) returned revise with 13 findings, all applied; the re-check approved after one more sentence (a missing Homebrew cache folder), applied verbatim; safety ADR Amendments entry of 2026-10-28, menu bar ADR §1, §6 item 11, §7
+- [ ] Test (fake commands port): a confirmed list `[{action: simctl-runtime-delete, identifier}]` runs exactly the real `simctl runtime delete <identifier>`, with no `--keep-asset` and never the shim or `xcrun`. An unknown id, `all` or a build, a runtime with a booted device, one with `deletable: false`, one in the state `Deleting`, one without a `runtimeIdentifier`, and one whose `parentMountPath` lies outside AssetsV2 are each refused before any run.
 - [ ] Test: `disk free` without `--actions` and without a TTY exits with the refusal code and runs nothing. `--yes` is not accepted.
-- [ ] Test: `homebrew-cleanup` runs `brew cleanup` with no other arguments, and its dry run runs `brew cleanup -n`. After the run, the `cache.homebrew` finding in `last-scan.json` is measured again.
+- [ ] Test: `brew-cleanup` runs `/opt/homebrew/bin/brew cleanup` with no other arguments and `HOMEBREW_NO_AUTOREMOVE=1` in its environment, and its dry run runs `brew cleanup -n` with the same environment. After the run, the `cache.homebrew` finding in `last-scan.json` is measured again.
 - [ ] Test: every run writes one `actions.jsonl` line of the area-action kind, with the journal's own schema version, the command and the result; the scan report's `SCHEMA_VERSION` is unchanged. A run takes the exclusive lock and reports busy when it is held.
 - [ ] Test (fake commands port): a runtime that leaves the list while its AssetsV2 folder keeps its size yields "not freed" with the bytes, and a runtime still listed after the timeout yields "still deleting".
 - [ ] Test with a fake CLI: `disk free` is queued in the `CLIRunner`; a scan queued behind it waits and does not fail busy.
@@ -96,7 +96,7 @@ Rough until the plan gate.
 - [ ] Contract test: the sheet's confirm button is the only caller of `disk free` in the app, and the scheduled path never calls it.
 - [ ] `docs/disk-free.schema.json` is generated and checked like the other schemas.
 - [ ] Manual (owner): deleting an unused simulator runtime from the app frees its size, and `xcrun simctl runtime list` no longer lists it. Whether macOS asks for a password is recorded here.
-- [ ] Manual (owner): Homebrew cleanup from the app shows the same list as `brew cleanup -n` in Terminal, then frees about that much.
+- [ ] Manual (owner): Homebrew cleanup from the app shows the same list as `HOMEBREW_NO_AUTOREMOVE=1 brew cleanup -n` in Terminal (with no other `HOMEBREW_*` variable set in the shell), then frees about that much.
 
 ## Final Summary
 

@@ -95,6 +95,8 @@ How the lanes behave:
 - On quit the app leaves a lane's run alone. `disk agents` writes no file, so an orphaned run only prints into a closed pipe.
 - The app never starts `disk agents` on its own; only the Whole disk view runs it.
 
+Amended 2026-10-28, story "Whole disk: free space with the owning tool" (epic DDC-002): `disk free` is a kind of the queue, beside `clean`, never a lane; its dry run too, as `clean`'s dry run is, so a preview never runs beside a clean or a `disk free`. It takes the ddc lock, so a Scan now pressed during a long `brew cleanup` waits in the queue instead of failing busy, and a scheduled scan behind it waits too. It is never coalesced: two confirmed runs are two runs. The app never runs it beside `disk`: the Whole disk view disables Measure while a `disk free` run is queued or running, and every area action's button while a `disk` run is going, because both write `last-disk.json`. From the terminal they can still overlap; then the last to finish writes `last-disk.json`, as "Whole disk: what lies outside the home folder" accepts. Stop cancels the run by its ticket; the CLI forwards the signal to the tool's process group (item 6.4), so a stopped `brew cleanup` ends as a stopped native command does. A runtime's deletion is done by CoreSimulator's daemon, so a stop during it only ends ddc's wait (the safety ADR's amendment of 2026-10-28). The exclusive lock is held for at most one `NATIVE_TIMEOUT` per action.
+
 UniFFI is not used now (Alternative A).
 
 ### 2. UI: `NSStatusItem` and `NSPopover` hosting SwiftUI
@@ -282,6 +284,17 @@ These changes are additive. One change is visible in the terminal: a held lock e
       - **Values that ddc assigns itself** are strict enums, such as the kind of a running harness process: `cli`, `app-server`, `app` or `other`. Here `other` is a value the CLI emits for a process it cannot name, not a catch-all for the decoder. A new variant bumps `schema_version`, as for every report.
       - **The app** decodes both reports strictly, as §1 requires.
 
+11. **`ddc disk free`** (amended 2026-10-28, story "Whole disk: free space with the owning tool"). It runs an area action of the disk report: `simctl-runtime-delete` for one simulator runtime, or `brew-cleanup`. The safety ADR's amendment of 2026-10-28 holds the guard, the lock, the measuring and the journal.
+    - **`ddc disk free --actions <file|-> [--dry-run] [--json]`.** The list is `{"schema_version": 1, "actions": [{"action": "simctl-runtime-delete", "identifier": "<asset id>"}, {"action": "brew-cleanup"}]}`, the ids those of the disk report's `action`. An unknown field anywhere in it, an action named twice, an unknown id, an `identifier` on `brew-cleanup` or none on a runtime, or a malformed list refuses the whole list (exit 2) before anything runs, as `--items` does.
+    - **`--dry-run`** runs each tool's own dry run after the same location probe: `simctl runtime delete <identifier> --dry-run`, and `brew cleanup -n` with the run's environment. It prints what each would remove and its estimate, takes the shared lock as `clean --items --dry-run` does, writes no journal line and changes no report. The confirmation sheet opens on it.
+    - **Without `--actions`** at a terminal it lists the actions available now, with their dry-run estimates, and asks for each, default No, before it takes the exclusive lock. Without a terminal it refuses (exit 2). There is no `--yes`.
+    - **Which rows offer an action.** A runtime whose `parentMountPath` lies under `/System/Library/AssetsV2/`, not `deletable: false`, with a `runtimeIdentifier` and no booted device; the area `homebrew`, whose folder is `/opt/homebrew`. The app disables the button otherwise and says why; the CLI's probe decides again at run time.
+    - **Output.** A report per action, in the order listed: ran, refused (with the reason), failed, still deleting, or removed but not freed; the bytes before and after; and for a failure the exact command to run in Terminal. Schema `docs/disk-free.schema.json`, version 1.
+    - **After the run**, under the exclusive lock and before the report is printed:
+      - it measures the `cache.homebrew` finding in `last-scan.json` again, when that report has the current schema and the home's roots (item 1's "The report after the clean");
+      - it edits `last-disk.json`, written atomically, and skips that with a note when the file is absent or of another schema version. After `brew-cleanup` the `homebrew` area gets `stale: true`. A runtime that left the list leaves `simulators.runtimes`, and `listed_bytes` becomes the sum of those that remain. After any runtime action that ran, one still deleting included, the `simulator-runtimes` area gets `stale: true`. A stopped run still makes these edits before it ends by its signal, as `clean --items` writes its report after a cancel. Every other number, `not_counted` included, and `generated_at` stay as measured. `stale` is a new optional field: the app ignores unknown keys and decodes only the version and the enums strictly, so it needs no version bump, as `ignored` did. The app shows a stale area's bytes as "before cleanup" until the next Measure.
+    - **Exit codes**, as `clean --items`: 0 when the list was carried out, refused or failed actions included (the report says which); 2 when refused before anything ran; 75 when the lock is held; 1 on an error before any action, or, without `--json`, when an action failed.
+
 ### 7. Consent: the confirmation sheet is interactive consent
 
 This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and confirmation". That ADR stays accepted, and the change is recorded there as a dated amendment.
@@ -295,6 +308,8 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - in the app, the sheet's Clean action is the only caller of `clean`, and a test enforces this. Notifications, the scheduler and the popover can only open the Review window or the sheet.
 
 §8 of the safety ADR ("Background mode") still holds: the background path never calls the executor.
+
+Amended 2026-10-28, story "Whole disk: free space with the owning tool" (epic DDC-002): an area action is consented to the same way. The confirmed action list that the Whole disk view's confirmation sheet passes to `ddc disk free --actions` counts as interactive confirmation for each listed action, as an item list does for `clean`. The sheet shows the tool's dry run, the exact command, and what the action cannot undo. One caller per destructive command: in the app the sheet's confirm button is the only caller of `disk free` without `--dry-run`, as Clean is the only caller of `clean`, and a contract test enforces both. Notifications, the scheduler and the popover never call it. `--actions` lets a script without a TTY run `brew cleanup` or delete a runtime; that is the cost of the machine-readable consent channel, as it is for `--items`.
 
 ### 8. Build, signing and distribution
 
