@@ -7,10 +7,10 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [app, review, confirmation, user-report]
-code_refs: []
+code_refs: ["app/Packages/DDCKit/Sources/DDCKit/AfterClean.swift", "app/Packages/DDCKit/Sources/DDCKit/SkipSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/Confirmation.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SkipSummaryTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift"]
 specs: []
 started_at: "2026-10-28T18:28:36.859Z"
 closed_at: null
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-28T18:28:36.859Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -53,10 +53,10 @@ Nothing changes in the CLI. The predictions are the CLI's; the app only stops of
 
 ## Decomposition
 
-- [ ] Order: this story and "Review window: after a clean, only skips that can clear stay selected" share the `afterClean` table; whichever is implemented first adds it.
-- [ ] DDCKit: a pure value on the sheet state, beside `predictions`: `skipSummary` with the count and bytes predicted to be skipped, the owner apps named, and a `nothingToClean` flag (every confirmed item `wouldSkip`, check finished). Unit-tested without a view.
-- [ ] DDCKit: `CleanWording` sentences for the warnings line ("Quit A and B, then Check Again.", the most common other cause) and for the header ("frees about X; Y will be skipped", "frees about X before the check").
-- [ ] App: `ConfirmSheet` disables the Clean button on `nothingToClean`, and shows the new header and warnings line. `cleanConfirmedItems()` itself returns without running when `nothingToClean` holds or the check is `.checking`; the existing contract test that pins its one caller (`ContractTests`) is extended to the guard.
+- [x] Order: this story and "Review window: after a clean, only skips that can clear stay selected" share the `afterClean` table; whichever is implemented first adds it.
+- [x] DDCKit: a pure value on the sheet state, beside `predictions`: `skipSummary` with the count and bytes predicted to be skipped, the owner apps named, and a `nothingToClean` flag (every confirmed item `wouldSkip`, check finished). Unit-tested without a view.
+- [x] DDCKit: `CleanWording` sentences for the warnings line ("Quit A and B, then Check Again.", the most common other cause) and for the header ("frees about X; Y will be skipped", "frees about X before the check").
+- [x] App: `ConfirmSheet` disables the Clean button on `nothingToClean`, and shows the new header and warnings line. `cleanConfirmedItems()` itself returns without running when `nothingToClean` holds or the check is `.checking`; the existing contract test that pins its one caller (`ContractTests`) is extended to the guard.
 
 ## Implementation Plan
 
@@ -71,16 +71,26 @@ Planned by `projectstore:planner` on 2026-10-28, after "VM images: Docker prune 
 
 ## Acceptance Criteria
 
-- [ ] Test (DDCKit): with every item's prediction `wouldSkip(ownerRunning)`, `nothingToClean` is true, the warnings sentence names each app once in the order first seen, and `cleanConfirmedItems()` starts no CLI run (fake runner records no call).
-- [ ] Test (DDCKit): with 2 of 6 items predicted to skip, the header's "frees about" equals the bytes of the other 4, and the skipped bytes are named.
-- [ ] Test (DDCKit): while the check is `.checking`, the clean is not allowed; while `.waiting`, it is allowed and the header carries "before the check"; when the check then reports every item skipped, `nothingToClean` becomes true.
-- [ ] Test (DDCKit): Stop during `.checking` ends the check as `.stopped`, and the clean is then allowed.
-- [ ] Test (DDCKit): a check that `.failed`, was `.stopped` or is `.busy` leaves the clean allowed.
-- [ ] Test (DDCKit): every item `wouldSkip(changedSinceScan)` → the line advises Scan Again, not Check Again; a mix of owner-running and changed-since-scan names both, owner apps first.
-- [ ] Contract test (source check, `ContractTests` style): the sheet's Clean button is disabled on `nothingToClean`, and `cleanConfirmedItems()` guards it.
+- [x] Test (DDCKit): with every item's prediction `wouldSkip(ownerRunning)`, `nothingToClean` is true, the warnings sentence names each app once in the order first seen, and `cleanConfirmedItems()` starts no CLI run (fake runner records no call). — evidence: `SkipSummaryTests.allOwnerRunning`, `CleanRunTests.everyItemSkipped` (the fake runner records the dry run only); guard in `CleanRun.cleanConfirmedItems()`
+- [x] Test (DDCKit): with 2 of 6 items predicted to skip, the header's "frees about" equals the bytes of the other 4, and the skipped bytes are named. — evidence: `SkipSummaryTests.twoOfSix`
+- [x] Test (DDCKit): while the check is `.checking`, the clean is not allowed; while `.waiting`, it is allowed and the header carries "before the check"; when the check then reports every item skipped, `nothingToClean` becomes true. — evidence: `SkipSummaryTests.checkStates`
+- [x] Test (DDCKit): Stop during `.checking` ends the check as `.stopped`, and the clean is then allowed. — evidence: `CleanRunTests.stopTheCheck` (a gated FakeCLI dry run)
+- [x] Test (DDCKit): a check that `.failed`, was `.stopped` or is `.busy` leaves the clean allowed. — evidence: `SkipSummaryTests.otherStates`
+- [x] Test (DDCKit): every item `wouldSkip(changedSinceScan)` → the line advises Scan Again, not Check Again; a mix of owner-running and changed-since-scan names both, owner apps first. — evidence: `SkipSummaryTests.changedSinceScan`
+- [x] Contract test (source check, `ContractTests` style): the sheet's Clean button is disabled on `nothingToClean`, and `cleanConfirmedItems()` guards it. — evidence: `ContractTests.cleanHasOneOwner`
 - [ ] Manual (owner): with Google Chrome running, select only the Chrome cache, open the sheet: the button is disabled and the line says to quit Google Chrome. Quit Chrome, Check Again: the button is enabled and the clean deletes it.
 
 ## Final Summary
+
+**What changed (code commit 1e551d6).** The confirmation sheet acts on the CLI's dry-run predictions. `SkipSummary` (DDCKit) holds the items predicted to be skipped: their bytes, the running apps (once each, in the order first seen), and the after-clean classes present. `nothingToClean` is true when the check has finished and every item would be skipped. `ReviewModel.Sheet.cleanAllowed` (confirm stage, not `.checking`, not `nothingToClean`) disables the Clean button and guards `cleanConfirmedItems()`. The warnings line then says what to do, in the order keep → rescan → never: "Quit A and B, then Check Again.", the in-use process ("Possibly in use by" for an unknown cwd, in a sentence of its own), the Docker Desktop advice and its Finder footer (taken over from "VM images: Docker prune runs only while Docker Desktop answers"), "N items changed since the scan. Scan Again…", and the causes that never clear. The header's "frees about" leaves out the predicted skips and names their bytes, or says "before the check" while the check waits for a scan. While the check runs, a **Stop** ends it as `.stopped`, and Clean is then allowed. New `AfterClean.swift` holds the shared table: one exhaustive switch over all 22 reasons.
+
+**Why.** In the user's recording of 2026-10-28, the sheet said every item would be skipped, yet offered Clean, and each clean deleted nothing.
+
+**Tests executed.** `swift test`: 262 tests in 30 suites (11 new). `make gate-fast` before the commit and `make gate` before the push passed (nextest 430/430). The app target builds unsigned. The reviewer (`projectstore:reviewer`) found no blockers. Its nit on mixed certain and possible in-use processes was applied, with a test.
+
+**Follow-ups (nits).** Turning on Delete permanently for one item clears its prediction, so Clean is enabled again even when that item's other causes would still skip it. The CLI re-checks, so this is not a safety issue. `skipSummary` is computed several times per render. One rescan sentence covers `missing` and `entry-locked` too.
+
+**Open.** The manual criterion is the owner's.
 
 ## Dependencies
 
