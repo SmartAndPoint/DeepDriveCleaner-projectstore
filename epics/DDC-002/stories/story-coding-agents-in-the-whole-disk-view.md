@@ -3,18 +3,18 @@ type: story
 id: "story-coding-agents-in-the-whole-disk-view"
 epic: "DDC-002"
 title: "Coding agents in the Whole disk view"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [cli, app, agents, whole-disk]
-code_refs: []
+code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-core/src/disk/visitor.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/agents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cmd/disk_agents.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/disk_agents_cli.rs", "crates/ddc-cli/tests/readme_cli.rs", "crates/ddc-cli/tests/structure.rs", "docs/agents.schema.json", "README.md", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsReport.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/AgentsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CLIRunnerTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/agents-report.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/agents-fast.json", "app/DeepDriveCleaner/AgentsSection.swift", "app/DeepDriveCleaner/DiskView.swift", "app/DeepDriveCleaner/DiskWindowController.swift", "app/DeepDriveCleaner/AppDelegate.swift"]
 specs: []
-started_at: null
+started_at: "2026-10-28T14:35:35.291Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-28T14:35:35.291Z"
 ---
 
 # Coding agents in the Whole disk view
@@ -63,16 +63,16 @@ It takes no lock.
 
 Rough until the plan gate.
 
-- [ ] **Amendment to the menu bar ADR, "Menu bar app: Swift shell over the ddc CLI"**, before any code.
+- [x] **Amendment to the menu bar ADR, "Menu bar app: Swift shell over the ddc CLI"**, before any code. — done: vault commit dc92fc1 (ADR §1 lane rule, §6.10)
   - **§1, the lane rule** (amends the 2026-10-28 amendment for `disk`). A kind that takes no lock and writes nothing another command reads runs beside the queue. Each such kind has one running process at a time, and kinds never wait for each other. Today these kinds are `disk` and `disk agents`. A whole-disk walk of several minutes must not hold up a session list.
   - **§6, the new command.**
     - Its schema, and that its exit codes follow `ddc disk`: 0 on success, a closed stdout included, and the usage and environment errors of every command.
     - The carve-out: fields passed through from a harness (`status`, `entrypoint`) are free strings, never strict enums, because their values are another program's internals.
   - **Consequences.** The count of CLI contracts becomes eight: the rules listing of item 6.8 joins the list too.
-- [ ] **ddc-core: `agents::HARNESSES`.** One table in code holds every harness's folders, taken from the research note: `~/.claude`, `~/Library/Application Support/Claude/claude-code`, `~/.codex`, `~/.cache/codex-runtimes`, `~/.cursor`, `~/.local/share/opencode`, `~/.cache/opencode` and `~/.config/opencode`. Nested entries: `~/.claude/projects`, `~/.codex/sessions` and `~/.codex/worktrees`. They are the source of the app's nested folder rows.
+- [x] **ddc-core: `agents::HARNESSES`.** One table in code holds every harness's folders, taken from the research note: `~/.claude`, `~/Library/Application Support/Claude/claude-code`, `~/.codex`, `~/.cache/codex-runtimes`, `~/.cursor`, `~/.local/share/opencode`, `~/.cache/opencode` and `~/.config/opencode`. Nested entries: `~/.claude/projects`, `~/.codex/sessions` and `~/.codex/worktrees`. They are the source of the app's nested folder rows. — done: `crates/ddc-core/src/agents/mod.rs`
   - It excludes the rest of `~/Library/Application Support/Claude` (the desktop chat app) and `~/Library/Application Support/Cursor` (editor state).
   - DDC-003's catalog rules should read this table rather than keep their own list. That is recorded under Dependencies, for that epic's plan gate.
-- [ ] **CLI: `ddc disk agents [--json] [--no-sizes]`.** `--no-sizes` skips the walk; the report then marks its sizes absent, while the transcript counts, which come from names, stay. It is read-only, takes no lock, writes no file and sends no notification. The report has its own `AGENTS_SCHEMA_VERSION` and a schema file in `docs/`. Per harness it gives:
+- [x] **CLI: `ddc disk agents [--json] [--no-sizes]`.** `--no-sizes` skips the walk; the report then marks its sizes absent, while the transcript counts, which come from names, stay. It is read-only, takes no lock, writes no file and sends no notification. The report has its own `AGENTS_SCHEMA_VERSION` and a schema file in `docs/`. Per harness it gives: — done: `crates/ddc-cli/src/cmd/disk_agents.rs`, `docs/agents.schema.json`
   - `id`: `claude-code`, `codex`, `cursor` or `opencode`;
   - `running`: the processes of the harness that run, each with its kind. The kind is ddc's own classification, a strict enum with an `other` case: `cli`, `app-server`, `app`, `other`. They come from the process list of `sys::procs`, matched by the exact executable basename (`claude`, `codex`, `opencode`) or the app bundle (`Cursor`), never by a substring. The Claude desktop chat app runs as `Claude` and is never Claude Code;
   - `folders`: each path with its allocated bytes. A nested folder (`~/.claude/projects` inside `~/.claude`) is reported inclusive and marked nested. The harness total sums only the top-level folders;
@@ -84,7 +84,7 @@ Rough until the plan gate.
   - `transcripts`: the count and allocated bytes of the transcripts that no live session writes. For Claude Code, a transcript is `projects/<p>/<id>.jsonl` together with its `projects/<p>/<id>/` folder. For Codex, it is the `sessions/` rollouts.
 
   A harness whose folders are all absent is left out. Liveness is never stored: each run reads it again.
-- [ ] **Liveness, Claude Code.** For each `sessions/<n>.json` whose name is a number:
+- [x] **Liveness, Claude Code.** For each `sessions/<n>.json` whose name is a number: — done: `agents/claude.rs`
   - The record is read for `pid`, `sessionId`, `startedAt`, `procStart`, `status`, `entrypoint`, `name` and `cwd` only. `procStart` is read for the comparison and never emitted. `messagingSocketPath` and the `.key` files are never read into the report.
   - The session is live when `sys::procs::bsd_info(pid)` finds a process whose uid equals `uid()` and for which either proof holds: its start time is no later than `startedAt`, or its start time formatted as UTC ctime (`%a %b %e %H:%M:%S %Y`) equals `procStart`. The second proof covers a resumed session that may keep an older `startedAt`.
   - It is stale when there is no such process.
@@ -92,15 +92,15 @@ Rough until the plan gate.
   - An empty `sessions/` folder is readable with no sessions: Claude Code removes records on exit. `records: unknown` is for a missing folder, or for candidate records none of which parses.
   - Records are parsed key by key from a JSON map, with a size cap, and only files named `<digits>.json` are read. The per-session key files are named `<pid>.<hex>.key`.
   - An npm-installed Claude Code runs as `node` and does not show under `running`; its sessions are still found from the records.
-- [ ] **Liveness, Codex.** A thread is open when any process of the current user holds `thread-writer-locks/<id>.lock` open.
+- [x] **Liveness, Codex.** A thread is open when any process of the current user holds `thread-writer-locks/<id>.lock` open. — done: `agents/codex.rs`, `sys/procs.rs::open_vnodes`
   - `sys::procs` gains `open_vnodes(pid)`, which returns `(dev, ino, path)` for each open file from the fd's vnode info (`PROC_PIDFDVNODEPATHINFO`, `vst_dev` and `vst_ino`). It is called per pid, because the process snapshot leaves the open files of the caller's children empty.
   - Only the lock files in `thread-writer-locks/` are ever `stat`ed, to get their `(dev, ino)`; no open path of any process is `stat`ed, since a file in a protected folder could make macOS ask.
   - Only names of the form `<thread-id>.lock` count; `.coordination.lock` and other hidden files are ignored.
   - No `lsof` and no `flock` probe.
   - The rollout is found by the `<id>` suffix of its file name.
-- [ ] **Sizes.** The size-only visitor of `ddc disk` walks these folders only, never the whole home. A folder that cannot be read is counted as unreadable, as in the disk report.
-- [ ] **Skips.** `skips` in `settings.json` bind the walk and the record read alike (menu bar ADR §6.10). A harness folder under a skip is never opened, and the harness is reported with the skip as its reason. A skip inside a harness folder (`~/.claude/projects`) is never opened either: that folder is reported skipped, and the transcripts read through it are reported absent with the same reason.
-- [ ] **App: a Coding agents section** under the area rows of the Whole disk view.
+- [x] **Sizes.** The size-only visitor of `ddc disk` walks these folders only, never the whole home. A folder that cannot be read is counted as unreadable, as in the disk report. — done: `agents/sizes.rs`
+- [x] **Skips.** `skips` in `settings.json` bind the walk and the record read alike (menu bar ADR §6.10). A harness folder under a skip is never opened, and the harness is reported with the skip as its reason. A skip inside a harness folder (`~/.claude/projects`) is never opened either: that folder is reported skipped, and the transcripts read through it are reported absent with the same reason. — done: `agents/mod.rs` (the name listings stop at a skip inside, after review)
+- [x] **App: a Coding agents section** under the area rows of the Whole disk view. — done: `AgentsSection.swift`, `AgentsModel.swift`, `AgentsSummary.swift`
   - **Rows.**
     - One row per harness: its name, what of it runs, and its total size.
     - Nested rows for its folders.
@@ -109,47 +109,56 @@ Rough until the plan gate.
     - When the records are `unknown`, one line instead of the sessions: "ddc cannot read Claude Code's session records".
   - **When it runs.** The view runs `ddc disk agents --json --no-sizes` and then `ddc disk agents --json`, one after the other in its own read-only lane, when it appears and when the section's Refresh button is pressed. The first report shows the session rows at once; the second adds the sizes. The section shows even when there is no whole-disk report yet. It never runs from the scheduled path.
   - **A failed run** shows its message in the section and keeps the area rows. When the sizes run fails after a good `--no-sizes` run, the session rows of the first report stay, with the sizes shown as absent.
-- [ ] **Canvas.** Bring the purple "AI agent harnesses" block on artboard 13 in line with this section, and replace its "Idle N d" chips: a session either runs or is not listed. Re-read the canvas before any republish, because another session changed it.
-- [ ] **README.** One line on `ddc disk agents` in the CLI guide and in the Whole disk bullet. It must say that the output shows project folders and session names.
+- [x] **Canvas.** Bring the purple "AI agent harnesses" block on artboard 13 in line with this section, and replace its "Idle N d" chips: a session either runs or is not listed. Re-read the canvas before any republish, because another session changed it. — done: artboard 13 republished 2026-10-28 (version 12): no bar segment, Live chips only
+- [x] **README.** One line on `ddc disk agents` in the CLI guide and in the Whole disk bullet. It must say that the output shows project folders and session names. — done: README `ddc disk` section and the Whole disk bullet
 
 ## Implementation Plan
+
+From the planner's pass (2026-10-28), in this order:
+
+1. **ddc-core, `agents` module** (new): `mod.rs` holds `HARNESSES` and `report()`; `model.rs` the report types and `AGENTS_SCHEMA_VERSION`; `running.rs` the process classification; `claude.rs` and `codex.rs` the two liveness tests; `sizes.rs` the walk. `sys::procs` gains `open_vnodes`, `process_start` and a process list without open files. The walk reuses `disk::visitor::DiskVisitor`, made `pub(crate)`.
+2. **CLI**: `DiskAction::Agents` under `ddc disk` (`cli.rs`), `cmd/disk_agents.rs`, the table in `render.rs`, `docs/agents.schema.json`, and the README lines.
+3. **DDCKit**: `CLIRunner` lanes per kind (`disk`, `diskAgents`), where the same arguments join and other arguments wait; `AgentsReport` (decoding), `AgentsSummary` (rows), `AgentsModel` (the two runs, single flight).
+4. **App**: `AgentsSection` in `DiskView`; one `AgentsModel` made in `AppDelegate` and passed to both places that build the view.
+5. **Tests**: `ddc-core/tests/agents.rs`, `ddc-cli/tests/disk_agents_cli.rs`, `CLIRunnerTests`, `AgentsReportTests`, `AgentsSummaryTests`, `AgentsModelTests`, `ContractTests`, with fixtures under `/Users/example`.
+6. **Canvas** and the vault close after the review.
 
 ## Acceptance Criteria
 
 **Test**
-- [ ] `ddc disk agents --json` validates against its schema file, and `DDC_UPDATE_SCHEMA=1` regenerates it.
-- [ ] Claude Code liveness, over a temp HOME with fixture records:
+- [x] `ddc disk agents --json` validates against its schema file, and `DDC_UPDATE_SCHEMA=1` regenerates it. — evidence: `ddc-core/tests/agents.rs::committed_agents_schema_is_current` (schema generated from the serialized type) + `disk_agents_cli.rs::the_report_lists_the_harnesses_and_their_live_sessions` (the output decodes as that type)
+- [x] Claude Code liveness, over a temp HOME with fixture records: — evidence: `agents.rs::claude_sessions_are_live_stale_or_unknown`, `agents.rs::records_folder_missing_empty_or_unparsable`, `agents/claude.rs` unit tests
   - a record whose pid is this test process, with `startedAt` after its start, is live;
   - a record with a dead pid is stale;
   - a record whose pid is this process but whose `startedAt` is before the process start (the reused-pid case) is stale;
   - a record without `pid` is unknown and does not make the others stale;
   - a record whose `startedAt` is before the process start but whose `procStart` equals the process's UTC start is live (the resumed-session case);
   - a missing `sessions/` folder gives `records: unknown`.
-- [ ] A record with an unknown `status`, an unknown `entrypoint` and unknown extra keys still decodes, in the CLI and in the app, and its session is live.
-- [ ] The report never contains `messagingSocketPath`, `procStart`, a `.key` file's name or its contents.
-- [ ] `running`: a process named `Claude` in a `Claude.app` bundle is not Claude Code; a process whose name only contains `claude` is not either. A fixture with all three proves it.
-- [ ] Codex liveness, over a temp HOME:
+- [x] A record with an unknown `status`, an unknown `entrypoint` and unknown extra keys still decodes, in the CLI and in the app, and its session is live. — evidence: `agents.rs::claude_sessions_are_live_stale_or_unknown` (CLI) + `AgentsTests.swift AgentsReportTests.decodes` (app)
+- [x] The report never contains `messagingSocketPath`, `procStart`, a `.key` file's name or its contents. — evidence: `agents.rs::claude_sessions_are_live_stale_or_unknown` (asserts on the JSON)
+- [x] `running`: a process named `Claude` in a `Claude.app` bundle is not Claude Code; a process whose name only contains `claude` is not either. A fixture with all three proves it. — evidence: `agents/running.rs::the_claude_desktop_app_and_a_name_containing_claude_are_not_claude_code`
+- [x] Codex liveness, over a temp HOME: — evidence: `agents.rs::a_held_lock_is_an_open_thread`, `agents.rs::the_codex_sweep_stats_no_open_path_and_takes_no_lock`, `procs.rs::open_vnodes_of_a_child_carry_the_stat_identity`
   - a lock file that a test child process holds open is open;
   - the other lock files are not;
   - `.coordination.lock` is ignored;
   - no `flock` is called anywhere in the module, and no open path is `stat`ed (a source test, as `ContractTests` does for the app).
-- [ ] Transcripts: a live Claude Code session with no transcript yet is tolerated. The remaining-transcripts count excludes the live sessions' transcripts.
-- [ ] Sizes:
+- [x] Transcripts: a live Claude Code session with no transcript yet is tolerated. The remaining-transcripts count excludes the live sessions' transcripts. — evidence: `agents.rs::transcripts_leave_out_the_live_sessions`
+- [x] Sizes: — evidence: `agents.rs::sizes_count_hard_links_once_and_nested_folders_inclusively`, `agents.rs::an_unreadable_folder_is_unreadable_and_an_unreadable_file_is_still_sized`
   - a fixture tree with a hard link counts it once;
   - an unreadable folder is reported unreadable, not as zero;
   - a nested folder is inclusive and marked nested;
   - the harness total sums the top-level folders only.
-- [ ] With `~/.claude` in `skips`, no record under it is read and no size is walked; the harness is reported as skipped.
-- [ ] A harness with no folders is absent. Cursor and opencode carry `running` and `folders` but no `sessions`.
-- [ ] A fixture transcript and a fixture `opencode.db` without read permission do not make the command fail, and their sizes are still reported.
-- [ ] `CLIRunnerTests`: a `disk agents` run is not delayed by a `disk` run held at a gate, nor by a queued scan. A second `disk agents` request with the same arguments joins the running one; one with other arguments waits for it and is then run.
-- [ ] App:
+- [x] With `~/.claude` in `skips`, no record under it is read and no size is walked; the harness is reported as skipped. — evidence: `agents.rs::a_skipped_harness_folder_is_never_opened` (also skips one level inside `projects/` and `sessions/`), `disk_agents_cli.rs::skips_in_the_settings_bind_the_record_read`
+- [x] A harness with no folders is absent. Cursor and opencode carry `running` and `folders` but no `sessions`. — evidence: `agents.rs::a_harness_without_folders_is_absent_and_no_sizes_leaves_bytes_out`, `agents.rs::an_unreadable_folder_is_unreadable_and_an_unreadable_file_is_still_sized`
+- [x] A fixture transcript and a fixture `opencode.db` without read permission do not make the command fail, and their sizes are still reported. — evidence: `agents.rs::an_unreadable_folder_is_unreadable_and_an_unreadable_file_is_still_sized`
+- [x] `CLIRunnerTests`: a `disk agents` run is not delayed by a `disk` run held at a gate, nor by a queued scan. A second `disk agents` request with the same arguments joins the running one; one with other arguments waits for it and is then run. — evidence: `CLIRunnerTests.agentsBesideDiskAndQueue`, `CLIRunnerTests.agentsOtherArgumentsWait`
+- [x] App: — evidence: `AgentsReportTests.decodes`; `AgentsSummaryTests.rows`, `unknownRecords`; `AgentsModelTests.failedFast`, `failedSizes`, `joins`; the section is drawn below the area rows in `DiskView.swift`
   - a fixture report decodes;
   - the section shows one row per harness, with live sessions nested, the transcripts line, and the unknown-records line;
   - a failed run keeps the area rows and shows its message;
   - a failed sizes run after a good `--no-sizes` run keeps the session rows;
   - a Refresh pressed while the two runs are going starts no third run.
-- [ ] `ContractTests`: the app runs `disk agents` only from the Whole disk view; `ScheduledWork` and `PopoverModel` never run it; nothing in the section sends a destructive command.
+- [x] `ContractTests`: the app runs `disk agents` only from the Whole disk view; `ScheduledWork` and `PopoverModel` never run it; nothing in the section sends a destructive command. — evidence: `ContractTests.agentsCallers`, `ContractTests.agentsContracts`
 
 **Manual (owner)**
 - [ ] On the reference machine, with a few Claude Code and Codex sessions open, the section lists them as live with their project folders. After a session is closed, Refresh no longer lists it, and the count of remaining transcripts rises by one.

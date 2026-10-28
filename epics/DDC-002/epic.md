@@ -8,7 +8,7 @@ created: 2026-10-18
 updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, macos, swift]
-code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "docs/progress.schema.json", "docs/disk.schema.json", "README.md"]
+code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "docs/progress.schema.json", "docs/disk.schema.json", "docs/agents.schema.json", "README.md"]
 review_status: reviewed
 reviewed_at: 2026-10-18
 ---

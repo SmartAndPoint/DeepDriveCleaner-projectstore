@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T11:33:19.960Z
+generated_at: 2026-10-28T14:51:06.054Z
 
 ---
 
@@ -35,7 +35,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | in-progress |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
-| epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | planned |
+| epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | in-progress |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | in-progress |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | in-progress |
@@ -49,6 +49,29 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | planned |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
+| epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
+| epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | Complexity guard: operation counts and scaling exponents | story | planned |
+| epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | planned |
+| epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | Load run on the reference machine, including system folders | story | planned |
+| epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | Mandatory gate before every commit | story | in-progress |
+| epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | Memory and CPU under load: peak memory, leaks and CPU time | story | planned |
+| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | Synthetic load trees: large, wide, deep and hostile | story | planned |
+| epics/DDC-006/epic.md | Code shape gate: measurable conventions that guide humans and agents | epic | planned |
+| epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md | Agents and editors see violations as they write | story | planned |
+| epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md | Burn down the baseline: split long files and functions | story | planned |
+| epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons.md | Clippy at full strength: curated lints with reasons | story | planned |
+| epics/DDC-006/stories/story-code-shape-conventions-and-the-checkers-design.md | Code shape conventions and the checker's design | story | planned |
+| epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries.md | ddc-shape: a syn-based checker for size, nesting, cohesion and boundaries | story | planned |
+| epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | SwiftLint with the same limits for the app | story | planned |
+| epics/DDC-007/epic.md | Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers | epic | planned |
+| epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | Build matrix: every target built, tested and packaged from one tag | story | planned |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | planned |
+| epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | Move OS calls behind the platform module | story | planned |
+| epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | planned |
+| epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | Platform seam: ADR and capability model | story | planned |
+| epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | planned |
+| epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | Windows install: PowerShell script, winget and a signed binary | story | planned |
+| epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | planned |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | Coding-agent harnesses on macOS: where their data lives and how to tell a live session | research | final |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
@@ -219,6 +242,84 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md |
+| epics/DDC-005/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-005/epic.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| epics/DDC-005/epic.md | wikilink | epics/DDC-001/epic.md |
+| epics/DDC-005/epic.md | wikilink | epics/DDC-002/epic.md |
+| epics/DDC-005/epic.md | wikilink | epics/DDC-006/epic.md |
+| epics/DDC-005/epic.md | wikilink | epics/DDC-007/epic.md |
+| epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-code-shape-conventions-and-the-checkers-design.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries.md |
+| epics/DDC-006/epic.md | epic-contains | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-code-shape-conventions-and-the-checkers-design.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries.md |
+| epics/DDC-006/epic.md | mdlink | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md |
+| epics/DDC-006/epic.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| epics/DDC-006/epic.md | wikilink | epics/DDC-005/epic.md |
+| epics/DDC-006/epic.md | wikilink | epics/DDC-007/epic.md |
+| epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-006/stories/story-code-shape-conventions-and-the-checkers-design.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | mdlink | epics/DDC-006/epic.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
+| epics/DDC-007/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-007/epic.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-007/epic.md | wikilink | epics/DDC-001/epic.md |
+| epics/DDC-007/epic.md | wikilink | epics/DDC-005/epic.md |
+| epics/DDC-007/epic.md | wikilink | epics/DDC-006/epic.md |
+| epics/DDC-007/epic.md | wikilink | research/distribution-through-agents.md |
+| epics/DDC-007/epic.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | wikilink | research/distribution-through-agents.md |
+| epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/distribution-through-agents.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/distribution-through-agents.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
