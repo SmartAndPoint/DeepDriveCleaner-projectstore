@@ -47,7 +47,7 @@ The window is an `NSTabViewController` with `tabStyle = .toolbar`, and the windo
 
 The owner decided four things.
 
-**1. Automatic cleaning, strict variant.** "After a scheduled scan" offers three choices:
+**1. Automatic cleaning, strict variant.** (Superseded on 2026-10-28, see D3: Automation offers two choices.) "After a scheduled scan" offers three choices:
 - Notify me (the default);
 - Clean download caches automatically, then notify me;
 - Only show it in the menu bar.
@@ -145,6 +145,7 @@ Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story.
 
     The chip states the classes as they are, and no row claims to be safer than its least safe rule.
 - **D3.** The per-group Auto flag is not stored here. The Automation pane draws "Clean download caches automatically" but disables it ("arrives in a later version"), so `auto` is never stored. The flag and its storage belong to "Automatic cleaning of download caches after a scheduled scan", which needs its ADR amendments first.
+  - **Superseded on 2026-10-28.** The owner parked "Automatic cleaning of download caches after a scheduled scan", so the disabled choice is removed, and Automation offers two choices: Notify me and Only show it in the menu bar. `auto` is still never stored, and a stored `"auto"` still reads as Notify me (`SettingsTests.automation`). Artboard 10 of the design canvas still draws three choices; the canvas is not edited.
 - **D4.** "Not scanned" is a new optional report field, `not_scanned`, not a new `SkipReason`. It lists the user's skips that the walk actually stopped at, in canonical form. The visitor records them as it records keep markers, so the list is never truncated.
   - A skip inside a claimed finding is not listed. The walk still reads that finding, and the finding is kept whole instead.
   - The prompting areas a background scan leaves out are not listed either: they are not the user's skips.

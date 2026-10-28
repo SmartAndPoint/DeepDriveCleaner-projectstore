@@ -5,7 +5,7 @@ title: "Menu bar app"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-25
+updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, macos, swift]
 code_refs: ["app/", "scripts/build-app.sh", "scripts/icons/", "crates/ddc-cli/", "crates/ddc-core/", "docs/clean.schema.json", "docs/scan.schema.json", "docs/notify.schema.json", "docs/settings.schema.json", "docs/rules.schema.json", "docs/progress.schema.json", "README.md"]
@@ -20,7 +20,7 @@ reviewed_at: 2026-10-18
 | **Status** | in-progress |
 | **Priority** | p2 |
 | **Created** | 2026-10-18 |
-| **Updated** | 2026-10-21 |
+| **Updated** | 2026-10-28 |
 
 ---
 
@@ -65,7 +65,7 @@ The screens are modelled in the design canvas before any code.
 | [story-review-and-clean-window](./stories/story-review-and-clean-window.md) | in-progress | Group and item views, selection, confirmation sheet with dry-run warnings and per-item permanent delete, progress, result with skips grouped by cause |
 | [story-review-window-sorted-sidebar-select-all-and-folder-groups](./stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md) | in-progress | Sidebar tinted by class and ordered by size, Select all, folder subgroups that collapse, no repeated words on rows (design canvas board 9) |
 | [story-user-data-pick-your-own-files-for-the-trash](./stories/story-user-data-pick-your-own-files-for-the-trash.md) | in-progress | `scan` lists entries inside user-data folders; `clean --items` takes a picked entry to the Trash only; User data section and "Your own files" block in the app (safety ADR amendment 2026-10-20) |
-| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | in-progress | 0.3.0. Board 10 (2026-10-21): toolbar tabs General, Folders (always scan; exclude as count-never-clean or skip; not-readable folders), Schedule, Automation (notify, automatic cleaning as a choice, menu bar only), Types (with Auto), Permissions |
+| [story-settings-folders-types-notifications](./stories/story-settings-folders-types-notifications.md) | in-progress | 0.3.0. Board 10 (2026-10-21): toolbar tabs General, Folders (always scan; exclude as count-never-clean or skip; not-readable folders), Schedule, Automation (notify, menu bar only; the automatic-cleaning choice was dropped on 2026-10-28), Types (with Auto), Permissions |
 | [story-background-scan-and-notifications-in-the-app](./stories/story-background-scan-and-notifications-in-the-app.md) | in-progress | 0.3.0. Scheduler agent and `--scheduled` mode, notifications with Review / Remind me tomorrow, working hours, offered migration from the 0.1.0 LaunchAgent, Login Items under the app; takes over the scheduled-tick checks of the 0.2.0 clean-machine check |
 | [story-distribution-the-020-cask-with-the-app](./stories/story-distribution-the-020-cask-with-the-app.md) | in-progress | Cask 0.2.0 (`depends_on macos: :tahoe`, `app` and `binary` from the bundle, `zap launchctl:` for both agents), release tooling for the zipped app, README with a detailed CLI guide, `DISCLAIMER.md` and the CLI's terminal warning, upgrade of the reference machine |
 | [story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open](./stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md) | in-progress | 0.2.1. The app in the Dock and Cmd-Tab with a main menu while a window is open; items held open by a running process skipped as in use instead of a tool's command waiting out its timeout |
@@ -73,6 +73,9 @@ The screens are modelled in the design canvas before any code.
 | [story-automatic-cleaning-of-download-caches-after-a-scheduled-scan](./stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md) | parked | Parked by the owner on 2026-10-28: a scan informs, it never removes on its own. Owner's choice of 2026-10-21, strict variant: after a scheduled scan, clean the Package downloads groups marked Auto, above a floor, skipping what is in use; waits for safety ADR §8 / Alternative A and menu bar ADR §5 / §7 amendments |
 | [story-review-window-clean-only-the-selection-in-this-group](./stories/story-review-window-clean-only-the-selection-in-this-group.md) | in-progress | Board 12, variant B (owner, 2026-10-21): "Clean N from <group>…" at the end of the group's Select all row opens the confirmation with only that group's selected items; ships with the HIG pass |
 | [story-faster-clean-re-check-only-what-the-selection-needs](./stories/story-faster-clean-re-check-only-what-the-selection-needs.md) | in-progress | Owner's choice of 2026-10-21 ("1 и 2"), measured on the 0.2.2 build: a clean waits ~29 s on the full rescan before its first action. `clean --items` walks the whole home only for toolchain items, otherwise the listed items and their ancestors; the CLI leaves last-scan.json describing the disk after the clean and the app runs no scan after it. ADR amendments of 2026-10-24; plan gate 2026-10-25, for 0.2.4. |
+| [story-whole-disk-what-lies-outside-the-home-folder](./stories/story-whole-disk-what-lies-outside-the-home-folder.md) | planned | Owner, 2026-10-28: show where the whole disk goes, not only the home folder. Read-only `ddc disk --json`: the startup container as areas with sizes, what each is and what frees it; size-only walk outside the home folder, no findings; "not counted" never clamped; `last-disk.json` |
+| [story-whole-disk-in-the-app](./stories/story-whole-disk-in-the-app.md) | planned | The report in the app: a bar of the container and one row per area, from the popover and the Review window; `ddc disk` in a lane of its own beside the runner's queue; on demand, never scheduled |
+| [story-whole-disk-free-space-with-the-owning-tool](./stories/story-whole-disk-free-space-with-the-owning-tool.md) | planned | `ddc disk free` runs `simctl runtime delete` or `brew cleanup` from a confirmed action list, with a dry-run preview; amends the safety ADR §5–§7 and the menu bar ADR §6–§7 first; never from the scheduled path |
 
 ## Expected Results
 
@@ -123,4 +126,4 @@ The owner decided the epic's open questions on 2026-10-18; the ADR "Menu bar app
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-28*

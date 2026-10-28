@@ -2,13 +2,16 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T07:13:58.407Z
+generated_at: 2026-10-28T09:27:33.973Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
+- [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
+- [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
+- [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 
 ## ToDo
 

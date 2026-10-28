@@ -9,6 +9,7 @@ Research notes — investigations, spikes, comparisons, and findings.
 | File | Title | Status | Date |
 |------|-------|--------|------|
 | [where-developer-disk-space-goes-macos](./where-developer-disk-space-goes-macos.md) | Where a developer's disk space goes (macOS) | final | 2026-10-17 |
+| [what-fills-system-data-on-a-developers-mac](./what-fills-system-data-on-a-developers-mac.md) | What fills System Data on a developer's Mac | final | 2026-10-28 |
 
 ---
 
