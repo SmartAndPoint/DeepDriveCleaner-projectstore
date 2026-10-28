@@ -3,17 +3,17 @@ type: story
 id: "story-mandatory-gate-before-every-commit"
 epic: "DDC-005"
 title: "Mandatory gate before every commit"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, ci, quality, git-hooks]
-code_refs: []
+code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml"]
 specs: []
 started_at: 2026-10-28
-closed_at: null
+closed_at: 2026-10-28
 plan_updated_at: 2026-10-28
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: 2026-10-28
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -50,17 +50,17 @@ Later stories add their checks to these tiers: the S-size load checks and the co
 
 ## Decomposition
 
-- [ ] Time today's `make check` on the reference machine (cold and warm), to set the budgets.
-- [ ] `make gate-fast` and `make gate` (full) in the Makefile. `make check` stays as an alias of `gate-fast`, so nothing that calls it breaks.
-- [ ] `make tools`: installs the pinned tool versions with `cargo install --locked` (cargo-nextest, cargo-deny, cargo-machete, cargo-llvm-cov). The versions sit in one place.
-- [ ] `deny.toml`: allowed licenses compatible with PolyForm Noncommercial distribution; deny yanked and vulnerable crates; warn on duplicate versions.
-- [ ] `cargo machete`: an ignore list in `Cargo.toml` metadata for dependencies used only through macros or features, each with a comment.
-- [ ] `.config/nextest.toml`: slow-test warning at 30 s, timeout at 120 s; a CI profile with retries 0. Nextest does not run doc tests, so the gate runs `cargo test --doc` separately.
-- [ ] MSRV: either `cargo +1.89 check --workspace` in the full tier, or raise `rust-version` to the pinned toolchain. Decide, and record the decision in the epic's Open Questions.
-- [ ] `.githooks/pre-commit` (fast tier) and `.githooks/pre-push` (full tier). Both set `PATH=$HOME/.cargo/bin:$PATH` first. `make hooks` sets `git config core.hooksPath .githooks`. The README's development section and AGENTS.md (outside the projectstore block) both say to run it once, so agent clones get the hooks too.
-- [ ] `.github/workflows/gate.yml`: on push and pull request, on `macos-latest`, run `make tools` (pinned versions, cached by a key over the version list), then `make gate`, coverage and the M-size load checks, with a cargo cache. `.github/workflows/nightly.yml`: the nightly tier. DDC-007's build matrix grows from these files.
-- [ ] `make dist` depends on `gate` instead of `check`, and refuses a commit whose CI run for `HEAD` is not green (`gh run list --commit`).
-- [ ] Prove the gate catches each failure kind (see Acceptance Criteria) on a throwaway branch.
+- [x] Time today's `make check` on the reference machine (cold and warm), to set the budgets.
+- [x] `make gate-fast` and `make gate` (full) in the Makefile. `make check` stays as an alias of `gate-fast`, so nothing that calls it breaks.
+- [x] `make tools`: installs the pinned tool versions with `cargo install --locked` (cargo-nextest, cargo-deny, cargo-machete, cargo-llvm-cov). The versions sit in one place.
+- [x] `deny.toml`: allowed licenses compatible with PolyForm Noncommercial distribution; deny yanked and vulnerable crates; warn on duplicate versions.
+- [x] `cargo machete`: an ignore list in `Cargo.toml` metadata for dependencies used only through macros or features, each with a comment. (None needed: `cargo machete` flags nothing today.)
+- [x] `.config/nextest.toml`: slow-test warning at 30 s, timeout at 120 s; a CI profile with retries 0. Nextest does not run doc tests, so the gate runs `cargo test --doc` separately.
+- [x] MSRV: either `cargo +1.89 check --workspace` in the full tier, or raise `rust-version` to the pinned toolchain. Decide, and record the decision in the epic's Open Questions.
+- [x] `.githooks/pre-commit` (fast tier) and `.githooks/pre-push` (full tier). Both set `PATH=$HOME/.cargo/bin:$PATH` first. `make hooks` sets `git config core.hooksPath .githooks`. The README's development section and AGENTS.md (outside the projectstore block) both say to run it once, so agent clones get the hooks too.
+- [x] `.github/workflows/gate.yml`: on push and pull request, on `macos-latest`, run `make tools` (pinned versions, cached by a key over the version list), then `make gate`, coverage and the M-size load checks, with a cargo cache. `.github/workflows/nightly.yml`: the nightly tier. DDC-007's build matrix grows from these files.
+- [x] `make dist` depends on `gate` instead of `check`, and refuses a commit whose CI run for `HEAD` is not green (`gh run list --commit`).
+- [x] Prove the gate catches each failure kind (see Acceptance Criteria) on a throwaway branch.
 
 ## Implementation Plan
 
@@ -95,21 +95,36 @@ Planned with `projectstore:planner` on 2026-10-28.
 
 ## Acceptance Criteria
 
-- [ ] `make gate-fast` and `make gate` exist. Their timings on the reference machine are recorded in this story: `gate-fast` ≤ 60 s warm and `gate` ≤ 5 min warm, or the epic's open question is re-decided with the measured numbers.
-- [ ] With the hooks installed, a commit with an unformatted file, a clippy warning or a failing test is refused, with the failing command named in the output.
-- [ ] A push with a vulnerable or license-incompatible dependency (test with a throwaway branch) is refused by `cargo deny`.
-- [ ] A test that sleeps forever fails by timeout instead of hanging the gate.
-- [ ] The GitHub Actions run on `main` is green, and a deliberately broken branch shows a red run. The nightly workflow has run at least once.
-- [ ] `make dist` runs the full gate first.
+- [x] `make gate-fast` and `make gate` exist. Their timings on the reference machine are recorded in this story: `gate-fast` ≤ 60 s warm and `gate` ≤ 5 min warm, or the epic's open question is re-decided with the measured numbers.
+- [x] With the hooks installed, a commit with an unformatted file, a clippy warning or a failing test is refused, with the failing command named in the output.
+- [x] A push with a vulnerable or license-incompatible dependency (test with a throwaway branch) is refused by `cargo deny`.
+- [x] A test that sleeps forever fails by timeout instead of hanging the gate.
+- [x] The GitHub Actions run on `main` is green, and a deliberately broken branch shows a red run. The nightly workflow has run at least once.
+- [x] `make dist` runs the full gate first.
 
 ## Final Summary
 
-Status on 2026-10-28: commit `a68800d` is built and checked locally. It is not on GitHub yet, because the push needs the `workflow` scope on the owner's `gh` token. Reviewed by `projectstore:reviewer`, and all its findings are fixed:
+Done on 2026-10-28. The commits on `main`:
+- `88b323a`: the gate itself;
+- `b0a29c3`: fixes `make tools` on GitHub's `macos-26` image of 2026-10-21, which installs rustup with Homebrew and has no `~/.cargo/bin/cargo`;
+- `04c421a`: every pushed commit keeps its own Gate run. Before it, a later push replaced the pending run of an earlier one, and `make dist` reads the run of its HEAD.
+
+Reviewed by `projectstore:reviewer`, and all its findings are fixed:
 - the CI tool cache had broken `make tools`; the install now checks the binary's own version;
 - `*.profraw` is ignored;
 - `ci-green.sh` reads only push runs and splits fields on `|`;
 - `.NOTPARALLEL` is set;
 - AGENTS.md now asks for a 10-minute tool timeout on commit and push.
+
+GitHub Actions (`SmartAndPoint/DeepDriveCleaner`):
+
+| Run | Commit | Result |
+|---|---|---|
+| Gate 40719961003 | `88b323a` | green. Cold: gate 12 min, coverage 11 min, app 2 min |
+| Nightly 40723880175 (dispatch) | `88b323a` | green |
+| Gate 40725327474 | `gate-proof-red` (a failing test) | red at `make: *** [nextest]` and `[coverage]`; app green. Branch deleted |
+| Gate 40727061101 | `c164663` | green |
+| Gate 40728055440 | `04c421a` | green. Warm cache: gate 6 min, coverage and app 1 min each |
 
 Timings on the reference machine (10 cores):
 
@@ -137,8 +152,6 @@ Acceptance evidence (throwaway branch `gate-proof`, hooks installed with `-c cor
 | `smallvec = "=1.6.0"` | `.githooks/pre-push` refused: `RUSTSEC-2021-0003`, `advisories FAILED` |
 | `html2md` (GPL-3.0+) | `.githooks/pre-push` refused: `error[rejected]: failed to satisfy license requirements` |
 | `make -n dist` | runs `scripts/ci-green.sh` first, then the full gate, then `swift test`, then `build-dist.sh` |
-
-Still open, all of it after the push: a green Gate run on `main`, a red run on a deliberately broken branch, and one nightly run by dispatch.
 
 Known gap: CLI integration tests call `env_clear()`, which drops `LLVM_PROFILE_FILE`. The CLI children's coverage is lost, and they write `*.profraw` into their working folder (now ignored). Story "Coverage floor and property tests for the safety invariants" passes the variable through.
 

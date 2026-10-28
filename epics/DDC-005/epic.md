@@ -8,7 +8,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, quality, testing, performance, ci]
-code_refs: []
+code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml"]
 review_status: reviewed
 reviewed_at: 2026-10-28
 ---
@@ -66,7 +66,7 @@ Decisions the epic relies on:
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | in-progress | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
+| [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | done | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
 | [story-coverage-floor-and-property-tests-for-the-safety-invariants](./stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md) | planned | Line coverage measured and ratcheted from `main`. Property and differential tests for the safety and counting invariants. Interruption tests. Fuzz targets for the parsers |
 | [story-synthetic-load-trees-large-wide-deep-and-hostile](./stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md) | planned | A deterministic generator of 10⁴–10⁷-entry trees on a disposable disk image, with a manifest of the expected findings and plan. It refuses any target that is not on its own image |
 | [story-complexity-guard-operation-counts-and-scaling-exponents](./stories/story-complexity-guard-operation-counts-and-scaling-exponents.md) | planned | Cost counters (directory entries read, claim lookups, rule matches, allocations) under a feature, asserted linear in the gate. Scaling slopes on larger trees. Regression tests that reproduce both steps of `aa64c83` |
@@ -77,7 +77,7 @@ Implementation order: the gate, then the trees, then memory and CPU (the harness
 
 ## Expected Results
 
-- [ ] `make gate-fast` and `make gate` are the mandatory checks. The git hooks and CI run them, and their parts and timings are documented.
+- [x] `make gate-fast` and `make gate` are the mandatory checks. The git hooks and CI run them, and their parts and timings are documented.
 - [ ] Coverage per crate is measured. The floor only rises. The safety invariants hold under property tests.
 - [ ] `make load` generates trees, runs the complexity, memory and CPU checks in isolation, and writes `bench/load-<date>.tsv`.
 - [ ] A reintroduced quadratic step, either one, fails the gate.
