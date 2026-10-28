@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [cli, app, safety, whole-disk]
-code_refs: []
+code_refs: ["crates/ddc-core/src/free/", "crates/ddc-core/src/exec/journal.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/disk/model.rs", "crates/ddc-core/src/disk/simulators.rs", "crates/ddc-core/src/report/after_clean.rs", "crates/ddc-core/src/store.rs", "crates/ddc-core/src/plan.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/disk_free.rs", "crates/ddc-core/tests/common/fakes.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-cli/src/cmd/disk_free.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/tests/disk_free_cli.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk-free.schema.json", "docs/disk.schema.json", "README.md", "app/Packages/DDCKit/Sources/DDCKit/FreeReport.swift", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskReport.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskSummaryTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/free-preview.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/free-report.json", "app/DeepDriveCleaner/AreaActionSheet.swift", "app/DeepDriveCleaner/DiskView.swift", "app/DeepDriveCleaner/AppDelegate.swift"]
 specs: []
 started_at: "2026-10-28T15:24:31.635Z"
 closed_at: null
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-28T15:24:31.635Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -54,7 +54,7 @@ Rough until the plan gate.
   - **§6:** the new commands `ddc disk`, `ddc disk free` and its `--dry-run`, with their schemas and exit codes.
   - **§7:** one caller per destructive call, extended to `disk free`. The caller is the Whole disk sheet's confirm button, and `ContractTests` gains a test that names it.
   - **§1:** `disk free` is a `CLIRunner` queue kind beside `clean`, never in the read-only `.disk` lane of "Whole disk in the app". It takes the ddc lock, so a Scan now during a long `brew cleanup` waits in the queue instead of failing busy. The two never run at once in the app: each button is disabled while the other's run is queued or running, because both write `last-disk.json` (amendment of 2026-10-28, story "Whole disk in the app"). From the terminal they can still overlap; then the last to finish writes `last-disk.json`, as "Whole disk: what lies outside the home folder" accepts.
-- [ ] **CLI: `ddc disk free --actions FILE|- [--dry-run] [--json]`.**
+- [x] **CLI: `ddc disk free --actions FILE|- [--dry-run] [--json]`.**
   - **Simulator runtime:**
     - It runs `simctl runtime delete <identifier>`, where `identifier` is the runtime's asset id from `runtime list -j`, not its `runtimeIdentifier`. It never passes `--keep-asset`, which would free nothing. `simctl` is run as in "Whole disk: what lies outside the home folder": never `xcrun`, never the shim under `xcode-select -p`, only the real CoreSimulator binary after `xcodebuild -checkFirstLaunchStatus` exits 0.
     - The booted check joins devices on `runtimeIdentifier`.
@@ -75,7 +75,7 @@ Rough until the plan gate.
     - When a tool fails because it needs an administrator's password or a terminal, the result carries the exact command for the user to run in Terminal. The app shows it with a Copy button.
   - **At a terminal without `--actions`**, it lists the available actions with their dry-run estimate and asks for each one, default No. Without a terminal and without `--actions`, it refuses.
   - **Output:** a `--json` report with the schema `docs/disk-free.schema.json` at version 1. The exit codes follow `clean --items`.
-- [ ] **App:**
+- [x] **App:**
   - an action button on a runtime row and on the Homebrew row;
   - a confirmation sheet with the dry run's preview and the exact command;
   - progress, then the result in the row;
@@ -125,19 +125,36 @@ Fakes only: an extended `FakeCommands` (exe paths, call sequences, failures, a h
 ## Acceptance Criteria
 
 - [x] Both ADR amendments are accepted after a critic pass, before any code that runs an action. — evidence: critic (2026-10-28) returned revise with 13 findings, all applied; the re-check approved after one more sentence (a missing Homebrew cache folder), applied verbatim; safety ADR Amendments entry of 2026-10-28, menu bar ADR §1, §6 item 11, §7
-- [ ] Test (fake commands port): a confirmed list `[{action: simctl-runtime-delete, identifier}]` runs exactly the real `simctl runtime delete <identifier>`, with no `--keep-asset` and never the shim or `xcrun`. An unknown id, `all` or a build, a runtime with a booted device, one with `deletable: false`, one in the state `Deleting`, one without a `runtimeIdentifier`, and one whose `parentMountPath` lies outside AssetsV2 are each refused before any run.
-- [ ] Test: `disk free` without `--actions` and without a TTY exits with the refusal code and runs nothing. `--yes` is not accepted.
-- [ ] Test: `brew-cleanup` runs `/opt/homebrew/bin/brew cleanup` with no other arguments and `HOMEBREW_NO_AUTOREMOVE=1` in its environment, and its dry run runs `brew cleanup -n` with the same environment. After the run, the `cache.homebrew` finding in `last-scan.json` is measured again.
-- [ ] Test: every run writes one `actions.jsonl` line of the area-action kind, with the journal's own schema version, the command and the result; the scan report's `SCHEMA_VERSION` is unchanged. A run takes the exclusive lock and reports busy when it is held.
-- [ ] Test (fake commands port): a runtime that leaves the list while its AssetsV2 folder keeps its size yields "not freed" with the bytes, and a runtime still listed after the timeout yields "still deleting".
-- [ ] Test with a fake CLI: `disk free` is queued in the `CLIRunner`; a scan queued behind it waits and does not fail busy.
-- [ ] Test: a tool exiting with an authorization failure yields a result with the Terminal command.
-- [ ] Contract test: the sheet's confirm button is the only caller of `disk free` in the app, and the scheduled path never calls it.
-- [ ] `docs/disk-free.schema.json` is generated and checked like the other schemas.
+- [x] Test (fake commands port): a confirmed list `[{action: simctl-runtime-delete, identifier}]` runs exactly the real `simctl runtime delete <identifier>`, with no `--keep-asset` and never the shim or `xcrun`. An unknown id, `all` or a build, a runtime with a booted device, one with `deletable: false`, one in the state `Deleting`, one without a `runtimeIdentifier`, and one whose `parentMountPath` lies outside AssetsV2 are each refused before any run. — evidence: core `disk_free.rs`: `a_runtime_is_deleted_with_coresimulators_simctl_alone_and_its_bytes_are_measured`, `every_runtime_the_probe_cannot_vouch_for_is_refused_before_any_delete` (booted and booting devices included), `without_ready_developer_tools_nothing_is_listed_or_deleted`; `structure.rs::disk_free_runs_only_its_two_commands` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test: `disk free` without `--actions` and without a TTY exits with the refusal code and runs nothing. `--yes` is not accepted. — evidence: CLI `disk_free_cli.rs`: `without_actions_and_without_a_terminal_it_refuses_and_runs_nothing`, `there_is_no_yes` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test: `brew-cleanup` runs `/opt/homebrew/bin/brew cleanup` with no other arguments and `HOMEBREW_NO_AUTOREMOVE=1` in its environment, and its dry run runs `brew cleanup -n` with the same environment. After the run, the `cache.homebrew` finding in `last-scan.json` is measured again. — evidence: core `brew_cleanup_runs_alone_from_the_areas_brew_with_no_autoremove`, `after_brew_cleanup_the_homebrew_cache_finding_is_measured_again`; CLI `brew_cleanup_runs_alone_with_no_autoremove_and_its_dry_run_changes_nothing`, `after_brew_cleanup_the_last_scan_is_measured_again` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test: every run writes one `actions.jsonl` line of the area-action kind, with the journal's own schema version, the command and the result; the scan report's `SCHEMA_VERSION` is unchanged. A run takes the exclusive lock and reports busy when it is held. — evidence: core `the_journal_has_its_own_version_and_the_scan_reports_is_unchanged`; CLI `a_confirmed_runtime_is_deleted_journaled_and_left_out_of_the_saved_disk_report`, `a_held_lock_exits_75_and_runs_nothing`; `clean_safety.rs:149-152` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test (fake commands port): a runtime that leaves the list while its AssetsV2 folder keeps its size yields "not freed" with the bytes, and a runtime still listed after the timeout yields "still deleting". — evidence: core `a_runtime_that_left_the_list_while_its_folder_kept_its_size_is_removed_not_freed`, `a_runtime_still_listed_at_the_deadline_is_still_deleting`, `a_stop_during_the_wait_ends_it_as_still_deleting_and_journals_it`, `a_stop_during_the_delete_call_reads_the_list_once` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test with a fake CLI: `disk free` is queued in the `CLIRunner`; a scan queued behind it waits and does not fail busy. — evidence: Swift `DiskFreeTests`: `scanWaits`, `neverCoalesced`, `stopDuringRun` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Test: a tool exiting with an authorization failure yields a result with the Terminal command. — evidence: core `a_failing_tool_carries_its_terminal_command_and_names_an_administrator_only_on_a_permission_error`; CLI `a_permission_error_fails_with_the_terminal_command_and_exits_1_in_text` (projectstore:reviewer, 2026-10-28: Met)
+- [x] Contract test: the sheet's confirm button is the only caller of `disk free` in the app, and the scheduled path never calls it. — evidence: Swift `ContractTests::freeCallers` (the one `dryRun: false` run sits in `freeConfirmedActions`, called only from `AreaActionSheet.swift`; the scheduled files never name it) (projectstore:reviewer, 2026-10-28: Met)
+- [x] `docs/disk-free.schema.json` is generated and checked like the other schemas. — evidence: core `committed_free_schema_is_current`; Swift `ContractTests::freeContracts` (projectstore:reviewer, 2026-10-28: Met)
 - [ ] Manual (owner): deleting an unused simulator runtime from the app frees its size, and `xcrun simctl runtime list` no longer lists it. Whether macOS asks for a password is recorded here.
 - [ ] Manual (owner): Homebrew cleanup from the app shows the same list as `HOMEBREW_NO_AUTOREMOVE=1 brew cleanup -n` in Terminal (with no other `HOMEBREW_*` variable set in the shell), then frees about that much.
 
 ## Final Summary
+
+**What changed.** `ddc disk free` runs the owning tool on a whole-disk area: `simctl runtime delete <asset id>` for one simulator runtime, and `/opt/homebrew/bin/brew cleanup` with `HOMEBREW_NO_AUTOREMOVE=1` for Homebrew. Each runs only after its own dry run and an explicit confirmation: a question per action at a terminal, or a list the app's sheet confirmed, passed with `--actions`. There is no `--yes`. The core module `free/` probes, runs and measures; every run takes the exclusive lock and writes one area-action line to `actions.jsonl` (journal schema 2; the scan report's schema is unchanged). The report is `docs/disk-free.schema.json`, version 1. After a run, `last-disk.json` drops a deleted runtime and marks the Homebrew area stale ("before cleanup"), and `last-scan.json` measures `cache.homebrew` again. In the app, a runtime row and the Homebrew row of the Whole disk view get a button that opens a sheet: the tool's dry run, the exact command with Copy Command, what cannot be undone, then Stop, and the result in the row.
+
+**Why.** The two largest areas outside the home folder are owned by tools that know what is safe to remove; DDC runs those tools instead of deleting their folders (safety ADR amendment of 2026-10-28, menu bar ADR §6 item 11, §7).
+
+**Review fixes (projectstore:reviewer, 2026-10-28).** The Homebrew sheet names `/opt/homebrew/Cellar` and `~/Library/Caches/Homebrew` and says that shell-profile `HOMEBREW_*` settings do not reach a run the app starts, while `brew.env` files do. Ctrl-C at a terminal question ends the process before anything runs; the signal handler is installed only once the list is known, and a dry run ended by a signal ends by it too. A stop while a tool runs reports what the list shows (gone, still deleting) or "stopped before the tool finished". Any device state other than Shutdown refuses a runtime delete. The confirm button is disabled during a whole-disk scan, and a scan waits while a sheet waits for its confirmation. A new whole-disk measure clears the rows' result lines.
+
+**Tests executed.** `make check` (fmt, clippy `-D warnings`, all Rust tests), `swift test` (250 tests), and an unsigned `xcodebuild` of the app. No test runs the real `simctl` or `brew`; the CLI tests use a temporary HOME and data directory.
+
+**Risks and follow-ups.**
+- Whether Xcode 27's runtime `path` always lies inside its `.asset` folder is settled by the owner's manual check (AC 11).
+- Two Whole disk windows would each show the sheet.
+- The Homebrew cache folder may be a symlink; the measure follows the area's rules.
+- With a terminal on stdout, `--json` without `--actions` prints the questions and then the JSON.
+- The journal bump to schema 2 is not described in the README.
+- Accepted as notes: the 0600 list file is created then written (a short race in the user's own temp folder); a journal write error mid-run ends the run as in `clean`; a lock wait longer than `NATIVE_TIMEOUT` is not bounded separately.
+- ACs 11 and 12 are the owner's; the story stays in progress until they are recorded.
 
 ## Dependencies
 
