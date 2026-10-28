@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T10:28:47.293Z
+generated_at: 2026-10-28T11:18:44.334Z
 
 ---
 
@@ -46,7 +46,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | planned |
-| epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | planned |
+| epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
