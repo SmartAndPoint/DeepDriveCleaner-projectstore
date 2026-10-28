@@ -68,11 +68,11 @@ Rough until the plan gate.
   - **§6, the new command.**
     - Its schema, and that its exit codes follow `ddc disk`: 0 on success, a closed stdout included, and the usage and environment errors of every command.
     - The carve-out: fields passed through from a harness (`status`, `entrypoint`) are free strings, never strict enums, because their values are another program's internals.
-  - **Consequences.** The count of CLI contracts becomes seven.
+  - **Consequences.** The count of CLI contracts becomes eight: the rules listing of item 6.8 joins the list too.
 - [ ] **ddc-core: `agents::HARNESSES`.** One table in code holds every harness's folders, taken from the research note: `~/.claude`, `~/Library/Application Support/Claude/claude-code`, `~/.codex`, `~/.cache/codex-runtimes`, `~/.cursor`, `~/.local/share/opencode`, `~/.cache/opencode` and `~/.config/opencode`. Nested entries: `~/.claude/projects`, `~/.codex/sessions` and `~/.codex/worktrees`. They are the source of the app's nested folder rows.
   - It excludes the rest of `~/Library/Application Support/Claude` (the desktop chat app) and `~/Library/Application Support/Cursor` (editor state).
   - DDC-003's catalog rules should read this table rather than keep their own list. That is recorded under Dependencies, for that epic's plan gate.
-- [ ] **CLI: `ddc disk agents [--json]`.** It is read-only, takes no lock, writes no file and sends no notification. The report has its own `AGENTS_SCHEMA_VERSION` and a schema file in `docs/`. Per harness it gives:
+- [ ] **CLI: `ddc disk agents [--json] [--no-sizes]`.** `--no-sizes` skips the walk; the report then marks its sizes absent, while the transcript counts, which come from names, stay. It is read-only, takes no lock, writes no file and sends no notification. The report has its own `AGENTS_SCHEMA_VERSION` and a schema file in `docs/`. Per harness it gives:
   - `id`: `claude-code`, `codex`, `cursor` or `opencode`;
   - `running`: the processes of the harness that run, each with its kind. The kind is ddc's own classification, a strict enum with an `other` case: `cli`, `app-server`, `app`, `other`. They come from the process list of `sys::procs`, matched by the exact executable basename (`claude`, `codex`, `opencode`) or the app bundle (`Cursor`), never by a substring. The Claude desktop chat app runs as `Claude` and is never Claude Code;
   - `folders`: each path with its allocated bytes. A nested folder (`~/.claude/projects` inside `~/.claude`) is reported inclusive and marked nested. The harness total sums only the top-level folders;
@@ -88,7 +88,10 @@ Rough until the plan gate.
   - The record is read for `pid`, `sessionId`, `startedAt`, `procStart`, `status`, `entrypoint`, `name` and `cwd` only. `procStart` is read for the comparison and never emitted. `messagingSocketPath` and the `.key` files are never read into the report.
   - The session is live when `sys::procs::bsd_info(pid)` finds a process whose uid equals `uid()` and for which either proof holds: its start time is no later than `startedAt`, or its start time formatted as UTC ctime (`%a %b %e %H:%M:%S %Y`) equals `procStart`. The second proof covers a resumed session that may keep an older `startedAt`.
   - It is stale when there is no such process.
-  - It is unknown when the record has no `pid` or `startedAt`.
+  - It is unknown when the record has no `pid` or `startedAt`, or when its `pidDomain` is present and not `darwin` (the pid is not a local one).
+  - An empty `sessions/` folder is readable with no sessions: Claude Code removes records on exit. `records: unknown` is for a missing folder, or for candidate records none of which parses.
+  - Records are parsed key by key from a JSON map, with a size cap, and only files named `<digits>.json` are read. The per-session key files are named `<pid>.<hex>.key`.
+  - An npm-installed Claude Code runs as `node` and does not show under `running`; its sessions are still found from the records.
 - [ ] **Liveness, Codex.** A thread is open when any process of the current user holds `thread-writer-locks/<id>.lock` open.
   - `sys::procs` gains `open_vnodes(pid)`, which returns `(dev, ino, path)` for each open file from the fd's vnode info (`PROC_PIDFDVNODEPATHINFO`, `vst_dev` and `vst_ino`). It is called per pid, because the process snapshot leaves the open files of the caller's children empty.
   - Only the lock files in `thread-writer-locks/` are ever `stat`ed, to get their `(dev, ino)`; no open path of any process is `stat`ed, since a file in a protected folder could make macOS ask.
@@ -96,6 +99,7 @@ Rough until the plan gate.
   - No `lsof` and no `flock` probe.
   - The rollout is found by the `<id>` suffix of its file name.
 - [ ] **Sizes.** The size-only visitor of `ddc disk` walks these folders only, never the whole home. A folder that cannot be read is counted as unreadable, as in the disk report.
+- [ ] **Skips.** `skips` in `settings.json` bind the walk and the record read alike (menu bar ADR §6.10). A harness folder under a skip is never opened, and the harness is reported with the skip as its reason. A skip inside a harness folder (`~/.claude/projects`) is never opened either: that folder is reported skipped, and the transcripts read through it are reported absent with the same reason.
 - [ ] **App: a Coding agents section** under the area rows of the Whole disk view.
   - **Rows.**
     - One row per harness: its name, what of it runs, and its total size.
@@ -103,8 +107,8 @@ Rough until the plan gate.
     - Nested rows for live sessions: the project folder name, the status and the start time. Codex threads are labelled "open in Codex".
     - One line for the remaining transcripts: their count and size.
     - When the records are `unknown`, one line instead of the sessions: "ddc cannot read Claude Code's session records".
-  - **When it runs.** The view runs `ddc disk agents --json` when it appears and when Refresh is pressed, in its own read-only lane. It never runs from the scheduled path.
-  - **A failed run** shows its message in the section and keeps the area rows.
+  - **When it runs.** The view runs `ddc disk agents --json --no-sizes` and then `ddc disk agents --json`, one after the other in its own read-only lane, when it appears and when the section's Refresh button is pressed. The first report shows the session rows at once; the second adds the sizes. The section shows even when there is no whole-disk report yet. It never runs from the scheduled path.
+  - **A failed run** shows its message in the section and keeps the area rows. When the sizes run fails after a good `--no-sizes` run, the session rows of the first report stay, with the sizes shown as absent.
 - [ ] **Canvas.** Bring the purple "AI agent harnesses" block on artboard 13 in line with this section, and replace its "Idle N d" chips: a session either runs or is not listed. Re-read the canvas before any republish, because another session changed it.
 - [ ] **README.** One line on `ddc disk agents` in the CLI guide and in the Whole disk bullet. It must say that the output shows project folders and session names.
 
@@ -135,19 +139,22 @@ Rough until the plan gate.
   - an unreadable folder is reported unreadable, not as zero;
   - a nested folder is inclusive and marked nested;
   - the harness total sums the top-level folders only.
+- [ ] With `~/.claude` in `skips`, no record under it is read and no size is walked; the harness is reported as skipped.
 - [ ] A harness with no folders is absent. Cursor and opencode carry `running` and `folders` but no `sessions`.
 - [ ] A fixture transcript and a fixture `opencode.db` without read permission do not make the command fail, and their sizes are still reported.
-- [ ] `CLIRunnerTests`: a `disk agents` run is not delayed by a `disk` run held at a gate, nor by a queued scan.
+- [ ] `CLIRunnerTests`: a `disk agents` run is not delayed by a `disk` run held at a gate, nor by a queued scan. A second `disk agents` request with the same arguments joins the running one; one with other arguments waits for it and is then run.
 - [ ] App:
   - a fixture report decodes;
   - the section shows one row per harness, with live sessions nested, the transcripts line, and the unknown-records line;
-  - a failed run keeps the area rows and shows its message.
+  - a failed run keeps the area rows and shows its message;
+  - a failed sizes run after a good `--no-sizes` run keeps the session rows;
+  - a Refresh pressed while the two runs are going starts no third run.
 - [ ] `ContractTests`: the app runs `disk agents` only from the Whole disk view; `ScheduledWork` and `PopoverModel` never run it; nothing in the section sends a destructive command.
 
 **Manual (owner)**
 - [ ] On the reference machine, with a few Claude Code and Codex sessions open, the section lists them as live with their project folders. After a session is closed, Refresh no longer lists it, and the count of remaining transcripts rises by one.
 - [ ] The harness sizes in the section are within 5 % of `du -sk` on the same folders.
-- [ ] `ddc disk agents --json` finishes in under 10 s on the reference machine. Record the time and the entry count in the Final Summary; the research note measured 5.1 s for about 124,000 entries without the Claude desktop folder.
+- [ ] `ddc disk agents --json` finishes in under 10 s on the reference machine, and `ddc disk agents --json --no-sizes` in under 1 s. Record the time and the entry count in the Final Summary; the research note measured 5.1 s for about 124,000 entries without the Claude desktop folder.
 
 ## Final Summary
 
@@ -161,7 +168,7 @@ Rough until the plan gate.
 - **Open questions for the plan gate:**
   - whether a resumed session keeps its old `startedAt`: resume a throwaway session and compare its record's `startedAt` and `procStart` with `ps -o lstart=` in UTC;
   - whether the ChatGPT app's embedded Codex writes to `~/.codex`, so that "Codex runs" names the right binary;
-  - whether to measure sizes on every appearance, or to show liveness at once and the sizes when the walk ends. The view appearing must not wait 5 s for its session rows.
+  - the time zone of the time in a Codex rollout's file name; until settled, it is passed through as written.
 
 ## Dependencies
 

@@ -80,6 +80,21 @@ All CLI runs go through one in-app runner that serialises them. A scheduled scan
 
 Amended 2026-10-28, story "Whole disk in the app" (epic DDC-002): every run but `disk` goes through one queue and never overlaps another. Two runs that take the ddc lock would make one fail as busy, and `rules`, `notify` and `schedule`, which take no lock, stay queued too. `disk` is the one that takes no lock and writes nothing another command reads: today only `ddc disk` writes `last-disk.json`. The runner therefore runs it in a lane of its own, beside the queue: it never waits for a scan or a clean, and a scan or a clean never waits for it. A whole-disk measurement beside a scheduled scan reads the disk at the same time; that is accepted. The lane holds one `disk` run at a time, and a second request joins the running one, as Scan now joins a queued scan. Stop on the Whole disk view cancels that run only, by its ticket. On quit the app leaves a running `disk` alone: SIGTERM would replace the last full report with a partial one, and the CLI saves its report before it prints, so an orphaned run still finishes and writes it. The app never starts `disk` on its own: the scheduled path stays the home folder's scan. `ddc disk free` (story "Whole disk: free space with the owning tool") takes the lock and stays in the queue. It will also edit `last-disk.json` (it marks the area it freed as stale), so the two never run at once in the app: each button is disabled while the other's run is queued or running.
 
+Amended 2026-10-28, story "Coding agents in the Whole disk view" (epic DDC-002): the lane above becomes a rule. A kind gets a lane of its own, beside the queue, when three things hold:
+- the user waits on it for seconds or minutes;
+- it takes no lock;
+- whatever it writes, the app keeps apart from any run that reads or edits the same file.
+
+`disk` meets the third through the button rule above: it writes `last-disk.json`, and the app never runs it beside `disk free`. Today there are two such kinds: `disk` and `disk agents`. `rules` stays queued: it finishes in milliseconds, so a lane would gain nothing.
+
+How the lanes behave:
+- Each lane holds one running process. The model that owns the view joins a second request to its run in progress, so each run has one ticket, and a Stop, where the view has one, cancels it. Under it the runner joins only a request with the same arguments, and a request with other arguments waits for the running one. So a request for the sizes report never receives the `--no-sizes` one. For `disk` every request has the same arguments, and the runner's join stays as it was.
+- A Refresh pressed while the two `disk agents` runs are going joins them. The sessions it shows are then a few seconds old; that is accepted.
+- Kinds never wait for each other, nor for the queue. A whole-disk walk of several minutes therefore never holds up the session list.
+- Two walks beside each other read the disk at the same time. That is accepted, as for `disk` beside a scan.
+- On quit the app leaves a lane's run alone. `disk agents` writes no file, so an orphaned run only prints into a closed pipe.
+- The app never starts `disk agents` on its own; only the Whole disk view runs it.
+
 UniFFI is not used now (Alternative A).
 
 ### 2. UI: `NSStatusItem` and `NSPopover` hosting SwiftUI
@@ -250,6 +265,23 @@ These changes are additive. One change is visible in the terminal: a held lock e
 8. **Rule groups.** `ddc rules --json` lists every rule id with its category, class, removal method, whether the Types tab can switch it off, and a `group` label ("Python environments", "node_modules", "Package downloads", …; the groups were re-cut on 2026-10-28 to match the Settings design, see "Settings: folders, types, notifications"). It is the source of the app's Types settings.
 9. **Volumes.** The report gains an optional `volumes` list: the free and total bytes of the volume of each scan root. The low-disk check applies to every scanned volume, not only the home folder's, and the notify decision names the volume. As in 0.1.0, it fires for a volume only when something selected lies on it: otherwise `ddc clean` cannot help (owner, 2026-10-19). Unlike 0.1.0, the repeat rule (a fifth more, or a week) holds back only the threshold. While a volume stays almost full with something selected on it, every scheduled scan notifies, a scan caught up after sleep included, until nothing selected is left on it or the user picks Remind me tomorrow. There is no minimum amount and no minimum gap: a few KiB selected on a full disk is enough. A 0.1.0-style agent from `ddc schedule install` repeats the same way, and `notify_low_disk: false` in `settings.json` stops it (owner, 2026-10-19).
 
+10. **The whole-disk reports** (amended 2026-10-28, epic DDC-002).
+    - **`ddc disk [--json] [--progress json]`** (story "Whole disk: what lies outside the home folder"). It prints the disk report with its own `schema_version` and saves it to `last-disk.json`.
+    - **`ddc disk agents [--json] [--no-sizes]`** (story "Coding agents in the Whole disk view"). It prints what coding-agent harnesses keep under the home folder, and their live sessions, with its own `schema_version`. It saves nothing, takes no lock and sends no notification. Liveness is read again on every run. With `--no-sizes` it walks nothing, so it answers in a fraction of a second, and the report says that its sizes are absent. The app runs it that way first, then without the flag, one after the other in the same lane, so the session rows show before the sizes. It reports no progress: the first run already fills the section, and the second only adds the sizes.
+    - **Skips.** `skips` in `settings.json` bind both commands, the session-record read included. A harness folder under a skip is never opened: no sizes are walked and no record is read. The harness is reported with the skip as its reason. A skip inside a harness folder, such as `~/.claude/projects`, is never opened either: that folder is reported skipped, and what is read only through it, such as the transcripts, is reported absent with the same reason. This holds the safety ADR's promise that a skipped folder is never opened.
+    - **Exit codes for both.**
+      - 0 when done, a closed stdout included.
+      - 2 on a usage error.
+      - 1 when no report can be made at all, for example without a home folder. A folder, a record or a database that cannot be read is reported in the output, never turned into an error.
+      - For `ddc disk`, 1 also when the report could not be saved. It is still printed; the app shows the last saved report with the error.
+      - A stopped run ends by its signal, as a clean does (item 4).
+      - Neither command takes the lock, so neither returns 75.
+    - **What is a string and what is an enum.**
+      - **Values copied from a harness record** are typed in the schema as they were read: as strings or numbers. They are never re-typed into an enum. Examples are a Claude Code session's `status` and `entrypoint`. Their values are another program's internals, and a new value must not make the report unreadable.
+      - **Reading the records.** The CLI reads them leniently and ignores unknown keys. A record without the fields its test needs is reported as `unknown`, and a records folder of an unexpected shape as `records: unknown`. Neither is ever reported as an ended session.
+      - **Values that ddc assigns itself** are strict enums, such as the kind of a running harness process: `cli`, `app-server`, `app` or `other`. Here `other` is a value the CLI emits for a process it cannot name, not a catch-all for the decoder. A new variant bumps `schema_version`, as for every report.
+      - **The app** decodes both reports strictly, as §1 requires.
+
 ### 7. Consent: the confirmation sheet is interactive consent
 
 This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and confirmation". That ADR stays accepted, and the change is recorded there as a dated amendment.
@@ -365,7 +397,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
 - Login Items lists two entries for the app: the login item and the scheduler agent.
 - `brew uninstall` without `--zap` leaves both background items in Login Items until macOS drops them; the README says so.
 - `--items` lets a script remove named `review` items without a TTY (item 7).
-- Five new CLI contracts must stay stable, each with a `schema_version`: the `--items` input, the clean report, the progress events, the settings file and the notify decision.
+- Five new CLI contracts must stay stable, each with a `schema_version`: the `--items` input, the clean report, the progress events, the settings file and the notify decision. Amended 2026-10-28: the list is now the `--items` input, the clean report, the progress events, the settings file, the notify decision, the rules listing (item 6.8), the disk report and the agents report (item 6.10).
 - A Swift toolchain (Xcode) joins Rust in the build.
 
 **What changes in code / process**:

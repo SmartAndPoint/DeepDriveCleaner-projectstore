@@ -78,9 +78,10 @@ This note does not ask which harness data may be cleaned, or how. That belongs t
   - **The Claude desktop app.** It keeps its own state in `~/Library/Application Support/Claude`. Only `claude-code/` in that folder is Claude Code: the binaries the desktop app starts coding sessions from. The rest is the chat app's state.
 - **Session records.** Each `~/.claude/sessions/<pid>.json` holds these keys:
   - `cwd`, `entrypoint` (seen: `cli`, `claude-desktop`, `sdk-ts`), `kind`, `messagingSocketPath`, `name`;
-  - `pid`, `procStart`, `sessionId`, `startedAt`, `status` (seen: `idle`, `waiting`, `busy`; absent on the `sdk-ts` session), `updatedAt`, `version`.
+  - `pid`, `procStart`, `sessionId`, `startedAt`, `status` (seen: `idle`, `waiting`, `busy`; absent on the `sdk-ts` session), `updatedAt`, `version`;
+  - and, on some records, `pidDomain` (seen: `darwin`), `hostSessionId`, `bridgeSessionId`, `peerProtocol`, `peerFeatures`, `waitingFor`, `statusUpdatedAt`, `nameSince`, `nameSource`.
 
-  The file's name is its `pid`. Beside each record is a hidden per-session `.key` file. It is not session metadata, and a reader should neither read it nor report it, nor the `messagingSocketPath`.
+  The file's name is its `pid`. Beside each record is a per-session key file, named `<pid>.<hex>.key`. It is not session metadata, and a reader should neither read it nor report it, nor the `messagingSocketPath`.
 - **`procStart`** is a 24-character ctime-style string (`%a %b %e %H:%M:%S %Y`). It is the process start time in UTC: 13 of 13 equal `ps -o lstart=` with `TZ=UTC`, and 0 of 13 in local time.
 - **`startedAt`** is never earlier than the process start (13 of 13). So the zone-free test is this: the process with that pid has the current user's uid and a start time no later than `startedAt`. One `proc_pidinfo(PROC_PIDTBSDINFO)` call gives the uid and the start time, and `sys::procs::bsd_info` already makes that call. `startedAt` minus the process start was under 5 s for 11 records and under 60 s for 2. The records carry no resume marker, so whether any of the 13 was resumed is not known, nor whether `--resume` keeps the old `startedAt`; and `procStart` is the second proof for that case.
 - **Liveness, observed.** 13 of 13 records were live: 9 `idle`, 2 `waiting`, 1 `busy`, and 1 without a status.
