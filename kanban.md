@@ -2,15 +2,13 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-25T10:16:10.118Z
+generated_at: 2026-10-28T03:45:02.566Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
-- [ ] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2
-- [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
 - [ ] [[epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan|DDC-002: Automatic cleaning of download caches after a scheduled scan]] #p3
 
@@ -23,10 +21,12 @@ generated_at: 2026-10-25T10:16:10.118Z
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
 - [ ] [[epics/DDC-002/stories/story-app-skeleton-and-build-pipeline|DDC-002: App skeleton and build pipeline]] #p1
+- [ ] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-cli-progress-events|DDC-002: CLI: progress events]] #p2
 - [ ] [[epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app|DDC-002: Distribution: the 0.2.0 cask with the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-menu-bar-popover|DDC-002: Menu bar popover]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-and-clean-window|DDC-002: Review and clean window]] #p1
+- [ ] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2
 - [ ] [[epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open|DDC-002: Release 0.2.1: the Review window in the Dock, and skip what a running process holds open]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups|DDC-002: Review window: sorted sidebar, Select all and folder groups]] #p2
 - [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2

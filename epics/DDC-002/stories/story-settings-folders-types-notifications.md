@@ -10,7 +10,7 @@ created: 2026-10-18
 updated: 2026-10-28
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, settings]
-code_refs: []
+code_refs: ["README.md", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/AutomationSettingsView.swift", "app/DeepDriveCleaner/FoldersSettingsView.swift", "app/DeepDriveCleaner/GeneralSettingsView.swift", "app/DeepDriveCleaner/PermissionsSettingsView.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/ScheduleSettingsView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/TypesSettingsView.swift", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/FolderList.swift", "app/Packages/DDCKit/Sources/DDCKit/NotReadable.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/Schedule.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsFile.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsModel.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsStore.swift", "app/Packages/DDCKit/Sources/DDCKit/SharedSettings.swift", "app/Packages/DDCKit/Sources/DDCKit/TypesRows.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RealCLISettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/rules_cli.rs", "crates/ddc-cli/tests/settings_cli.rs", "crates/ddc-core/src/model.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/settings.rs", "crates/ddc-core/tests/report.rs", "crates/ddc-core/tests/settings.rs", "docs/scan.schema.json", "docs/settings.schema.json"]
 specs: []
 started_at: "2026-10-28T02:56:30.432Z"
 closed_at: null
@@ -101,21 +101,21 @@ It has its own story: "Automatic cleaning of download caches after a scheduled s
 
 Re-cut at the plan gate (2026-10-28) for artboard 10.
 
-- [ ] CLI "Skip entirely":
+- [x] CLI "Skip entirely":
   - an additive `skips` list in `settings.json`;
   - `--skip PATH` on `scan` and `clean`, which only adds to the list;
   - `not_scanned` in the report and one line in the terminal;
   - the README and both schemas.
 
   The ADR amendments are written first.
-- [ ] Core: re-cut `GROUPS` to the Types rows of artboard 10 plus "Maven and test browsers" (D2): 14 switchable rows and two fixed, 16 groups.
-- [ ] DDCKit:
+- [x] Core: re-cut `GROUPS` to the Types rows of artboard 10 plus "Maven and test browsers" (D2): 14 switchable rows and two fixed, 16 groups.
+- [x] DDCKit:
   - `SettingsFile` and `SettingsStore`, a read-modify-write that keeps every unedited key;
   - `FolderList`, `TypesRows` and `Schedule`;
   - the new `AppPreferences` keys;
   - decoding of `inaccessible` and `not_scanned`;
   - the "Not readable" list.
-- [ ] App:
+- [x] App:
   - an `NSTabViewController` window (`.toolbar`) with the six panes General, Folders, Schedule, Automation, Types and Permissions;
   - the seams that "Background scan and notifications in the app" fills: next scan, scheduler control, the scheduled-scan row, the migration row;
   - the "not scanned" line in Review.
@@ -243,7 +243,7 @@ Release 0.3.0 is not tagged before that story lands.
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Core test (`tests/settings.rs`):
+- [x] Core test (`tests/settings.rs`) — evidence: `crates/ddc-core/tests/settings.rs` `skips_add_up_protect_and_must_be_folders`, `a_malformed_file_is_an_error_naming_it`, `committed_settings_schema_is_current` (commit 6a16187):
   - `skips` must be absolute;
   - a missing skip is skipped with a note;
   - `--skip` adds to the file's skips;
@@ -252,66 +252,66 @@ Release 0.3.0 is not tagged before that story lands.
   - unknown keys are still refused;
   - the settings `schema_version` stays 1;
   - the committed settings schema is current.
-- [ ] Core test (`tests/report.rs`):
+- [x] Core test (`tests/report.rs`) — evidence: `crates/ddc-core/tests/report.rs` `a_skipped_folder_is_never_opened_and_is_listed_as_not_scanned`, `committed_json_schema_is_current`:
   - a skipped folder is never opened: a mode-000 directory at or under it gives no `inaccessible` entry, and nothing inside it becomes a finding;
   - `not_scanned` lists the skipped folder in canonical form, also when it was given through a symlink;
   - a skip inside a claimed finding makes that finding `user.kept` and unselected, and is absent from `not_scanned`;
   - a report without `not_scanned` still decodes;
   - the scan `schema_version` stays 1;
   - the committed scan schema is current.
-- [ ] CLI test:
+- [x] CLI test — evidence: `crates/ddc-cli/tests/settings_cli.rs` `a_skip_is_not_scanned_in_every_scan` (also the dropped-exclude case), `crates/ddc-cli/tests/clean_items_cli.rs` `an_item_at_under_or_above_a_skip_is_kept_in_the_dry_run_and_the_clean`:
   - with `skips` in `settings.json`, `scan --json` lists the folder in `not_scanned` and the terminal prints the "Not scanned" line;
   - `clean --items --dry-run` of an item at, under or above a skip predicts `kept`;
   - the real `clean --items` of the same items skips them as `kept`, not `changed-since-scan`, and removes nothing;
   - an `--exclude` flag that replaces a settings exclude covered by a skip does not name that exclude as dropped;
   - `scan --background --notify json` applies the skips together with the prompting areas.
-- [ ] CLI test: `rules --json` gives the 16 groups of D2 in order, with these members:
+- [x] CLI test: `rules --json` gives the 16 groups — evidence: `crates/ddc-cli/tests/rules_cli.rs` `rules_json_groups_follow_the_settings_types`, `rules_json_lists_every_rule_with_its_group`; of D2 in order, with these members:
   - "Package downloads" is exactly npm, pnpm, yarn, bun, pip, Poetry, Homebrew and CocoaPods;
   - "Toolchain caches" is exactly Cargo, uv, Go modules, Go build cache and Gradle, all `safe`;
   - "Maven and test browsers" is exactly the Maven repository and the three test-browser rules;
   - every rule still has a group.
-- [ ] DDCKit test: a Types row's chips are the distinct classes of its switchable rules, in class order. "Toolchain caches" reads Safe, and "node_modules" reads Rebuildable and Review.
-- [ ] DDCKit test:
+- [x] DDCKit test: a Types row's chips — evidence: `SettingsTests.swift` `typesChips`; are the distinct classes of its switchable rules, in class order. "Toolchain caches" reads Safe, and "node_modules" reads Rebuildable and Review.
+- [x] DDCKit test — evidence: `SettingsTests.swift` `keepsUneditedKeys`, `omitsEmpty`, `neverOverwritesUnreadable`:
   - Settings writes `settings.json` atomically and keeps every key it did not edit, the `scheduler` record included;
   - it omits empty lists;
   - a malformed or newer file is never overwritten, and the pane says why;
   - the written file passes `SharedSettings.read`.
-- [ ] DDCKit test:
+- [x] DDCKit test — evidence: `SettingsTests.swift` `typesSwitch`, `typesApplyAtOnce`:
   - switching a group off writes exactly its switchable ids to `disabled_rules`, and switching it back on removes them;
   - after the store's change hook, the popover summary marks those findings ignored with no rescan;
   - the same holds for "Hide items smaller than".
-- [ ] DDCKit test:
+- [x] DDCKit test — evidence: `SettingsTests.swift` `addRoot`, `refusals`, `lastRoot`, `exclusionMode`:
   - adding `/Volumes/Work` to the default writes `[home, /Volumes/Work]`;
   - each of these is refused with a message: a folder inside a root, a root around an existing one, the same folder given twice or through a symlink, and a skip or exclude at or above a root;
   - the last root cannot be removed;
   - changing an exclude row's mode moves its path between `excludes` and `skips`.
-- [ ] Test with a fake CLI: after roots, excludes and skips are edited, Scan Now runs exactly `scan --json --progress json`, with no paths, `--exclude` or `--skip`.
-- [ ] Test with the real CLI (temp HOME and data dir; skipped without `target/debug`): a skip written by the Settings model appears in `not_scanned`, and a `node_modules` inside it is not found.
-- [ ] DDCKit test (`TempDefaults`):
+- [x] Test with a fake CLI (evidence: `SettingsTests.swift` `scanNowTakesNoFlags`): after roots, excludes and skips are edited, Scan Now runs exactly `scan --json --progress json`, with no paths, `--exclude` or `--skip`.
+- [x] Test with the real CLI (evidence: `RealCLISettingsTests.swift` `skipIsNotScanned`, ran against `target/debug`) (temp HOME and data dir; skipped without `target/debug`): a skip written by the Settings model appears in `not_scanned`, and a `node_modules` inside it is not found.
+- [x] DDCKit test (`TempDefaults`) — evidence: `SettingsTests.swift` `preferences`:
   - these app preferences persist in `UserDefaults` and never appear in `settings.json`: the size next to the icon, the badge, working hours, the after-scan choice, the schedule and delete-permanently;
   - the icon switches change the icon state at once;
   - the Pause switch writes `ScansPaused`, the same key as the popover's.
-- [ ] Unit test (Schedule):
+- [x] Unit test (Schedule) — evidence: `SettingsTests.swift` `scheduleDefaults`, `nextScan`, `schedulerSeam`:
   - only whole hours can be chosen;
   - "Scan automatically" defaults to on, daily at 10:00 (D1);
   - the Next scan line is the seam the popover footer uses;
   - with Scan automatically off it reads "Off…";
   - while paused it reads "Paused…".
-- [ ] Unit test (Automation):
+- [x] Unit test (Automation) — evidence: `SettingsTests.swift` `automation`:
   - the GiB threshold and the low-disk switch write `notify_threshold` and `notify_low_disk`;
   - with scheduled scans off, the pane says so and is disabled;
   - the automatic choice cannot be selected, and `auto` is never stored.
-- [ ] Unit test (Full Disk Access):
+- [x] Unit test (Full Disk Access) — evidence: `SettingsTests.swift` `fullDiskAccess`, `notReadableAreas`, `notReadableOwnScanOnly`; `ContractTests.swift` `promptingAreas`:
   - the Folders banner and the Permissions row follow the popover's probe on a temp path;
   - "Not readable" is the report's `inaccessible` collapsed to one row per prompting area;
   - the list changes only on the app's own Scan Now result, and loading a report from disk leaves it unchanged;
   - a drift test checks the Swift list against `PROMPTING_AREAS`.
-- [ ] DDCKit test: a report with `not_scanned` gives the Review window's "Not scanned" line, and a report without it gives none.
-- [ ] Contract tests:
+- [x] DDCKit test (evidence: `SettingsTests.swift` `notScannedLine`): a report with `not_scanned` gives the Review window's "Not scanned" line, and a report without it gives none.
+- [x] Contract tests — evidence: `ContractTests.swift` `settingsKeys`, `strictSettings` (skips, null lists), `typesHelp`, `cleanHasOneOwner`, `titleCase`:
   - `settingsKeys` includes `skips`;
   - `cleanHasOneOwner` and `titleCase` stay green;
   - every group label has help text.
-- [ ] `make check` and `make app-test` pass.
+- [x] `make check` and `make app-test` pass. — evidence: both exit 0 on 2026-10-28 before commit 6a16187; 166 Swift tests in 21 suites; unsigned xcodebuild with no warnings; `projectstore:reviewer` found every automated AC met.
 - [ ] Manual check:
   - Settings opens from the gear, the right-click menu and ⌘,;
   - the tabs are toolbar tabs, and the window title is the pane's name;
