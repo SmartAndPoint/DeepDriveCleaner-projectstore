@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T15:02:42.268Z
+generated_at: 2026-10-28T15:25:04.282Z
 
 ---
 
@@ -47,7 +47,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
-| epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | planned |
+| epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |

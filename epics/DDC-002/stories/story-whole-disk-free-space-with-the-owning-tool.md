@@ -3,7 +3,7 @@ type: story
 id: "story-whole-disk-free-space-with-the-owning-tool"
 epic: "DDC-002"
 title: "Whole disk: free space with the owning tool"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [cli, app, safety, whole-disk]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-28T15:24:31.635Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-28T15:24:31.635Z"
 ---
 
 # Whole disk: free space with the owning tool
@@ -82,6 +82,45 @@ Rough until the plan gate.
   - a refused or failed action keeps its message and the Terminal command.
 
 ## Implementation Plan
+
+Planned 2026-10-28 with the planner, against the ADR amendments of 2026-10-28 (safety ADR Amendments entry; menu bar ADR §1, §6 item 11, §7). Shape follows "Coding agents in the Whole disk view": a new top-level core module, a `disk` subcommand, a DDCKit report and model, a view part, fake-CLI and contract tests.
+
+**Decided at this gate, where the ADRs are silent** (conservative, each reported):
+- A runtime whose `path` does not lie in a `<hash>.asset` folder under the `parentMountPath` is refused `no-asset-folder`: its freed bytes could not be measured.
+- "An action named twice" is the same `(action, identifier)` pair twice, or `brew-cleanup` twice. Two different runtimes in one list stay legal.
+- A measured folder at or under a `settings.json` skip is never opened: its bytes are reported as not measured and the `cache.homebrew` re-measure is skipped. The action itself is not refused.
+- `disk free` refuses as root, as `clean` does.
+- A failing `simctl list devices -j` refuses (`devices-unknown`); it never defaults to no devices.
+- simctl's and brew's dry-run text is kept as raw lines; brew's "would free approximately" is parsed leniently into an optional estimate. The runtime's estimate is its measured asset folder.
+- The view's "Scan Whole Disk" button is what the ADR calls Measure.
+
+**Core** (`crates/ddc-core`)
+1. `exec/journal.rs`: `JOURNAL_SCHEMA_VERSION = 2`, `kind` on every line (`item` | `area-action`), `AreaActionEntry` and an `AreaJournal` trait on `FileJournal` and a memory journal. `model::SCHEMA_VERSION` stays 1, pinned by a test.
+2. `disk/simulators.rs`: extract `locate()` (xcode-select → `xcodebuild -checkFirstLaunchStatus` → CoreSimulator's simctl, with `DEVELOPER_DIR`) and make the runtime and device parsers `pub(crate)`. `disk/mod.rs`: `Sources.brew` = `<data root>/opt/homebrew/bin/brew`. `disk/model.rs`: `Area.stale`, optional, skipped when false; `DISK_SCHEMA_VERSION` stays 1. No action code under `disk/`: `structure.rs` forbids it there.
+3. New `free/`: `model.rs` (`FREE_SCHEMA_VERSION = 1`, `ActionList` with `deny_unknown_fields` and its parse errors, `FreeReport`, `ActionResult` tagged kebab-case, `Refusal` strict enum, `Preview`); `probe.rs` (the location guard, folders by `(dev, ino)`, the AssetsV2 prefix with its trailing slash, the cache compared as a path when missing); `simctl.rs` (delete, then poll the list under one shared deadline, cancel between polls); `brew.rs` (`BREW_ENV`, `cleanup` / `cleanup -n`); `measure.rs` (allocated bytes through `scan::walk`); `mod.rs` (`run`, `dry_run`, `available`, `edit_last_disk`).
+4. `store.rs`: `read_last_disk` with the disk version gate. `report/after_clean.rs`: `edit_tool_cleaned` for a re-measured `cache.homebrew`, without fabricating a clean report. `exec/native.rs`: share `tail()`.
+
+**CLI** (`crates/ddc-cli`)
+5. `cli.rs`: `disk free [--actions FILE|-] [--dry-run] [--json]` (with hidden `--system-root` and `--data-dir`); no `--yes`. `cmd/mod.rs`: dispatch, and `read_list` shared with `clean_items.rs`.
+6. `cmd/disk_free.rs`: parse and refuse before anything; without `--actions`, no TTY → 2, at a TTY dry-run under the shared lock and ask each `[y/N]`; signals; exclusive lock (dry run: shared); journal; run; re-measure `cache.homebrew` when `last-scan.json` has the current schema and the home's roots; edit `last-disk.json`; print; re-raise a signal. Exit codes as `clean --items`. `render.rs`, `prompt.rs`, README section.
+7. `docs/disk-free.schema.json` (with `ActionList`), `docs/disk.schema.json` regenerated for `stale`.
+
+**App**
+8. DDCKit: `CLIRunner.Kind` `.diskFree` and `.diskFreeDryRun`, queue kinds, never coalesced. New `AreaActionList`, `FreeReport` (strict), `AreaActions` (which rows offer an action and the sheet's wording), `DiskFreeRun` (`extension DiskModel`, the only code that runs `disk free`: `previewAction`, `freeConfirmedActions`, `stopFree`; the list written to a 0600 temp file). `DiskModel`: free state; Scan Whole Disk disabled while a free run is queued or running, action buttons while a `disk` run goes; after a run, reload, and after `brew-cleanup` tell the popover to reload `last-scan.json`. `DiskReport.Area.stale`; `DiskSummary`: runtime sub-rows, row actions, "before cleanup" for a stale size.
+9. App target: `AreaActionSheet.swift` (preview, exact command, what cannot be undone, confirm); `DiskView`: "Delete Runtime…" and "Clean Up Homebrew…", progress, the result in the row, a failure with "Copy Command"; the read-only wording goes.
+
+**Tests, by AC**
+- Runtime: the exact CoreSimulator simctl call without `--keep-asset`, never `xcrun` or the shim; one refusal table (unknown id, `all`, a build, `--unusable`, booted, `deletable: false`, `Deleting`, no `runtimeIdentifier`, outside AssetsV2, `AssetsV2Evil`, `..`, devices unknown, first launch pending), with no delete run.
+- No `--actions` and no TTY → 2, nothing run; `--yes` → 2; every `ActionList` error refuses the whole list.
+- Brew: the area's brew, `cleanup` alone, the three variables, `cleanup -n` with them; refusals (Intel prefix, cache elsewhere, cellar outside); a missing cache folder compared as a path; `cache.homebrew` re-measured and the area stale.
+- Journal: one `area-action` line at version 2 per run, none for a dry run; clean lines carry `kind: "item"`; lock held → 75.
+- Freed bytes: freed, removed-not-freed, still-deleting after the deadline, and a stop during the wait journaled as still-deleting.
+- Swift: a scan queued behind `disk free` waits and is done; two free requests are two runs; the button rules.
+- A permission error → failed, needing an administrator, with the exact Terminal command; other failures and a timeout without it.
+- Contract: `freeConfirmedActions` defined in `DiskFreeRun` and called only by `AreaActionSheet`; `.diskFree` only in `CLIRunner` and `DiskFreeRun`; nothing scheduled mentions it; `structure.rs` keeps `xcrun`, `--keep-asset`, `--prune` and `remove_` out of `free/`; schema and enum mirrors.
+- Schemas checked like the others; app fixtures round-trip.
+
+Fakes only: an extended `FakeCommands` (exe paths, call sequences, failures, a hook that shrinks the fixture asset folder) in core; shell-script fakes under `--system-root` and a temp HOME in the CLI tests; a `disk free` branch in `FakeCLI`. No test runs the real `simctl` or `brew`.
 
 ## Acceptance Criteria
 
