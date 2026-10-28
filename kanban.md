@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T17:56:48.314Z
+generated_at: 2026-10-28T18:52:25.074Z
 
 ---
 
@@ -10,11 +10,8 @@ generated_at: 2026-10-28T17:56:48.314Z
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
-- [ ] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1
-- [ ] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1
 - [ ] [[epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data|DDC-002: The Trash: its own row, not Your data]] #p2
 - [ ] [[epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder|DDC-002: User data: move a folder's picked files to the Trash from that folder]] #p2
-- [ ] [[epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers|DDC-002: VM images: Docker prune runs only while Docker Desktop answers]] #p1
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
@@ -57,6 +54,9 @@ generated_at: 2026-10-28T17:56:48.314Z
 - [ ] [[epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus|DDC-002: HIG pass: keyboard, colour, empty states and menus]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group|DDC-002: Review window: clean only the selection in this group]] #p2
 - [ ] [[epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view|DDC-002: Coding agents in the Whole disk view]] #p2
+- [ ] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1
+- [ ] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1
+- [ ] [[epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers|DDC-002: VM images: Docker prune runs only while Docker Desktop answers]] #p1
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2

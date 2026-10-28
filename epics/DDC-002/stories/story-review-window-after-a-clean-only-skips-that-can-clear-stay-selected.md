@@ -3,7 +3,7 @@ type: story
 id: "story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected"
 epic: "DDC-002"
 title: "Review window: after a clean, only skips that can clear stay selected"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [app, review, selection, clean-result, user-report]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-28T18:28:37.082Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-28T18:28:37.082Z"
 ---
 
 # Review window: after a clean, only skips that can clear stay selected
@@ -56,6 +56,17 @@ The recording also shows, for one frame, an **empty sheet**: a blank rounded pan
 - [ ] App: `CleanResultView` shows the new last line and the Scan Again button when `needsRescan > 0`; `ConfirmSheet` keeps the last stage's content while `model.sheet` becomes nil during the dismiss.
 
 ## Implementation Plan
+
+Planned by `projectstore:planner` on 2026-10-28, after "Review window: Clean is not offered when every item would be skipped" (which adds `AfterClean.swift`).
+
+**The investigation, done while planning.** The built CLI on a temp HOME (no tools on `PATH`, deleted items only): three `__pycache__` folders scanned; one replaced by a fresh folder (new inode); `clean --items` on it and a sibling. The sibling was deleted; the replaced one was `changed-since-scan`, and `last-scan.json` still held its old inode. A second clean skipped it again. Cause: in `ddc-cli/src/cmd/clean_items.rs::run`, the pruned walk's fresh findings (`scanned`) are dropped (`base.unwrap_or(scanned)`), and `after_clean::edit` leaves skipped items as they were. The saved report keeps the stale `(dev, ino)`, and the app reloads it instead of scanning, so every clean skips the item again until a full scan. The clean itself does not change untouched items. The full walk does not loop.
+
+1. **Core fix.** Keep `scanned` in the pruned branch and pass it to `after_clean::edit` as `fresh`. For each listed item that is not user data and was not removed: a finding at its path in `fresh` replaces the base finding (identity, parents, class, sizes), the totals move by the difference as `Edit::resize` does; no finding there and the outcome `missing`, `changed-since-scan`, `rule-mismatch`, `not-a-directory` or `symlink` → the finding is dropped. Picked entries (folder `contents`) are left alone. `tests/after_clean.rs::skipped_failed_and_not_run_items_stay_…` changes with it; a regression test in `ddc-cli/tests/clean_items_cli.rs` (rename a listed folder aside, recreate it, clean: the saved report holds the new inode and a second clean deletes it).
+2. **The selection.** `CleanRun.runClean` keeps the last clean's report and end time on `ReviewModel`, with a flag the next `reload()` consumes: a row in the report stays selected only for `skipped` with `afterClean == .keep`, or `not-run`; native items (any result), `failed`, and rescan or never skips are deselected; rows outside the report keep their selection. Other reloads (Settings, Scan Again) do not consume it.
+3. **The tool note.** `ReviewModel.toolNote(for:)` from the last clean, shown in the row detail (`ReviewView`, `ReviewGroupsView`); cleared when a scan newer than the clean's end replaces the report, as `cleaned` is.
+4. **The result.** `CleanResult` gains `staysSelected` and `needsRescan`; `CleanWording` the sentences. `CleanResultView`: the count line or none; **Scan Again** when `needsRescan > 0`, which closes the sheet and runs `scanAgain()`, disabled while cleaning or rescanning.
+5. **The empty sheet.** `ReviewModel.lastSheet`, kept after `closeSheet()`; `ConfirmSheet` draws `model.sheet ?? model.lastSheet`, so the dismiss animation never shows an empty panel. The presentation binding stays on `model.sheet != nil`.
+6. **Tests.** New `AfterCleanTests` (every tag maps; a version-3 fake report with the eight kinds leaves owner-running, in-use and not-run selected; the result lines; the note cleared by a newer scan; `lastSheet` after close). `ContractTests`: Scan Again calls only `scanAgain()`. New `RealCLICleanTests`, a copy of the `RealCLIDryRunTests` wrapper with an empty `PATH`, listing deleted items only (never trashed ones, which would use the real Trash), replaying the loop.
 
 ## Acceptance Criteria
 

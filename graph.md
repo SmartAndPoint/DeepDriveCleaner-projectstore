@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T17:56:39.714Z
+generated_at: 2026-10-28T18:52:24.875Z
 
 ---
 
@@ -43,15 +43,15 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | planned |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
-| epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | Review window: after a clean, only skips that can clear stay selected | story | planned |
-| epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | Review window: Clean is not offered when every item would be skipped | story | planned |
+| epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | Review window: after a clean, only skips that can clear stay selected | story | in-progress |
+| epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | Review window: Clean is not offered when every item would be skipped | story | in-progress |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | planned |
 | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | User data: move a folder's picked files to the Trash from that folder | story | planned |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
-| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | planned |
+| epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | planned |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |

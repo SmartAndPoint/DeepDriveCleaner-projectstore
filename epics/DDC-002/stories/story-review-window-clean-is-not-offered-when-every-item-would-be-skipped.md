@@ -3,7 +3,7 @@ type: story
 id: "story-review-window-clean-is-not-offered-when-every-item-would-be-skipped"
 epic: "DDC-002"
 title: "Review window: Clean is not offered when every item would be skipped"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [app, review, confirmation, user-report]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-28T18:28:36.859Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-28T18:28:36.859Z"
 ---
 
 # Review window: Clean is not offered when every item would be skipped
@@ -59,6 +59,15 @@ Nothing changes in the CLI. The predictions are the CLI's; the app only stops of
 - [ ] App: `ConfirmSheet` disables the Clean button on `nothingToClean`, and shows the new header and warnings line. `cleanConfirmedItems()` itself returns without running when `nothingToClean` holds or the check is `.checking`; the existing contract test that pins its one caller (`ContractTests`) is extended to the guard.
 
 ## Implementation Plan
+
+Planned by `projectstore:planner` on 2026-10-28, after "VM images: Docker prune runs only while Docker Desktop answers". DDCKit first, then the sheet.
+
+1. **The shared table.** New `DDCKit/AfterClean.swift`: `enum AfterClean { keep, rescan, never }` and `SkipReason.afterClean`, one exhaustive switch over all 22 reasons, as the table of "Review window: after a clean, only skips that can clear stay selected" (keep: owner-running, in-use, in-use-unknown-cwd, tool-not-ready; never: kept, protected, project-root, scan-root, outside-scan-roots, action-not-allowed, needs-confirmation, inside-another-item, native-unavailable; rescan: the rest, incomplete included). This story adds it; the other uses it.
+2. **The sheet's summary.** `ReviewModel.Sheet` gains `skipSummary` (count, bytes of the `wouldSkip` items, owner apps once each in confirmation order, the classes present, `nothingToClean` = check `.checked` and every item `wouldSkip`) and `cleanAllowed` = confirm stage, not `.checking`, not `nothingToClean`. `Confirmation.reclaimable(excluding:)` for the header.
+3. **The guard.** `CleanRun.cleanConfirmedItems()` returns unless `cleanAllowed`. A public `stopCheck()` wraps `stopWarnings()` (it already ends `.checking`/`.waiting` as `.stopped`).
+4. **Wording.** `CleanWording`: the warnings sentence by class, keep → rescan → never: "Quit A and B, then Check Again." for owner apps, for `tool-not-ready`, "Start Docker Desktop, then Check Again." when the detail is that Docker Desktop is not running, and for a missing context "The desktop-linux context is missing; open Docker Desktop once to create it, then Check Again.", either followed by "If you no longer use Docker Desktop, its folder is yours to delete in Finder." (deferred here from "VM images: Docker prune runs only while Docker Desktop answers"); "<reason>; Check Again when it ends." for `in-use`; "These items changed since the scan. Scan Again to see them as they are now."; the never cause in `reason()` words. The header: "frees about X; Y will be skipped", "frees about X before the check".
+5. **The sheet.** `ConfirmSheet.swift`: Clean `.disabled(model.isCleaning || !sheet.cleanAllowed)`; the header; `warningsLine` uses the sentence and shows **Stop** while `.checking`.
+6. **Tests.** New `SkipSummaryTests` (pure, from `ReviewFixture`): all owner-running; 2 of 6; each warnings state; changed-since-scan only; a mix. `CleanRunTests` with `FakeCLI`: a dry run of all `owner-running` → `cleanConfirmedItems()` runs no clean; Stop during a gated dry run → `.stopped`, clean allowed. `ContractTests.cleanHasOneOwner` extended to the `cleanAllowed` guard and the button's `!sheet.cleanAllowed`.
 
 ## Acceptance Criteria
 
