@@ -8,7 +8,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, quality, testing, performance, ci]
-code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs"]
+code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "scripts/load-image.sh"]
 review_status: reviewed
 reviewed_at: 2026-10-28
 ---
@@ -68,9 +68,9 @@ Decisions the epic relies on:
 |-------|--------|-------------|
 | [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | done | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
 | [story-coverage-floor-and-property-tests-for-the-safety-invariants](./stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md) | planned | Line coverage measured and ratcheted from `main`. Property and differential tests for the safety and counting invariants. Interruption tests. Fuzz targets for the parsers |
-| [story-synthetic-load-trees-large-wide-deep-and-hostile](./stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md) | planned | A deterministic generator of 10⁴–10⁷-entry trees on a disposable disk image, with a manifest of the expected findings and plan. It refuses any target that is not on its own image |
+| [story-synthetic-load-trees-large-wide-deep-and-hostile](./stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md) | done | A deterministic generator of 10⁴–10⁷-entry trees on a disposable disk image, with a manifest of the expected findings and plan. It refuses any target that is not its own image or a marked temporary folder (S only on macOS) |
 | [story-complexity-guard-operation-counts-and-scaling-exponents](./stories/story-complexity-guard-operation-counts-and-scaling-exponents.md) | planned | Cost counters (directory entries read, claim lookups, rule matches, allocations) under a feature, asserted linear in the gate. Scaling slopes on larger trees. Regression tests that reproduce both steps of `aa64c83` |
-| [story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time](./stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md) | planned | An isolated load harness. Peak RSS per entry, `leaks --atExit`, AddressSanitizer for `sys/`, heap profiles, CPU time, idle waits. Dated results, a comparison script and a profiling runbook |
+| [story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time](./stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md) | in-progress | An isolated load harness. Peak RSS per entry, `leaks --atExit`, AddressSanitizer for `sys/`, heap profiles, CPU time, idle waits. Dated results, a comparison script and a profiling runbook |
 | [story-load-run-on-the-reference-machine-including-system-folders](./stories/story-load-run-on-the-reference-machine-including-system-folders.md) | planned | `make bench-real`: read-only release-build scans of the home, `~/Projects` and the whole-disk areas, run by the owner, recorded and compared. Advisory, not a release gate |
 
 Implementation order: the gate, then the trees, then memory and CPU (the harness and the runbook), then the complexity guard, then the reference-machine run. The coverage story can start after the gate; its interruption tests wait for the trees.

@@ -3,17 +3,17 @@ type: story
 id: "story-synthetic-load-trees-large-wide-deep-and-hostile"
 epic: "DDC-005"
 title: "Synthetic load trees: large, wide, deep and hostile"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, testing, performance, load]
-code_refs: [".config/nextest.toml", "Cargo.toml", "Makefile", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**"]
+code_refs: [".config/nextest.toml", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Cargo.toml", "Makefile", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "scripts/load-image.sh"]
 specs: []
 started_at: 2026-10-28
-closed_at: null
+closed_at: "2026-10-28T20:28:41.935Z"
 plan_updated_at: 2026-10-28
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: 2026-10-28
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -32,7 +32,7 @@ plan_updated_at: 2026-10-28
 
 Load tests need large trees that are the same on every run and every machine. Real homes differ and change. The `aa64c83` quadratic steps showed up only on large system trees with many sibling folders. A tree of a few hundred files hides any O(n²) step.
 
-This story adds a generator. It builds a tree from a profile, a size and a seed, always with the same shape. It writes empty files and files of a few 4 KiB blocks, so a tree costs inodes and little data rather than gigabytes. M and larger trees build on a disposable disk image, so millions of entries never touch the user's volume and cleanup is one detach. S trees (10⁴ entries) go to a marked temporary folder, so the fast gate needs no image.
+This story adds a generator. It builds a tree from a profile, a size and a seed, always with the same shape. It writes empty files and files of a few 4 KiB blocks, so a tree costs inodes and little data rather than gigabytes. M and larger trees build on a disposable disk image, so millions of entries never touch the user's volume as entries and cleanup is one detach. S trees (10⁴ entries) go to a marked temporary folder, so the fast gate needs no image.
 
 Profiles (each is a shape real disks have):
 
@@ -67,20 +67,21 @@ Size tiers: S = 10⁴ entries (fast gate), M = 10⁵ (CI), L = 10⁶ (nightly an
 - [x] Sizes are the same on every filesystem. Payload files are exactly 4096·k bytes long, with non-zero content. Marker files whose content a matcher reads (`CACHEDIR.TAG`, `CMakeCache.txt`, `pyvenv.cfg`, toolchain pins) are padded to exactly 4096 bytes with trailing newlines (every parser of these files skips blank lines or trims). Everything else is empty. Symlink targets stay under 60 bytes, which ext4 stores without a block (DDC-007). The tree root, after `canonicalize()`, is padded to a fixed length of 160 bytes, so path lengths, the `PATH_MAX` boundary and the order of findings are the same on every machine.
 - [x] Home. Most catalog rules are anchored at the home folder (`Catalog::builtin(home)`). Each profile's description names the home its manifest assumes: none (content-matched project rules only) or a fake home inside the tree (`<tree>/Users/load` for `users` and `mixed`, `<tree>/System/Volumes/Data/Users/load` for `system-root`). `verify` passes it to the scan through `Env::with_paths`; a profile without a home gets an empty folder beside the tree. Home-anchored findings are expected only when the profile provides a home. It is never the real home.
 - [x] Modification times are backdated by the description (older than the default `min_age` of 14 days where a finding is expected, newer where it is not), so the expected plan is exact.
-- [ ] Safety guard, by filesystem identity, not by path prefix. Two target kinds are allowed:
-  - M and above on macOS: a volume the generator mounted itself. Before the first write it calls `statfs` on the target and checks that `f_mntfromname` equals the device `hdiutil attach -plist` returned.
+- [x] Safety guard, by filesystem identity, not by path prefix. Two target kinds are allowed:
+  - M and above on macOS: a volume the generator mounted itself. Before the first write it calls `statfs` on the target and checks that `f_mntfromname` equals the device `hdiutil attach -plist` returned, and that the volume's root is named `ddc-load-<nonce>`, is the user's, and holds a `.ddc-loadgen` marker with that nonce (written by `load-image.sh` right after the attach).
   - S trees (all platforms) and everything on Linux and Windows: a fresh directory under the system temporary folder (`$TMPDIR`), holding a marker file the generator created. The marker check is by identity, not by name alone: a direct child of `$TMPDIR` named `ddc-load-<nonce>`, owned by the user, whose `.ddc-loadgen` holds that nonce (so a copied marker or a nested `ddc-load-*` folder is refused).
   
   In both cases it refuses any target on the same filesystem as the real home or `/` (compared by `st_dev`, with the real home from `getpwuid(getuid())`, not from `$HOME`), unless it is the marked temporary folder. So the fast gate needs no disk image. When the password database names no home, the guard fails closed.
 
-  Step 1 implements the decision and the marked temporary folder. The tier-to-target mapping is not enforced: a marked temporary folder accepts any `--entries`. Step 3 decides whether to refuse more than S there once the image exists. The image kind trusts `--device` today; step 3 adds a check that the device is an image this run attached (a marker at the image root written by `load-image.sh`, or `hdiutil info`).
-- [ ] macOS `make load-image`:
-  - creates a sparse APFS disk image (`hdiutil create -type SPARSE`);
-  - detaches a stale image from an interrupted run first;
-  - attaches it with `hdiutil attach -nobrowse -plist` at `/Volumes/ddc-load-<pid>` (no `sudo` needed);
-  - writes `.metadata_never_index` and `.fseventsd/no_log` at the root, so Spotlight and fseventsd do not index millions of entries;
-  - detaches and deletes it afterwards.
-- [ ] Generation time per tier is recorded. L must build in ≤ 5 min on the reference machine. Otherwise the tier is cached as an image.
+  On macOS a marked temporary folder takes S trees only (`TEMP_MAX` = 10⁴ entries); a larger one is refused with a pointer to `make load-image`. On Linux and Windows, with no image, the folder takes any size. The marker proves the volume was marked by a `load-image.sh` run, not that it is a disk image: an external disk prepared the same way by hand would pass. Against accidents that is enough; a check that `--device` is listed by `hdiutil info` would close it.
+- [x] macOS `make load-image LOAD_PROFILE=<profile|all> LOAD_SIZE=S|M|L|XL` (`scripts/load-image.sh`):
+  - creates an APFS sparse bundle (`hdiutil create -type SPARSEBUNDLE`) in the user's temporary folder, named `ddc-image-<pid>-<nonce>`. At S it built `projects` in 4.5 s, against 54 s for a single-file sparse image and 84 s for a UDIF image;
+  - first discards an image left by an interrupted run, found by the process in its name being gone;
+  - attaches it with `hdiutil attach -nobrowse -owners on -plist` at `/Volumes/ddc-load-<nonce>` (no `sudo` needed); `create` and `attach` are retried, as hosted runners now and then answer "Resource busy";
+  - writes `.metadata_never_index`, `.fseventsd/no_log` and the guard's marker at the root, so Spotlight and fseventsd leave millions of entries alone (`mdutil -s` reports indexing disabled);
+  - builds every asked profile in its own folder with `ddc-loadgen build --verify --brief`, prints build and scan times per profile, and fails if any profile differs from its manifest;
+  - detaches the image by its whole disk and deletes it afterwards; when the detach fails it keeps the image for the next run's sweep.
+- [x] Generation time per tier is recorded (Implementation Plan, step 3). L must build in ≤ 5 min on the reference machine; `mixed` at L built in 3 min 52 s, so no tier is cached as an image.
 - [x] A test in the fast gate: S-size trees of every profile generate identically for the same seed and the same `fs_caps` (the manifest hash is stable). Only `names`, and `mixed` through its `names` part, depend on `fs_caps`.
 - [x] Golden check. `make golden-record` and `make golden-check`: for every S profile except `hostile`, run `scan --json` and `disk --json` (on `system-root`) with a fixed `HOME` and `--data-dir`, and `rules --json` once (the catalog does not depend on the tree). Normalise what differs between runs and machines, store the outputs under `bench/golden/`, and diff:
   - times: `generated_at`, `duration_ms`, `as_of`, idle days, and a `last_activity` other than the fixed old date (it becomes `<build>`; the old date stays verbatim);
@@ -137,18 +138,76 @@ Planned with `projectstore:planner` on 2026-10-28. Three commits; the first is u
    - A `load` job in `gate.yml` (M) and an L `mixed` step in `nightly.yml`. L and XL times are recorded here.
    - Left from step 1's review:
      - the image check above, and the tier-to-target decision.
-   - Left from step 2: a test that a dropped `hostile` or `deep-path-max` tree is gone; M builds of `deep-path-max`, `system-root`, `hostile` and `mixed` (AC 1 has S for all eleven, M for the first seven).
+   - Left from step 2: a test that a dropped `hostile` or `deep-path-max` tree is gone; M builds of `deep-path-max`, `system-root`, `hostile` and `mixed` (AC 1 then had M for the first seven only; it now covers all eleven).
+
+   Done in `6983243`, reviewed with `projectstore:reviewer`. Measured on the reference machine (release build, seed 1, on the image) while other sessions kept it busy (load average 25–64), so the times are upper bounds. Every profile at M verified with no difference:
+
+   | Profile | Entries | Build (s) | Scan (s) |
+   |---|---|---|---|
+   | `projects` | 100 027 | 11.0 | 0.9 |
+   | `wide` | 100 001 | 14.6 | 0.1 |
+   | `wide-root` | 100 000 | 17.2 | 18.2 |
+   | `deep` | 100 242 | 19.0 | 4.6 |
+   | `deep-path-max` | 100 556 | 22.7 | 10.4 |
+   | `users` | 100 006 | 12.0 | 2.0 |
+   | `links` | 100 004 | 61.6 | 0.1 |
+   | `names` | 100 101 | 17.3 | 2.9 |
+   | `system-root` | 100 013 | 14.1 | 1.4 |
+   | `hostile` | 100 004 | 14.2 | 1.0 |
+   | `mixed` | 100 041 | 19.7 | 1.9 |
+
+   On GitHub's `macos-26` runner (Gate run 40762150384) the same eleven verified with no difference; builds took 13–78 s per profile (`links` the slowest, `wide-root`'s scan 19.6 s), and the `load` job 8 minutes in all.
+
+   All eleven at M take 1.8 GiB on the volume and 1.9 GB of image. `links` took 346 s in the run of all eleven, while another process saturated the Data volume's I/O, and 61.6 s alone; hard links are its cost. `wide-root`'s 18 s scan is the `dir_has_any` re-read of the root (Technical Notes).
+
+   `mixed` at L: 1 000 123 entries (289 164 folders, 710 834 files, 1.5 GB of file data), built in 231.9 s, scanned and checked in 51.6 s with no difference, 5 min 4 s with the image's create, attach, detach and delete. The image took 1.9 GB and was gone afterwards. XL is not run: it is manual, at about ten times L.
+
+   Changes from the plan:
+   - A sparse bundle, not a single-file sparse image, from the measurement above.
+   - The image check is the marker at the volume root, not `hdiutil info` (Safety guard).
+   - The Gate workflow's new `load` job builds every profile at M; `make dist` now waits for it too, since `scripts/ci-green.sh` reads the whole run. The nightly workflow builds `mixed` at L in a job of its own, so a gate or coverage failure does not skip it. Each uploads its per-profile JSON (`target/load`).
+   - The Makefile variables are `LOAD_PROFILE`, `LOAD_SIZE` and `LOAD_SEED`, so a generic `PROFILE` in the environment does not leak in.
+   - Every profile test and the mutator test now assert that the dropped tree is gone (left from step 2).
 
 ## Acceptance Criteria
 
-- [ ] `ddc-loadgen` builds every profile at S and M; the same seed and the same `fs_caps` give the same manifest hash.
-- [x] A scan of each profile's S tree except `hostile` finds exactly the manifest's expected findings and totals, and `clean --dry-run` plans exactly its expected items (asserted in the fast gate). For `hostile`, the scan completes without a panic and its findings are a subset of the manifest's static set.
-- [x] `make golden-check` passes on an unchanged tree and fails on a seeded change to one rule (test).
-- [ ] The generator refuses a folder on the home's or the boot volume's filesystem without its marker, and a mount point whose `statfs` device does not match the attached image (tested). The two refusals are tested since step 1 (`tests/guard.rs`); left open until step 3's check that the device is an image this run attached.
-- [ ] An L `mixed` tree (10⁶ entries) is generated, scanned and removed on the reference machine; times are recorded in this story.
-- [x] Under `hostile`, a scan completes with no panic. In the deterministic reader test, vanished entries are counted as vanished and their finding is `incomplete`, not an error.
+- [x] `ddc-loadgen` builds every profile at S and M; the same seed and the same `fs_caps` give the same manifest hash — evidence: `crates/ddc-loadgen/tests/determinism.rs` (pinned S hashes), `make load-image LOAD_PROFILE=all LOAD_SIZE=M` locally and in the Gate `load` job (run 40762150384), 0 differences; the M hashes in that run's `load-m` artifact equal the local ones for all eleven profiles.
+- [x] A scan of each profile's S tree (`hostile` while static) finds exactly the manifest's expected findings and totals, and `clean --dry-run` plans exactly its expected items (asserted in the fast gate). Under the mutator, `hostile`'s scan completes without a panic and its findings are a subset of the manifest's static set — evidence: `crates/ddc-loadgen/tests/profiles.rs`, `crates/ddc-loadgen/tests/hostile.rs::a_scan_completes_while_the_tree_changes`.
+- [x] `make golden-check` passes on an unchanged tree and fails on a seeded change to one rule (test) — evidence: `crates/ddc-cli/tests/golden_cli.rs::a_change_to_one_rule_fails_the_golden_check`, `make golden-check`.
+- [x] The generator refuses a folder on the home's or the boot volume's filesystem without its marker, and a mount point whose `statfs` device does not match the attached image (tested). Tested in `tests/guard.rs`, the unmarked image and the too-large temporary tree included — evidence: `crates/ddc-loadgen/tests/guard.rs::decision_table`, `::the_real_home_and_the_boot_volume_are_refused`, `::a_mount_that_is_not_the_attached_image_is_refused`.
+- [x] An L `mixed` tree (10⁶ entries) is generated, scanned and removed on the reference machine; times are recorded in this story — evidence: `make load-image LOAD_PROFILE=mixed LOAD_SIZE=L` on 2026-10-29 local (2026-10-28 UTC), 1 000 123 entries, built in 231.9 s, scanned in 51.6 s, 0 differences, image removed (Implementation Plan, step 3); brief output in Attachments.
+- [x] Under `hostile`, a scan completes with no panic. In the deterministic reader test, vanished entries are counted as vanished and their finding is `incomplete`, not an error — evidence: `crates/ddc-loadgen/tests/hostile.rs::a_vanished_or_replaced_entry_makes_its_finding_incomplete`.
 
 ## Final Summary
+
+**What changed.** A workspace tool crate, `ddc-loadgen`, builds deterministic load trees from a profile, a size and a seed, and derives from the same description a manifest of what a scan must report. There are eleven profiles: `projects`, `wide`, `wide-root`, `deep`, `deep-path-max`, `users`, `links`, `names`, `system-root`, `hostile` and `mixed`. Three commits:
+- `919f896`: the generator, seven profiles, the guard;
+- `54336bb`: the remaining profiles, the golden check, pinned hashes;
+- `6983243`: the disk image and the CI jobs.
+
+**How each tier runs:**
+- **S trees** build in a marked temporary folder inside every gate. There, the S scan is checked exactly against its manifest, and `scan`, `disk` and `rules` JSON are compared with `bench/golden/`.
+- **M and larger trees** build on a disposable APFS sparse bundle (`make load-image`). CI builds all eleven profiles at M on every push. The nightly run builds `mixed` at L.
+
+**Why.** The quadratic steps fixed in `aa64c83` showed only on large real trees. These trees make scale, hostile file systems and behaviour changes testable on every run and every machine, and give DDC-006's refactors and DDC-007's move a behaviour-preservation check.
+
+**Tests executed:**
+- `make gate`: 431 tests;
+- Gate runs 40738831087, 40746829361 and 40762150384, all green;
+- `make load-image` locally:
+  - all profiles at S and at M;
+  - `mixed` at L;
+  - each with 0 differences, and each image removed afterwards.
+
+**Risks and follow-ups:**
+- The golden files of `names` and `mixed` exist for case-insensitive, normalization-insensitive APFS only (`scan-cini.json`). A case-sensitive APFS Data volume fails `golden_names` and `golden_mixed` in `gate-fast`, with a pointer to `make golden-record`, which would add a second variant. DDC-007 records the variants for its file systems.
+- The image check is a marker, not `hdiutil info`. See Safety guard.
+- The manifest assumes an unprivileged user. Root reads locked folders.
+- `make dist` now waits for the M `load` job (about 8 minutes on the runner).
+- `wide-root` shows the `dir_has_any` re-read of the root: an 18 s scan at M. Story "Complexity guard: operation counts and scaling exponents" asserts and removes it.
+- XL (10⁷ entries, about 20 GB of image) is manual and has not been run.
+- The nightly `load` job (`mixed` at L) has not yet run on a hosted runner: the only Nightly run (40723880175) predates it. Its first scheduled run is 2026-10-29 03:00 UTC; until it is green, L on the runner is untested (M built 2–3 times slower there than locally).
+- The load test group (S trees of eleven profiles and the golden check) runs in `gate-fast` before every commit, about 50 s of wall time on 4 threads.
 
 ## Technical Notes
 
@@ -156,7 +215,7 @@ Planned with `projectstore:planner` on 2026-10-28. Three commits; the first is u
 - The `wide-root` profile also exercises a step `aa64c83` left in place: `dir_has_any` for the `requirements*.txt` glob reads the project root once per venv that has no lock file beside it. Story "Complexity guard: operation counts and scaling exponents" asserts it.
 
 - `hdiutil create`, `attach` and `detach` need no `sudo` and raise no permission prompt. Nothing here needs elevated rights.
-- An APFS sparse image grows with the data written, and empty files cost metadata only. File data runs 0.2–2.3 KB per entry by profile (step 1's M figures), plus metadata of about 1 KiB per entry: about 1–3.5 GB for L and 10–35 GB for XL. That is why XL is manual; step 3 records the measured `du` of an L tree on the image.
+- An APFS sparse bundle grows with the data written, and empty files cost metadata only. File data runs 0.2–2.3 KB per entry by profile (step 1's M figures), plus metadata. Measured: `mixed` at L took 1.9 GB of image for 1.5 GB of file data; XL would be about 20 GB. That is why XL is manual.
 - Anything moved to the Trash on the image goes to the image's own `.Trashes`, not the user's Trash. It disappears with the detach.
 
 ## Dependencies
@@ -165,7 +224,7 @@ Planned with `projectstore:planner` on 2026-10-28. Three commits; the first is u
 
 ## Attachments
 
--
+- `L-mixed.json`, the brief output of `make load-image LOAD_PROFILE=mixed LOAD_SIZE=L` (2026-10-29 local): entries 1 000 123 (289 164 folders, 710 834 files, 59 errors, 1 502 846 976 bytes scanned), hash `d4c71c4a605ae30e`, `build_ms` 231867, `verify_ms` 51607, `difference_count` 0, on `/Volumes/ddc-load-6b31b16f` (gone afterwards).
 
 ---
 
