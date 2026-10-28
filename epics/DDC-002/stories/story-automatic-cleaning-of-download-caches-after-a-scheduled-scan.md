@@ -3,11 +3,11 @@ type: story
 id: "story-automatic-cleaning-of-download-caches-after-a-scheduled-scan"
 epic: "DDC-002"
 title: "Automatic cleaning of download caches after a scheduled scan"
-status: planned
+status: parked
 priority: p3
 assignee: "Evgenii Konev"
 created: 2026-10-21
-updated: 2026-10-25
+updated: 2026-10-28
 external_refs: {}
 tags: [app, safety, background]
 code_refs: []
@@ -22,13 +22,15 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | parked |
 | **Priority** | p3 |
 | **Assignee** | Evgenii Konev |
 
 ---
 
 ## Description
+
+> **Parked by the owner on 2026-10-28.** A scan informs; it never removes anything on its own. The risk outweighs the gain: an unattended clean acts on whatever a rule matches, so a project someone keeps inside a path that looks like a cache (a module written for three months inside a `.venv`) would be removed with nobody watching. The notification after a scheduled scan already says what can be freed. Alternative A of the safety ADR "Cleanup safety model: risk classes, plan and confirmation" stays rejected, and §8 of that ADR stands. The disabled choice "Clean download caches automatically, then notify me" is removed from Settings → Automation, so the app no longer promises it. The text below is kept as it was.
 
 The owner chose the strict variant of automatic cleaning on 2026-10-21. It is a third choice under "After a scheduled scan" in Settings → Automation (artboard 10 of the design canvas, story "Settings: folders, types, notifications"). The choices:
 - Notify me (the default);

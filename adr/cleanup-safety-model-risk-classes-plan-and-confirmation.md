@@ -145,7 +145,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 **Cons**:
 - Removal happens without the person knowing; a cache that is needed right now (for example, for an offline build) disappears.
 
-**Rejected because**: the user chose the "scan only" mode. It can come back later as an option.
+**Rejected because**: the user chose the "scan only" mode. It can come back later as an option. The owner turned the option down again on 2026-10-28: an unattended clean would remove a project kept inside a path that looks like a cache, with nobody watching (story "Automatic cleaning of download caches after a scheduled scan", DDC-002, parked).
 
 ### Alternative B: everything to the Trash by default
 

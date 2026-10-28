@@ -205,7 +205,7 @@ Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story. No
 ## Technical Notes
 
 - Why Login Items changes: the 0.1.0 agent's program is a bare binary outside any bundle, so System Settings lists it under the signer, "Evgenii Konev · 1 item", with a generic icon, and the background-activity banner says "Software from “Evgenii Konev”". An agent registered with `SMAppService.agent` from the bundle is attributed to the bundle. For any plist outside the bundle, `AssociatedBundleIdentifiers` (`man launchd.plist`) associates the job with the app; `ddc schedule install` sets it (story "CLI: shared settings, types and the notify decision").
-- The developer name in Login Items and in the background-activity banner stays "Evgenii Konev" in 0.3.0; it becomes the organization's only after "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint".
+- The developer name in Login Items and in the background-activity banner stays "Evgenii Konev" in 0.3.0; it becomes the organization's only after a switch to an organization team.
 - Login Items lists two entries for the app: the login item and the scheduler agent.
 - The notify rule and its state file stay in Rust (`notify.rs`); the app presents the decision and asks the CLI to record it.
 - From "CLI: shared settings, types and the notify decision":

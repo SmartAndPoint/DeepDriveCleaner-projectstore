@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-25T10:16:10.323Z
+generated_at: 2026-10-28T07:13:58.681Z
 
 ---
 
@@ -30,8 +30,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
 | epics/DDC-002/epic.md | Menu bar app | epic | in-progress |
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | in-progress |
-| epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | planned |
-| epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | planned |
+| epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | parked |
+| epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | in-progress |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | in-progress |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
@@ -43,8 +43,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
-| epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | planned |
-| epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | Signing team: parameterise TEAM_ID, then switch to SmartAndPoint | story | planned |
+| epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 
@@ -121,7 +120,6 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
-| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md |
@@ -138,7 +136,6 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
-| epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
 | epics/DDC-002/epic.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/epic.md | wikilink | epics/DDC-001/epic.md |
@@ -194,7 +191,4 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
-| epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | mdlink | epics/DDC-002/epic.md |
-| epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
-| epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint.md | wikilink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | mdlink | epics/DDC-002/epic.md |

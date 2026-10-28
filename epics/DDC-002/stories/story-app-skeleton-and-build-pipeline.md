@@ -192,7 +192,7 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 - GrammarHelper's `Assets.xcassets/AppIcon.appiconset` is the model for the icon set; `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` makes the build write the `.icns`.
 - LaunchServices keeps one instance per bundle id: a user's launch while a `--scheduled` instance runs only reaches that instance, which is why promotion exists.
 - The process boundary needs no entitlements; the app is not sandboxed, like GrammarHelper.
-- The team id comes from the same constant as `scripts/build-dist.sh`; making it one setting is in "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint".
+- The team id comes from the same constant as `scripts/build-dist.sh`; making it one setting is later work, tracked outside this vault.
 
 ## Dependencies
 

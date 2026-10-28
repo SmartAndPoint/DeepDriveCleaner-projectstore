@@ -117,7 +117,7 @@ The public texts about Full Disk Access (README, release notes, caveats) say the
 - GrammarHelper's cask writes `depends_on macos: :tahoe`; current Homebrew reads a bare symbol as that version or later, and `brew style` decides the accepted form.
 - `settings.json` refuses unknown keys ("CLI: shared settings, types and the notify decision"), so a separately installed CLI older than the app that wrote the file exits 1 on every command until it is upgraded. The cask ships the app with its own CLI, so the two always match. 0.1.0 does not read `settings.json` at all, so this matters from 0.3.0 on, when the app's Settings write new keys; the 0.3.0 release notes say so.
 - `CURRENT_PROJECT_VERSION` is bumped by hand (2 for 0.2.0) and no script checks it; `build-app.sh` checks only `MARKETING_VERSION`. LaunchServices does not depend on it; a forgotten bump is invisible but harmless.
-- The team switch is not part of this release: "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint" is a later, independent story.
+- The team switch is not part of this release: a switch to an organization team is later work, tracked outside this vault.
 
 ## Dependencies
 

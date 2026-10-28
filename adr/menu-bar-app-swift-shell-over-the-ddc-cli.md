@@ -275,7 +275,7 @@ This **amends** §5 of the ADR "Cleanup safety model: risk classes, plan and con
   A zip, not a DMG: the cask is the install path, and a zip of a stapled app also works when downloaded by hand.
 - **The CLI's path.** It becomes stable (`/Applications/DeepDriveCleaner.app/Contents/Helpers/deepdrivecleaner`). That matters only when launchd starts the CLI (`ddc schedule install` for people who use only the CLI): its own Full Disk Access grant then survives upgrades. Run from Terminal, the CLI is governed by Terminal's grant.
 - **Version.** The workspace version and the app's `MARKETING_VERSION` are the same. `make dist` refuses a mismatch.
-- **Team.** 0.2.0 is signed by the existing team, 8MSDJTBW2D (the owner's decision, 2026-10-18): a proper app first. The switch to a SmartAndPoint organization team is a later, independent story, "Signing team: parameterise TEAM_ID, then switch to SmartAndPoint", not a step of this release. It has two visible effects:
+- **Team.** 0.2.0 is signed by the existing team, 8MSDJTBW2D (the owner's decision, 2026-10-18): a proper app first. The switch to a SmartAndPoint organization team is later work, tracked outside this vault, not a step of this release. It has two visible effects:
   - a one-time cost: the designated requirement includes the team, so every user grants Full Disk Access once more;
   - the developer name in Login Items & Extensions and in the background-activity banner becomes the organization's.
 

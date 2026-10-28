@@ -2,15 +2,13 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-28T04:12:24.911Z
+generated_at: 2026-10-28T07:13:58.407Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
-- [ ] [[epics/DDC-002/stories/story-signing-team-parameterise-teamid-then-switch-to-smartandpoint|DDC-002: Signing team: parameterise TEAM_ID, then switch to SmartAndPoint]] #p3
-- [ ] [[epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan|DDC-002: Automatic cleaning of download caches after a scheduled scan]] #p3
 
 ## ToDo
 
