@@ -79,7 +79,7 @@ Implementation order: the gate, then the trees, then memory and CPU (the harness
 
 - [x] `make gate-fast` and `make gate` are the mandatory checks. The git hooks and CI run them, and their parts and timings are documented.
 - [ ] Coverage per crate is measured. The floor only rises. The safety invariants hold under property tests.
-- [ ] `make load` generates trees, runs the complexity, memory and CPU checks in isolation, and writes `bench/load-<date>.tsv`.
+- [ ] `make load` generates trees, runs the complexity, memory and CPU checks in isolation, and writes `bench/load-<date>-<size>.tsv`.
 - [ ] A reintroduced quadratic step, either one, fails the gate.
 - [ ] A runbook explains how to profile the core (flamegraph, heap profile, `leaks`, counters) when a number regresses.
 
