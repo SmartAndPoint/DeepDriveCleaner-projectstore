@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-29T09:02:50.987Z
+generated_at: 2026-10-29T09:29:13.482Z
 
 ---
 
@@ -10,7 +10,6 @@ generated_at: 2026-10-29T09:02:50.987Z
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
-- [ ] [[epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder|DDC-002: User data: move a folder's picked files to the Trash from that folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
@@ -58,6 +57,7 @@ generated_at: 2026-10-29T09:02:50.987Z
 - [ ] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1
 - [ ] [[epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data|DDC-002: The Trash: its own row, not Your data]] #p2
+- [ ] [[epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder|DDC-002: User data: move a folder's picked files to the Trash from that folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers|DDC-002: VM images: Docker prune runs only while Docker Desktop answers]] #p1
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
