@@ -109,6 +109,17 @@ Either way the check itself is the same small piece, and (c) is a step towards (
 
 The idea is recorded, and the owner will decide later. When it is picked up, the four questions above become an ADR: the Homebrew-or-Sparkle choice first, with an amendment to ADR "Menu bar app: Swift shell over the ddc CLI" (§8 for the cask and the network request, §5 for who relaunches the app after an update). Then stories follow in the epic "Menu bar app" for the app, and in the standalone CLI epic for `ddc update`.
 
+## The owner's answers (2026-10-29)
+
+Asked in the session that picked the idea up:
+
+1. **Defaults.** The check is on: at most once a day, shown in the popover and Settings, and Settings can switch it off. Install happens only when the person presses **Update and Relaunch**, never on its own.
+2. **Route on the Mac.** First (a1), a detached `brew upgrade` for Homebrew installs; changed the same day to **(b), Sparkle 2 for every install**, with `auto_updates true` in the cask.
+3. **The manifest.** Sparkle's `appcast.xml`, attached to each release and read at `releases/latest/download/appcast.xml`. No `latest.json`.
+4. **Where the check lives.** In the app, through Sparkle. No `ddc update` for now; a CLI self-update is the standalone CLI epic's.
+
+The decision is the ADR [[adr/updates-through-sparkle-alongside-the-homebrew-cask|Updates through Sparkle, alongside the Homebrew cask]].
+
 ## References
 
 - `scripts/publish-release.sh`, `packaging/homebrew/deepdrivecleaner.rb.tmpl`

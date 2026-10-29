@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T13:52:39.602Z
+generated_at: 2026-10-29T14:54:02.158Z
 
 ---
 
@@ -19,6 +19,7 @@ full typed neighborhood, both directions, in one call.
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | Cleanup safety model: risk classes, plan and confirmation | adr | accepted |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | Menu bar app: Swift shell over the ddc CLI | adr | proposed |
 | adr/rust-core-library-and-cli-with-json-output.md | Rust core: library + CLI with JSON output | adr | accepted |
+| adr/updates-through-sparkle-alongside-the-homebrew-cask.md | Updates through Sparkle, alongside the Homebrew cask | adr | proposed |
 | epics/DDC-001/epic.md | Disk space cleaner CLI for developers | epic | in-progress |
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
@@ -52,6 +53,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | planned |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
+| epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates | story | planned |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | in-progress |
 | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | User data: move a folder's picked files to the Trash from that folder | story | in-progress |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
@@ -66,7 +68,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | Complexity guard: operation counts and scaling exponents | story | in-progress |
-| epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | planned |
+| epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | in-progress |
 | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | Load run on the reference machine, including system folders | story | planned |
 | epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | Mandatory gate before every commit | story | done |
 | epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | Memory and CPU under load: peak memory, leaks and CPU time | story | in-progress |
@@ -104,10 +106,14 @@ full typed neighborhood, both directions, in one call.
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md |
 | adr/rust-core-library-and-cli-with-json-output.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | adr/rust-core-library-and-cli-with-json-output.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | epics/DDC-007/epic.md |
+| adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | research/update-check-and-update-in-place.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
@@ -176,6 +182,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
@@ -271,6 +278,10 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | wikilink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
+| epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | wikilink | research/update-check-and-update-in-place.md |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | mdlink | epics/DDC-002/epic.md |
@@ -384,6 +395,7 @@ full typed neighborhood, both directions, in one call.
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
 | research/update-check-and-update-in-place.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| research/update-check-and-update-in-place.md | wikilink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | research/update-check-and-update-in-place.md | wikilink | epics/DDC-007/epic.md |
 | research/update-check-and-update-in-place.md | wikilink | research/distribution-through-agents.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |

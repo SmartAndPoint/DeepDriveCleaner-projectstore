@@ -334,6 +334,9 @@ Amended 2026-10-28, story "Whole disk: free space with the owning tool" (epic DD
 - **Team.** 0.2.0 is signed by the existing team, 8MSDJTBW2D (the owner's decision, 2026-10-18): a proper app first. The switch to a SmartAndPoint organization team is later work, tracked outside this vault, not a step of this release. It has two visible effects:
   - a one-time cost: the designated requirement includes the team, so every user grants Full Disk Access once more;
   - the developer name in Login Items & Extensions and in the background-activity banner becomes the organization's.
+- **2026-10-29, proposed; takes effect when the ADR [[adr/updates-through-sparkle-alongside-the-homebrew-cask|Updates through Sparkle, alongside the Homebrew cask]] is accepted at the work-start gate of story "Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates" (epic DDC-002).** It reverses "no Sparkle, updates through `brew upgrade`" (Context item 4) for this app: the app updates itself through Sparkle 2, only when the person presses **Update and Relaunch**. What changes here:
+  - §8: Sparkle.framework is signed inside-out before the CLI and the app, without its XPC services. The zip is also the Sparkle enclosure, and `publish-release.sh` uploads an EdDSA-signed `appcast.xml` after the cask. The cask gains `auto_updates true` and two `zap` paths. A team change is never installed this way.
+  - §5: the updater starts only when the status item is shown, never in a `--tick` or `--scheduled` launch, and the install waits while a scan or clean runs.
 
 ## Rationale
 
