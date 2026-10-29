@@ -15,7 +15,9 @@ tags: [performance, memory, cpu, leaks, dhat, load, ddc-005]
 Use this runbook when the load harness reports something:
 - `make load` fails over a memory or CPU limit;
 - `bench/compare_load.py` flags a metric more than 15% worse;
-- `make leaks` fails.
+- `make leaks` fails;
+- the counter-ratio test in `crates/ddc-loadgen/tests/profiles.rs` fails;
+- `make scaling` reports a slope over 1.2.
 
 Use it also before optimizing anything in `ddc-core`.
 
@@ -24,9 +26,11 @@ It covers:
 - a CPU flamegraph;
 - a heap profile;
 - the leak check and its exclusions;
-- re-baselining the limits.
+- re-baselining the limits;
+- the operation counters, and adding one;
+- the scaling slopes.
 
-The harness and its rules are in story "Memory and CPU under load: peak memory, leaks and CPU time" (epic DDC-005 "Production-grade Rust core: mandatory gate and load testing"). Story "Complexity guard: operation counts and scaling exponents" adds a section on its operation counters later.
+The harness and its rules are in story "Memory and CPU under load: peak memory, leaks and CPU time" (epic DDC-005 "Production-grade Rust core: mandatory gate and load testing"). The counters and the slopes are in story "Complexity guard: operation counts and scaling exponents" (same epic).
 
 All commands run from the repository root.
 
@@ -73,7 +77,7 @@ Check these before profiling. Each one makes the old numbers stale without any r
 - **The machine was busy or slowed down.** `mode=enforce-memory` means CPU was recorded and not judged, and nothing was published to `bench/`. Battery, Low Power Mode or heat raise CPU seconds without raising the load (Prerequisites).
 - **The seed changed.** Only seed 1 is published and compared.
 - **The baseline is provisional.** The first `bench/load-limits.tsv` (commit `56bef23`) has CPU limits from a busy machine; its first `#` line says so. Its memory limits stand.
-- **`wide-root` CPU after story "Complexity guard: operation counts and scaling exponents".** That story removes the `dir_has_any` re-read (an 18 s scan at M), so its CPU limit is re-baselined.
+- **`wide-root` CPU after commit `d9ad787`.** It removed the `dir_has_any` re-read (an 18 s scan at M), so the old `wide-root` CPU limit is far too loose until the next re-baseline. It hides nothing: the counter-ratio test guards that step now.
 
 If one of these explains the change, re-baseline (step 7). Otherwise it is a regression: profile it (steps 3 and 4) and fix the code.
 
@@ -117,7 +121,7 @@ open target/profiling/scan.trace
 
 Remove the folder with `make loadgen-clean` afterwards. It removes every marked folder of this user, including one that a run in another worktree is using, so run it only when no other run is in progress.
 
-**Limit:** this records at S only. The disk image of `make load` is detached when its script exits, so a cost that appears only at M (a superlinear one, like `wide-root`'s `dir_has_any`) cannot be recorded with this runbook yet. Story "Complexity guard: operation counts and scaling exponents" finds such costs with its operation counters.
+**Limit:** this records at S only. The disk image of `make load` is detached when its script exits, so a cost that appears only at M (a superlinear one, like `wide-root`'s old `dir_has_any`) cannot be recorded with this runbook. Find such a cost with the counters first (step 8): a ratio failure names the counter, and the counter names the site. `make scaling` (step 9) shows whether the cost is in CPU time.
 
 ### 4. Heap profile (dhat)
 
@@ -145,7 +149,7 @@ How sites are charged:
 
 The reference top 10 (`mixed` at M) is in the story.
 
-`dhat-heap` installs a global allocator, and `op-stats` will install one too (story "Complexity guard: operation counts and scaling exponents"). A build with both fails with a `compile_error!`.
+`dhat-heap` installs a global allocator, and so does `op-stats` (step 8). A build with both fails with a `compile_error!`.
 
 ### 5. Leak check
 
@@ -203,17 +207,102 @@ Explain every limit that rises in the commit message. Then run `make load` once 
 
 That `make load` can exit 1 although every limit passed: when the stale baseline came from slower code, `compare_load.py` flags each metric more than 15% worse than the previous table. The table is already written. Read the `WORSE:` lines and explain them in the commit, as for the limits.
 
+### 8. Operation counters
+
+The counters live in `crates/ddc-core/src/stats.rs`. They count work, not calls: every directory entry read, every comparison, every step up the ancestors, every allocation. They count only in a build with the cargo feature `ddc-core/op-stats`, which `make nextest` and the gate turn on and no release build does. Without the feature every call compiles to nothing. `make release-check`, `scripts/build-dist.sh` and `scripts/build-app.sh` fail if the marker symbol `_DDC_OP_STATS` is in a shipped binary, and also if `nm` sees no `_main` (a stripped binary).
+
+The ratio test is part of `crates/ddc-loadgen/tests/profiles.rs`. Each profile is built at 5 000 and at 10 000 entries, and the work of one scan and plan, and of one `clean --items` preflight, is measured on each. A failure line reads:
+
+```
+wide-root scan and plan: dir_entries_read grew 3.8x (83452 -> 314647) for 2.00x the entries (5000 -> 10000); bound Linear: each directory is listed once per walk
+```
+
+Read it like this:
+- The line is 2.5x for a doubling (2 × (1 + ε), ε = 0.25). A quadratic step gives about 4x.
+- The smaller count is taken as at least 64, so a counter that rises from 0 or a few to under 160 passes: it is too small to say anything.
+- **A ratio near 4x** is a quadratic step: find the site that adds to that counter (`grep -rn 'Counter::<Name>' crates/ddc-core/src`) and look for a loop over findings, claims, markers or a directory listing inside another such loop.
+- **A ratio between 2.3x and 2.5x in `system-root`, `mixed` or `users`** is likely the fixed home scaffold, not the algorithm. These profiles carry 636 to 728 scaffold entries, and counters that grow with the planted items grow (2n − F)/(n − F) times. After `d9ad787` the highest was `system-root` at 2.32x. Each home-anchored rule added to the catalog adds about 7 scaffold entries. Check whether the change added rules before looking for a loop; the fix then is in the test (subtract a scaffold-only tree, story "Complexity guard: operation counts and scaling exponents", Technical Notes), not in ε.
+- **`the counters read 0`**: the test was run without `--features ddc-core/op-stats`. Use `make nextest`.
+- **`nextest runs the tests as …`**: a nextest mode other than one process per test. The counters are global, so the test refuses to run.
+- **`an item list at n: …`**: a profile gained or lost its `clean --items` list at one size. Update `listable` in the test if that is intended.
+
+The test runs only under nextest. `cargo test` (the nightly AddressSanitizer job) runs the tests as threads of one process, where the counters would mix, so it only verifies the trees.
+
+#### Adding a counter
+
+1. Add a variant to `Counter` in `crates/ddc-core/src/stats.rs`, to `Counter::ALL`, a name in `name()` and a bound with its reason in `bound()`. One counter, one kind of cost: a big linear site and a small quadratic one under one counter hide the quadratic one. At a doubling, a quadratic part fails only when it is more than a quarter of its counter.
+2. Count at the cost site, never once at the call: inside the loop body or the comparison. `stats::counted(Counter::X, || a == b)` counts one comparison; `stats::add(Counter::X, n)` adds `n`. A directory read goes through `stats::read_dir` or a `DirReader`; `crates/ddc-cli/tests/structure.rs` fails on any other `fs::read_dir` in `ddc-core`.
+3. Run `make nextest`. A new counter that fails at once has found a step that was already there: fix it, or record it in the story with why it is bounded.
+4. Prove it can fail: on a throwaway worktree, never committed, put back a loop the counter must see and run `cargo nextest run -p ddc-loadgen --features ddc-core/op-stats --test profiles --no-fail-fast`. Record the output in the story.
+5. If the counter needs an `NLogN` bound, write why next to it; every counter is `Linear` today.
+
+#### Comparison loops that are not counted
+
+Each is bounded by something other than the tree. A change that makes one of them depend on the tree adds a counter.
+
+| Site | Loops over | Bounded by |
+|---|---|---|
+| `report/contents.rs` `walked.iter().find` | the user-data walks, per user-data folder | the user-data rules (one walk per rule and root) |
+| `report/contents.rs` `protected.iter().any`, `exec/preflight.rs` `PROTECTED_IN_HOME.iter().any` | `PROTECTED_IN_HOME`, per entry or item | a constant list |
+| `report/contents.rs` the findings, per user-data folder | all findings | counted in `claim_lookups`; at most five folders |
+| `report/mod.rs` `hidden`, `rules/visitor.rs` skips and excludes, `rules/mod.rs` `user_skips`, `exec/preflight.rs` excludes | the user's settings lists, per directory or item | the settings (a few entries) |
+| `report/mod.rs` `count_findings` | the findings, per risk class | the five classes (linear in the findings) |
+| `rules/matcher.rs` child lookups | one directory's listing, per catalog name | the catalog; the listing is counted in `dir_entries_read` |
+| `rules/classify.rs` `dir_has_any` `patterns.iter().any` | the lock list, per entry of a listing | the lock list; the listing is counted and memoized |
+| `rules/toolchain.rs` | one toolchain's installed versions, per pin | the versions of one tool |
+| `rules/mod.rs` `by_id`, `tag_of`; `rules/listing.rs` groups | the catalog | the catalog |
+| `rules/classify.rs` `limit` roots, `exec/preflight.rs` roots | the scan's roots | the command line |
+| `report/recheck.rs` `unreadable` | the recorded read errors | `max_recorded` (the list is truncated) |
+| `exec/preflight.rs` `trashed.iter().any` | the folders trashed so far, per item | one `clean --items` call (items × trashed) |
+| `exec/preflight.rs` `out.skipped.iter().any` | the skips of one item's re-walk | `max_recorded` |
+| `exec/guard.rs` `marker_above` | the ancestors of one item, one `symlink_metadata` each | the item's depth; the preflight twin of what `ancestor_checks` counts in `classify.rs`, not counted |
+| `report/after_clean.rs` `owners.iter().find` | the owners of one item's re-walk | that item |
+
+Outside the sweep's folders, and what the `walked` row rests on: `scan/walker.rs` `listed.iter_mut().find(|l| &l.owner == owner)` builds `walked`, entries × user-data folders, linear only because every user-data rule is home-relative.
+
+Not bounded, and out of the story's scope: `plan.rs` `plan_listed`, and every per-item lookup in `report/after_clean.rs` — `finding`, `at_or_under`, `trash_on`, `leave_entry`, `refresh`'s `fresh.findings.iter().find`, `remove_entry`'s `contents.entries.iter().position` and `finish`'s `lines.iter().any` — look each listed item up among all findings, entries or lines: O(items × findings) for one clean. `make scaling`'s `clean-items` column shows it; a follow-up story if its slope does.
+
+### 9. Scaling slopes
+
+```bash
+make scaling                                    # every profile at M, enforce
+make scaling SCALING_SIZE=L SCALING_PROFILE=mixed,wide-root,projects,users   # SCALING_L_PROFILES
+make scaling SCALING_LIMITS=record              # judge nothing
+```
+
+What it does:
+- Reads the 1-minute load, then builds the release CLI and generator.
+- For each size, an eighth, a quarter, half and all of the tier (12 500 to 100 000 at M, 125 000 to 10⁶ at L), builds and checks every profile's tree on one disk image of that size, and runs the CLI on it as `make load` does, 3 runs per command, in record mode. The outputs are in `target/scaling/<size>/<entries>/`.
+- `ddc-loadgen slopes` fits, per profile and command, the log-log slope of the median CPU time and of the median peak memory above the profile's base, and writes `target/scaling/<size>/scaling.tsv`.
+- Prints how long the four sizes took; record it with the run.
+- A run with CPU judged, seed 1, of every profile, or at L and XL of `SCALING_L_PROFILES` (`mixed,wide-root,projects,users`, named in this order: the names are compared as one string), lands in `bench/scaling-<date>-<size>.tsv`, never over an existing file.
+
+How it judges, in `enforce` mode (`record` judges nothing, and its `cpu_judged`, `rss_judged` and `verdict` columns say `no` and `-`):
+- The judged slope is the local one between the two largest sizes (`cpu_slope`, `rss_slope`); `cpu_fit` and `rss_fit` through all four are for information, since the constant base of every command flattens them. A linear command has slope 1; over 1.2 fails.
+- Only `scan` and `clean-dry-run` are judged; `scan-background`, `disk` and `clean-items` are recorded.
+- CPU is judged only on a quiet start (the 1-minute load from before the build at most a quarter of the CPUs), from 3 runs or more, and only where the median at the second-largest size is at least 1 s. A spread of δ ms on a median of m ms moves the slope by about δ / (m · ln 2): the tens of milliseconds a scan of a few hundred wobbles by move it by more than 0.1, the 3% of a second-long one by about 0.04. `mode=enforce-memory` on the `#` line means the machine was busy.
+- A profile without a `scan` or `clean-dry-run` row fails. Tables with a failed run, two tables at the same size, or a judged command at one size only are refused.
+- Peak memory is judged above `rss_base_bytes` from `bench/load-limits.tsv` (divided by its 25% headroom), and only at L or XL: at M most profiles add a few hundred bytes per entry to an 11 MB base, so the raw slope says nothing. A judged command with no base fails: re-baseline (step 7).
+
+A slope over 1.2 that the counters did not catch is a cost they do not see: syscalls, locks, cache misses, or an uncounted comparison loop (the table above). Profile it at the largest size (steps 3 and 4) on an L tree built with `make load-image`.
+
+The L run of the four profiles takes 1–2 hours of the reference machine. An interrupted run starts again from the smallest size. A run that ends `mode=enforce-memory` (the load was over a quarter of the CPUs before the build) publishes nothing, the memory half included: wait for a quiet machine and run it again.
+
+`wide`, `links` and `hostile` stay under the 1 s floor at M (a `wide` scan of 10⁵ entries takes about 0.2 s) and are not in the L set, so their CPU slope is never judged: for them the counters (step 8) are the only complexity guard. Their slopes are still recorded. The nightly workflow runs every profile at M in record mode for information; a hosted runner is neither quiet nor the reference machine. Nothing compares its `scaling-m` artifacts: read them when a slope is in question. Its `timeout-minutes: 120` is a first guess; record the first nightly's duration in the story.
+
 ## Verification
 
 - [ ] `make load` on the quiet reference machine exits 0, and the `#` line of `target/load/load-M.tsv` says `mode=enforce`.
 - [ ] `bench/compare_load.py` prints `no metric more than 15% worse`, or every flag is explained in the commit.
 - [ ] `make leaks` exits 0, with `"passed": true` for every profile.
 - [ ] After a heap fix: the site's per-entry bytes fell in `make heap-profile`, and peak RSS fell in `make load`.
+- [ ] `make nextest` passes, with the profile tests among them (the counter ratios).
+- [ ] `make scaling` on the quiet reference machine exits 0, and the `#` line of `target/scaling/M/scaling.tsv` says `mode=enforce`.
 
 ## Rollback
 
 - **Limits:** `git checkout <commit> -- bench/load-limits.tsv` restores the previous baseline.
-- **A published table that should not be there:** `git rm bench/load-<date>-<size>.tsv`. `compare_load.py` then uses the newest earlier one.
+- **A published table that should not be there:** `git rm bench/load-<date>-<size>.tsv`; `compare_load.py` then uses the newest earlier one. A scaling table is removed the same way (`git rm bench/scaling-<date>-<size>.tsv`); nothing compares scaling tables.
 - **Disk images:** each run discards its own image. One left behind by an interrupted run is discarded by the next `make load`, `make load-image` or `make heap-profile`, once the process that made it has ended.
 - **Marked temporary folders:** step 3 leaves one; `make leaks` leaves one only when it is killed. `make loadgen-clean` removes them (see step 3 for when it is safe). It builds the generator in the dev profile, so the first run is slow.
 - **Profiling output:** `target/profiling` (with `tree.json`, `scan.json.gz`, `scan.trace`) and `target/dhat` are build output; delete them to reclaim space. Nothing in step 3 writes to the repository root, so `make dist`'s clean-tree check is not affected.
@@ -244,17 +333,36 @@ The CLI passed to `ddc-loadgen heap` is the plain release build. Use `make heap-
 - Find what holds the volume with `hdiutil info` and `lsof +D <mount point>`.
 - The next `make load`, `make load-image` or `make heap-profile` discards the kept image.
 
+### `slopes need the tables of two sizes or more` or `measured at one size only`
+A size failed to build, or a judged command ran at one size only. The failed size's message is above it in `make scaling`'s output. A recorded command at one size (`clean-items` needs an item list) keeps its row with `points` 1 and no slopes.
+
+### `… exited <code>: measure again`
+A run of the CLI failed in one of the tables. Its output is in `target/scaling/<size>/<entries>/`.
+
+### `the tables mix seeds`, `the tables mix sizes` or `two tables are both at <n> entries`
+`ddc-loadgen slopes` was given tables from different runs by hand. `make scaling` deletes the size's folder first and cannot produce these; give `slopes` the four tables of one run.
+
+### `<command> on <profile>: not measured`
+A profile's tables have no `scan` or `clean-dry-run` rows in enforce mode. The run measured something else; run `make scaling` again.
+
+### `<command> on <profile>: peak memory at or below its base <n> bytes`
+At L, the command's peak memory at one of the two largest sizes is not above `rss_base_bytes` / 1.25, so no slope can be taken. The base is stale: re-baseline (step 7).
+
+### `<command> on <profile>: no memory base`
+The profile or command has no row in `bench/load-limits.tsv`. Re-baseline (step 7).
+
 ## References
 
 - Story "Memory and CPU under load: peak memory, leaks and CPU time" (epic DDC-005 "Production-grade Rust core: mandatory gate and load testing").
-- Story "Complexity guard: operation counts and scaling exponents" (same epic): scaling exponents and the counters section of this runbook.
+- Story "Complexity guard: operation counts and scaling exponents" (same epic): the counters and the scaling slopes (steps 8 and 9).
 - Code:
-  - `crates/ddc-loadgen/src/{run,limits,leaks,heap,measure,isolate}.rs`
+  - `crates/ddc-loadgen/src/{run,limits,leaks,heap,measure,isolate,scaling}.rs`, `crates/ddc-loadgen/tests/profiles.rs`
+  - `crates/ddc-core/src/stats.rs`, `crates/ddc-core/src/sys/op_stats.rs`
   - `crates/ddc-core/src/heap.rs`
   - `scripts/load-image.sh`
   - `bench/compare_load.py`
   - `bench/dhat_top.py`
-- Makefile targets: `load`, `load-baseline`, `leaks`, `heap-profile`, `asan`, `bench-test`.
+- Makefile targets: `load`, `load-baseline`, `scaling`, `leaks`, `heap-profile`, `asan`, `bench-test`, `nextest`, `release-check`.
 - `man leaks`, `man xctrace`, `man env`; [samply](https://github.com/mstange/samply).
 
 ---
