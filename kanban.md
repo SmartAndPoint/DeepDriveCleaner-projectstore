@@ -2,19 +2,19 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-29T11:42:51.067Z
+generated_at: 2026-10-29T13:20:42.007Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
-- [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change|DDC-002: Review window: sort a group's rows by name, size or last change]] #p2
 - [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
+- [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
 - [ ] [[epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions|DDC-006: Burn down the baseline: split long files and functions]] #p2
 - [ ] [[epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons|DDC-006: Clippy at full strength: curated lints with reasons]] #p2
@@ -59,6 +59,7 @@ generated_at: 2026-10-29T11:42:51.067Z
 - [ ] [[epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder|DDC-002: User data: move a folder's picked files to the Trash from that folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers|DDC-002: VM images: Docker prune runs only while Docker Desktop answers]] #p1
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool|DDC-002: Whole disk: free space with the owning tool]] #p2
+- [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder|DDC-002: Review window: say when the saved scan is not of the home folder]] #p1

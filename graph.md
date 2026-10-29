@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T11:42:51.631Z
+generated_at: 2026-10-29T13:20:42.201Z
 
 ---
 
@@ -58,12 +58,13 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md | Whole disk: Conda environments and its package cache, with conda | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
-| epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | planned |
+| epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall.md | Whole disk: Homebrew packages, their sizes, and brew uninstall | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md | Whole disk: Show in Finder and the honest action for each row | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
+| epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | Complexity guard: operation counts and scaling exponents | story | in-progress |
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | planned |
 | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | Load run on the reference machine, including system folders | story | planned |
@@ -294,6 +295,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md |
@@ -312,6 +314,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-005/epic.md | wikilink | epics/DDC-002/epic.md |
 | epics/DDC-005/epic.md | wikilink | epics/DDC-006/epic.md |
 | epics/DDC-005/epic.md | wikilink | epics/DDC-007/epic.md |
+| epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | mdlink | epics/DDC-005/epic.md |
