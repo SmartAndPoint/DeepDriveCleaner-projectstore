@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-29T07:53:37.303Z
+generated_at: 2026-10-29T09:02:50.987Z
 
 ---
 
@@ -15,7 +15,6 @@ generated_at: 2026-10-29T07:53:37.303Z
 - [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change|DDC-002: Review window: sort a group's rows by name, size or last change]] #p2
-- [ ] [[epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda|DDC-002: Whole disk: Conda environments and its package cache, with conda]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall|DDC-002: Whole disk: Homebrew packages, their sizes, and brew uninstall]] #p2
 - [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
@@ -64,6 +63,7 @@ generated_at: 2026-10-29T07:53:37.303Z
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder|DDC-002: Review window: say when the saved scan is not of the home folder]] #p1
+- [ ] [[epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda|DDC-002: Whole disk: Conda environments and its package cache, with conda]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row|DDC-002: Whole disk: Show in Finder and the honest action for each row]] #p2
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1

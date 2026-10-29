@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T07:53:37.598Z
+generated_at: 2026-10-29T09:02:51.185Z
 
 ---
 
@@ -56,7 +56,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | User data: move a folder's picked files to the Trash from that folder | story | planned |
 | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
 | epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | in-progress |
-| epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md | Whole disk: Conda environments and its package cache, with conda | story | planned |
+| epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md | Whole disk: Conda environments and its package cache, with conda | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | planned |
 | epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall.md | Whole disk: Homebrew packages, their sizes, and brew uninstall | story | planned |
