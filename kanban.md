@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-29T14:54:01.290Z
+generated_at: 2026-10-29T15:26:55.597Z
 
 ---
 
@@ -12,7 +12,6 @@ generated_at: 2026-10-29T14:54:01.290Z
 - [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change|DDC-002: Review window: sort a group's rows by name, size or last change]] #p2
-- [ ] [[epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates|DDC-002: Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
@@ -63,6 +62,7 @@ generated_at: 2026-10-29T14:54:01.290Z
 - [ ] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder|DDC-002: Review window: say when the saved scan is not of the home folder]] #p1
+- [ ] [[epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates|DDC-002: Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates]] #p1
 - [ ] [[epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda|DDC-002: Whole disk: Conda environments and its package cache, with conda]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall|DDC-002: Whole disk: Homebrew packages, their sizes, and brew uninstall]] #p2
 - [ ] [[epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row|DDC-002: Whole disk: Show in Finder and the honest action for each row]] #p2
