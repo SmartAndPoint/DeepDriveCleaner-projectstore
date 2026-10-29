@@ -1,0 +1,124 @@
+---
+type: story
+id: "story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall"
+epic: "DDC-002"
+title: "Whole disk: Homebrew packages, their sizes, and brew uninstall"
+status: planned
+priority: p2
+assignee: "Evgenii Konev"
+created: 2026-10-29
+updated: 2026-10-29
+external_refs: {}
+tags: [core, app, whole-disk, homebrew, native-command, adr-amendment, user-report]
+code_refs: []
+specs: []
+started_at: null
+closed_at: null
+plan_updated_at: null
+---
+
+# Whole disk: Homebrew packages, their sizes, and brew uninstall
+
+| Field | Value |
+|---|---|
+| **Epic** | [DDC-002](../epic.md) |
+| **Status** | planned |
+| **Priority** | p2 |
+| **Assignee** | Evgenii Konev |
+
+---
+
+## Description
+
+The owner, 2026-10-29: for Homebrew, list what is installed and how big it is with its dependencies, and offer removal, reusing brew itself. Today the Homebrew row has one action, `brew cleanup` (old versions and downloads). The analysis is in the research note "Removal wherever a size is shown: coding agents, protected folders and the whole disk" (Finding 6).
+
+**What brew gives, and what it does not.**
+
+- `brew info --json=v2 --installed`: each formula's `installed[]` entries (version, time, `runtime_dependencies`, `installed_on_request`; Homebrew removed the old `installed_as_dependency` field long ago, `tab.rb`), the formula's `name`, `full_name` and `pinned`, and the installed casks with their `depends_on`. No sizes: brew computes sizes only for its text output.
+- `brew uninstall <formula>` refuses while an installed formula or cask depends on it. It has no dry run. By default it also removes the dependencies nothing needs any more (`HOMEBREW_NO_AUTOREMOVE` turns that off). It does not stop a running `brew services` job, and it leaves the formula's data in `var/` and `etc/`.
+
+**The list.** A sheet from the Homebrew row, beside `brew cleanup`:
+
+- the formulae the user installed, largest first: `installed_on_request` is per keg, so a formula counts as installed on request when any of its kegs is (an upgraded dependency carries the flag over, `formula_installer.rb`);
+- each with its size, measured by ddc from its installed keg, `Cellar/<name>/<version>` from `installed[]` ("measured, never assumed"), and the size of the dependencies it alone holds (below);
+- a formula with more than one installed version (more than one entry in `installed[]`) shows each version with its measured keg. `brew uninstall` without `--force` removes one version and leaves the formula installed at an older one, so its removal takes `--force` (below);
+- while `brew info` runs (it loads every formula and can take many seconds), the sheet shows a progress state;
+- the dependencies listed under it, each with its size and whether anything else needs it.
+
+**The removal of one formula.**
+
+- The dry run is ddc's: the keg's size, what depends on it (from the JSON), whether it is pinned, and a `brew services` job for it. A formula with dependents, a pinned one, or one with a service job is not offered; the sheet names the reason. `<prefix>` is `/opt/homebrew`, the only prefix the area covers (`disk/areas.rs`, `free/probe.rs`), where the prefix and the repository coincide; an Intel install's repository is `/usr/local/Homebrew`, and a later extension must use that. `brew services list --json` is asked when `brew services` is part of brew itself (`<prefix>/Library/Homebrew/services` exists; Homebrew moved it into Homebrew/brew in March 2025 and archived the tap) or when the old tap `<prefix>/Library/Taps/homebrew/homebrew-services` exists. With neither (an older brew with no tap, where the command would clone the tap), the service state is "not known" and the sheet says so. A service job is an entry of `brew services list --json` whose `name` (the formula's short `name`, not `full_name`) is the formula's and whose `status` is anything but `none`: `started`, `scheduled` (an interval job), `stopped` (loaded, exited 0), `error`, `unknown` and `other` all leave a launchd job that `brew uninstall` would leave pointing at a removed binary; a service stopped with `brew services stop` reports `none`. `status` is read as any string, not a closed set. Run without `sudo`, the command reads the user's launchd domain, so a service started with `sudo brew services` shows as `status: none` with `user: "root"` and a `file` under the user's own `~/Library/LaunchAgents` that does not exist: brew sees the plist in `/Library/LaunchDaemons` (so `user` is `root`, `formula_wrapper.rb` `owner`), but as a user it does not ask the system launchd domain, so it cannot say whether the job is loaded (`status` `none`), and it prints the path in the user's own folder. An entry with `user: "root"` therefore refuses whatever its `status` and `file`, the sheet saying "a root service is registered for it; its state is not known". An entry with `status: none` whose `file` exists under `~/Library/LaunchAgents` also refuses (a plist left registered but not loaded, which `brew uninstall` would leave pointing at nothing), the sheet saying "a service of yours is registered for it but not running; remove it with brew services first". The folder matters: a service formula never started (postgresql, redis) prints `status: none`, `user: null` and `file` at the keg's own `homebrew.mxcl.<name>.plist`, which exists; that is not a refusal. `user` is read as a string that may be null (not registered, or `brew services run`, which loads a job without a plist). Otherwise the sheet says "no service of yours registered with launchd".
+- The command: `brew uninstall --formula <formula>` with `BREW_ENV` (`free/brew.rs`: `HOMEBREW_NO_AUTOREMOVE=1`, `HOMEBREW_NO_ENV_HINTS=1`, `NO_COLOR=1`, as `brew cleanup` runs today) plus `HOMEBREW_NO_AUTO_UPDATE=1`, with the location probe, the exclusive data-dir lock and an `area-action` journal line.
+- The confirmation says: the Cellar is what is freed; the formula's data in `var/` and `etc/` stays; brew cannot know about users outside brew (a virtualenv linked against brew's openssl).
+- `brew info` and `brew services list` run under the same environment as the uninstall.
+- **`--formula` on every `uninstall`** (`info` always runs with `--installed`, which needs the casks too, for their `depends_on`). With a bare name, a formula found installed wins over a cask of the same name, but a formula removed between the listing and the command falls through to the cask: `brew uninstall docker` would then remove Docker Desktop. With `--formula` a plain uninstall fails instead; with `--force`, brew skips the error and exits 0 having removed nothing (`cmd/uninstall.rb` reports unavailable formulae only without `--force`), so only ddc's re-read below notices a formula that is gone. `--formula` also makes "formulae only" something the fake-brew test can check. Every command names a formula by its `full_name` (`user/tap/foo` for a tap formula), never the short `name`, which can be ambiguous between taps.
+- **The re-read, before every uninstall** (one formula, several versions, the orphans): right before the command, ddc reads `brew info --json=v2 --installed` again (and `brew services list --json` when brew has it), recomputes dependents and the orphan set from it, and refuses, saying why, when a formula is no longer installed, is now pinned, has installed kegs that are not exactly the confirmed ones (an upgrade or a `brew cleanup` in between), has gained a dependent (named in the refusal), is no longer an orphan, or has a service job by the rule above. One formula's JSON has no reverse dependencies, so only the whole listing can show a new dependent; brew's own dependents refusal stays the backstop. The app hands the CLI the confirmed kegs, since the dry run and the run are separate invocations.
+- **The orphans**, computed by ddc from the JSON, recursively: the formula's runtime dependencies, and theirs, that were not installed on request (`installed_on_request` false) and that no remaining installed formula, and no installed cask's `depends_on formula:`, needs. A pinned one is left out of the set and listed as "kept: pinned". Dependents are matched on the short name: a `runtime_dependencies` entry carries the dependency's `full_name` (`tab.rb`), compared by its part after the last `/` as brew's own `missing_dependencies` does (a Cellar rack holds one formula per short name); a cask's `depends_on formula:` string is matched against both `name` and `full_name`. They are listed after the removal, each with every keg and its size, measured again at that point. Removing them is a second action with its own confirmation: one `brew uninstall --formula --force <a> <b>…` with all of them (without `--force`, an orphan with several kegs loses one keg, or the whole command stops on brew's "multiple versions installed" error before removing anything; the re-read does the pinned check `--force` skips), under the same environment, the lock, the re-read and its own journal line, the names carried in its `command` string (the `area-action` entry has one `identifier`; its schema does not change). Under `--force` brew removes rack by rack and stops at the first keg it cannot remove: the confirmation says the ones before it are gone, and after a failure the sheet lists the orphans again; a Stop or a timeout is a failure here too (`free/mod.rs` `stopped()`, `free/brew.rs` `run_failed` "timed out after N s"), and is the likeliest partial removal. Two differences from brew's own `autoremove`, stated in that confirmation's wording and tests: brew's JSON turns an absent `installed_on_request` (very old installs) into false, where `autoremove` keeps such a keg; and `autoremove` considers bottled formulae only, where ddc's set also holds formulae built from source. The second confirmation lists every one by name, so the user decides.
+- **Several versions** (the owner, 2026-10-29: in our own window, not in Terminal). The same Remove… button; the confirmation lists every version with its size. The command is `brew uninstall --formula --force <formula>`, one command for every version, in the sheet like the others, with its output.
+  - What `--force` changes for a formula (Homebrew 7.0 source, `uninstall.rb`, `cmd/uninstall.rb`): every keg of the formula is removed, brew's own pinned check is skipped, and the per-keg lock is not taken. Dependents are still refused, before any keg is touched, and `HOMEBREW_NO_AUTOREMOVE` still holds. A file that cannot be removed still stops it with an error (`keg.rb` turns `EACCES` and `ENOTEMPTY` into a failure with or without `--force`); the "ignore errors" of its help text is the cask installer's.
+  - So the re-read above matters most here: it does the pinned check `--force` skips, and it is the only thing that notices a formula already gone.
+  - Not `brew cleanup <formula>` and then `brew uninstall`: cleanup keeps a linked old keg, a keg another keg's `.keepme` references, every keg of a formula whose current version is not installed (the usual reason for several kegs), and anything listed in `HOMEBREW_NO_CLEANUP_FORMULAE`. The sequence would stop in exactly the cases it is for.
+- **`--dry-run` and the terminal.** `ddc disk free --dry-run --actions` for `brew-uninstall` and `brew-uninstall-orphans` is the re-read without the command: the same refusals, or what would run with the kegs and their bytes; there is no brew dry run to show. `ddc disk free` at a terminal does not list package removals: they come only through `--actions`, from the app's sheet.
+- The freed bytes are measured after the command, and the Homebrew area in `last-disk.json` is marked stale as after `brew-cleanup` (`free/mod.rs`, `edit_last_disk`).
+
+**Not in this story.** Casks: a cask uninstall removes an app from `/Applications` (the Applications row), and its `uninstall` stanza can call `sudo` or `launchctl`, which fail on a closed stdin. `--zap`. `brew autoremove`, which removes what is orphaned now, not what one removal orphans.
+
+**The work-start gate.**
+
+- A safety ADR amendment first: "uninstall a formula with its own tool" is beyond the 2026-10-28 amendment's "the owning tool frees its own area" (old versions and downloads). It states the dry run above, the orphans as a separate action, formulae only, and the environment: the 2026-10-28 amendment lists `BREW_ENV`'s three variables exactly, so the new one names `HOMEBREW_NO_AUTO_UPDATE` as added for `info`, `services list` and `uninstall`. It admits `brew uninstall --formula` and `brew uninstall --formula --force` (several versions), with the re-read before every uninstall above.
+- The structure test `disk_free_runs_only_its_two_commands` is a list of forbidden substrings in `free/` (`Command::new`, `remove_`, `sudo`, `autoremove` and others). It is reworked for `uninstall` and keeps forbidding `autoremove` and `sudo`; names with `remove_` in them stay out of `free/`.
+- A menu bar ADR §6 amendment: item 10 gains `ddc disk brew-packages --json` (it takes no lock and writes nothing, but runs for many seconds: a lane by the 2026-10-28 rule, which may run beside a running `brew-uninstall` or `brew-cleanup`, the same accepted race as the API folder); item 11 gains the `brew-uninstall` and `brew-uninstall-orphans` actions, the kegs field and the names field (the orphans), their `--dry-run` (the re-read), and that the terminal prompt does not offer them; `FREE_SCHEMA_VERSION` goes from 1 to 2 for both the `--actions` list and the report, which share it; the list of contracts at its end grows by three (the listing, the `--actions` list and the disk-free report, which it already lacks). It also states: `ActionId` is shared by the disk report and the free list, so its two new ids appear in both schemas and the app's strict `DiskReport.ActionId` grows with them; the disk report's `schema_version` stays 1, an exception to item 10's rule that a new variant bumps it, because an area's `action` never carries the package ids (the Homebrew row keeps `brew-cleanup`), so no reader of `last-disk.json` meets a value it does not know, and `docs/disk.schema.json` is regenerated (one enum keeps the journal and the free list on one set of ids); an uninstall runs up to three brew commands besides the probe's (the re-read's `info` and `services list`, then `uninstall`) under one shared `NATIVE_TIMEOUT` budget, so the exclusive lock is still held for at most one `NATIVE_TIMEOUT` per action, and `brew uninstall` does not start when less than a floor of it remains (a `FreeContext` field, 60 s by default, milliseconds in tests; the result is a `Failed`, not a new `Refusal` variant, with "brew could not start; nothing was removed", the same words as an offline API fetch, and its `output` says "the check took N s of M s; try again" so the sheet can tell the two apart; the sheet lists again), so a re-read that eats the budget never starts an uninstall with almost no time left; the location probe's three sub-second `brew --prefix/--cellar/--cache` queries count against the same budget (`probe::brew` gains the remaining budget as a parameter in place of its fixed 60 s); and the listing runs outside the lock knowingly: a clean of `cache.homebrew` beside it can remove the API folder brew is filling, and the listing then fails with "brew could not list its packages".
+- The story "Whole disk: free the checked areas in one sheet" (p3) is amended: a package removal never joins a multi-row free, because each needs its own confirmation.
+
+## Decomposition
+
+- [ ] Safety ADR amendment (critic-reviewed).
+- [ ] Menu bar ADR §6 amendment: the new listing contract and the changed `--actions` list (critic-reviewed).
+- [ ] Core/CLI: the listing as a command the app reads (`ddc disk brew-packages --json`, its own `schema_version`); parse `brew info --json=v2 --installed` (formulae, casks' `depends_on`); measure each keg `Cellar/<name>/<version>`; dependents; the recursive orphan set; a running service (`brew services list --json`, when brew has it built in or the old tap exists).
+- [ ] Core: `ddc disk free` gains a `brew-uninstall` action (the formula's `full_name` in `identifier`, the confirmed kegs in a new field; `--force` for several versions) and a `brew-uninstall-orphans` action carrying several names; `ListedAction` (`free/model.rs`, `deny_unknown_fields`) gains the fields and `FREE_SCHEMA_VERSION` is bumped; the re-read before each, with the probe, the lock, `BREW_ENV` plus `HOMEBREW_NO_AUTO_UPDATE=1`, the journal line and the measured result; the budget floor (a `FreeContext` field) and the probe under the same budget; the structure test amended.
+- [ ] App: the packages sheet from the Homebrew row: the progress state while brew answers ("Asking Homebrew…"), the list, the dry run, the confirmation, "Checking with Homebrew…" while the re-read runs, the command's output while it runs, the orphans step. The listing command runs under the same 600 s limit as the other brew commands (`NATIVE_TIMEOUT`).
+- [ ] Vault: amend "Whole disk: free the checked areas in one sheet".
+
+## Implementation Plan
+
+## Acceptance Criteria
+
+- [ ] Test (core): from a fixture of `brew info --json=v2 --installed`, the list has the on-request formulae with their dependencies; a formula another formula or a cask depends on is not offered and names the dependent; a tap formula (`name: foo`, `full_name: user/tap/foo`) is found as a dependency through a core dependent's `runtime_dependencies` entry `user/tap/foo`, and the refusal names the dependent by `full_name`; a keg with `runtime_dependencies: null` is read through its declared `dependencies` and `recommended_dependencies` (the fixture's blank-tab dependent names its needed formula only in `recommended_dependencies`).
+- [ ] Test (core): the orphan set of a fixture is recursive, and excludes a dependency another formula or a cask's `depends_on formula:` still needs, including a tap orphan candidate referenced as `user/tap/foo` by a remaining formula.
+- [ ] Test (core): sizes come from a measured fake keg in a temp folder, not from brew; a pinned formula is not offered; a formula with two entries in `installed[]` is offered, with both versions measured; with a fake prefix that has `Library/Homebrew/services`, `brew services list --json` runs; with neither that folder nor the old tap, the service state is "not known" and no `brew services` runs; a services entry in the shape brew prints for a `sudo` service (`status: none`, `user: "root"`, a `file` under the user's `~/Library/LaunchAgents` that does not exist) refuses with the root wording.
+- [ ] Test (core): every call of the fake `brew` (a script) — `info`, `services list`, `uninstall` — sees `BREW_ENV` and `HOMEBREW_NO_AUTO_UPDATE=1` in its environment.
+- [ ] Test (core): with two kegs, the fake `brew` receives `info --json=v2 --installed`, `services list --json` when the prefix has it, and then `uninstall --formula --force <full_name>`; it writes an `area-action` journal line; when that re-read shows the formula pinned, no longer installed, a keg not in the confirmation, or a confirmed keg gone, no `uninstall` runs and the result says why.
+- [ ] Test (core): the one-version uninstall runs the fake `brew` with `info --json=v2 --installed`, `services list --json` when the prefix has it, and then `uninstall --formula <full_name>`, nothing else; a tap formula is named by its `full_name`; it holds the exclusive lock and writes an `area-action` journal line; a formula with a service entry of `status` `started` or `scheduled` (a fixture each), or one that gained a dependent since the dry run, is refused, the refusal naming the dependent; `status: none` from an entry whose `user` is not `root` and whose `file` does not exist is not a refusal; with that `file` present under `~/Library/LaunchAgents` (registered but not loaded) it is; an entry with `status: none`, `user: null` and `file` at the fake keg's own `homebrew.mxcl.<name>.plist`, present, is not a refusal.
+- [ ] Test (core): the orphans' action re-reads, then runs `uninstall --formula --force <a> <b>…` under the same environment, holds the lock and writes its own journal line with every name; an orphan with two kegs is listed with both and removed by that command; a pinned dependency is not in the set and shows as kept; when the re-read's listing shows an orphan another formula or a cask came to need since the dry run, nothing is removed and the refusal names the dependent.
+- [ ] Test (core): with a short timeout and floor set in the test's `FreeContext`, a fake `info` that exits 0 after longer than the timeout less the floor but before the timeout: no `uninstall` runs, the result is "brew could not start; nothing was removed" with the check's time in `output`, and the `area-action` line's `result` is not `freed`; with a fake `info` that returns at once, `uninstall` runs.
+- [ ] Test (core): `ddc disk free --dry-run --actions` with `brew-uninstall` or `brew-uninstall-orphans` runs the fake `brew` with the re-read only, never `uninstall`, and reports the kegs and their bytes, or the refusal; `ddc disk free` at a terminal lists no package removal.
+- [ ] Test (core): the orphan set treats `installed_on_request: false` as installed as a dependency; a fixture from an older brew that still carries `installed_as_dependency` parses and the field is ignored; a formula with one keg on request and one not counts as installed on request.
+- [ ] Test (core): the reworked structure test passes for `free/` and still forbids `autoremove` and `sudo`.
+- [ ] Manual (owner): the Homebrew row lists the installed formulae with sizes; removing a leaf formula frees its Cellar size; a formula with two versions is removed in the sheet with both; its orphans are offered after, and removing them frees theirs.
+
+## Final Summary
+
+## Technical Notes
+
+- Tests never run the real brew: a script stands in for it, and fixtures hold its JSON.
+- An installed but unlinked formula (`brew unlink`) is listed like a linked one: its keg is measured and `brew uninstall` removes it the same way.
+- brew's own dependents refusal (`installed_dependents.rb`) looks only at optlinked kegs. `brew unlink` keeps the opt link (`Keg#unlink` removes only the linked-keg record), so an unlinked formula is still covered. A rack with no opt link (the older kegs after the current version was removed, an interrupted upgrade) is not; nor is a dependent whose tab has no `runtime_dependencies` (`Formula#missing_dependencies` returns none for a blank tab). In both cases ddc's check is the only guard.
+- A keg whose `runtime_dependencies` is null (an empty tab) is read through the formula's declared `dependencies` and `recommended_dependencies` instead, so it neither blocks every removal nor hides what it needs.
+- `brew uninstall` does not stop a running service: nothing in `cmd/uninstall.rb`, `uninstall.rb` or `keg.rb` touches services. Hence the refusal.
+- Every brew command downloads Homebrew's API files before it runs when `~/Library/Caches/Homebrew/api` is missing (`brew.rb` fetches them for any command), whatever `HOMEBREW_NO_AUTO_UPDATE` says, and the `cache.homebrew` rule removes that folder. So the first brew command after a clean goes to the network, and offline it fails before doing anything. Each step says which command failed: the listing "brew could not list its packages", an uninstall "brew could not start; nothing was removed". Without `HOMEBREW_NO_AUTO_UPDATE=1` every command would also download again a file older than the API's stale limit: that is why the variable is set on all of them.
+- The structure test's forbidden list also has `prune` and `trash`: the orphan code avoids the word "prune".
+- brew's JSON has no schema; the parser ignores unknown fields and refuses the action when a field it needs is missing.
+
+## Dependencies
+
+- Research note "Removal wherever a size is shown: coding agents, protected folders and the whole disk" (Finding 6)
+- "Whole disk: free space with the owning tool" (DDC-002): `ddc disk free`, the brew probe, the action sheet; this story waits for it to close
+- Safety ADR "Cleanup safety model: risk classes, plan and confirmation": the amendment this story adds
+
+## Attachments
+
+-
+
+---
+
+*Last updated: 2026-10-29*
