@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-28T20:02:38.766Z
+generated_at: 2026-10-29T04:39:19.504Z
 
 ---
 
@@ -46,6 +46,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | Review window: after a clean, only skips that can clear stay selected | story | in-progress |
 | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | Review window: Clean is not offered when every item would be skipped | story | in-progress |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
+| epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | planned |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | in-progress |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | planned |
@@ -61,8 +62,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | planned |
 | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md | Load run on the reference machine, including system folders | story | planned |
 | epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md | Mandatory gate before every commit | story | done |
-| epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | Memory and CPU under load: peak memory, leaks and CPU time | story | planned |
-| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | Synthetic load trees: large, wide, deep and hostile | story | in-progress |
+| epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md | Memory and CPU under load: peak memory, leaks and CPU time | story | in-progress |
+| epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md | Synthetic load trees: large, wide, deep and hostile | story | done |
 | epics/DDC-006/epic.md | Code shape gate: measurable conventions that guide humans and agents | epic | planned |
 | epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write.md | Agents and editors see violations as they write | story | planned |
 | epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions.md | Burn down the baseline: split long files and functions | story | planned |
@@ -79,6 +80,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | planned |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | Windows install: PowerShell script, winget and a signed binary | story | planned |
 | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | planned |
+| ops/profiling-the-core.md | Profiling the core | runbook | draft |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | Coding-agent harnesses on macOS: where their data lives and how to tell a live session | research | final |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
@@ -159,6 +161,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |
@@ -244,6 +247,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
