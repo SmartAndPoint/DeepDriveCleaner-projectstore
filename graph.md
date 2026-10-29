@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T13:20:42.201Z
+generated_at: 2026-10-29T13:52:39.602Z
 
 ---
 
@@ -302,6 +302,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-mandatory-gate-before-every-commit.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md |
+| epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md |
 | epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
 | epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md |
 | epics/DDC-005/epic.md | mdlink | epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders.md |

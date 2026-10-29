@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-29
 external_refs: {}
 tags: [app, whole-disk, free, user-report]
-code_refs: []
+code_refs: ["app/DeepDriveCleaner/AreaActionSheet.swift", "app/DeepDriveCleaner/DiskView.swift", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "crates/ddc-cli/tests/disk_free_cli.rs"]
 specs: []
 started_at: "2026-10-29T13:12:54.962Z"
 closed_at: null
@@ -47,9 +47,9 @@ The one-row buttons stay. It is p3: the gain is one sheet instead of a few; the 
 
 ## Decomposition
 
-- [ ] DDCKit: `FreeSheet` holds `offers`, and its `confirm` and `result` stages hold one report per offer, aligned by index; `previewAction`'s "closed meanwhile" check compares the list; `runFree` writes them all and accepts a report only when it has one action per offer with the same `action` and `identifier` in the same order (today it requires exactly one); `brewPackages.actionEnded` is called per pair.
-- [ ] DDCKit: `DiskModel.checked`, `toggle`, `canCheck`, the run order, `previewChecked()`, the would-run subset on confirm, the "Free 1 of 2" wording.
-- [ ] App: checkboxes on offer rows, the bar and its button in `DiskView`; `AreaActionSheet` shows a list of previews and results.
+- [x] DDCKit: `FreeSheet` holds `offers`, and its `confirm` and `result` stages hold one report per offer, aligned by index; `previewAction`'s "closed meanwhile" check compares the list; `runFree` writes them all and accepts a report only when it has one action per offer with the same `action` and `identifier` in the same order (today it requires exactly one); `brewPackages.actionEnded` is called per pair.
+- [x] DDCKit: `DiskModel.checked`, `toggle`, `canCheck`, the run order, `previewChecked()`, the would-run subset on confirm, the "Free 1 of 2" wording.
+- [x] App: checkboxes on offer rows, the bar and its button in `DiskView`; `AreaActionSheet` shows a list of previews and results.
 
 ## Implementation Plan
 
@@ -66,16 +66,33 @@ Pitfalls: never iterate the `Set` for order; never send refused or failed previe
 
 ## Acceptance Criteria
 
-- [ ] Test (DDCKit, fake runner): two runtimes checked → one dry-run call with both in the list, then one run call with both; the results map back to their rows; the result stage shows no summed figure; a report whose actions do not match the list in count, order or identifier is a failure, not a partial success.
-- [ ] Test (DDCKit): a stop after the first action leaves the second "not run"; after a run, whatever its result, a failed report included, the sheet's checkboxes are clear.
-- [ ] Test (DDCKit): rows without an offer, a package removal, and every row while `!canFree` (during a scan, while a sheet is open) cannot be checked; checks of rows no longer offered are pruned when the report changes, including to none or unreadable; the bar's button is disabled while `!canFree` or with nothing checked.
-- [ ] Test (DDCKit): of two previews, one `would-run` and one refused → the confirm runs a list of one, its title says "Free 1 of 2", and the refused one shows its reason and gets no entry in `freeResults`; with none `would-run`, confirm is not offered and no run call is made.
-- [ ] Test (DDCKit): a conda environment and its install's package cache checked together produce a list with `conda-env-remove` first.
-- [ ] Contract test: `freeConfirmedActions()` keeps one caller, the sheet's confirm button, and the checked bar's button is the only caller of `previewChecked()`.
-- [ ] Test (CLI): two runtimes in one `--actions` list give two journal lines and both leave `last-disk.json`.
+- [x] Test (DDCKit, fake runner): two runtimes checked → one dry-run call with both in the list, then one run call with both; the results map back to their rows; the result stage shows no summed figure; a report whose actions do not match the list in count, order or identifier is a failure, not a partial success. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `freeBoth`, `mismatchedRun`; `DiskFreeTests.mismatchedReport`
+- [x] Test (DDCKit): a stop after the first action leaves the second "not run"; after a run, whatever its result, a failed report included, the sheet's checkboxes are clear. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `stopAndFailure`, `mismatchedRun` (checks clear after a failed run)
+- [x] Test (DDCKit): rows without an offer, a package removal, and every row while `!canFree` (during a scan, while a sheet is open) cannot be checked; checks of rows no longer offered are pruned when the report changes, including to none or unreadable; the bar's button is disabled while `!canFree` or with nothing checked. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `refusedChecks`, `pruned`, `rowOrder`; `DiskView.swift` `.disabled(!model.canFreeChecked)`
+- [x] Test (DDCKit): of two previews, one `would-run` and one refused → the confirm runs a list of one, its title says "Free 1 of 2", and the refused one shows its reason and gets no entry in `freeResults`; with none `would-run`, confirm is not offered and no run call is made. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `mixedPreviews`, `totalAndRefusal`, `listOfOne`
+- [x] Test (DDCKit): a conda environment and its install's package cache checked together produce a list with `conda-env-remove` first. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `condaOrder`
+- [x] Contract test: `freeConfirmedActions()` keeps one caller, the sheet's confirm button, and the checked bar's button is the only caller of `previewChecked()`. — evidence: `ContractTests.freeCallers` (one caller of `.freeConfirmedActions(`, `.previewChecked(` once in `DiskView.swift`, one `.sheet(`, never-frees regex with `previewChecked`)
+- [x] Test (CLI): two runtimes in one `--actions` list give two journal lines and both leave `last-disk.json`. — evidence: `crates/ddc-cli/tests/disk_free_cli.rs` `two_runtimes_in_one_list_run_in_order_each_journaled_and_both_leave_the_saved_disk_report`
 - [ ] Manual (owner): with two deletable runtimes, check both, free them in one sheet, and compare with `xcrun simctl runtime list`.
 
 ## Final Summary
+
+App only, five commits on main, from "hold a list of area actions in the free sheet" to "free two runtimes in one disk free list, as the checked rows send them". No schema change: free stays 3, disk stays 2.
+
+- **What changed.**
+  - Every Whole disk row with an offer has a checkbox. The bar reads "N checked" and holds **Free N Checked…**.
+  - The area-action sheet takes a list. It makes one dry-run call and shows each preview in run order, with its consequence, estimate and command. The total reads "about" or "at least".
+  - The confirm sends only the would-run subset ("Free 1 of 2"), rebuilt from the sheet's own previews. Each action gets its own result, and no total is shown after the run.
+  - Rows and run order come from one walk (`AreaActions.places`), with `conda-clean` stably last.
+  - Checks are pruned in a `didSet` on the report.
+  - A failed dry run of a single non-brew action now shows its output and no confirm button. Before, the sheet showed a confirm button that did nothing.
+- **Tests.** `make gate` passed. `swift test` passed 320 tests. The CLI test runs two runtimes in one list. The app builds unsigned.
+- **Reviews.** The critic approved the plan with fixes, and they were applied. `projectstore:reviewer` found no consent-safety defect: only previews shown as would-run are ever sent, in the order shown. Its nits are left as they are: the sheet's own wording is untested, `orderedOffers` is rebuilt per row, and the caller count of `freeConfirmedActions`.
+- **Deviations at implementation.**
+  - `conda-clean` runs after every other action, not only after `conda-env-remove`.
+  - After confirm, the sheet's offers shrink to the would-run subset, so the results list only what ran.
+  - Checks are also disabled while the Homebrew packages sheet is open.
+- **Open.** The owner's manual check. VoiceOver on the row checkbox inside the combined row element is worth a look.
 
 ## Dependencies
 
