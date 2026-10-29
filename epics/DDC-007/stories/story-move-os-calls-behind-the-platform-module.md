@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [rust, refactor, portability]
 code_refs: []
@@ -45,6 +45,7 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 | `env.rs` | `HOME`, `~/Library` folders |
 | `ddc-cli/src/launchd.rs`, `notify.rs`, `cmd/schedule.rs` | launchd, `osascript`, `std::os::unix` |
 | `ddc-cli/src/main.rs`, `progress.rs`, `cmd/{diag,clean,clean_items,background,disk,schedule}.rs` | direct use of `ddc_core::sys` (iopolicy, rlimit, procs, signals, statfs, term) |
+| `ddc-loadgen/src/{isolate,build,run,measure,target,verify}.rs` | direct use of `ddc_core::sys` (procs, usage, statfs, rlimit); the property tests of DDC-005's story "Coverage floor and property tests for the safety invariants" stand on it |
 | `ddc-core/tests/common/`, `in_use.rs`, `clean_safety.rs`, `user_data.rs` and the other core test files (7 in all), and 6 CLI test files | `std::os::unix` in the test harness |
 
 ## Decomposition
@@ -61,7 +62,7 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 
 - [ ] `cargo check --workspace --all-targets` passes for `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl` and `x86_64-pc-windows-msvc`, in the gate.
 - [ ] On macOS the full test suite passes, and the golden outputs are identical except for the fields the seam ADR added.
-- [ ] No file under `src/` outside `platform/` (in `ddc-core`) and `cli/platform` (in `ddc-cli`) references `libc::`, `std::os::unix`, `std::os::windows` or `cfg(target_os)`, and no file in `ddc-cli` outside `cli/platform` references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it).
+- [ ] No file under `src/` outside `platform/` (in `ddc-core`) and `cli/platform` (in `ddc-cli`) references `libc::`, `std::os::unix`, `std::os::windows` or `cfg(target_os)`, and no file in `ddc-cli` outside `cli/platform`, nor in `ddc-loadgen`, references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it).
 - [ ] `unsafe_code` is denied everywhere except `platform/`.
 - [ ] `projectstore:reviewer` confirmed the move preserved behaviour.
 
@@ -84,4 +85,4 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*

@@ -3,18 +3,18 @@ type: story
 id: "story-coverage-floor-and-property-tests-for-the-safety-invariants"
 epic: "DDC-005"
 title: "Coverage floor and property tests for the safety invariants"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [rust, testing, coverage, property-tests, fuzzing]
-code_refs: []
+code_refs: ["Makefile", ".config/nextest.toml", ".config/tools.mk", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Cargo.toml", "crates/ddc-core/Cargo.toml", "crates/ddc-loadgen/Cargo.toml", "crates/ddc-loadgen/src/isolate.rs", "crates/ddc-loadgen/src/measure.rs", "clippy.toml", "crates/ddc-cli/tests/scan_cli.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/exec/guard.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/report/mod.rs"]
 specs: []
-started_at: null
+started_at: "2026-10-29T14:30:18.629Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-29T14:30:18.629Z"
 ---
 
 # Coverage floor and property tests for the safety invariants
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -30,51 +30,78 @@ plan_updated_at: null
 
 ## Description
 
-The ~315 tests check examples: a given tree gives a given finding. Nobody knows which lines no test reaches. The safety promises hold for any tree, not just the examples, and for those promises examples are the weakest kind of evidence.
+The 561 tests check examples: a given tree gives a given finding. The safety promises hold for any tree, not just the examples, and for those promises examples are the weakest kind of evidence. Coverage is measured (`make coverage`, in CI on every push and nightly), but nothing fails when it drops, and the numbers are wrong: 16 of the 18 test files of `ddc-cli` start the binary with `env_clear()`, which drops `LLVM_PROFILE_FILE`, so the instrumented CLI writes no profile. On `e933b7b` every `ddc-cli/src/cmd/*.rs` and `main.rs` read 0%, `ddc-cli` 48.2%, and the core code those tests run through the CLI is not counted either (`ddc-core` 91.9%).
 
-The promises come from the safety ADR and DDC-001:
-- no protected folder, `user-data` item or VM directory is ever planned for deletion;
+The promises come from the safety ADR ("Cleanup safety model: risk classes, plan and confirmation") and DDC-001:
+- no plan item is a protected folder or a scan root, or an ancestor of one (the ADR protects the folders themselves, not their contents: the children of `Library/Caches` or `.cache` are planned by design); no `user-data` item is planned without explicit selection; no VM directory is planned for deletion or the Trash; no item holds a `.ddc-keep` at any depth or has one in an ancestor inside the scan root; `Library/CloudStorage` and `Mobile Documents` are neither removed nor walked;
+- the default selection (ADR §1, §3): no `review` finding is selected by default; a `rebuildable` finding is selected by default only with its manifest, and for an environment (a rule with `lockfiles`) its lock file too (a build product such as `target/`, Gradle `build/` or a CMake build needs the manifest alone, `classify.rs`), with activity older than `min_age`, and not under `~/Library` or a top-level hidden folder of `$HOME`; a confirmation for some classes runs only the default-selected findings of those classes;
 - sizes are counted once;
-- the plan does not depend on walk order;
-- an interrupted clean leaves a consistent state.
+- the plan does not depend on the walk's thread count or on the order of directory entries;
+- an interrupted clean or scan leaves a consistent state.
 
-This story measures coverage and sets a floor that only rises. It states the invariants as property tests over generated trees, checks the rule matcher against a simple reference implementation, tests interruption, and fuzzes the parsers that read outside input.
+This story makes the coverage numbers true and sets a floor that only rises, states the invariants as property tests over generated trees, checks the rule matcher against a simple reference, tests interruption, and fuzzes the parsers that read outside input. These tests also guard epic DDC-007's move of the OS calls behind a platform module, so they reach the core through seams that survive it (`DirReader`, `StdReader`, the exec ports), never through `sys::`.
 
 ## Decomposition
 
-- [ ] Add `llvm-tools-preview` to `rust-toolchain.toml`. `cargo llvm-cov` over the workspace gives line and region coverage per crate and per module, as text and HTML. `make coverage` writes the report to `target/coverage/`. It runs in CI on every push, not in the local hooks.
-- [ ] Record today's numbers. The floor per crate is the measured value minus 1 point, in `coverage-floor.toml`. A CI check fails when coverage drops below the floor. The floor is raised (ratchet) only by `make coverage-ratchet`, run by the owner on `main` from the latest CI numbers, never from a branch or by CI itself.
-- [ ] Target for the safety path: line coverage ≥ 90% for `exec/mod.rs`, `exec/delete.rs`, `exec/guard.rs`, `exec/preflight.rs`, `exec/journal.rs`, `plan.rs` and `rules/classify.rs`. `sys/` and the CLI's rendering are adapters, excluded from the target and covered by integration tests. Add tests until the target is met, or record why a line is unreachable.
-- [ ] `proptest` strategies for small random trees: projects, caches, protected folders, user data, keep markers, nested claims, hard links, symlinks.
-- [ ] Property: for any tree, no plan contains a path inside a protected folder, a `user-data` item without explicit selection, or a VM directory.
-- [ ] Property: the report's totals equal the sum over distinct findings. Nested claims and hard links are counted once.
-- [ ] Property: findings and plan are the same for 1 thread and N threads, and for any order of directory entries.
-- [ ] Differential test: the rule matcher agrees with a deliberately simple reference matcher (linear scan over all rules) on generated paths.
-- [ ] Property: every JSON report round-trips and validates against `docs/scan.schema.json` (and the clean, progress and disk schemas). `generated_at` and `duration_ms` are excluded from equality.
-- [ ] Interruption tests: `kill -TERM` during a scan of an S tree and during a clean of 10⁴ items of a generated tree. `clean` ends by the signal it received (it re-raises it, `clean_items.rs`); `scan` has no handler and simply dies. In both cases the lock is released (kernel `flock`), `last-scan.json` is either the previous or the complete new file (atomic write in `store.rs`), a second run works normally, and nothing outside the plan was removed.
-- [ ] Fuzz targets (`cargo fuzz`, nightly, in the nightly workflow): `disk/plist.rs`, reading `settings.json` and `last-scan.json`, parsing the `--items` list. `make fuzz` runs each for a set time; crashes become regression tests.
+- [ ] Keep the coverage profile through `env_clear()`: the trait `ddc_loadgen::isolate::ClearEnv` gives `Command` a `clear_env()` that clears the environment and puts back `LLVM_PROFILE_FILE` when the parent has it (a path into the coverage target folder, so the HOME and PATH isolation is unchanged). Every `env_clear()` in `crates/ddc-cli/tests` and `crates/ddc-loadgen/src/measure.rs` goes through it, and `clippy.toml` disallows a bare `Command::env_clear` workspace-wide, so `gate-fast` refuses one. A child killed by a signal writes no profile: lost coverage, not a failure.
+- [ ] Per-crate floor: `make coverage` (already in CI) also writes `target/coverage/summary.json` and HTML, and `bench/coverage_floor.py` (stdlib, `python3 -I`, tested in `make bench-test`) checks the per-crate and per-file line coverage against `bench/coverage-floor.tsv`, where each of the seven safety files must have a row and a safety file's floor under 90% needs a reason in the TSV. The per-crate floor is set from the CI numbers after the first item minus 1 point, the per-file floors from the lowest of three CI runs minus 3 points (a file such as `exec/guard.rs` branches on the runner's process table and a timed re-read, so a few lines move between runs), never from a local run. CI enforces these floors, not 90%: the 90% target of the next item is reached once, in step 9, recorded in Technical Notes, and then held by the ratchet. `make coverage-ratchet` raises it, run by the owner on `main` from the latest green CI run's summary (`gh run download`), never by CI itself. Lowering a floor is an owner's TSV edit with a reason line (for example a new command the owner keeps manual); CI never lowers it. The floor is checked in CI's `coverage` job and nightly, not in `make gate`, which does not measure coverage.
+- [ ] Target for the safety path: line coverage ≥ 90% for `exec/mod.rs`, `exec/delete.rs`, `exec/guard.rs`, `exec/preflight.rs`, `exec/journal.rs`, `plan.rs` and `rules/classify.rs`. On `e933b7b`, before the first item: `journal.rs` 71.0%, `delete.rs` 87.5%, `exec/mod.rs` 89.4%, the others 91.4–98.6%. Re-measured after the first item, then tests are added until the target is met, or the reason a line is unreachable is recorded.
+- [ ] `proptest` strategies for small generated trees, the scan root being the generated home (`Env::with_paths`, `roots` naming it), so the protected folders lie inside it: a list of placements (so shrinking drops whole parts) built with `ddc_loadgen::desc` and `fixtures::place`, so a new rule joins the strategy by itself: rule fixtures at a random depth or at home; a marker that matches by a file alone (a valid `CACHEDIR.TAG`, or `pyvenv.cfg`) put directly into a protected folder that the walk asks `Catalog::claimable` about (`Documents`, `Desktop`, `Projects`, `.ssh`, `.gnupg`, `.config`), drawn in at least one case in ten, with nothing else in that folder to block the claim: the folders the visitor descends or claims before asking (`Library`, `Library/Caches`, `.cache`, `.local`, `Downloads`, `Pictures`, `Movies`, `Music`, `Library/CloudStorage`, `Mobile Documents`, `rules/visitor.rs` `before_read` and `after_read`) never reach that check, so a draw among them tests nothing; `.ddc-keep` inside a placement at any depth, or in an ancestor; nested claims; hard links within and across placements; symlinks to protected folders or out of the tree; a VM rule's path with a marker inside; `.git` or a manifest at a would-be finding's top; environments and build products with and without lock files, and ages, for the default selection; rule fixtures under `Library/CloudStorage` and `Mobile Documents`, so that the property about them is not vacuous (a counting reader asserts neither folder is opened). Shrinking is bounded (`max_shrink_time`) so a failing case prints its minimal tree before the `load` group's 240 s kill.
+- [ ] Property, safety, over findings and plans: for any generated tree, no item of the default plan or of the all-selected plan is a protected folder, a scan root or an ancestor of one; none with action Delete or Trash is at, inside or above a VM rule's path; none holds a `.ddc-keep` at any depth or has one in an ancestor inside the scan root (the entry lock of the user's own folders, ADR amendment 2026-10-20, excepted); no finding, entry or large file lies under `Library/CloudStorage` or `Mobile Documents`; and the default selection of the Description holds over the findings. `build_plan` drops `user-data` findings and the scan roots by construction (`plan.rs`), so those two are not properties of it: the user-data property is over `plan_listed` with a generated list, where a listed user-data folder, an entry with action `delete` or `permanent: true` is refused.
+- [ ] Property, the executor (the plan is untrusted input, ADR §1): a protected folder injected into a plan ends skipped with reason `Protected`, not merely skipped; a `Delete` or `Trash` item of a `native-only` rule ends `action-not-allowed`; a listed user-data entry that holds a `.ddc-keep` ends `entry-locked` (ADR amendment 2026-10-20); every removed path lies under a deleted item. An injected protected item must pass the checks before the protected one: inside the roots, not a root itself (so not `$HOME`), complete, with its real `(dev, ino)` from `symlink_metadata` and its parent's real or `None`. The fake `ProcessTable` names `ProcInfo` through a re-export `exec::ProcInfo`, never `ddc_core::sys::`.
+- [ ] Property, counted once: `ddc_loadgen::verify::diffs` against the manifest (totals, per-finding bytes and shared bytes, the plan) is empty, and the class totals equal the sum over the non-ignored findings. It runs on the cases `manifest()` models (locks, ages, app-owned downgrades, `user.kept`); a strategy case it does not model (a `.ddc-keep` deep inside a planted finding, nested claims, markers in protected folders) feeds the safety property only, and step 5 lists which ones.
+- [ ] Property, thread and order independence: a seam `report::scan_with_reader(…, &dyn DirReader)` over the existing `scan_inner`, and a test reader that wraps `StdReader` and permutes each listing by a seed and the directory's path, over one scan root. One thread, eight threads, `StdReader` and the permuting reader give the same report and plan, with `generated_at` and `duration_ms` left out. The bulk reader is compared to `StdReader` separately, with the private-size fields left out: `StdReader` reads no private size, so `private_bytes` and `selected_reclaimable_bytes` differ for the rules whose files may be clones (the bun, pnpm and uv caches, uv and pnpm environments). Within one root the walk is order-independent by construction (sorted owners, entries, errors; set-based hard-link holders); across roots a hard link's bytes go to the first root seen, so multi-root trees are out of scope.
+- [ ] Differential test: the rule matcher (`RuleVisitor` through the `Visitor` trait) agrees with a deliberately simple reference, a linear scan over the catalog's rules with the documented precedence, on generated paths whose names come from the catalog itself; and whenever the walk claims a rule, `Catalog::verify` agrees.
+- [ ] Every JSON report round-trips (`ScanReport`, the clean report, progress lines, the disk report). The ten committed schemas already have drift tests against the types; validating instances needs a validator crate (`jsonschema`), taken only if it passes `make msrv` and `make deny`, otherwise this stays round-trip plus drift and the reason is recorded here.
+- [ ] Interruption, extending what exists (`scan_cli.rs` SIGTERM of a scan, `clean_items_cli.rs` TERM and HUP during a tool and Ctrl-C, `clean_safety.rs` tombstones): a scan of an S tree killed mid-walk; a clean of every delete item of an S tree with `--json`, sent SIGSTOP after its k-th `item` event, then SIGTERM, then SIGCONT (as `scan_cli.rs` does). An `item` event is written after its outcome, so item k+1 may be running when the k-th event is read: the test accepts k or k+1 items done and the rest `not-run` (the clean stops after the current item and re-raises, `cmd/clean_items.rs` and `cmd/clean.rs`); a SIGKILL during one large deletion, where the item is intact, gone or a tombstone that the next scan reports. In each case the lock (`File::try_lock`) is free, `last-scan.json` is the previous or the complete new file, a second run works, nothing outside the plan was removed. A `.last-scan.json.tmp-<pid>` left by a SIGKILL (`store.rs`, nothing sweeps it today) is either allowed or swept, decided in step 8 and asserted by the test. The signal tests are `cfg(unix)` and signal the process group with `libc::kill` directly, not `ddc_core::sys::signals::kill_group`, so the new test files keep off `sys::`; an in-process twin of the SIGTERM case through `ExecOptions.cancel` needs no signals and is the one that runs on every OS. The lists are delete-only: a trash item goes to the real Trash whatever `HOME` is.
+- [ ] Fuzz targets (`cargo fuzz` in `fuzz/`, the nightly toolchain pinned like the AddressSanitizer run, in the nightly workflow): `disk::plist::parse`, `plan::ListedItems::parse` (the `--items` list), `free::model::ActionList::parse` (the app's `disk free` list), settings (`settings::parse` made public) and the last scan (a `store` function that decodes bytes, split out of `read_last_scan`). `make fuzz` runs each for a set time; a crash becomes a test in `ddc-core/tests/fuzz_regressions.rs`. The parsers of tool output that drive a destructive command are serde_json over the tools' JSON and will not crash; what matters there is semantic, so they get property tests instead of fuzz targets: an orphan set never names a formula with a remaining dependent (`brew/graph.rs` `orphans` and `would_orphan`, read from `brew info`; `free/uninstall.rs`), and a simulator runtime identifier matches exactly one runtime (`free/probe.rs`, `free/simctl.rs`; `simctl runtime delete`).
 
 ## Implementation Plan
 
+From `projectstore:planner` (opus), 2026-10-29, on `e933b7b`. Each step is one commit that passes `make gate`.
+
+1. `test: keep the coverage profile through env_clear` (`isolate::ClearEnv`, the 25 call sites, `measure.rs`, the `clippy.toml` rule). Push, read the CI coverage three times (the push, two re-runs) for the per-file spread.
+2. `build: per-crate coverage floor`: the `coverage` recipe writes JSON and HTML and runs `bench/coverage_floor.py` (and its test); `coverage-ratchet`; `bench/coverage-floor.tsv` from step 1's CI numbers minus 1; the summary in the `coverage` job's artifact.
+3. `test: rule matcher against a linear reference`: `proptest` as a workspace dependency (`default-features = false, features = ["std"]`, passing `make msrv` at 1.89 and `make deny`), `crates/ddc-core/tests/matcher_reference.rs`.
+4. `test: no plan holds a protected folder, user data or a VM`: `crates/ddc-loadgen/tests/properties.rs` (the strategy, both halves of the safety property), in the nextest `load` group. In process: `target::Scratch`, `build::build`, `Env::with_paths` with a fixed `now`, `ReaderKind::Std`, a fixed `StatFs` fake, a fake Trash, a fake `ProcessTable` through a new `pub use crate::sys::procs::ProcInfo` in `exec`. The protected lists come through one helper, so DDC-007's per-OS split changes one line. The `brew info` and `simctl` properties go in with the other core properties.
+5. `test: sizes are counted once on generated trees` (`verify::diffs`).
+6. The `scan_with_reader` seam, then `test: same report for any thread count and entry order`.
+7. `test: reports round-trip`, with validation if `jsonschema` passes.
+8. `test: interrupted scans and cleans leave a consistent state`: `crates/ddc-cli/tests/interrupt_cli.rs` and the in-process twin in `clean_safety.rs`.
+9. `test: safety modules to 90% line coverage`.
+10. `ci: fuzz the parsers nightly`: the two public seams, `fuzz/` with its own lock file (checked against `cargo machete`), `make fuzz`, the nightly job, `fuzz_regressions.rs`.
+11. The owner's `make coverage-ratchet` on `main`; the seeded-bug run on a throwaway worktree, never committed.
+
+Cases: 256 per property in `make gate`, which CI runs, set in one place (a `gate`-specific `PROPTEST_CASES` that its `nextest` prerequisite inherits); `gate-fast` on its own runs 32, since the pre-commit tier is already over its budget (epic DDC-005: 42 s warm, 78 s after a core change, against 60 s); the nightly raises it. Estimated, not measured: 10–30 ms per case (a tree of about 100 nodes, one to three scans), 3–8 s per property at 256. `jsonschema` goes in with `default-features = false`, since its defaults pull `reqwest`.
+
 ## Acceptance Criteria
 
-- [ ] `make coverage` produces per-crate and per-module numbers. The floor file exists, and a drop below it fails CI.
+- [ ] The CLI's own code is measured: `make coverage` in CI shows `ddc-cli/src/cmd/*.rs` above 0%.
+- [ ] `make coverage` produces per-crate and per-file numbers; `bench/coverage-floor.tsv` exists, and a drop below it fails the `coverage` job in CI.
 - [ ] The named safety modules reach ≥ 90% line coverage, or each uncovered line has a recorded reason.
-- [ ] The three invariant properties and the matcher differential test run in the fast gate with ≥ 256 cases each. A seeded bug (e.g. a protected-folder check removed) is caught by a property test. This is shown once, on a throwaway branch.
-- [ ] The interruption tests pass in the full gate.
+- [ ] The safety, executor, counted-once and order properties and the matcher differential test run in nextest with ≥ 256 cases each in `make gate` and CI. A seeded bug is caught by a property test, shown once on a throwaway worktree: the protected-folder check in `Catalog::claimable` removed (caught by the strategy's markers in `Documents`, `Desktop`, `Projects`, `.ssh` or `.gnupg`); both protected checks of `Guard::check` removed, by folded path and by `(dev, ino)` (with both gone an injected protected item ends `rule-mismatch`, not `Protected`, and the assertion on the reason fails). The failing outputs are recorded here.
+- [ ] A `.last-scan.json.tmp-<pid>` after a SIGKILL is asserted as allowed or swept, as step 8 decides.
+- [ ] The interruption tests pass in `make gate`.
 - [ ] Each fuzz target ran for ≥ 10 minutes without a crash, or its crash is fixed and kept as a test.
 
 ## Final Summary
 
 ## Technical Notes
 
-- Property and interruption tests write to temporary directories only, with `HOME` and `--data-dir` pointed at scratch folders (the isolation rules of story "Memory and CPU under load: peak memory, leaks and CPU time"). Proptest's shrinking keeps failures small enough to read.
-- The FFI in `sys/` cannot run under Miri. Its safety rests on these tests, the leak check and the nightly AddressSanitizer run in story "Memory and CPU under load: peak memory, leaks and CPU time".
+- Coverage on `e933b7b`, 2026-10-29, `make coverage` locally (3:45, a busy machine), lines: `ddc-core` 91.94%, `ddc-loadgen` 83.91%, `ddc-cli` 48.19% (`cmd/*` and `main.rs` 0%), total 81.19%; regions 79.89%, functions 84.27%. Not a baseline: the floor comes from CI after the `env_clear` fix.
+- Coverage with step 1, on `74117a2`, 2026-10-29, locally (571 tests): lines `ddc-core` 94.0%, `ddc-loadgen` 83.95%, `ddc-cli` 83.46% (`cmd/*` 50.0–95.2%, `du.rs` and `disk_free.rs` the lowest, `main.rs` 92.6%), total 89.90%; regions 88.48%. The safety files: `plan.rs` 96.98, `classify.rs` 98.60, `guard.rs` 93.63, `preflight.rs` 92.10, `exec/mod.rs` 92.34, `delete.rs` 89.58, `journal.rs` 100.0. The core code the CLI tests run is now counted, so `journal.rs` rose from 71%; only `delete.rs` is under 90%.
+- Already in place before this story: `make tools` adds `llvm-tools-preview` and pins `cargo-llvm-cov` (`.config/tools.mk`); `make coverage` writes `target/lcov.info` and a text summary; the `coverage` job of `gate.yml` and the nightly run it. The ten JSON schemas in `docs/` each have a drift test. Signals: `clean`, `clean --items`, `disk`, `disk free` and `disk agents` re-raise the signal they received (`sys::signals::reraise`); `scan` has no handler. A SIGTERM during a clean stops after the current item (`exec/mod.rs`); only a SIGKILL or a power loss can leave a torn removal.
+- The limits format is TSV checked by stdlib Python, like `bench/load-limits.tsv`: `tomllib` is not in macOS's `/usr/bin/python3` 3.9.
+- A marked temporary folder holds at most 10⁴ entries on macOS (`TEMP_MAX`), so the interruption trees are S trees, not 10⁴ items.
+- Property and interruption tests write to temporary directories only, with `HOME` and `--data-dir` pointed at scratch folders (the isolation of story "Memory and CPU under load: peak memory, leaks and CPU time"). Proptest's regression files are committed when they appear; a dirty tree blocks `build-dist.sh`.
+- The FFI in `sys/` cannot run under Miri. Its safety rests on these tests, the leak check and the nightly AddressSanitizer run of story "Memory and CPU under load: peak memory, leaks and CPU time".
 
 ## Dependencies
 
-- Story "Mandatory gate before every commit" (the gate this story adds to).
-- Story "Synthetic load trees: large, wide, deep and hostile" for the interruption tests' trees.
+- Story "Mandatory gate before every commit" (the gate this story adds to; it recorded the `env_clear` gap).
+- Story "Synthetic load trees: large, wide, deep and hostile": `desc`, `build`, `manifest`, `verify::diffs`, `fixtures::place` and the marked scratch folders are the strategies' tree and the counted-once oracle.
+- ADR "Cleanup safety model: risk classes, plan and confirmation": the invariants.
+- Epic DDC-007 "Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers": these tests guard its story "Move OS calls behind the platform module". The test files reach the core through seams, but `ddc-loadgen`, which they stand on, imports `ddc_core::sys::` in six files (`isolate.rs`, `build.rs`, `run.rs`, `measure.rs`, `target.rs`, `verify.rs`); that story's inventory lists `ddc-loadgen` for this reason.
 
 ## Attachments
 
@@ -82,4 +109,4 @@ This story measures coverage and sets a floor that only rises. It states the inv
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*
