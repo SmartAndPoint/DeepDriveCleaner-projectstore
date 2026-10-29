@@ -5,10 +5,10 @@ title: "Production-grade Rust core: mandatory gate and load testing"
 status: in-progress
 priority: p1
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [rust, quality, testing, performance, ci]
-code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "scripts/load-image.sh", "bench/compare_load.py", "bench/test_compare_load.py", "bench/dhat_top.py", "bench/test_dhat_top.py", "bench/load-limits.tsv", "crates/ddc-core/src/heap.rs", "crates/ddc-core/src/sys/usage.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/exec/system.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/load_cli.rs", "crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/scanner.rs"]
+code_refs: [".config/nextest.toml", ".config/tools.mk", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Makefile", "deny.toml", "scripts/ci-green.sh", "crates/ddc-core/Cargo.toml", "Cargo.toml", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "scripts/load-image.sh", "bench/compare_load.py", "bench/test_compare_load.py", "bench/dhat_top.py", "bench/test_dhat_top.py", "bench/load-limits.tsv", "crates/ddc-core/src/heap.rs", "crates/ddc-core/src/sys/usage.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/exec/system.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/load_cli.rs", "crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/scanner.rs", "crates/ddc-core/src/stats.rs", "crates/ddc-core/src/sys/op_stats.rs", "crates/ddc-core/src/sys/bulk.rs", "crates/ddc-core/src/scan/reader.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/classify.rs", "crates/ddc-core/src/rules/matcher.rs", "crates/ddc-cli/tests/structure.rs", "scripts/build-dist.sh", "scripts/build-app.sh", "crates/ddc-core/src/agents/claude.rs", "crates/ddc-core/src/agents/codex.rs", "crates/ddc-core/src/agents/mod.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/exec/delete.rs", "crates/ddc-core/src/report/project.rs", "crates/ddc-core/src/rules/toolchain.rs"]
 review_status: reviewed
 reviewed_at: 2026-10-28
 ---
@@ -20,7 +20,7 @@ reviewed_at: 2026-10-28
 | **Status** | in-progress |
 | **Priority** | p1 |
 | **Created** | 2026-10-28 |
-| **Updated** | 2026-10-28 |
+| **Updated** | 2026-10-29 |
 
 ---
 
@@ -31,7 +31,7 @@ No change reaches `main` without one mandatory check. The check formats, lints, 
 Success criteria:
 
 - A local git hook refuses a commit with a format error, a clippy warning or a failing test. The hook is versioned in the repository. CI re-runs the gate on every push; a red run on `main` is reported, and `make dist` refuses to build a commit whose CI run is not green.
-- Re-applying either quadratic step that commit `aa64c83` removed makes a test in the gate fail, on any machine and without a wall-clock limit.
+- Re-applying the per-finding directory read that commit `aa64c83` removed (step 2) makes a test in the gate fail, on any machine and without a wall-clock limit. Its per-claim scan (step 1) fails the gate when its comparison is counted, as the runbook requires; restored verbatim, an uncounted comparison loop moves no counter, and whether the CPU slope of `make scaling` at L shows it is measured once and recorded in story "Complexity guard: operation counts and scaling exponents".
 - On generated trees of 10⁴ to 10⁶ entries, scan and report time and peak memory grow with a log-log slope ≤ 1.2. macOS `leaks --atExit` reports no leaked allocation after a scan.
 - No `make load` run reads or writes the owner's real home, data directory, settings, LaunchAgents, notifications or Trash. (The owner's own `make bench-real` reads the home by design, read-only.)
 - Every number is written to a dated file in `bench/`, and a script compares it with the previous run.
@@ -69,7 +69,7 @@ Decisions the epic relies on:
 | [story-mandatory-gate-before-every-commit](./stories/story-mandatory-gate-before-every-commit.md) | done | `make gate-fast` / `make gate`: fmt, clippy, tests with timeouts, docs, cargo-deny, unused dependencies, MSRV. Versioned pre-commit and pre-push hooks, a GitHub Actions workflow on every push and a nightly one |
 | [story-coverage-floor-and-property-tests-for-the-safety-invariants](./stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md) | planned | Line coverage measured and ratcheted from `main`. Property and differential tests for the safety and counting invariants. Interruption tests. Fuzz targets for the parsers |
 | [story-synthetic-load-trees-large-wide-deep-and-hostile](./stories/story-synthetic-load-trees-large-wide-deep-and-hostile.md) | done | A deterministic generator of 10⁴–10⁷-entry trees on a disposable disk image, with a manifest of the expected findings and plan. It refuses any target that is not its own image or a marked temporary folder (S only on macOS) |
-| [story-complexity-guard-operation-counts-and-scaling-exponents](./stories/story-complexity-guard-operation-counts-and-scaling-exponents.md) | planned | Cost counters (directory entries read, claim lookups, rule matches, allocations) under a feature, asserted linear in the gate. Scaling slopes on larger trees. Regression tests that reproduce both steps of `aa64c83` |
+| [story-complexity-guard-operation-counts-and-scaling-exponents](./stories/story-complexity-guard-operation-counts-and-scaling-exponents.md) | in-progress | Cost counters (directory entries read, claim lookups, rule matches, allocations) under a feature, asserted linear in the gate. Scaling slopes on larger trees. Regression tests that reproduce both steps of `aa64c83` |
 | [story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time](./stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time.md) | in-progress | An isolated load harness. Peak RSS per entry, `leaks --atExit`, AddressSanitizer for `sys/`, heap profiles, CPU time, idle waits. Dated results, a comparison script and a profiling runbook |
 | [story-load-run-on-the-reference-machine-including-system-folders](./stories/story-load-run-on-the-reference-machine-including-system-folders.md) | planned | `make bench-real`: read-only release-build scans of the home, `~/Projects` and the whole-disk areas, run by the owner, recorded and compared. Advisory, not a release gate |
 
@@ -80,7 +80,7 @@ Implementation order: the gate, then the trees, then memory and CPU (the harness
 - [x] `make gate-fast` and `make gate` are the mandatory checks. The git hooks and CI run them, and their parts and timings are documented.
 - [ ] Coverage per crate is measured. The floor only rises. The safety invariants hold under property tests.
 - [ ] `make load` generates trees, runs the complexity, memory and CPU checks in isolation, and writes `bench/load-<date>-<size>.tsv`.
-- [ ] A reintroduced quadratic step, either one, fails the gate.
+- [ ] A reintroduced quadratic step fails the gate: step 2 of `aa64c83`, or step 1 with its comparison counted.
 - [ ] A runbook explains how to profile the core (flamegraph, heap profile, `leaks`, counters) when a number regresses.
 
 ## Dependencies
@@ -104,4 +104,4 @@ Implementation order: the gate, then the trees, then memory and CPU (the harness
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*

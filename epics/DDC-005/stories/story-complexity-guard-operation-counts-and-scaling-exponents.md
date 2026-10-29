@@ -3,18 +3,18 @@ type: story
 id: "story-complexity-guard-operation-counts-and-scaling-exponents"
 epic: "DDC-005"
 title: "Complexity guard: operation counts and scaling exponents"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [rust, testing, performance, complexity]
-code_refs: []
+code_refs: ["Makefile", "scripts/build-dist.sh", "scripts/build-app.sh", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/Cargo.toml", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/stats.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/sys/op_stats.rs", "crates/ddc-core/src/sys/bulk.rs", "crates/ddc-core/src/scan/reader.rs", "crates/ddc-core/src/agents/claude.rs", "crates/ddc-core/src/agents/codex.rs", "crates/ddc-core/src/agents/mod.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/exec/delete.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/project.rs", "crates/ddc-core/src/rules/classify.rs", "crates/ddc-core/src/rules/matcher.rs", "crates/ddc-core/src/rules/toolchain.rs"]
 specs: []
-started_at: null
+started_at: "2026-10-29T06:21:11.631Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-29T06:21:11.631Z"
 ---
 
 # Complexity guard: operation counts and scaling exponents
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -33,42 +33,76 @@ plan_updated_at: null
 A wall-clock limit ("scan in ≤ 60 s") catches a slow machine as readily as a slow algorithm, and it misses a quadratic step until the input is big enough. This story catches a quadratic step by its shape, in two complementary ways:
 
 1. **Cost counters (deterministic, in the fast gate).** The core counts the work its hot paths do. The counters measure cost, not call sites. A loop that calls a cheap function n times and a function that reads a directory of n entries both show up.
-   - `dir_entries_read`: every entry returned by a directory read, wherever it happens. Counting inside the two `DirReader` implementations (`scan/reader.rs`, `sys/bulk.rs`) covers the walker and `exec/preflight.rs`. One `counted_read_dir` helper covers the direct `fs::read_dir` sites: `report/project.rs` (`last_activity`), `rules/matcher.rs`, `rules/classify.rs`, `rules/toolchain.rs`, `exec/delete.rs` and `disk/`. This is the counter that catches `aa64c83` step 2.
-   - `claim_lookups`: comparisons made while matching claims to findings. This catches step 1.
-   - `rule_match_attempts`.
-   - `ancestor_checks`.
+   - `dir_entries_read`: every entry returned by a directory read, wherever it happens in `ddc-core`. Counting inside the two `DirReader` implementations (`scan/reader.rs`, `sys/bulk.rs`) covers the walker, `exec/preflight.rs` and `report/recheck.rs`. One lazy `stats::read_dir` adapter covers the direct `fs::read_dir` sites: `report/project.rs` (`last_activity`), `rules/matcher.rs`, `rules/classify.rs`, `rules/toolchain.rs`, `exec/delete.rs`, `disk/` and `agents/`. This is the counter that catches `aa64c83` step 2.
+   - `claim_lookups`: comparisons made while matching claims to findings, and while looking a path up among the findings in `report/contents.rs`. This does **not** catch a verbatim restore of step 1: the pre-`aa64c83` code was a bare `findings.iter().any(|f| f.path == o.path)`, which reads nothing, allocates nothing and moves no counter. It catches step 1 only when the comparison is counted, as the runbook's "Adding a counter" requires. No counter design catches an uncounted comparison loop; such a loop may show in the CPU slope of `make scaling` at L (an estimate for `mixed` L puts a restored step 1 between slope 1.1 and 1.3, so it is measured once, Decomposition below).
+   - `rule_match_attempts`: every call of the rule matcher. This counts calls, not cost: the cost is in the child lookups (`has_child`, `has_child_dir`), each a scan of a listing that `dir_entries_read` already counted. It is linear while the visitor calls the matchers once per directory read.
+   - `ancestor_checks`: every step up the ancestors while looking for a project root, and every prefix check against excludes.
+   - `marker_checks`: every check of a claim or a user-data entry against the keep markers, split from `ancestor_checks` so the markers × claims product is never diluted by the linear project-root walk.
    - `allocations` and `bytes_allocated`: a counting `#[global_allocator]` wrapper, active only under the feature.
 
-   A test runs the same profile at n and 4n entries and checks each counter's ratio. It fails if a counter grows faster than its declared bound: linear for most, n·log n where it is justified and written next to the counter. A quadratic step multiplies by 16 instead of 4. That is visible on S-size trees, independent of the machine, and never flaky.
-2. **Scaling slopes (wall clock and memory, measured on the reference machine).** The test times scan, report, plan and the after-clean recheck at n, 2n, 4n and 8n on M and L trees. It fits the log-log slope of CPU time and of peak memory, and reports above 1.2. This catches costs that no counter sees: syscalls, locks, cache misses.
+   A test runs the same profile at n and 4n entries and checks each counter's ratio, where r is the growth of the manifest's entries, not of its findings: findings are planted in proportion to the entries (`wide-root`: 166 against 41 at the planned sizes, 4.05), and the difference falls inside ε. It fails if a counter grows faster than its declared bound: linear for most, n·log n where it is justified and written next to the counter. A quadratic step multiplies by 16 instead of 4. That is visible on small trees, independent of the machine, and never flaky.
+2. **Scaling slopes (CPU time and memory, measured on the reference machine).** The harness times scan and report (`scan`), plan (`clean-dry-run`) and the after-clean recheck (`clean-items`) at four sizes, n, 2n, 4n and 8n, where 8n is the tier: 12 500 to 100 000 for M, 125 000 to 10⁶ for L. It fits the log-log slope of CPU time and of peak memory, and reports above 1.2. This catches costs that no counter sees: syscalls, locks, cache misses, and possibly an uncounted comparison loop. CPU is judged on the local slope between 4n and 8n, only where the median CPU at 4n is at least 1 s (below that, a 10 ms wobble moves the slope by more than 0.1, so it is recorded and not judged); the full fit is recorded for information (the constant base flattens it). Peak memory is judged above the profile's base from `bench/load-limits.tsv` (`rss_base_bytes`, about 11 MB), and only at L: at M most profiles add a few hundred bytes per entry to that base, so the raw slope is near 0 whatever the algorithm.
 
 ## Decomposition
 
-- [ ] A `stats` module in `ddc-core`. Counters are relaxed atomics, or per-thread counters summed at the end, behind a cargo feature `op-stats`, which is not a default feature. Each counter is declared with its bound (`Linear`, `NLogN`) and a one-line reason. Tests read counters as deltas around the measured scan. The ratio tests run serially (a nextest `test-group` with `max-threads = 1`) and only through nextest, which runs each test in its own process; `make check` is an alias of `gate-fast`, so no gate path runs them under plain `cargo test`.
-- [ ] `op-stats` and the memory story's `dhat-heap` both install a `#[global_allocator]`: a `compile_error!` refuses both at once.
-- [ ] The counters above at their sites. A profile of an L `mixed` scan confirms no hot path is missed.
-- [ ] Fast-gate test, in process (library calls, no harness needed): `wide-root`, `users` and `projects` at S and 4·S; the other profiles at 10³ and 4·10³ (the ratio depends on shape, not size). Assert `count(4n) / count(n) ≤ 4 · (1 + ε)` for `Linear` and the matching bound for `NLogN`.
-- [ ] A third quadratic step, found while planning the load trees and not fixed by `aa64c83`: `rules/classify.rs` `dir_has_any` reads the project root for the glob `requirements*.txt` once per venv with no lock file beside it, uncached. The `wide-root` profile (10⁴ siblings, N venvs) must show it in `dir_entries_read`. The step fires when a venv sits directly under that root (parent = project root, so `[parent, project_root]` reads it twice) and no lock file is beside it. Fix it, for example with a `dir → has_lock` memo inside one `classify` call, or by recording lock-file presence in the visitor's `on_file`; both cost O(distinct directories), unlike caching whole listings. Keep the guard as its regression test.
-- [ ] Regression tests for `aa64c83`. The counters are written on the current code first. Then, on a throwaway branch, each step is restored on its own: the per-claim scan over all finding paths, then the per-finding `last_activity` read. The guard must fail each time, naming the counter. Record both failing outputs in this story.
-- [ ] `make scaling`: reuses the memory story's harness and column order. CPU time (user + system, median of 3 runs) and peak memory at four sizes, slope fit, and a table written to `bench/scaling-<date>.tsv`. It runs on the reference machine. CI runs it at M for information only.
-- [ ] A section "Adding a counter" in the runbook "Profiling the core" from story "Memory and CPU under load: peak memory, leaks and CPU time". That story writes the runbook first.
+- [ ] A `stats` module in `ddc-core`. Counters are relaxed atomics behind a cargo feature `op-stats`, which is not a default feature; without it every call compiles to nothing. Each counter is declared with its bound (`Linear`, `NLogN`) and a one-line reason. Tests read counters as deltas around the measured scan. nextest runs each test in its own process, so counters never leak between tests and the ratio tests can run in parallel (the existing `load` test group). They run only through nextest; `make check` is an alias of `gate-fast`, so no gate path runs them under plain `cargo test`. The ratio test is compiled with or without the feature and fails when every counter reads 0, so dropping `op-stats` from the Makefile's `FEATURES` fails the gate instead of silently removing the guard. The whole gate (golden outputs, `load_cli`, every unit test) runs on the counting-allocator build; only `release-check`, `scripts/build-dist.sh`, `scripts/build-app.sh` and `make load` run the shipped allocator.
+- [x] `op-stats` and the memory story's `dhat-heap` both install a `#[global_allocator]`: a `compile_error!` refuses both at once. (`crates/ddc-core/src/heap.rs`, commit `fa7cff7`.)
+- [ ] The counters above at their sites.
+- [ ] A sweep of the comparison loops over findings, claims and keep markers in `report/`, `rules/` and `exec/preflight.rs`: each one is counted, or is listed in the runbook with why it is bounded (for example `report/contents.rs`, `walked.iter().find` once per user-data folder). A heap profile or a samply recording cannot establish this: a comparison loop allocates nothing. A structure test cannot either: no grep tells a loop over the findings from a loop over a fixed catalog. Known follow-up beyond this sweep: `plan.rs` `plan_listed` and `report/after_clean.rs` (Technical Notes).
+- [ ] Fast-gate test, in process (library calls, no harness needed), folded into `crates/ddc-loadgen/tests/profiles.rs`: the S tree of 10 000 entries that `check` already builds and scans is the 4n point, so only an n = 2 500 tree is built extra, for every profile (+27 500 entries for the group, about a quarter more work). 10 000 is the most a marked temporary folder may hold on macOS (`TEMP_MAX`). A warm-up scan of a small tree runs first, so one-time allocations (the catalog, lazy statics) bias neither point; the walk's pool is built per scan, a fixed cost that only lowers the ratio. The ratio assertion runs only under nextest (`NEXTEST` set): plain `cargo test` runs the profile tests as threads of one process and their deltas would interleave. The same test also runs `preflight` in process over the plan's items (as `clean --items --dry-run` does) and checks its own `dir_entries_read` delta, so the preflight half of the `dir_has_any` fix has a deterministic test too. `hostile` is scanned static, without its mutator, as `check` does now. Assert `count(4n) ≤ r · (1 + ε) · max(count(n), 64)` for `Linear`, where r is the real growth of the manifest's entries, and `r · ln(4n)/ln(n) · (1 + ε)` for `NLogN`.
+- [ ] A third quadratic step, found while planning the load trees and not fixed by `aa64c83`: `rules/classify.rs` `dir_has_any`. The Python lock list always holds the glob `requirements*.txt`, so for every `python.venv` it lists the venv's parent and the project root, uncached. In `wide-root` (10⁴ siblings, N venvs under one root) each venv re-reads the root up to its `requirements.txt`, so `dir_entries_read` grows with N × siblings. The same call runs once per listed item in `exec/preflight.rs` (`effective_class`), so `clean --items --dry-run` is quadratic too. Fix both with one `(dir, lock list) → bool` memo, held across one `classify` call and across `preflight`'s item loop. Keep the guard as its regression test.
+- [ ] Keep markers against claims, which the counters will show: `rules/classify.rs` checks every claim against every keep marker (`markers.iter().any(|m| m.starts_with(..))`), and `projects` plants markers in proportion to n. `report/contents.rs` does the same per user-data entry. If `marker_checks` fails the ratio (it will, in `projects` and `mixed`), replace the scan with one set of the markers' ancestors, built once (`m.starts_with(p)` ⇔ `p` is an ancestor of `m`).
+- [ ] Regression tests for `aa64c83`. The counters are written on the current code first. Then, on throwaway branches, each step is restored on its own: the per-finding `last_activity` read, which must fail naming `dir_entries_read`; the per-claim scan with its comparison counted, which must fail naming `claim_lookups`; and the per-claim scan verbatim, which passes and is recorded as the counters' limit. The verbatim branch also goes once through `make scaling` at L on `mixed`, and its CPU slope is recorded: whether the slope sees it is measured, not assumed. Record all three outputs in this story. Step 2 shows only in `wide-root`: in `projects` each project root is small.
+- [ ] `make scaling`: reuses the memory story's harness and column order. `scripts/load-image.sh` takes an entry count below the tier, CPU time (user + system, median of 3 runs) and peak memory are measured at the four sizes, and `ddc-loadgen slopes` fits the slopes and writes `bench/scaling-<date>-<size>.tsv` (never replacing a file, only for an enforce run of seed 1 with CPU judged). It runs on the reference machine. The nightly workflow runs it at M in record mode, for information only.
+- [ ] The release binary carries no counters: structure tests on `scripts/build-dist.sh`, `scripts/build-app.sh` (the CLI inside the app) and the manifests; an `nm` check in `release-check` and in both scripts against an exported marker symbol that only the `op-stats` build has, failing when `nm` itself fails or prints no symbol table (a `strip` added to `[profile.release]`, as release builds for DDC-007 may want, would make `nm` print nothing and every check pass); a structure test that the marker's name is the same in `sys/op_stats.rs`, the Makefile and both scripts; and an automated positive control: the ratio test runs `nm` on its own executable and asserts the marker is there. `#[used]` keeps the marker on Mach-O; on ELF (epic DDC-007) it must be checked again.
+- [ ] A section "Adding a counter" in the runbook "Profiling the core" from story "Memory and CPU under load: peak memory, leaks and CPU time".
 
 ## Implementation Plan
 
+Planned with `projectstore:planner` on 2026-10-29. Four commits on `main`, each passing `make gate` on its own, two throwaway branches, then the runbook.
+
+1. **Counters behind `op-stats`.**
+   - `crates/ddc-core/src/stats.rs`: `Counter`, `Bound`, `COUNTERS` with reasons, `add`, `snapshot` and `Snapshot::delta`, and the lazy counting `read_dir` adapter (an early exit stays an early exit).
+   - `crates/ddc-core/src/sys/op_stats.rs`: the counting allocator, forwarding to `System`, with cache-line-padded relaxed atomics and nothing that allocates. It lives in `sys`, the one module allowed `unsafe`. An exported `DDC_OP_STATS` marker symbol makes the `nm` check meaningful under LTO.
+   - The counter sites: `sys/bulk.rs` and `scan/reader.rs` (`dir_entries_read`), `report/mod.rs` `totals` (`claim_lookups`), `rules/matcher.rs` `matches` (`rule_match_attempts`), `rules/classify.rs` `project_root`, the exclude and marker checks, and `report/contents.rs` (`ancestor_checks`). Every direct `fs::read_dir` in `ddc-core` goes through `stats::read_dir`.
+   - `crates/ddc-cli/tests/structure.rs`: `build-dist.sh` passes no features, `op-stats` is not a default feature, no manifest enables it outside a `[features]` table, and no `fs::read_dir(` in `ddc-core` outside `stats.rs`.
+   - The `nm` check in `release-check` and `scripts/build-dist.sh`. A positive control by hand: an `op-stats` release build does show the marker. Recorded here.
+   - The cost of the counting allocator on `gate-fast` is measured before and after.
+2. **The ratio test and the `dir_has_any` fix.**
+   - `crates/ddc-loadgen` gets a feature `op-stats = ["ddc-core/op-stats"]`; the Makefile's `FEATURES` names both. The feature is never turned on in a `[dependencies]` entry, so it cannot reach `release-check` or the dist build.
+   - `verify::scan_and_plan`, used by `verify::scanned`, so the test measures only the scan and the plan.
+   - The ratio check in `crates/ddc-loadgen/tests/profiles.rs::check`, after the warm-up, on the n = 2 500 tree and the S tree, in the nextest `load` group it already runs in. The failure line names the profile, the counter, both counts, the entries and the bound.
+   - The positive control: `nm` on `std::env::current_exe()` finds `DDC_OP_STATS`. `release-check` and both build scripts also require `_main` in the symbols, so a stripped binary fails instead of passing.
+   - `marker_checks` split from `ancestor_checks` (`stats.rs`, `rules/classify.rs`, `report/contents.rs`).
+   - The test is run first without the fixes, and the `wide-root` failure (and `projects`, if the markers fail) is recorded here (AC 3).
+   - The `dir_has_any` memo, and the markers set (`projects`, 65 → 250 claims against 2 → 8 markers, and `mixed` will fail before it; sorting `keep_markers()` once also makes the short-circuit counts independent of the walk's order). The memo changes the signature of `effective_class` (`rules/classify.rs`) and the `check` loop in `exec/preflight.rs`; it is safe across the item loop because preflight checks every item before anything is deleted. `profiles`, `golden_cli` and `load_cli` must show no change in findings or classes.
+3. **Throwaway branches, never merged** (AC 2), cut from commit 2: the per-claim scan restored in `totals` twice, verbatim from `aa64c83^` and with its comparison counted; and the `activity` memo removed. All three outputs recorded here, the verbatim one passing.
+4. **`make scaling`.** `LOAD_ENTRIES` in `scripts/load-image.sh`, `crates/ddc-loadgen/src/scaling.rs` with `Cmd::Slopes` (least-squares slope of ln value against ln entries, for information, and the judged local slope between the two largest sizes, memory above its base), the Makefile target, and a nightly job at M in record mode with `timeout-minutes: 120` to start, set from the first run's measured time (4 builds per profile on a hosted runner, 2–3 times slower than locally). `hostile` is scaled static, without its mutator, so its CPU does not vary run to run.
+5. **Vault.** "Adding a counter" in the runbook "Profiling the core", with step 2's `wide-root` bullet, step 3's "Limit" and step 4's `op-stats` line brought up to date. Critic.
+
 ## Acceptance Criteria
 
-- [ ] With `op-stats` on, every profile passes the counter-ratio test at the sizes above in the fast gate, in ≤ 15 s total, or the measured time is recorded and the sizes are lowered.
-- [ ] Restoring either quadratic step of `aa64c83` alone makes the counter test fail with a message that names the counter and the measured ratio (evidence: two throwaway-branch outputs).
-- [ ] Before the `dir_has_any` fix, `wide-root` at S and 4·S fails the `dir_entries_read` ratio (the output is recorded in this story); after the fix it passes.
-- [ ] `make scaling` on M and L trees on the reference machine produces slopes ≤ 1.2 for CPU time and peak memory of scan and report, recorded in `bench/`.
-- [ ] The release binary carries no counters: `scripts/build-dist.sh` passes no `--features`, `op-stats` is not a default feature (both asserted in `ddc-cli/tests/structure.rs`), and `nm` on the dist binary finds no `op_stats` symbol.
+- [ ] With `op-stats` on, every profile passes the counter-ratio test at 2 500 and 10 000 entries in the fast gate, adding ≤ 15 s to the wall time of `make nextest` (measured as the difference with the ratio check on and off, same machine, back to back). If it adds more, the measured time is recorded and the n point is lowered, but only while every pre-fix failure still reproduces at the lower size: `wide-root` on `dir_entries_read`, and `projects` and `mixed` on `marker_checks`.
+- [ ] Restoring step 2 of `aa64c83` (the per-finding `last_activity` read) makes the counter test fail with a message that names `dir_entries_read` and the measured ratio. Restoring step 1 (the per-claim scan) with its comparison counted, as the runbook requires, makes it fail on `claim_lookups`; restored verbatim it passes, and that is recorded as the known limit of the counters (evidence: three throwaway-branch outputs).
+- [ ] Before the `dir_has_any` fix, `wide-root` at 2 500 and 10 000 entries fails the `dir_entries_read` ratio (the output is recorded in this story); after the fix it passes.
+- [ ] `make scaling` on the reference machine produces local slopes (4n to 8n) ≤ 1.2 for the CPU time of `scan` and `clean-dry-run` at M (every profile) and at L (`mixed`, `wide-root`, `projects`, `users`), and for their peak memory above the base at L, recorded in `bench/`. The L run takes on the order of 1–2 hours of the reference machine (4 builds per profile, the largest 10⁶ entries, and 3 commands × 3 runs at each size); its measured duration is recorded here.
+- [ ] The release binary carries no counters: `scripts/build-dist.sh` and `scripts/build-app.sh` pass no `--features`, `op-stats` is not a default feature (both asserted in `ddc-cli/tests/structure.rs`), and `nm` on the release, dist and app CLI binaries finds no `DDC_OP_STATS` symbol, which an `op-stats` build does have (asserted by the ratio test on its own executable).
 
 ## Final Summary
 
 ## Technical Notes
 
-- Pick ε so that the n·log n terms of sorting fit the bound: about 0.25 at these sizes.
+- Commit 1 on `main`: `ae070e5` (the counters, the `nm` checks, the structure tests) and `469b72a` (review fixes: the checks fail closed when `nm` or `strings` fails, `scripts/build-app.sh` is covered, the marker's name is tied across files, `report/contents.rs` counts its lookups). The positive control by hand, 2026-10-29: `cargo build --release --locked -p ddc-cli --features ddc-core/op-stats` in a separate target folder, then `nm … | grep DDC_OP_STATS` gave `0000000100217d9c S _DDC_OP_STATS`; the plain release build from `make release-check` has none among its 5 212 symbols.
+- The counting allocator's cost on the gate, 2026-10-29: `cargo nextest run --workspace`, two runs each back to back, without and with `op-stats`: user CPU 43.1 s and 39.1 s without, 39.9 s and 40.0 s with. No difference beyond the noise. The machine was loaded (1-minute load 12–54 on 10 CPUs), so the wall times (119–223 s) say nothing; system time (165–263 s) is the tree building, the same in both.
+- Critic pass on 2026-10-29 (fable), twice. Second pass: approve after fixes, applied: the three-output form of the `aa64c83` regressions, with the verbatim step 1 measured through `make scaling` at L instead of assumed; a 1 s floor for judging a CPU slope; `nm` must see a symbol table; a deterministic preflight check; `marker_checks` split out; the ratio assertion only under nextest; a starting nightly timeout. First pass: approve after fixes. Applied: AC 2 limited to what the counters can see (step 1 restored verbatim is not counted); the ratio test folded into `profiles.rs` with only the 2 500 tree extra; `scripts/build-app.sh` covered; the `nm` check fails on `nm`'s own failure and has an automated positive control; AC 4 judges local slopes, memory above the base and only at L, on named profiles; the code-level sweep of comparison loops replaces the heap-profile check; the ε reasons rewritten.
+- ε = 0.25 absorbs what is not the algorithm: fixture rounding (findings planted per budget, `budget / 60`), fixed scaffolding in every tree, short-circuit scans whose length depends on APFS order and the parallel walk, and buffer growth by doubling. No counter counts sort comparisons, and all six are `Linear` today. The floor of 64 keeps a jump from 0 to 3 from failing.
 - The counting allocator replaces the global allocator only under `op-stats`, so the counted numbers come from a slightly different binary than the shipped one. The peak-RSS numbers in the memory story come from the real release build.
+- Counters are global relaxed atomics, not per-thread: the walker runs its own rayon pool, and per-thread counters would need a registry. Each sits on its own cache line.
+- One counter, one kind of cost: a big linear site and a small quadratic one under one counter dilute the ratio at small n.
+- `exec/preflight.rs` `trashed.iter().any(...)` compares each item with the folders trashed so far in the same run: items × trashed, bounded by one `clean --items` call. The sweep lists it in the runbook.
+- `make scaling` judges memory above `rss_base_bytes` from `bench/load-limits.tsv`, which is still the provisional baseline; at L the signal (90–180 MB) dwarfs an 11 MB base, so the error is small.
+- Out of scope, measured by `make scaling`'s `clean-items` column: `plan.rs` `plan_listed` and `report/after_clean.rs` look each listed item up among all findings, O(items × findings). A follow-up story if the slope shows it.
+- `wide-root`'s CPU limit in `bench/load-limits.tsv` stays the provisional one after the fix; re-baselining is the owner's open item in story "Memory and CPU under load: peak memory, leaks and CPU time".
 
 ## Dependencies
 
@@ -82,4 +116,4 @@ A wall-clock limit ("scan in ≤ 60 s") catches a slow machine as readily as a s
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*
