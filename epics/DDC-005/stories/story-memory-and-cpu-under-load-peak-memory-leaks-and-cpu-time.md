@@ -179,6 +179,12 @@ By total bytes allocated:
 
 The global peak is the serialisation of `last-scan.json`: the whole report is pretty-printed into one buffer before the atomic write. Streaming it to the temporary file would cut up to two thirds of the peak heap. Path joins dominate the traffic (`project.rs:41`, `walker.rs:315`, `classify.rs:132`). These are notes for later work; this story changes no hot path.
 
+### Owner runs on the reference machine, 2026-10-29
+
+- **First `make leaks`:** all 11 profiles passed, 0 leaks for 0 bytes. It joined `make gate` in commit `3862eef`. `leaks` passes its environment on to the command: without `HOME` the CLI exits with "HOME is not set", so no profile could have passed otherwise. Whether excluded blocks count in the summary line is still open; the list is empty, so it waits for the first exclusion.
+- **"Process … is not debuggable" on stderr:** every run prints it for the ad-hoc, linker-signed cargo build. It limits only the memory contents `leaks` can show. A deliberately leaking probe built the same way (`rustc`, ten 4 KiB blocks whose pointers are dropped) was reported with 9 leaks for 46080 bytes and exit 1.
+- **`make load-baseline`:** ran at a 1-minute load of 104.27 (S) and 82.78 (M) on 10 CPUs, far over the ncpu/4 of a quiet machine. Not committed. The memory limits agree with the provisional baseline within a few percent, except `clean-items` (one run, no median) on `hostile` (56 → 42 MB) and `system-root` (64 → 71 MB). CPU at that load is noise. The CPU budget stays provisional until a quiet run.
+
 ## Dependencies
 
 - Story "Synthetic load trees: large, wide, deep and hostile".
@@ -190,4 +196,4 @@ The global peak is the serialisation of `last-scan.json`: the whole report is pr
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-29*
