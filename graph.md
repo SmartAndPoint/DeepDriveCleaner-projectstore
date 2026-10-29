@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T10:50:06.500Z
+generated_at: 2026-10-29T11:12:32.930Z
 
 ---
 
@@ -59,7 +59,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md | Whole disk: Conda environments and its package cache, with conda | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet.md | Whole disk: free the checked areas in one sheet | story | planned |
-| epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall.md | Whole disk: Homebrew packages, their sizes, and brew uninstall | story | planned |
+| epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall.md | Whole disk: Homebrew packages, their sizes, and brew uninstall | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md | Whole disk: Show in Finder and the honest action for each row | story | in-progress |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | in-progress |

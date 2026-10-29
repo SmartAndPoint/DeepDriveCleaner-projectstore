@@ -3,7 +3,7 @@ type: story
 id: "story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall"
 epic: "DDC-002"
 title: "Whole disk: Homebrew packages, their sizes, and brew uninstall"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [core, app, whole-disk, homebrew, native-command, adr-amendment, user-report]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-29T10:59:35.019Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-29T10:59:35.019Z"
 ---
 
 # Whole disk: Homebrew packages, their sizes, and brew uninstall
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -66,8 +66,8 @@ The owner, 2026-10-29: for Homebrew, list what is installed and how big it is wi
 **The work-start gate.**
 
 - A safety ADR amendment first: "uninstall a formula with its own tool" is beyond the 2026-10-28 amendment's "the owning tool frees its own area" (old versions and downloads). It states the dry run above, the orphans as a separate action, formulae only, and the environment: the 2026-10-28 amendment lists `BREW_ENV`'s three variables exactly, so the new one names `HOMEBREW_NO_AUTO_UPDATE` as added for `info`, `services list` and `uninstall`. It admits `brew uninstall --formula` and `brew uninstall --formula --force` (several versions), with the re-read before every uninstall above.
-- The structure test `disk_free_runs_only_its_two_commands` is a list of forbidden substrings in `free/` (`Command::new`, `remove_`, `sudo`, `autoremove` and others). It is reworked for `uninstall` and keeps forbidding `autoremove` and `sudo`; names with `remove_` in them stay out of `free/`.
-- A menu bar ADR §6 amendment: item 10 gains `ddc disk brew-packages --json` (it takes no lock and writes nothing, but runs for many seconds: a lane by the 2026-10-28 rule, which may run beside a running `brew-uninstall` or `brew-cleanup`, the same accepted race as the API folder); item 11 gains the `brew-uninstall` and `brew-uninstall-orphans` actions, the kegs field and the names field (the orphans), their `--dry-run` (the re-read), and that the terminal prompt does not offer them; `FREE_SCHEMA_VERSION` is raised by one (1 to 2, or 2 to 3 after the conda story) for both the `--actions` list and the report, which share it; the list of contracts at its end grows by three (the listing, the `--actions` list and the disk-free report, which it already lacks). It also states: `ActionId` is shared by the disk report and the free list, so its two new ids appear in both schemas and the app's strict `DiskReport.ActionId` grows with them; the disk report's `schema_version` stays 1, an exception to item 10's rule that a new variant bumps it, because an area's `action` never carries the package ids (the Homebrew row keeps `brew-cleanup`), so no reader of `last-disk.json` meets a value it does not know, and `docs/disk.schema.json` is regenerated (one enum keeps the journal and the free list on one set of ids); an uninstall runs up to three brew commands besides the probe's (the re-read's `info` and `services list`, then `uninstall`) under one shared `NATIVE_TIMEOUT` budget, so the exclusive lock is still held for at most one `NATIVE_TIMEOUT` per action, and `brew uninstall` does not start when less than a floor of it remains (a `FreeContext` field, 60 s by default, milliseconds in tests; the result is a `Failed`, not a new `Refusal` variant, with "brew could not start; nothing was removed", the same words as an offline API fetch, and its `output` says "the check took N s of M s; try again" so the sheet can tell the two apart; the sheet lists again), so a re-read that eats the budget never starts an uninstall with almost no time left; the location probe's three sub-second `brew --prefix/--cellar/--cache` queries count against the same budget (`probe::brew` gains the remaining budget as a parameter in place of its fixed 60 s); and the listing runs outside the lock knowingly: a clean of `cache.homebrew` beside it can remove the API folder brew is filling, and the listing then fails with "brew could not list its packages".
+- The structure test `disk_free_runs_only_its_tools_commands` is a list of forbidden substrings in `free/` (`Command::new`, `remove_`, `sudo`, `autoremove` and others). It is reworked for `uninstall` and keeps forbidding `autoremove` and `sudo`; names with `remove_` in them stay out of `free/`.
+- A menu bar ADR §6 amendment: item 10 gains `ddc disk brew-packages --json` (it takes no lock and writes nothing, but runs for many seconds: a lane by the 2026-10-28 rule, which may run beside a running `brew-uninstall` or `brew-cleanup`, the same accepted race as the API folder); item 11 gains the `brew-uninstall` and `brew-uninstall-orphans` actions, the kegs field and the names field (the orphans), their `--dry-run` (the re-read), and that the terminal prompt does not offer them; `FREE_SCHEMA_VERSION` is raised by one (2 to 3: the conda story raised it to 2) for both the `--actions` list and the report, which share it; the list of contracts at its end grows by three (the listing, the `--actions` list and the disk-free report, which it already lacks). It also states: `ActionId` is shared by the disk report and the free list, so its two new ids appear in both schemas and the app's strict `DiskReport.ActionId` grows with them; the disk report's `schema_version` stays 2 (the conda story raised it for its own ids), an exception to item 10's rule that a new variant bumps it, because an area's `action` never carries the package ids (the Homebrew row keeps `brew-cleanup`), so no reader of `last-disk.json` meets a value it does not know, and `docs/disk.schema.json` is regenerated (one enum keeps the journal and the free list on one set of ids); an uninstall runs up to three brew commands besides the probe's (the re-read's `info` and `services list`, then `uninstall`) under one shared `NATIVE_TIMEOUT` budget, so the exclusive lock is still held for at most one `NATIVE_TIMEOUT` per action, and `brew uninstall` does not start when less than a floor of it remains (a `FreeContext` field, 60 s by default, milliseconds in tests; the result is a `Failed`, not a new `Refusal` variant, with "brew could not start; nothing was removed", the same words as an offline API fetch, and its `output` says "the check took N s of M s; try again" so the sheet can tell the two apart; the sheet lists again), so a re-read that eats the budget never starts an uninstall with almost no time left; the location probe's three sub-second `brew --prefix/--cellar/--cache` queries count against the same budget (`probe::brew` gains the remaining budget as a parameter in place of its fixed 60 s); and the listing runs outside the lock knowingly: a clean of `cache.homebrew` beside it can remove the API folder brew is filling, and the listing then fails with "brew could not list its packages".
 - The story "Whole disk: free the checked areas in one sheet" (p3) is amended: a package removal never joins a multi-row free, because each needs its own confirmation.
 
 ## Decomposition
@@ -76,10 +76,40 @@ The owner, 2026-10-29: for Homebrew, list what is installed and how big it is wi
 - [ ] Menu bar ADR §6 amendment: the new listing contract and the changed `--actions` list (critic-reviewed).
 - [ ] Core/CLI: the listing as a command the app reads (`ddc disk brew-packages --json`, its own `schema_version`); parse `brew info --json=v2 --installed` (formulae, casks' `depends_on`); measure each keg `Cellar/<name>/<version>`; dependents; the recursive orphan set; a running service (`brew services list --json`, when brew has it built in or the old tap exists).
 - [ ] Core: `ddc disk free` gains a `brew-uninstall` action (the formula's `full_name` in `identifier`, the confirmed kegs in a new field; `--force` for several versions) and a `brew-uninstall-orphans` action carrying several names; `ListedAction` (`free/model.rs`, `deny_unknown_fields`) gains the fields and `FREE_SCHEMA_VERSION` is bumped; the re-read before each, with the probe, the lock, `BREW_ENV` plus `HOMEBREW_NO_AUTO_UPDATE=1`, the journal line and the measured result; the budget floor (a `FreeContext` field) and the probe under the same budget; the structure test amended.
-- [ ] App: the packages sheet from the Homebrew row: the progress state while brew answers ("Asking Homebrew…"), the list, the dry run, the confirmation, "Checking with Homebrew…" while the re-read runs, the command's output while it runs, the orphans step. The listing command runs under the same 600 s limit as the other brew commands (`NATIVE_TIMEOUT`).
+- [ ] App: the packages sheet from the Homebrew row: the progress state while brew answers ("Asking Homebrew…"), the list, the dry run, the confirmation, "Checking with Homebrew…" while the re-read runs, the running line while the command runs and its output's tail after, the orphans step. The listing command runs under the same 600 s limit as the other brew commands (`NATIVE_TIMEOUT`).
 - [ ] Vault: amend "Whole disk: free the checked areas in one sheet".
 
 ## Implementation Plan
+
+From the planner's pass of 2026-10-29 at main b4eb12b (after the conda story).
+
+**Decisions at the work-start gate** (where the story, the ADRs and the code left a gap):
+
+- **The disk version stays 2**, not 1: the conda story raised it. The two ids still change `docs/disk.schema.json` (the shared `ActionId`) and DDCKit's strict `DiskReport.ActionId`. The free schema goes 2 to 3.
+- **Naming the dependent.** `Refused` keeps its fieldless reason; the action report gains `needed_by` (each formula with the formulae and casks that need it), empty and left out when empty. It is part of the free schema's bump.
+- **An unreadable re-read.** A non-zero exit, a timeout, or output that is not JSON is `failed` with "brew could not start; nothing was removed". JSON that parses but lacks a field the target formula needs is the refusal `brew-field-missing`. A failed re-read never sets `needs_admin`: the sheet must not offer the uninstall in Terminal for a `brew info` that could not write its API files.
+- **`brew services list` fails while brew has it:** fail closed. The listing offers no formula, each row saying "its service state could not be read"; the re-read is `failed` as above. Services "not known" (neither the built-in folder nor the old tap exists) is no refusal: the removal is offered with the note.
+- **What is measured:** the confirmed formulae's racks (`<cellar>/<name>`, by the re-read's `name`), before and after; the rest of the Cellar is not walked. The listing asks brew for its Cellar (the probe's `--cellar`), never assumes `/opt/homebrew/Cellar`.
+- **The re-read matches by `full_name`.** "No longer installed" is decided by the confirmed `identifier` against `full_name` in the fresh JSON, never `name`, so a tap formula replaced by a core one of the same short name (or the reverse) is refused even when the version strings coincide.
+- **The orphans step.** The listing carries a top-level `orphans` set (installed, not on request, needed by nothing outside the set, a fixpoint), and each formula its `would_orphan` and `kept_pinned`. After a `freed` of `brew-uninstall`, the app lists again and offers `would_orphan` ∩ the fresh `orphans`, once: no orphans step follows `brew-uninstall-orphans`. A formula with several kegs orphans the union over its kegs' runtime dependencies. A list with two `brew-uninstall-orphans` entries is refused as a duplicate.
+- **The command's output** shows after the run (its tail), with the running line while it runs: `ddc disk free --json` prints one report at its end.
+- **The probe's environment.** The uninstall path's location probe runs with the same four variables as `info`, `services list` and `uninstall`; `brew-cleanup` keeps exactly its three.
+- **The dependency.** Like the conda story, this one no longer waits for the manual checks of "Whole disk: free space with the owning tool".
+- **`needed_by` in the journal.** A refused line in `actions.jsonl` names the dependents: the journal entry gains `needed_by` (additive; readers accept unknown journal fields since the conda story).
+- **The probe's budget.** `probe::brew` takes a budget; `brew-cleanup` passes `min(TOOL_TIMEOUT, remaining)`, so its probe still stops at 60 s; `TOOL_TIMEOUT` is simctl's and unchanged.
+- **Release order.** The free schema's 2 to 3 lands after the v0.6.0 tag (which ships version 2), so no release carries two bumps.
+- **Not modelled.** The fake-brew tests do not model what brew writes outside the Cellar (`trust.json`, the API folder): an accepted cost of the ADR, not an AC.
+
+**Steps** (each ends with `make gate-fast`, the Swift ones with `make app-test`):
+
+1. `crates/ddc-core/src/brew/` (read only): `mod.rs` (the `info` and `services list` arguments, the four-variable environment, whether brew has services), `info.rs` (a lenient parse of `brew info --json=v2 --installed`), `graph.rs` (dependents by short name, declared `dependencies` + `recommended_dependencies` for a keg with no recorded runtime dependencies, casks' `depends_on`, the orphan fixpoint, pinned kept), `services.rs` (the verdicts). `tests/brew.rs` with JSON fixtures.
+2. `free/measure.rs` regions in one walk; `free/probe.rs` brew takes the remaining budget; `brew/listing.rs` + `model.rs`; `ddc disk brew-packages --json` (`cmd/disk_brew_packages.rs`, `cli.rs`, render), its schema `docs/brew-packages.schema.json`, README, the listing CLI test.
+3. The free contract in one commit: the two `ActionId`s, `kegs` and `names` on the list with their refusals of the whole list, the new `Refusal`s, `needed_by`, `FREE_SCHEMA_VERSION` 3, the dispatch arms including `not_run`, `FreeContext.floor`, `free/uninstall.rs`'s dry run (the re-read). `free::run`'s two arms run the re-read and return its refusal, else `failed` with "brew could not start; nothing was removed": no `uninstall` runs until step 4. In the same commit: the DDCKit enums and versions, every `switch` over `ActionId` (`AreaActions.swift`, `DiskFreeRun.swift`) and `Refusal`'s wording in `FreeReport.swift`; the literal `schema_version` 2 in `crates/ddc-cli/tests/disk_free_cli.rs`, `crates/ddc-core/tests/disk_free.rs`, `DiskFreeTests.swift` and the JSON fixtures; both `docs/disk.schema.json` and `docs/disk-free.schema.json` regenerated (`DDC_UPDATE_SCHEMA=1`).
+4. The `brew-uninstall` run: the budget, the floor, measured racks, the journal.
+5. The `brew-uninstall-orphans` run; the CLI end-to-end tests; the structure test `brew_runs_only_its_named_commands`: in `ddc-core/src/brew/` and `cmd/disk_brew_packages.rs` it forbids `"uninstall"`, `"--force"`, `"--zap"`, `"--cask"`, `"--ignore-dependencies"`, `"autoremove"`, `sudo`, `Command::new`, `remove_` and `trash`; it asserts `brew::INFO == ["info", "--json=v2", "--installed"]`, `brew::SERVICES_LIST == ["services", "list", "--json"]`, `free::uninstall::UNINSTALL == ["uninstall", "--formula"]` and that `--force` is the only other argument, as `conda_runs_only_its_named_commands` does for conda; `cmd/disk_brew_packages.rs` joins `the_disk_report_never_reaches_cleanup`'s file list. A test: the confirmation named `user/tap/foo`, the rack `foo` now holds core `foo` at the same version, and the action is refused with no `uninstall`.
+6. DDCKit: the listing's report and model, the `.brewPackages` lane, the offers with kegs and names, the wording.
+7. App: the packages sheet from the Homebrew row, the confirmation with kegs, the orphans step.
+8. Vault: "Whole disk: free the checked areas in one sheet" says version 3; `projectstore:reviewer`.
 
 ## Acceptance Criteria
 
@@ -112,7 +142,8 @@ The owner, 2026-10-29: for Homebrew, list what is installed and how big it is wi
 ## Dependencies
 
 - Research note "Removal wherever a size is shown: coding agents, protected folders and the whole disk" (Finding 6)
-- "Whole disk: free space with the owning tool" (DDC-002): `ddc disk free`, the brew probe, the action sheet; this story waits for it to close
+- "Whole disk: free space with the owning tool" (DDC-002): `ddc disk free`, the brew probe, the action sheet; its code has shipped, and this story does not wait for its manual checks
+- "Whole disk: Conda environments and its package cache, with conda" (DDC-002): `ListedAction`, free schema version 2, disk version 2, shipped in 0.6.0
 - Safety ADR "Cleanup safety model: risk classes, plan and confirmation": the amendment this story adds
 
 ## Attachments
