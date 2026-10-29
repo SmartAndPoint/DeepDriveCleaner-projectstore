@@ -2,14 +2,13 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-29T09:29:13.482Z
+generated_at: 2026-10-29T09:38:38.856Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
-- [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
 - [ ] [[epics/DDC-002/stories/story-whole-disk-free-the-checked-areas-in-one-sheet|DDC-002: Whole disk: free the checked areas in one sheet]] #p3
 - [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
@@ -54,6 +53,7 @@ generated_at: 2026-10-29T09:29:13.482Z
 - [ ] [[epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus|DDC-002: HIG pass: keyboard, colour, empty states and menus]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group|DDC-002: Review window: clean only the selection in this group]] #p2
 - [ ] [[epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view|DDC-002: Coding agents in the Whole disk view]] #p2
+- [ ] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3
 - [ ] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1
 - [ ] [[epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data|DDC-002: The Trash: its own row, not Your data]] #p2

@@ -3,18 +3,18 @@ type: story
 id: "story-popover-the-next-scan-line-opens-the-schedule-settings"
 epic: "DDC-002"
 title: "Popover: the Next scan line opens the Schedule settings"
-status: planned
+status: in-progress
 priority: p3
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [app, popover, settings, schedule]
-code_refs: []
+code_refs: ["app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanDue.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift"]
 specs: []
-started_at: null
+started_at: "2026-10-29T09:31:57.831Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-29T09:31:57.831Z"
 ---
 
 # Popover: the Next scan line opens the Schedule settings
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p3 |
 | **Assignee** | Evgenii Konev |
 
@@ -43,17 +43,27 @@ It opens a window and changes nothing. No scan starts and no setting changes fro
 
 ## Decomposition
 
-- [ ] DDCKit: `enum SettingsDestination { case schedule, permissions }` beside `NextScan` in `ScanDue.swift`, and `NextScan.settingsDestination`: `.at` and `.off` → `.schedule`, `.replaceOldScanFirst` → `.permissions`. The tooltip and hint strings live with it, so they cannot drift from the route.
-- [ ] `PopoverView` gets `openNextScan: (SettingsDestination) -> Void` beside `openSettings`. The footer's Next scan text becomes a `Button` with the link style, the secondary colour set explicitly, the tooltip and the hint; its action calls `openNextScan(model.nextScanValue.settingsDestination)` and nothing else.
-- [ ] `StatusItemController` wraps it as it wraps `openSettings`: `popover.performClose(nil)`, then the handler. `AppDelegate` maps the destination to `SettingsWindowController.Pane` and calls `settings?.show(pane:)`. The menu's "Settings…" item keeps the pane-less `openSettings`.
+- [x] DDCKit: `enum SettingsDestination { case schedule, permissions }` beside `NextScan` in `ScanDue.swift`, and `NextScan.settingsDestination`: `.at` and `.off` → `.schedule`, `.replaceOldScanFirst` → `.permissions`. The tooltip and hint strings live with it, so they cannot drift from the route.
+- [x] `PopoverView` gets `openNextScan: (SettingsDestination) -> Void` beside `openSettings`. The footer's Next scan text becomes a `Button` with the link style, the secondary colour set explicitly, the tooltip and the hint; its action calls `openNextScan(model.nextScanValue.settingsDestination)` and nothing else.
+- [x] `StatusItemController` wraps it as it wraps `openSettings`: `popover.performClose(nil)`, then the handler. `AppDelegate` maps the destination to `SettingsWindowController.Pane` and calls `settings?.show(pane:)`. The menu's "Settings…" item keeps the pane-less `openSettings`.
 
 ## Implementation Plan
 
+From the planner's pass of 2026-10-29.
+
+1. `ScanDue.swift`: `SettingsDestination` with `help` and `hint`, and `NextScan.settingsDestination` by an exhaustive switch. Test in `PopoverModelTests`.
+2. `PopoverView.swift`: `openNextScan`, and the footer's `Button(model.nextScanText)` inside `if !model.paused`, `.buttonStyle(.link)` then `.foregroundStyle(.secondary)`, `.pointerStyle(.link)`, `.help`, `.accessibilityHint`.
+3. `StatusItemController.swift`: the wrapper, `performClose(nil)` then the handler; the menu's "Settings…" keeps `openSettings`.
+4. `SettingsWindowController.swift`: `Pane.init(_ destination:)`. `AppDelegate.swift`: `settings?.show(pane: .init(destination))`.
+5. `ContractTests`: the one button, its one call, its modifiers, the paused guard, the wrapper and the pane-less menu item.
+6. Gate, unsigned build, `projectstore:reviewer`.
+
 ## Acceptance Criteria
 
-- [ ] Test (DDCKit, in `PopoverModelTests`): `settingsDestination` is `.schedule` for `.at(date)` (a future time and one already due) and for `.off`, and `.permissions` for `.replaceOldScanFirst`; the tooltip and hint name the same pane.
-- [ ] Contract test (source check, in `ContractTests`' style): `PopoverView.swift` has one button whose label is `model.nextScanText`, and its action calls only `openNextScan`.
-- [ ] While scans are paused, the line is not shown, as today.
+- [x] Test (DDCKit, in `PopoverModelTests`): `settingsDestination` is `.schedule` for `.at(date)` (a future time and one already due) and for `.off`, and `.permissions` for `.replaceOldScanFirst`; the tooltip and hint name the same pane. — evidence: `PopoverModelTests.nextScanDestination`
+- [x] Contract test (source check, in `ContractTests`' style): `PopoverView.swift` has one button whose label is `model.nextScanText`, and its action calls only `openNextScan`. — evidence: `ContractTests.nextScanLink`
+- [x] Contract test: while scans are paused, the line is not shown, as today (the button sits inside `if !model.paused`). — evidence: `ContractTests.nextScanLink` (anchored to `if !model.paused {`)
+- [x] Contract test: `StatusItemController` closes the popover before it calls the handler, the menu's "Settings…" stays pane-less, and `AppDelegate` opens the pane with `show(pane:)`. — evidence: `ContractTests.nextScanLink`; the app compiles unsigned (`xcodebuild … CODE_SIGNING_ALLOWED=NO build`)
 - [ ] Manual (owner): clicking "Next scan …" closes the popover and opens Settings → Schedule, both when Settings was closed and when it was open on another pane.
 
 ## Final Summary

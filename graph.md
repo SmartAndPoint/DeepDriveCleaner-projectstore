@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-29T09:29:13.800Z
+generated_at: 2026-10-29T09:38:39.085Z
 
 ---
 
@@ -40,7 +40,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | in-progress |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | in-progress |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
-| epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | planned |
+| epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | in-progress |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | planned |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
 | epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
