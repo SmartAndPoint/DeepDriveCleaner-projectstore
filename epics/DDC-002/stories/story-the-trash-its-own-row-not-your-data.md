@@ -3,18 +3,18 @@ type: story
 id: "story-the-trash-its-own-row-not-your-data"
 epic: "DDC-002"
 title: "The Trash: its own row, not Your data"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-29
 external_refs: {}
 tags: [core, app, review, trash, clean-result, user-report]
-code_refs: []
+code_refs: ["crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/tests/rules.rs", "crates/ddc-core/tests/report.rs", "crates/ddc-cli/tests/rules_cli.rs", "bench/golden/rules.json", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Sources/DDCKit/AfterClean.swift", "app/Packages/DDCKit/Tests/DDCKitTests/TrashTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanResultTests.swift", "app/DeepDriveCleaner/OpenTrashButton.swift", "app/DeepDriveCleaner/CleanResultView.swift", "app/DeepDriveCleaner/ReviewGroupsView.swift"]
 specs: []
-started_at: null
+started_at: "2026-10-29T05:12:09.708Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-29T05:12:09.708Z"
 ---
 
 # The Trash: its own row, not Your data
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -43,22 +43,63 @@ The rule's class, method and id do not change, so the safety model is untouched.
 
 ## Decomposition
 
-- [ ] Core: `rules/listing.rs` gains a "Trash" group holding `trash`, ordered after "Interrupted cleanups"; "Your data" loses it. The `rules --json` golden test and the DDCKit fixture `rules.json` are updated.
-- [ ] DDCKit: the Trash group's blurb in `CleanWording`; `CleanResult` exposes the bytes moved to the Trash, and `CleanWording` the result sentence.
-- [ ] App: the sidebar entry and its Open the Trash button; `CleanResultView` shows the Trash sentence and button when `trashed.count > 0`.
+- [x] Core: `rules/listing.rs` gains a "Trash" group holding `trash`, ordered after "Interrupted cleanups"; "Your data" loses it. The `rules --json` golden test and the DDCKit fixture `rules.json` are updated.
+- [x] DDCKit: the Trash group's blurb in `CleanWording`; `CleanResult` exposes the bytes moved to the Trash, and `CleanWording` the result sentence.
+- [x] App: the sidebar entry and its Open the Trash button; `CleanResultView` shows the Trash sentence and button when `trashed.count > 0`.
 
 ## Implementation Plan
 
+From the planner, 2026-10-29. The story needs no new module and no schema change.
+
+1. **Core.** `rules/listing.rs` `GROUPS` gains `("Trash", &["trash"])` after "Interrupted cleanups", and "Your data" loses `trash`. Then:
+   - `tests/rules.rs` allows "Trash" among the groups with no switch;
+   - `rules_cli.rs` lists the new group and its one member;
+   - a `report.rs` test scans a `.Trash` and pins `selected_reclaimable_bytes`.
+2. **Regenerated files.**
+   - `make golden-record` re-records the goldens; only `bench/golden/rules.json` changes.
+   - The DDCKit `Fixtures/rules.json` is regenerated from `rules --json` under a temp HOME.
+   - `docs/rules.schema.json` is unchanged: the schema does not list labels.
+3. **DDCKit.** The sidebar takes its labels from `rules --json`, so the Swift side needs only these changes:
+   - `trash` leaves `userDataOrder` and `CleanWording.userDataName`. Otherwise "Trash" would be in `groupOrder` twice, and the sidebar would show two identical entries.
+   - `GroupLayout` finds the Trash by its rule id (`ReviewItems.trashRule`). It gives the group `CleanWording.trashBlurb`, no Select all, no repeated hint, and `opensTrash`.
+   - `CleanWording.trashed(_:)` and `apfsNote(_:)` are added in `AfterClean.swift`.
+4. **App.**
+   - A new `OpenTrashButton` (`NSWorkspace.shared.open` on `~/.Trash`).
+   - The Trash group's header shows the button.
+   - `CleanResultView` shows one Trash line for the whole result, and the APFS note only through `apfsNote`.
+5. **One decision beyond the story's text.** The APFS note shows when something was deleted **or a tool ran**: a tool command such as `go clean -cache` frees space now too. A clean that only moved items to the Trash, or only skipped them, shows no APFS note.
+
 ## Acceptance Criteria
 
-- [ ] Test (core): `ddc rules --json` lists `trash` in the "Trash" group and in no other.
-- [ ] Test (core): a scan of a temp HOME with a `.Trash` of known size reports the `trash` finding as not selected, and `selected_reclaimable_bytes` leaves its bytes out.
-- [ ] Test (DDCKit): `ReviewItems` puts the Trash finding in its own sidebar entry named "Trash" in the review section, and its row cannot be selected; `ReportSummary.reclaimable(including:)` leaves it out even with `.review` included.
-- [ ] Test (DDCKit): `TypesRows.make` over the updated `rules.json` fixture gives no "Trash" row, and the other rows are unchanged.
-- [ ] Test (DDCKit): a clean result with trashed items says how many bytes went to the Trash; one with deleted items only does not.
+- [x] Test (core): `ddc rules --json` lists `trash` in the "Trash" group and in no other. — evidence: `crates/ddc-cli/tests/rules_cli.rs` (`members("Trash") == ["trash"]`), `crates/ddc-core/tests/rules.rs` (`group_of("trash")`), golden `bench/golden/rules.json`
+- [x] Test (core): a scan of a temp HOME with a `.Trash` of known size reports the `trash` finding as not selected, and `selected_reclaimable_bytes` leaves its bytes out. — evidence: `crates/ddc-core/tests/report.rs::the_trash_is_found_but_never_selected_or_counted_as_reclaimable`
+- [x] Test (DDCKit): `ReviewItems` puts the Trash finding in its own sidebar entry named "Trash" in the review section, and its row cannot be selected; `ReportSummary.reclaimable(including:)` leaves it out even with `.review` included. — evidence: `TrashTests.swift` `sidebar()`, `layout()`, `totals()`
+- [x] Test (DDCKit): `TypesRows.make` over the updated `rules.json` fixture gives no "Trash" row, and the other rows are unchanged. — evidence: `SettingsTests.swift` `typesChips` (14 rows, `row("Trash") == nil`)
+- [x] Test (DDCKit): a clean result with trashed items says how many bytes went to the Trash; one with deleted items only does not. — evidence: `CleanResultTests.swift` `trashed()`
 - [ ] Manual (owner): move something to the Trash with a clean, Scan Again: the Trash row has grown and is called Trash; Open the Trash opens Finder's Trash.
 
 ## Final Summary
+
+**What changed** (code commit a1f010f):
+- **Core.** The `trash` rule moved from "Your data" to its own "Trash" group in `rules/listing.rs`. Its class, removal and id are unchanged, so the safety model is untouched.
+- **Review window.** The Trash's entry under Review says what the Trash is, has an **Open the Trash** button and no Empty button, and has nothing to select. It is found by rule id, not label.
+- **Clean result.** It says "N went to the Trash. It comes back when you empty the Trash." with the same button. The APFS note shows only when something was deleted or a tool ran.
+- **Duplicate entry.** `trash` left the Swift user-data naming. Otherwise the sidebar would have shown "Trash" twice.
+
+**Tests run:**
+- the full gate at commit;
+- `swift test` in DDCKit (273 passed);
+- the golden re-record (only `rules.json` changed);
+- an unsigned Debug app build.
+
+The reviewer said commit. Its nit was applied (the fixture category).
+
+**Beyond the story's text.** The APFS note also shows after a tool command, which frees space now. A clean that only moved items to the Trash or only skipped them shows no note.
+
+**Follow-ups:**
+- AC6 is manual for the owner.
+- A large Trash sits high in the Review section, because entries are sorted by size there.
+- `OpenTrashButton` ignores the result of `NSWorkspace.open`; AC6 shows whether that matters.
 
 ## Dependencies
 
