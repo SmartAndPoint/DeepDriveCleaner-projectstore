@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected"
 epic: "DDC-002"
 title: "Review window: after a clean, only skips that can clear stay selected"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, review, selection, clean-result, user-report]
 code_refs: ["crates/ddc-core/src/report/after_clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-core/tests/after_clean.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "app/Packages/DDCKit/Sources/DDCKit/AfterClean.swift", "app/Packages/DDCKit/Sources/DDCKit/SkipSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanResult.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Tests/DDCKitTests/AfterCleanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RealCLICleanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/DeepDriveCleaner/CleanResultView.swift", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/DeepDriveCleaner/ReviewView.swift"]
 specs: []
 started_at: "2026-10-28T18:28:37.082Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:42.524Z"
 plan_updated_at: "2026-10-28T18:28:37.082Z"
 ---
 
@@ -77,7 +77,7 @@ Planned by `projectstore:planner` on 2026-10-28, after "Review window: Clean is 
 - [x] Contract test (source check): `CleanResultView`'s Scan Again calls only the model's `scanAgain()`. — evidence: `ContractTests.resultScanAgain`
 - [x] Test (DDCKit, real CLI on a temp HOME, in the pattern of the existing real-CLI dry-run tests): select a cache and a folder, change the folder after the scan, clean, reload: the cache is gone, the folder is deselected, and the result offers Scan Again. This replays the recording's loop end to end. — evidence: `RealCLICleanTests.changedFolderLoop` (empty `PATH`, deletes only); core: `crates/ddc-core/tests/after_clean.rs::skipped_and_not_run_items_take_the_rechecks_finding_or_leave`, `crates/ddc-cli/tests/clean_items_cli.rs::a_skipped_item_is_saved_as_the_recheck_found_it`
 - [x] Test (DDCKit): with `model.sheet` set to nil while the sheet is presented, the sheet's view model still yields the last stage's content (no empty state). — evidence: `AfterCleanTests.lastSheet`
-- [ ] Manual (owner): reproduce the recording's mix (a running app's cache, a folder changed after the scan, the Docker item with Docker Desktop quit), clean, and check what stays selected and what the result says; the sheet never shows an empty panel between its stages.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

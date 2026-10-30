@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall"
 epic: "DDC-002"
 title: "Whole disk: Homebrew packages, their sizes, and brew uninstall"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [core, app, whole-disk, homebrew, native-command, adr-amendment, user-report]
 code_refs: ["README.md", "app/DeepDriveCleaner/AreaActionSheet.swift", "app/DeepDriveCleaner/BrewPackagesSheet.swift", "app/DeepDriveCleaner/DiskView.swift", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/BrewPackages.swift", "app/Packages/DDCKit/Sources/DDCKit/BrewPackagesModel.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/FreeReport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/BrewPackagesTests.swift", "crates/ddc-cli/src/cmd/disk_brew_packages.rs", "crates/ddc-cli/src/cmd/disk_free.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/brew_packages_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/brew/", "crates/ddc-core/src/exec/journal.rs", "crates/ddc-core/src/free/uninstall.rs", "crates/ddc-core/src/free/probe.rs", "crates/ddc-core/src/free/measure.rs", "crates/ddc-core/src/free/model.rs", "crates/ddc-core/src/free/mod.rs", "crates/ddc-core/tests/brew.rs", "docs/brew-packages.schema.json", "docs/disk-free.schema.json"]
 specs: []
 started_at: "2026-10-29T10:59:35.019Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:44.352Z"
 plan_updated_at: "2026-10-29T10:59:35.019Z"
 ---
 
@@ -124,7 +124,7 @@ From the planner's pass of 2026-10-29 at main b4eb12b (after the conda story).
 - [x] Test (core): `ddc disk free --dry-run --actions` with `brew-uninstall` or `brew-uninstall-orphans` runs the fake `brew` with the re-read only, never `uninstall`, and reports the kegs and their bytes, or the refusal; `ddc disk free` at a terminal lists no package removal. — evidence: `brew.rs` `the_dry_run_rereads_brew_and_lists_every_keg_it_would_remove`; the dry-run part of `brew_packages_cli.rs` `a_listed_formula_is_uninstalled_by_brew_only_after_the_check`; terminal: `crates/ddc-core/tests/disk_free.rs` `available_offers_the_runtimes_the_probe_passes_and_homebrew`
 - [x] Test (core): the orphan set treats `installed_on_request: false` as installed as a dependency; a fixture from an older brew that still carries `installed_as_dependency` parses and the field is ignored; a formula with one keg on request and one not counts as installed on request. — evidence: `brew.rs` `installed_on_request_false_or_absent_is_a_dependency_and_one_keg_on_request_is_enough`
 - [x] Test (core): the reworked structure test passes for `free/` and still forbids `autoremove` and `sudo`. — evidence: `crates/ddc-cli/tests/structure.rs` `disk_free_runs_only_its_tools_commands` and `brew_runs_only_its_named_commands`; `make gate` green (nextest 569/569, leaks 0)
-- [ ] Manual (owner): the Homebrew row lists the installed formulae with sizes; removing a leaf formula frees its Cellar size; a formula with two versions is removed in the sheet with both; its orphans are offered after, and removing them frees theirs.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 
@@ -169,4 +169,4 @@ Code landed on main with eight commits, from "read Homebrew's installed formulae
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

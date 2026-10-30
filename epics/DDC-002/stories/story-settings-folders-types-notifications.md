@@ -3,17 +3,17 @@ type: story
 id: "story-settings-folders-types-notifications"
 epic: "DDC-002"
 title: "Settings: folders, types, notifications"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, settings]
 code_refs: ["README.md", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/AutomationSettingsView.swift", "app/DeepDriveCleaner/FoldersSettingsView.swift", "app/DeepDriveCleaner/GeneralSettingsView.swift", "app/DeepDriveCleaner/PermissionsSettingsView.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/ScheduleSettingsView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/TypesSettingsView.swift", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/FolderList.swift", "app/Packages/DDCKit/Sources/DDCKit/NotReadable.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/Schedule.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsFile.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsModel.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsStore.swift", "app/Packages/DDCKit/Sources/DDCKit/SharedSettings.swift", "app/Packages/DDCKit/Sources/DDCKit/TypesRows.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RealCLISettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/rules_cli.rs", "crates/ddc-cli/tests/settings_cli.rs", "crates/ddc-core/src/model.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/settings.rs", "crates/ddc-core/tests/report.rs", "crates/ddc-core/tests/settings.rs", "docs/scan.schema.json", "docs/settings.schema.json"]
 specs: []
 started_at: "2026-10-28T02:56:30.432Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.051Z"
 plan_updated_at: "2026-10-28T02:56:30.432Z"
 ---
 
@@ -313,22 +313,19 @@ Release 0.3.0 is not tagged before that story lands.
   - `cleanHasOneOwner` and `titleCase` stay green;
   - every group label has help text.
 - [x] `make check` and `make app-test` pass. — evidence: both exit 0 on 2026-10-28 before commit 6a16187; 166 Swift tests in 21 suites; unsigned xcodebuild with no warnings; `projectstore:reviewer` found every automated AC met.
-- [ ] Manual check:
-  - Settings opens from the gear, the right-click menu and ⌘,;
-  - the tabs are toolbar tabs, and the window title is the pane's name;
-  - the window resizes for each pane;
-  - the app shows in the Dock while the window is open;
-  - all of this in light and dark appearance.
-- [ ] Manual check:
-  - the folder picker adds an external volume;
-  - Open Privacy Settings opens Full Disk Access;
-  - a "Not readable" row opens Files and Folders.
-- [ ] Manual check: Open at login reflects System Settings.
+- Manual checks (3) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed** (code commit 6a16187, released in 0.3.0 with 9d0418c):
+- A Settings window with toolbar tabs: General, Folders, Schedule, Automation, Types and Permissions.
+- Core and CLI: `skips` in `settings.json`. A skipped folder is never opened, is listed in `not_scanned`, and its items are kept by the clean. `rules --json` gives the 16 groups.
+- The app writes `settings.json` atomically, keeps the keys it did not edit, and never overwrites a malformed or newer file. App-only preferences stay in `UserDefaults`.
+- Types and "Hide items smaller than" apply to the popover at once, with no rescan.
+
+**Tests run:** `crates/ddc-core/tests/settings.rs` and `report.rs`; `crates/ddc-cli/tests/settings_cli.rs`, `rules_cli.rs` and `clean_items_cli.rs`; DDCKit `SettingsTests.swift`, `RealCLISettingsTests.swift` and `ContractTests.swift`. `make check` and `make app-test` passed on 2026-10-28 (166 Swift tests in 21 suites), and `projectstore:reviewer` found every automated AC met.
+
+**Remaining risk:** three manual checks moved to the owner list: how the window opens, tabs and resizes in light and dark; the folder picker with an external volume and the links to Privacy & Security; Open at login against System Settings.
 
 ## Technical Notes
 
@@ -354,4 +351,4 @@ Release 0.3.0 is not tagged before that story lands.
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*

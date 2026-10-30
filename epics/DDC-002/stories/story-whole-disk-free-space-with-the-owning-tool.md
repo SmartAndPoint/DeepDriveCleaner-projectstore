@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-free-space-with-the-owning-tool"
 epic: "DDC-002"
 title: "Whole disk: free space with the owning tool"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [cli, app, safety, whole-disk]
 code_refs: ["crates/ddc-core/src/free/", "crates/ddc-core/src/exec/journal.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/disk/model.rs", "crates/ddc-core/src/disk/simulators.rs", "crates/ddc-core/src/report/after_clean.rs", "crates/ddc-core/src/store.rs", "crates/ddc-core/src/plan.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/disk_free.rs", "crates/ddc-core/tests/common/fakes.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-cli/src/cmd/disk_free.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/tests/disk_free_cli.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk-free.schema.json", "docs/disk.schema.json", "README.md", "app/Packages/DDCKit/Sources/DDCKit/FreeReport.swift", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskReport.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskSummaryTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/free-preview.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/free-report.json", "app/DeepDriveCleaner/AreaActionSheet.swift", "app/DeepDriveCleaner/DiskView.swift", "app/DeepDriveCleaner/AppDelegate.swift"]
 specs: []
 started_at: "2026-10-28T15:24:31.635Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.993Z"
 plan_updated_at: "2026-10-28T15:24:31.635Z"
 ---
 
@@ -134,8 +134,7 @@ Fakes only: an extended `FakeCommands` (exe paths, call sequences, failures, a h
 - [x] Test: a tool exiting with an authorization failure yields a result with the Terminal command. — evidence: core `a_failing_tool_carries_its_terminal_command_and_names_an_administrator_only_on_a_permission_error`; CLI `a_permission_error_fails_with_the_terminal_command_and_exits_1_in_text` (projectstore:reviewer, 2026-10-28: Met)
 - [x] Contract test: the sheet's confirm button is the only caller of `disk free` in the app, and the scheduled path never calls it. — evidence: Swift `ContractTests::freeCallers` (the one `dryRun: false` run sits in `freeConfirmedActions`, called only from `AreaActionSheet.swift`; the scheduled files never name it) (projectstore:reviewer, 2026-10-28: Met)
 - [x] `docs/disk-free.schema.json` is generated and checked like the other schemas. — evidence: core `committed_free_schema_is_current`; Swift `ContractTests::freeContracts` (projectstore:reviewer, 2026-10-28: Met)
-- [ ] Manual (owner): deleting an unused simulator runtime from the app frees its size, and `xcrun simctl runtime list` no longer lists it. Whether macOS asks for a password is recorded here.
-- [ ] Manual (owner): Homebrew cleanup from the app shows the same list as `HOMEBREW_NO_AUTOREMOVE=1 brew cleanup -n` in Terminal (with no other `HOMEBREW_*` variable set in the shell), then frees about that much.
+- Manual checks (2) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

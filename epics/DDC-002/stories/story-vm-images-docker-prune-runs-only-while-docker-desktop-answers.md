@@ -3,17 +3,17 @@ type: story
 id: "story-vm-images-docker-prune-runs-only-while-docker-desktop-answers"
 epic: "DDC-002"
 title: "VM images: Docker prune runs only while Docker Desktop answers"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [core, cli, app, native-command, docker, user-report]
 code_refs: ["crates/ddc-core/src/class.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/env.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/guard.rs", "crates/ddc-core/src/exec/preflight.rs", "crates/ddc-core/src/exec/journal.rs", "crates/ddc-core/src/exec/report.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-cli/src/prompt.rs", "docs/clean.schema.json", "docs/progress.schema.json", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/in_use.rs", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/ProgressEvent.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanResult.swift", "app/Packages/DDCKit/Tests/DDCKitTests/"]
 specs: []
 started_at: "2026-10-28T18:28:36.673Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.604Z"
 plan_updated_at: "2026-10-28T18:28:36.673Z"
 ---
 
@@ -94,7 +94,7 @@ Pitfalls: clippy forbids `remove_*` in tests and `env::var` outside `Env`; rustd
 - [x] Test (DDCKit): `CleanReport` at version 3 decodes `tool-not-ready` and a command's `output`; version 2 is refused; the strict list of reason tags includes the new one; the result's failure line shows the output's last line. — evidence: `CleanResultTests` "Docker Desktop not answering is a skip that says why…", `ContractTests.schemaEnums`, `ContractTests.skipReasonsHaveText`; `swift test` 251 tests green
 - [x] Contract tests: the three versions agree between Rust and DDCKit. — evidence: `ContractTests.cleanContracts`, `ContractTests.progressContracts`
 - [x] `make gate` green. — evidence: pre-push `make gate` passed on push of code commit 5cb3a28 (nextest 428/428, swift tests, clippy, doc)
-- [ ] Manual (owner): with Docker Desktop quit, select the Docker item: the sheet says it will be skipped because Docker Desktop is not running. Start it, Check Again, clean: both prune commands run and the result says what they reported.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

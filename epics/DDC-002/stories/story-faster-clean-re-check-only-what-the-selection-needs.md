@@ -3,17 +3,17 @@ type: story
 id: "story-faster-clean-re-check-only-what-the-selection-needs"
 epic: "DDC-002"
 title: "Faster clean: re-check only what the selection needs"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-21
-updated: 2026-10-25
+updated: 2026-10-30
 external_refs: {}
 tags: [cli, app, safety, performance]
 code_refs: ["README.md", "app/DeepDriveCleaner/AppDelegate.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanTimings.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanTimingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReviewSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/clean-report.json", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-core/src/exec/report.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-core/src/report/after_clean.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/toolchain.rs", "crates/ddc-core/src/scan/mod.rs", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/tests/after_clean.rs", "crates/ddc-core/tests/recheck.rs", "crates/ddc-core/tests/common/fixtures.rs", "docs/clean.schema.json", "docs/progress.schema.json"]
 specs: []
 started_at: "2026-10-25T09:17:22.397Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:42.172Z"
 plan_updated_at: "2026-10-25T09:17:22.397Z"
 ---
 
@@ -238,11 +238,19 @@ Planned 2026-10-25 with the planner, after "CLI: progress events" (DDC-002) land
   Evidence: `crates/ddc-core/tests/after_clean.rs` (10 tests, one per bullet, each checking the finding-derived totals against an independent recount); `crates/ddc-cli/tests/clean_items_cli.rs` `a_pruned_clean_edits_the_report_it_read`, `a_tool_cleaned_item_is_saved_at_its_new_size`, `sigterm_or_sighup_during_a_tool_ends_the_tool_and_ddc_with_the_report` (saved after a cancel, `generated_at` kept).
 - [x] **AC 7.** The app starts no scan after a clean that wrote the report (after a crash that followed the `cleaning` event it rescans, as today), and its sheet moves from preparing to cleaning on the CLI's `cleaning` event. A crash after the event points to the journal; a refusal, or a crash before the event, says "Nothing was touched". A clean report with `last_scan_saved: false`, none after the event, or a saved report the app cannot read, rescans as today (DDCKit tests). On the CLI side, `clean --items --progress json` on a temporary tree writes `preparing` then `cleaning` to stderr, each flushed, with `cleaning` before the first journal entry; without `--progress json`, stderr carries no JSON (test). — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift` `flow`, `events`, `crashAfterCleaningEvent`, `crashBeforeCleaningEvent`, `notSavedRescans`, `cancelRunning`, `refusedBeforeTouching`; `PopoverModelTests.reloadAfterClean`; `ContractTests.cleanContracts`; `crates/ddc-cli/tests/clean_items_cli.rs` `a_clean_emits_its_phases_walks_and_items_in_order`, `cleaning_is_on_stderr_before_the_first_action`, `without_the_flag_no_event_reaches_stderr`; `make app-test` 142 passed
 - [x] **AC 8.** The terminal's `ddc clean` still rescans the whole home before its plan (test). — evidence: `crates/ddc-cli/tests/clean_cli.rs` `the_terminal_clean_still_rescans_the_whole_home`
-- [ ] **AC 9.** On the reference machine, with the app log's times (manual check by the owner):
-  - a clean of caches only re-checks its items in under 1 s;
-  - the whole time before the first action stays under 3 s.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed** (code commit f55b514, released in 0.2.4 with a95d442):
+- `clean --items` re-checks only the listed items, their ancestors and, for a `Siblings` rule, the siblings. A `Tree` rule (nvm, pyenv, rustup), an unreadable ancestor, or a report of other roots or another home takes the full walk.
+- The CLI edits `last-scan.json` after the clean so it describes the disk, and reports `last_scan_saved`. The app runs no scan after a clean that saved the report.
+- The sheet moves from preparing to cleaning on the CLI's `cleaning` event. The app logs a `clean timings` line (`CleanTimings.swift`) for AC 9.
+- The terminal's `ddc clean` still rescans the whole home.
+
+**Tests run:** `crates/ddc-core/tests/recheck.rs` and `after_clean.rs`; `crates/ddc-cli/tests/clean_items_cli.rs` and `clean_cli.rs`; DDCKit `CleanRunTests`, `PopoverModelTests.reloadAfterClean`, `ContractTests.cleanContracts`; `make check` (2026-10-25) and `make app-test` (142 passed).
+
+**Remaining risk:** AC 9, the timing on the reference machine (re-check under 1 s, first action under 3 s), moved to the owner list; until it runs, the speed-up is not measured on real data. The edited report drifts from the disk in a few figures until the next full scan (decision 6).
 
 ## Technical Notes
 
@@ -280,4 +288,4 @@ Planned 2026-10-25 with the planner, after "CLI: progress events" (DDC-002) land
 
 ---
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-10-30*

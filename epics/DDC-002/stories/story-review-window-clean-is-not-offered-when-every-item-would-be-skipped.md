@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-clean-is-not-offered-when-every-item-would-be-skipped"
 epic: "DDC-002"
 title: "Review window: Clean is not offered when every item would be skipped"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, review, confirmation, user-report]
 code_refs: ["app/Packages/DDCKit/Sources/DDCKit/AfterClean.swift", "app/Packages/DDCKit/Sources/DDCKit/SkipSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/Confirmation.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SkipSummaryTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift"]
 specs: []
 started_at: "2026-10-28T18:28:36.859Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:42.695Z"
 plan_updated_at: "2026-10-28T18:28:36.859Z"
 ---
 
@@ -78,7 +78,7 @@ Planned by `projectstore:planner` on 2026-10-28, after "VM images: Docker prune 
 - [x] Test (DDCKit): a check that `.failed`, was `.stopped` or is `.busy` leaves the clean allowed. — evidence: `SkipSummaryTests.otherStates`
 - [x] Test (DDCKit): every item `wouldSkip(changedSinceScan)` → the line advises Scan Again, not Check Again; a mix of owner-running and changed-since-scan names both, owner apps first. — evidence: `SkipSummaryTests.changedSinceScan`
 - [x] Contract test (source check, `ContractTests` style): the sheet's Clean button is disabled on `nothingToClean`, and `cleanConfirmedItems()` guards it. — evidence: `ContractTests.cleanHasOneOwner`
-- [ ] Manual (owner): with Google Chrome running, select only the Chrome cache, open the sheet: the button is disabled and the line says to quit Google Chrome. Quit Chrome, Check Again: the button is enabled and the clean deletes it.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

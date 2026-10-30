@@ -3,17 +3,17 @@ type: story
 id: "story-popover-the-next-scan-line-opens-the-schedule-settings"
 epic: "DDC-002"
 title: "Popover: the Next scan line opens the Schedule settings"
-status: in-progress
+status: done
 priority: p3
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, popover, settings, schedule]
 code_refs: ["app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanDue.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift"]
 specs: []
 started_at: "2026-10-29T09:31:57.831Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:42.341Z"
 plan_updated_at: "2026-10-29T09:31:57.831Z"
 ---
 
@@ -64,9 +64,17 @@ From the planner's pass of 2026-10-29.
 - [x] Contract test (source check, in `ContractTests`' style): `PopoverView.swift` has one button whose label is `model.nextScanText`, and its action calls only `openNextScan`. — evidence: `ContractTests.nextScanLink`
 - [x] Contract test: while scans are paused, the line is not shown, as today (the button sits inside `if !model.paused`). — evidence: `ContractTests.nextScanLink` (anchored to `if !model.paused {`)
 - [x] Contract test: `StatusItemController` closes the popover before it calls the handler, the menu's "Settings…" stays pane-less, and `AppDelegate` opens the pane with `show(pane:)`. — evidence: `ContractTests.nextScanLink`; the app compiles unsigned (`xcodebuild … CODE_SIGNING_ALLOWED=NO build`)
-- [ ] Manual (owner): clicking "Next scan …" closes the popover and opens Settings → Schedule, both when Settings was closed and when it was open on another pane.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed** (code commit a6adf01, released in 0.6.0 with 8af8cf1):
+- The popover footer's "Next scan …" line is a link. It closes the popover and opens Settings on the pane `NextScan.settingsDestination` names: Schedule, or Permissions while the old background scan must be replaced first.
+- The menu's "Settings…" stays pane-less. The line is still hidden while scans are paused.
+
+**Tests run:** `PopoverModelTests.nextScanDestination`, `ContractTests.nextScanLink`; an unsigned app build (`CODE_SIGNING_ALLOWED=NO`).
+
+**Remaining risk:** one manual check moved to the owner list: the click in the real popover, with Settings closed and with Settings open on another pane.
 
 ## Dependencies
 

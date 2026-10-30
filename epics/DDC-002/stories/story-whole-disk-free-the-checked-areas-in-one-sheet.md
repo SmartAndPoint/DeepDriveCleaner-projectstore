@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-free-the-checked-areas-in-one-sheet"
 epic: "DDC-002"
 title: "Whole disk: free the checked areas in one sheet"
-status: in-progress
+status: done
 priority: p3
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, whole-disk, free, user-report]
 code_refs: ["app/DeepDriveCleaner/AreaActionSheet.swift", "app/DeepDriveCleaner/DiskView.swift", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "crates/ddc-cli/tests/disk_free_cli.rs"]
 specs: []
 started_at: "2026-10-29T13:12:54.962Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:44.178Z"
 plan_updated_at: "2026-10-29T13:12:54.962Z"
 ---
 
@@ -73,7 +73,7 @@ Pitfalls: never iterate the `Set` for order; never send refused or failed previe
 - [x] Test (DDCKit): a conda environment and its install's package cache checked together produce a list with `conda-env-remove` first. — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/CheckedFreeTests.swift` `condaOrder`
 - [x] Contract test: `freeConfirmedActions()` keeps one caller, the sheet's confirm button, and the checked bar's button is the only caller of `previewChecked()`. — evidence: `ContractTests.freeCallers` (one caller of `.freeConfirmedActions(`, `.previewChecked(` once in `DiskView.swift`, one `.sheet(`, never-frees regex with `previewChecked`)
 - [x] Test (CLI): two runtimes in one `--actions` list give two journal lines and both leave `last-disk.json`. — evidence: `crates/ddc-cli/tests/disk_free_cli.rs` `two_runtimes_in_one_list_run_in_order_each_journaled_and_both_leave_the_saved_disk_report`
-- [ ] Manual (owner): with two deletable runtimes, check both, free them in one sheet, and compare with `xcrun simctl runtime list`.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-conda-environments-and-its-package-cache-with-conda"
 epic: "DDC-002"
 title: "Whole disk: Conda environments and its package cache, with conda"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [core, app, whole-disk, conda, native-command, adr-amendment, user-report]
 code_refs: ["crates/ddc-core/src/conda.rs", "crates/ddc-core/src/disk/conda.rs", "crates/ddc-core/src/free/conda.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/tests/conda.rs", "crates/ddc-core/tests/disk_free.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk.schema.json", "docs/disk-free.schema.json", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift"]
 specs: []
 started_at: "2026-10-29T09:01:17.844Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.803Z"
 plan_updated_at: "2026-10-29T09:01:17.844Z"
 ---
 
@@ -107,9 +107,18 @@ From the planner's pass of 2026-10-29, adjusted by the critic's four passes. Sev
 - [x] Test (core): the /opt area actions refuse an environment in the home folder, the base, an environment not under `envs_dirs`, and one a fake process uses; the environment's dry run reports its own bytes (files whose every link lies inside it), and its run's freed bytes exclude its hard links into `pkgs` and into another environment; an environment or a `pkgs` the user cannot write is refused before any conda runs; an environment still present after a fake conda exits 0 is reported removed but not freed and stays in `last-disk.json`; the cache's estimate is `packages.total_size` plus `tarballs.total_size`; the terminal prompt lists both actions; the cache's dry run sums conda's JSON followed by trailing output; an identifier spelled `/System/Volumes/Data/opt/...` is matched to conda's `/opt/...` answer by device and inode, and conda receives the `/opt/...` spelling; each run writes an `area-action` journal line; a stopped run names the conda command; the CLI exits 75 while the lock is held. — evidence: `crates/ddc-core/tests/disk_free.rs` (refusals before conda starts: home, base through a link, link into home, link to another environment, no history, another /opt folder, dot-dot, relative, in use; not writable; conda's own answer; own bytes only; removed, not freed; stop before and mid-run; journal lines; last-disk edits)
 - [x] Test (core): the reworked structure test passes for `free/` with the conda actions and fails on `--force-pkgs-dirs`, `--all`, `--tempfiles`, `env remove` without `-p`, or a lookup of `conda` on the tool path. — evidence: `crates/ddc-cli/tests/structure.rs` `conda_runs_only_its_named_commands`
 - [x] Test (app): DDCKit reads disk and free reports at version 2 with the new ids and refusals; the Whole disk rows show each /opt environment nested under Conda with its offer; no cache offer when the folder is not writable. — evidence: DDCKit `DiskReportTests.conda`, `DiskFreeTests.contracts`/`offers`/`condaRows`/`condaWording`, `DiskSummaryTests.rows`, `ReviewGroupsTests.condaCacheHint`, `ContractTests` (enums match the schemas); 300 DDCKit tests pass and the app builds unsigned
-- [ ] Manual (owner): on a Mac with conda, an environment shows in Python environments with its size; removing it in Review removes it from `conda env list`.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
-## ## Final Summary
+## Final Summary
+
+**What changed** (code commits e16702a, 7754cc0, d98965c, 27ccee0 and b4eb12b, released in 0.6.0 with 8af8cf1):
+- Home folder: conda environments (`python.conda-env`) and the package cache (`cache.conda`) are found and cleaned with the install's own `bin/conda` (`env remove -p`; `clean` with fixed flags, never `--all`). The cache is skipped as `tool-not-ready` when conda cannot be held to that one folder or uses softlinks.
+- `ddc disk` lists the /opt installs' environments and cache, and `ddc disk free` removes them with their own conda after its refusals (base, home folder, in use, not writable). The disk and free schemas move to version 2.
+- App: the /opt environments are nested under Conda in Whole disk with their offers; Review shows the cache's hint.
+
+**Tests run:** `crates/ddc-core/tests/conda.rs`, `disk.rs` and `disk_free.rs`; `crates/ddc-cli/tests/disk_free_cli.rs` and `structure.rs` `conda_runs_only_its_named_commands`; DDCKit (300 tests passed) and an unsigned app build.
+
+**Remaining risk:** one manual check moved to the owner list: a real conda environment shown and removed. Open items recorded under Deviations at implementation: no test of the CLI's interactive prompt, of a cache path with a comma, or of an /opt clean under a `/System/Volumes/Data` identifier.
 
 ## Deviations at implementation
 
@@ -138,4 +147,4 @@ From the planner's pass of 2026-10-29, adjusted by the critic's four passes. Sev
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

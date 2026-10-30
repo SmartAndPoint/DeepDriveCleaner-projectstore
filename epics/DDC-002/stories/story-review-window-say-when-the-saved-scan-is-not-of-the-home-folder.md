@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder"
 epic: "DDC-002"
 title: "Review window: say when the saved scan is not of the home folder"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, review, popover, cli, defect, user-report]
 code_refs: ["app/Packages/DDCKit/Sources/DDCKit/ReportScope.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReportScopeTests.swift", "crates/ddc-core/src/env.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/tests/scan_cli.rs"]
 specs: []
 started_at: "2026-10-29T06:40:44.528Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:42.874Z"
 plan_updated_at: "2026-10-29T06:40:44.528Z"
 ---
 
@@ -74,7 +74,7 @@ From the planner's placement (2026-10-29):
 - [x] Test (DDCKit): the wording for one root and for several roots, in both cases. — evidence: `ReportScopeTests.swift` `wording`, with the another-home sentence
 - [x] Test (DDCKit): in the outside case the Review model offers no Clean and no Protect, and the popover's "Clean selected…" is off; in the inside case all stay as today; a report with equal roots and another home is "outside". — evidence: `ReportScopeTests.swift` `reviewGates`, `popoverGates`, `noticeGoesWithTheReport`, `unreadableSettings`
 - [x] Test (CLI): `scan <tmp>` with a temp HOME and no `--data-dir` prints the stderr line; with `--data-dir`, with `DDC_DATA_DIR`, or with the settings' own roots, it does not. — evidence: `crates/ddc-cli/tests/scan_cli.rs` `scan_of_other_roots_into_the_app_data_folder_says_the_app_shows_it`, `scan_of_the_settings_roots_by_path_says_nothing` (`make gate-fast`, 474 passed)
-- [ ] Manual (owner): after a terminal `ddc scan` of a folder outside the home, the Review window says so and Clean is off; Scan Now replaces the report and the notice goes.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 
@@ -101,4 +101,4 @@ From the planner's placement (2026-10-29):
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

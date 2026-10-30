@@ -3,17 +3,17 @@ type: story
 id: "story-the-trash-its-own-row-not-your-data"
 epic: "DDC-002"
 title: "The Trash: its own row, not Your data"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [core, app, review, trash, clean-result, user-report]
 code_refs: ["crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/tests/rules.rs", "crates/ddc-core/tests/report.rs", "crates/ddc-cli/tests/rules_cli.rs", "bench/golden/rules.json", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Sources/DDCKit/AfterClean.swift", "app/Packages/DDCKit/Tests/DDCKitTests/TrashTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/SettingsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanResultTests.swift", "app/DeepDriveCleaner/OpenTrashButton.swift", "app/DeepDriveCleaner/CleanResultView.swift", "app/DeepDriveCleaner/ReviewGroupsView.swift"]
 specs: []
 started_at: "2026-10-29T05:12:09.708Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.235Z"
 plan_updated_at: "2026-10-29T05:12:09.708Z"
 ---
 
@@ -76,7 +76,7 @@ From the planner, 2026-10-29. The story needs no new module and no schema change
 - [x] Test (DDCKit): `ReviewItems` puts the Trash finding in its own sidebar entry named "Trash" in the review section, and its row cannot be selected; `ReportSummary.reclaimable(including:)` leaves it out even with `.review` included. — evidence: `TrashTests.swift` `sidebar()`, `layout()`, `totals()`
 - [x] Test (DDCKit): `TypesRows.make` over the updated `rules.json` fixture gives no "Trash" row, and the other rows are unchanged. — evidence: `SettingsTests.swift` `typesChips` (14 rows, `row("Trash") == nil`)
 - [x] Test (DDCKit): a clean result with trashed items says how many bytes went to the Trash; one with deleted items only does not. — evidence: `CleanResultTests.swift` `trashed()`
-- [ ] Manual (owner): move something to the Trash with a clean, Scan Again: the Trash row has grown and is called Trash; Open the Trash opens Finder's Trash.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 

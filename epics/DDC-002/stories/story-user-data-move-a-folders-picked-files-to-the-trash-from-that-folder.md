@@ -3,17 +3,17 @@ type: story
 id: "story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder"
 epic: "DDC-002"
 title: "User data: move a folder's picked files to the Trash from that folder"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, review, user-data, user-report]
 code_refs: ["app/DeepDriveCleaner/ConfirmSheet.swift", "app/DeepDriveCleaner/ReviewGroupsView.swift", "app/Packages/DDCKit/Sources/DDCKit/Confirmation.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/SkipSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PickedMoveTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/UserDataTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift"]
 specs: []
 started_at: "2026-10-29T09:16:41.169Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:43.416Z"
 plan_updated_at: "2026-10-29T09:16:41.169Z"
 ---
 
@@ -74,9 +74,18 @@ From the planner's pass of 2026-10-29, adjusted by the critic's. DDCKit and the 
 - [x] Test (DDCKit): Telegram and WhatsApp layouts have no `pickScope`; a sheet of trash-only items is titled "Move 1 item to the Trash?" with the button "Move to the Trash", a mixed one "Clean 2 items?" and "Clean 2 items"; a Review-only trash sheet says "Move", and turning on Delete permanently for its item makes it "Clean". — evidence: `PickedMoveTests.reportOnly`, `PickedMoveTests.sheetWording`
 - [x] Contract test (source check): `SelectAllRow(` occurs once in `ReviewGroupsView.swift`, inside `if let all = layout.selectAll`; the `PickedRow` body contains no `CheckBox(`, `toggleAll(`, `set(` or `selection`, and its one button calls only `model.openSheet(scope: ids)`. `ContractTests.cleanHasOneOwner` matches the sheet's button by its call, `/Button\([^\n]*\{ model\.cleanConfirmedItems\(\) \}\n(?:\s*\.[^\n]*\n)*/`, since the label is now computed; its `role: .destructive` and `.disabled(… !sheet.cleanAllowed)` assertions and the one-owner count stay. — evidence: `ContractTests.userDataPickedRow`, `ContractTests.cleanHasOneOwner`
 - [x] `make app-test` passes and the unsigned app builds — evidence: `swift test` 294 tests passed; `xcodebuild … CODE_SIGNING_ALLOWED=NO build` succeeded (`make app` signs, `make gate` does not build the app)
-- [ ] Manual (owner): in Movies, pick one entry, press the button: the sheet holds that entry only and moves it to the Trash.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed** (code commit c90d44e, released in 0.6.0 with 8af8cf1):
+- A User data folder of entries (Movies, for example) gets a `PickedRow` instead of Select all. "Move N from <folder> to the Trash…" opens the sheet with only that folder's picked entries; other selected items stay selected.
+- The sheet's title and button say "Move … to the Trash" when every item goes to the Trash, and "Clean" otherwise.
+- Telegram and WhatsApp folders have no such row.
+
+**Tests run:** `PickedMoveTests` (scope, filter, a picked folder, sheet, keeps the rest, wording, report-only, sheet wording); `ContractTests` (the `PickedRow` contract, `cleanHasOneOwner`); `swift test` 294 passed; an unsigned app build.
+
+**Remaining risk:** one manual check moved to the owner list: a real move of one Movies entry.
 
 ## Dependencies
 

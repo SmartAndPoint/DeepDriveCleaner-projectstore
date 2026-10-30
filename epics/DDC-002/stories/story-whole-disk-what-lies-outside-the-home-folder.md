@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-what-lies-outside-the-home-folder"
 epic: "DDC-002"
 title: "Whole disk: what lies outside the home folder"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [cli, whole-disk, system-data]
 code_refs: ["crates/ddc-core/src/disk/", "crates/ddc-cli/src/cmd/disk.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/system.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-core/src/report/volumes.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/store.rs", "crates/ddc-core/src/sys/statfs.rs", "crates/ddc-core/tests/disk.rs", "crates/ddc-core/tests/data/apfs-list.plist", "crates/ddc-core/tests/common/fakes.rs", "crates/ddc-cli/tests/disk_cli.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk.schema.json", "docs/progress.schema.json", "app/Packages/DDCKit/Sources/DDCKit/ProgressEvent.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanProgress.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanTimings.swift", "README.md"]
 specs: []
 started_at: "2026-10-28T09:38:52.089Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:44.720Z"
 plan_updated_at: "2026-10-28T09:38:52.089Z"
 ---
 
@@ -138,9 +138,19 @@ Planned on 2026-10-28 against the code at `aa64c83`.
 - [x] Test: SIGTERM during the walk writes `last-disk.json` with `cancelled: true` and partial areas. — evidence: `crates/ddc-cli/tests/disk_cli.rs::sigterm_while_diskutil_runs_ends_it_and_still_saves_a_partial_report`, `crates/ddc-core/tests/disk.rs::a_stop_during_the_walk_still_reports_with_the_unfinished_areas_partial`
 - [x] `docs/disk.schema.json` is generated like the other schemas and checked by the schema test. — evidence: `crates/ddc-core/tests/disk.rs::committed_disk_schema_is_current`
 - [x] Test: the home fallback walk never opens a folder in `skips` or a cloud folder. A fixture with one of each, and a reader that records opens, shows no open below either. — evidence: `crates/ddc-core/tests/disk.rs::the_home_walk_never_opens_a_skip_or_a_cloud_folder`, `::a_skip_outside_the_home_folder_is_never_opened_through_the_data_volume`
-- [ ] Manual (owner): on the reference machine, `ddc disk` finishes in under 3 minutes. Each named area that is not partial is within 5% of a `du -skx` of the same paths taken the same day, less the `du` of the areas nested in it; a partial area is at most its `du`; and "not counted" is within 10 GB of the Data volume's consumed bytes minus everything counted.
+- Manual checks (1) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed** (code commit 62602bd, released in 0.4.0 with c164663):
+- `ddc disk [--json]`: a read-only report of the startup container as areas with sizes, from a size-only walk outside the home folder. It makes no findings and removes nothing.
+- The home row comes from `last-scan.json` only when it is whole-home, of the current schema, on the Data volume and at most 24 hours old. Otherwise `disk` walks the home itself and never opens a skip or a cloud folder.
+- "Not counted" is consumed minus counted, signed and never clamped; a negative value marks the report `inconsistent` with a cause.
+- Simulator runtimes are read through `simctl` only with developer tools present and the first launch done. The temporary folders have an entry budget. SIGTERM still saves a partial `last-disk.json`. `docs/disk.schema.json` is generated.
+
+**Tests run:** `crates/ddc-core/tests/disk.rs`, `crates/ddc-cli/tests/disk_cli.rs`, and `crates/ddc-cli/tests/structure.rs::the_disk_report_never_reaches_cleanup`.
+
+**Remaining risk:** one manual check moved to the owner list: the run time (under 3 minutes) and the area sizes against `du` and the Data volume's consumed bytes on the reference machine. Until it runs, the accuracy on a real disk is not checked.
 
 ## Technical Notes
 

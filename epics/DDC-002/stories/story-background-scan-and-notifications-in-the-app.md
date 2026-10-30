@@ -3,17 +3,17 @@ type: story
 id: "story-background-scan-and-notifications-in-the-app"
 epic: "DDC-002"
 title: "Background scan and notifications in the app"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, notifications, schedule]
 code_refs: ["README.md", "scripts/build-app.sh", "app/DeepDriveCleaner.xcodeproj/project.pbxproj", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/DebugMenu.swift", "app/DeepDriveCleaner/PermissionsSettingsView.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SystemAgentService.swift", "app/DeepDriveCleaner/SystemNotifications.swift", "app/DeepDriveCleaner/main.swift", "app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist", "app/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler-open.plist", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/LaunchMode.swift", "app/Packages/DDCKit/Sources/DDCKit/LegacyAgent.swift", "app/Packages/DDCKit/Sources/DDCKit/NotificationText.swift", "app/Packages/DDCKit/Sources/DDCKit/NotifyReport.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanDue.swift", "app/Packages/DDCKit/Sources/DDCKit/Schedule.swift", "app/Packages/DDCKit/Sources/DDCKit/ScheduledWork.swift", "app/Packages/DDCKit/Sources/DDCKit/SchedulerAgent.swift", "app/Packages/DDCKit/Sources/DDCKit/SettingsModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ScheduledScanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift"]
 specs: []
 started_at: "2026-10-28T03:23:01.141Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:41.994Z"
 plan_updated_at: "2026-10-28T03:23:01.141Z"
 ---
 
@@ -188,19 +188,19 @@ Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story. No
 - [x] Unit test: with "Only show it in the menu bar", a scheduled scan over the threshold posts nothing, sends no ack and sets the badge (B3) — evidence: `ScheduledScanTests.swift` `menuBarOnly` (commit dad390e)
 - [x] Unit test: the bundled scheduler plist is `BundleProgram Contents/MacOS/DeepDriveCleaner` with `ProgramArguments ["DeepDriveCleaner", "--tick"]` (B6), and its label is the agent label the app registers — evidence: `ScheduledScanTests.swift` `bundledPlists` (commit dad390e)
 - [x] Contract test: no DDCKit source imports `UserNotifications` or `ServiceManagement` — evidence: `ContractTests.swift` `noSystemFrameworks` (commit dad390e)
-- [ ] Manual check on the reference machine with the app quit: at the next tick (`app.log` shows `--tick`, then a `--scheduled` launch) the app is opened with `--scheduled`, scans, posts and quits, with no Dock icon and no change of focus; Review opens the Review window; Remind me tomorrow posts nothing until the first scheduled scan after the snooze, which posts if still over the threshold or still almost full
-- [ ] Manual check: after the first launch and the migration, System Settings → Login Items & Extensions lists the scheduled scan under "DeepDriveCleaner" with the app's icon, not under a developer name
-- [ ] Manual check after the migration: the 0.1.0 LaunchAgent is gone; `launchctl print gui/$UID/com.smartandpoint.deepdrivecleaner` finds no job and `~/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.plist` does not exist
-- [ ] Manual check: after the app is quit and replaced (as `brew upgrade` does), the next tick opens the new app and the scheduled scan runs
-- [ ] Manual check: double-clicking the app in Finder during a scheduled scan shows the menu bar icon, and the app keeps running after the scan
-- [ ] Manual check: with the Review window open, a Dock-icon click brings it forward, and the hourly tick does not
-- [ ] Manual check: with the app quit, Remind me tomorrow on a notification launches it in normal mode with its status item, and the badge is cleared
-- [ ] Manual check: `ddc schedule install` refuses while the app's agent is registered, and installs after the app is removed (the refusal shipped with "CLI: shared settings, types and the notify decision"; this checks it against the real agent)
+- Manual checks (8) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed** (code commit dad390e, released in 0.3.0 with 9d0418c; 118a6a9 adds the fallback scheduler agent to the cask's `zap`):
+- The app runs the scheduled scan itself: a bundled scheduler agent registered through `SMAppService`, a `--tick` that opens the app with `--scheduled`, and a fallback plist when the bundle program is refused (B6).
+- A pure due function (`ScanDue.swift`) for daily and weekly slots, reminders and slots missed while asleep. The popover footer and Settings read it.
+- Notifications with Review and Remind me tomorrow, working hours, "Only show it in the menu bar", and the denied and not-determined permission paths. The decision and its state stay in the CLI (`notify ack`, `notify snooze`).
+- The offered migration from the 0.1.0 LaunchAgent (Replace It). While the old plist exists, the app registers no agent and runs no scheduled scan (B1).
+
+**Tests run:** `ScheduledScanTests.swift` (due function, reminders, notification text, ack and denied permission, working hours, permission not determined, footer wording, agent healing, busy, migration, fallback, tick arguments, menu bar only, bundled plists) and `ContractTests.noSystemFrameworks`, all at commit dad390e.
+
+**Remaining risk:** the eight manual checks moved to the owner list: the real tick and `--scheduled` launch, the Login Items attribution, the 0.1.0 agent gone after the migration, a tick after an in-place upgrade, Finder and Dock behaviour during a scheduled scan, Remind me tomorrow with the app quit, and the `ddc schedule install` refusal against the real agent. The plan recorded that the bundle-program registration had not been observed; the first of these checks settles it.
 
 ## Technical Notes
 
@@ -227,4 +227,4 @@ Planned on 2026-10-28 with `projectstore:planner`. No spec covers this story. No
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*

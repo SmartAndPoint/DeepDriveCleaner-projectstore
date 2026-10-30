@@ -3,17 +3,17 @@ type: story
 id: "story-whole-disk-in-the-app"
 epic: "DDC-002"
 title: "Whole disk in the app"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, whole-disk]
 code_refs: ["app/DeepDriveCleaner/DiskView.swift", "app/DeepDriveCleaner/DiskWindowController.swift", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/ReviewWindowController.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskReport.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/DataDirectory.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskReportTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskSummaryTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CLIRunnerTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/disk-report.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/disk-cancelled.json", "crates/ddc-core/tests/disk.rs", "README.md"]
 specs: []
 started_at: "2026-10-28T10:45:53.178Z"
-closed_at: null
+closed_at: "2026-10-30T06:45:44.524Z"
 plan_updated_at: "2026-10-28T10:45:53.178Z"
 ---
 
@@ -124,10 +124,19 @@ Code for steps 1-3 was started before the critic's first pass. That pass (REVISE
 - [x] Test: quitting the app does not cancel a running whole-disk scan. — evidence: `ContractTests.diskCallers` (no `disk?.stop(` in AppDelegate; the terminate methods do not mention disk)
 - [x] The §1 amendment is accepted after a critic pass. — evidence: critic APPROVE on the third pass, 2026-10-28; the ADR frontmatter `review_status: reviewed`
 - [x] Test: nothing in the scheduled path runs `disk`. A contract test names the view's button as the one caller. — evidence: `ContractTests.diskCallers`
-- [ ] Manual (owner): the view opens from the popover and from the Review window, reads correctly in light and dark, and its bar matches the rows.
-- [ ] Manual (owner): start a whole-disk scan, quit the app from its menu (not from Xcode), wait about a minute, and check that `last-disk.json`'s date moved on and it reads `"cancelled": false`. This shows that macOS does not stop the orphaned CLI on quit.
+- Manual checks (2) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed** (code commit 50d3e08, released in 0.4.0 with c164663):
+- A Whole disk view, opened from the popover and the Review window: a bar of the container and one row per area from `last-disk.json`. The home segment is split by class only when it comes from the loaded scan.
+- `ddc disk` runs in its own lane beside the `CLIRunner` queue. Runs are keyed by ticket, so Stop ends only its own run, and a second request joins the running one.
+- On demand only: nothing in the scheduled path runs `disk`, and quitting the app does not cancel a running whole-disk scan.
+- The §1 amendment of "Menu bar app: Swift shell over the ddc CLI", accepted after a critic pass.
+
+**Tests run:** `DiskReportTests`, `DiskModelTests`, `DiskSummaryTests`, `CLIRunnerTests` (the disk lane and tickets), `ContractTests.diskContracts` and `ContractTests.diskCallers`, and `the_apps_disk_fixtures_are_reports_the_cli_could_write` in `crates/ddc-core/tests/disk.rs`.
+
+**Remaining risk:** two manual checks moved to the owner list: the view in light and dark with its bar matching the rows, and that macOS does not stop the orphaned CLI when the app quits (the contract test shows only that the app does not cancel it).
 
 ## Dependencies
 
