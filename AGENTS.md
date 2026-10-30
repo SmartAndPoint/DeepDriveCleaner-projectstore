@@ -12,38 +12,54 @@ human-started or spawned.
 - A pull request that merges without conflicts may be merged by the session that opened
   it. One with conflicts is rebased onto `origin/main` first; never force it through.
 - This checkout is on `main`, shared by every session, often with another session's
-  uncommitted edits in it. Never switch its branch and never `git reset --hard` it.
-  1. Commit on `main`, listing your files; never `git add -A`.
-  2. `git fetch origin main && git log --oneline origin/main..HEAD` lists what the PR
-     will carry: every local commit ahead of `origin/main`, whoever made it. Empty means
-     another session's PR already carried yours: stop, there is nothing to open. If it
-     lists another session's commit, tell that session it is going out with yours.
-     Then `git push origin HEAD:refs/heads/<topic>`.
+  uncommitted edits in it. Never switch its branch, never `git reset --hard` it, and never
+  `git pull --rebase --autostash` in it: the autostash hard-resets the files, and a write
+  landing in that moment leaves another session's edits only in a dangling autostash.
+- **Re-sync** moves local `main` to `origin/main` without a reset. Run it before you
+  commit and after your PR merges:
+
+  ```sh
+  git fetch origin main
+  old=$(git rev-parse HEAD)
+  if git merge-base --is-ancestor "$old" origin/main; then
+    git merge --ff-only origin/main
+  elif [ "$(git rev-parse "$old^{tree}")" = "$(git rev-parse 'origin/main^{tree}')" ]; then
+    git update-ref -m "re-sync after merge" refs/heads/main origin/main "$old"
+  else
+    echo "diverged: see git cherry -v origin/main HEAD; do not rebase here"
+  fi
+  ```
+
+  - `origin/main` only ahead (another clone's PR merged): the fast-forward rewrites only
+    the files those commits changed, and refuses rather than overwrites an uncommitted
+    edit to one of them; staged and untracked work is kept. If it refuses, that file is the owner's call.
+  - Same tree, other SHAs (your rebase-merged PR): `update-ref` moves the ref and touches
+    neither the index nor the files. It checks the tree, not the commits, so a local
+    commit that changes nothing (an empty commit, a commit and its revert) is dropped to
+    the reflog.
+  - Diverged: `git cherry -v origin/main HEAD` marks with `-` the local commits already
+    on `main` under new SHAs and with `+` the ones that are not. Ask the owner.
+- The steps:
+  1. Re-sync, then commit on `main`, listing your files; never `git add -A`.
+  2. `git cherry -v origin/main HEAD` lists what the PR will carry: every local commit
+     ahead of `origin/main`, whoever made it. A `-` line means a merged PR has not been
+     re-synced: re-sync first. No `+` line means another session's PR already carried
+     yours: stop. If a `+` line is another session's commit, tell that session it is
+     going out with yours. Then `git push origin HEAD:refs/heads/<topic>`.
   3. `gh pr create --base main --head <topic> --title "$(git log -1 --format=%s)"
      --body "$(git log -1 --format=%b)"`. `--fill` fails here: the topic branch exists
      only on GitHub.
   4. `gh pr merge <topic> --rebase`, with no `--auto`: there are no checks, and GitHub can
-     refuse auto-merge on a clean PR. Retry once if it is still computing mergeability.
+     refuse auto-merge while it is still computing mergeability. Retry once.
      Never pass `--delete-branch`; GitHub deletes the remote branch.
-  5. Move local `main` onto the merged commits without touching the index or the files.
-     The rebase merge gave them new SHAs but the same tree, so nothing on disk changes:
-
-     ```sh
-     git fetch origin main
-     old=$(git rev-parse HEAD)
-     if [ "$(git rev-parse "$old^{tree}")" = "$(git rev-parse 'origin/main^{tree}')" ]; then
-       git update-ref -m "re-sync after merge" refs/heads/main origin/main "$old"
-     else
-       echo "origin/main holds a change this checkout lacks: do not rebase here"
-     fi
-     ```
-
-     Never `git pull --rebase --autostash` in this checkout while another session is
-     working: it hard-resets the files, and a write landing in that moment leaves the
-     other session's edits only in a dangling autostash. When the trees differ, ask the
-     owner. If such a pull was run and printed `Created autostash: <sha>` before failing,
-     do not `git rebase --abort`: run `git rebase --continue`, then
-     `git stash apply <sha>`, and tell the other sessions.
+  5. Re-sync.
+- Any branch other than `main` (a conflicting PR to rebase, a topic to fix) is worked in
+  a throwaway worktree, never in this checkout: `git fetch origin <topic> main`,
+  `d=$(mktemp -d) && git worktree add "$d" origin/<topic>`, rebase onto `origin/main` there, `git -C "$d" push --force-with-lease
+  origin HEAD:refs/heads/<topic>`, then `git worktree remove "$d"`.
+- If an autostash pull was run here anyway and printed `Created autostash: <sha>` before
+  failing, do not `git rebase --abort` (it overwrites the files again): stop, tell the
+  owner and the other sessions; `<sha>` holds the stranded edits.
 - A change is done when `gh pr view <topic> --json state` says `MERGED`.
 
 ## Derived views
