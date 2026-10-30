@@ -83,6 +83,7 @@ generated_at: 2026-10-30T06:48:53.059Z
 - [x] [[epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder|DDC-002: Review window: say when the saved scan is not of the home folder]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda|DDC-002: Whole disk: Conda environments and its package cache, with conda]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall|DDC-002: Whole disk: Homebrew packages, their sizes, and brew uninstall]] #p2 #done
+- [x] [[epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust|DDC-005: Gate by what changed: load at night, one gate per release, app-only pushes skip Rust]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1 #done
 
