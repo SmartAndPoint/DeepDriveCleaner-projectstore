@@ -24,7 +24,7 @@ The flow comes from story "Build matrix: every target built, tested and packaged
 
 **Who pushes the tag:** the owner, with `make tag`. Nothing else creates it, and no workflow creates the GitHub release.
 
-**The release is one commit.** The tag, the macOS assets and the published release all name `HEAD` of `origin/main`. Nothing is pushed to `main` between `make tag` and the end of publish: any commit moves `origin/main` off the tag, and publish then refuses.
+**The release is one commit.** The tag, the macOS assets and the published release all name `HEAD` of `origin/main`. No PR is merged into `main` between `make tag` and the end of publish: any merge moves `origin/main` off the tag, and publish then refuses.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ The flow comes from story "Build matrix: every target built, tested and packaged
 - [ ] `.env` with the signing identity and the notary profile, loaded into the shell (`set -a && . <code repo>/.env && set +a`).
 - [ ] `gh` authenticated, plus `jq`, `xmllint` and `python3`, and the Xcode and Homebrew that previous releases used (`build-app.sh`; `ruby -c` and `brew style` in publish).
 - [ ] Sparkle's tools under `build/DerivedData` of this clone (`make dist` resolves them; publish names the `xcodebuild -resolvePackageDependencies` command when they are missing), and the EdDSA key in the login keychain: `sign_update` signs the appcast with it.
-- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, and they are equal. `CURRENT_PROJECT_VERSION` (the app's build number, equal in Debug and Release) is above the previous release's: Sparkle compares build numbers, not versions. A pre-release tag counts too, so a release after `0.8.0-rc.1` needs a build number above the rc's. `docs/releases/<version>.md` exists. `fuzz/Cargo.lock` is refreshed (`cargo update -p ddc-core --manifest-path fuzz/Cargo.toml`; `make gate` checks it as `fuzz-lock`). All of it is one commit, pushed to `main`: a commit of release notes alone changes only Rust-free paths, its Gate run skips the Rust jobs, and `make tag` refuses it until a dispatched Gate run (`gh workflow run gate.yml --ref main`) passes (story "Gate by what changed: load at night, one gate per release, app-only pushes skip Rust", DDC-005).
+- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, and they are equal. `CURRENT_PROJECT_VERSION` (the app's build number, equal in Debug and Release) is above the previous release's: Sparkle compares build numbers, not versions. A pre-release tag counts too, so a release after `0.8.0-rc.1` needs a build number above the rc's. `docs/releases/<version>.md` exists. `fuzz/Cargo.lock` is refreshed (`cargo update -p ddc-core --manifest-path fuzz/Cargo.toml`; `make gate` checks it as `fuzz-lock`). All of it is one commit, merged into `main` through a PR (`main` takes no direct push; story "Main only through pull requests, in the code and the vault", DDC-005). Wait with `gh pr checks <n> --watch --fail-fast` until `gh pr view <n> --json state` says `MERGED`, then `git switch main && git pull --ff-only`. The rebase merge gives the commit a new SHA, and `main`'s own push run after the merge is the one `make tag` reads. Keep the notes in that commit: a commit of release notes alone changes only Rust-free paths, its Gate run skips the Rust jobs, and `make tag` refuses it until a dispatched Gate run (`gh workflow run gate.yml --ref main`) passes (story "Gate by what changed: load at night, one gate per release, app-only pushes skip Rust", DDC-005).
 
 ## Steps
 
@@ -129,7 +129,7 @@ gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner
 
 It must print `release not found`. A draft counts as a release: delete the draft first (below). With `RELEASE_TARGETS: '[]'`, publish does not look at `release.yml`, so a release can exist under a red run.
 
-- **release.yml failed, or the fix needs a commit:** after the check above, fix it on `main`. Then delete the tag on origin (`git push origin :refs/tags/v<version>`) and locally (`git tag -d v<version>`), and run `make tag` again. Bumping the version also works. While targets are enabled, publish refuses a red run.
+- **release.yml failed, or the fix needs a commit:** after the check above, merge the fix through a PR and pull `main`. Then delete the tag on origin (`git push origin :refs/tags/v<version>`) and locally (`git tag -d v<version>`), and run `make tag` again. Bumping the version also works. While targets are enabled, publish refuses a red run.
 - **make dist or publish failed for an outside reason** (credentials, network, Apple's notary service): fix it and rerun. The tag stays, as long as nothing was committed.
 - **The release exists but publish stopped later** (for example at the tap): first run `gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner --json isDraft`. If it is published, rerun `publish-release.sh`. It resumes at the cask with the release's own assets after checking their digests, and never rebuilds them. A release without its appcast gets one uploaded. Resume has three conditions:
   - `HEAD` descends from the tag;
@@ -142,19 +142,20 @@ It must print `release not found`. A draft counts as a release: delete the draft
 
 | Message | Cause | Fix |
 |---|---|---|
-| `no gate.yml run for <sha> ran its Rust jobs` | The release commit changed only paths on `.config/rust-free-paths`, typically release notes pushed after the version bump, so its push run skipped them | `gh workflow run gate.yml --ref main` (a dispatched run always runs the Rust jobs), wait for it to pass, rerun. Next time, notes and bump in one commit |
-| `fuzz/Cargo.lock is stale` | The version bump did not refresh the fuzz lock | `cargo update -p ddc-core --manifest-path fuzz/Cargo.toml`, amend the bump commit, push |
+| `no gate.yml push run for <sha> yet` | The PR merged moments ago and `main`'s own run has not started | Wait a minute and rerun |
+| `no gate.yml run for <sha> ran its Rust jobs` | The release commit changed only paths on `.config/rust-free-paths`, typically release notes merged after the version bump, so its push run skipped them | `gh workflow run gate.yml --ref main` (a dispatched run always runs the Rust jobs), wait for it to pass, rerun. Next time, notes and bump in one commit |
+| `fuzz/Cargo.lock is stale` | The version bump did not refresh the fuzz lock | `cargo update -p ddc-core --manifest-path fuzz/Cargo.toml` on a branch, merge it through a PR, pull `main`, rerun |
 | `origin has no tag v<version>: run 'make tag' first` | `make dist` before `make tag` | Run step 1 |
 | `tag v<version> on origin points at <sha>, not HEAD` | This clone is behind, or a commit landed after the tag | `git pull` if behind. A checkout of the tag cannot be published (publish needs `HEAD` = `origin/main`). Otherwise bump the version, or, after the no-release check, delete the tag and tag again |
 | `tag v<version> exists here: remove it with 'git tag -d …'` | A local tag left from an earlier attempt, or fetched by `make dist` (its build-number check fetches tags) | If origin still holds it: the no-release check, then delete it there, or bump the version if a release exists (Rollback). Then `git tag -d v<version>` |
 | `tag v<version> exists on origin: bump the version, or …` | Rerunning `make tag` after a failed `release.yml` | Run the no-release check, delete the tag on origin, rerun |
 | `release v<version> is a draft: …` | `gh release create` was stopped before it published | Delete the draft, keep the tag, rerun |
 | `since v<version>, files outside the cask changed: …` | Resuming after a commit that touched more than the cask or feed files | Bump the version |
-| `HEAD is not origin/main` | Unpushed or unpulled commits | Push or pull, then rerun |
-| `the app's MARKETING_VERSION (…) is not the CLI's version (…)` | Only one of them was bumped | Bump both, push, rerun |
+| `HEAD is not origin/main` | Unmerged or unpulled commits | Merge them through a PR, `git pull --ff-only`, rerun |
+| `the app's MARKETING_VERSION (…) is not the CLI's version (…)` | Only one of them was bumped | Bump both through a PR, pull `main`, rerun |
 | `release.yml holds no single RELEASE_TARGETS line` | `release.yml` was edited by hand | Restore the single `  RELEASE_TARGETS: '<json>'` line |
 | `release v<version> is published but holds no SHA256SUMS` | Resuming a release made before this flow | Fix the cask by hand for that release |
-| `CURRENT_PROJECT_VERSION is N, not greater than M at v<…>` | The app's build number was not bumped | Raise it in Debug and Release, push, rerun. From `make tag` this costs nothing. From `make dist`, the tag is already out: run the no-release check, delete the tag, then tag again |
+| `CURRENT_PROJECT_VERSION is N, not greater than M at v<…>` | The app's build number was not bumped | Raise it in Debug and Release through a PR, pull `main`, rerun. From `make tag` this costs nothing. From `make dist`, the tag is already out: run the no-release check, delete the tag, then tag again |
 | `Sparkle's sign_update is missing from …` | Publish runs in a clone where `make dist` did not run, or after `build/` was removed | Run the `xcodebuild -resolvePackageDependencies` command the message names |
 | `generate_keys -p failed: is the EdDSA key in the login keychain?` | A sandboxed shell, or the key is not in this Mac's keychain | Run unsandboxed on the owner's Mac |
 | `the keychain's EdDSA public key (…) is not the app's SUPublicEDKey (…)` | The keychain holds another key than the one the app ships | Stop: Sparkle would reject the update. Find the right key; never change `SUPublicEDKey` to match |
