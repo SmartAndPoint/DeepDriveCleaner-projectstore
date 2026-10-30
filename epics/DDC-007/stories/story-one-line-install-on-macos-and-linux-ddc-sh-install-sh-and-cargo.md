@@ -3,18 +3,18 @@ type: story
 id: "story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo"
 epic: "DDC-007"
 title: "One-line install on macOS and Linux: ddc.sh/install.sh and cargo"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [distribution, install, macos, linux, website]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-30T07:37:33.282Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-30T07:37:33.282Z"
 ---
 
 # One-line install on macOS and Linux: ddc.sh/install.sh and cargo
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -103,6 +103,15 @@ Two more install routes need no script:
 
 ## Implementation Plan
 
+The macOS half lands now; the Linux half closes after story "Linux scanner and rule catalog" enables the musl archives. `SHA256SUMS` comes from story "Build matrix: every target built, tested and packaged from one tag".
+
+1. `packaging/install/install.sh` (POSIX `sh`, `set -eu`): flags, platform detection (arm64 macOS, Rosetta to arm64, Intel and macOS below 26 refused; Linux x86_64/aarch64 to musl, refused with "not released for Linux yet" while `SHA256SUMS` has no musl line), the version (latest by redirect, or `--version`), the existing-install check (exit 4 naming it; `--force`), download to files, checksum, archive listing, `codesign` against the Developer ID requirement on macOS, `--version` of the new binary, then an atomic replace in `--prefix` and the `ddc` link. Exit codes 0/2/3/4/5 in the header. `--uninstall` stops on the CLI's own LaunchAgent (exit 4). No `sudo`; nothing written outside `--prefix` and a temporary folder except `--modify-path`'s one profile line.
+2. Test seam: a loopback base URL plus `DDC_INSTALL_ALLOW_ADHOC=1` together; anything else non-https is refused.
+3. `packaging/install/test_install.py` and `stub.c`: a fake release over `http.server`, every case of the acceptance criteria, under `dash` and through `| sh`. `make install-test` joins `make gate`; `make install-lint` runs `shellcheck`.
+4. `.github/workflows/install.yml`: fake releases on macOS and Ubuntu on every push; the real latest release through `curl | sh`, `cargo install --git` and `cargo binstall` on a release, weekly and on demand.
+5. `MACOSX_DEPLOYMENT_TARGET=26.0` in `scripts/build-cli.sh` and `scripts/build-app.sh`, checked with `vtool`.
+6. `ddc-cli`'s `[package.metadata.binstall]`; README's install routes and the exit-code table; release notes name the install line and `shasum -a 256 -c SHA256SUMS --ignore-missing`.
+
 ## Acceptance Criteria
 
 - [ ] On a macOS runner without Homebrew's cask, `curl -fsSL <served>/install.sh | sh` installs the latest real release; `deepdrivecleaner --version` and `ddc --version` print it, after the `PATH` line the script prints (CI evidence).
@@ -135,4 +144,4 @@ Two more install routes need no script:
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*

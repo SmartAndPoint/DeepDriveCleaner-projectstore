@@ -3,18 +3,18 @@ type: story
 id: "story-build-matrix-every-target-built-tested-and-packaged-from-one-tag"
 epic: "DDC-007"
 title: "Build matrix: every target built, tested and packaged from one tag"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [ci, release, build, linux, windows]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-30T07:10:03.214Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-30T07:10:03.214Z"
 ---
 
 # Build matrix: every target built, tested and packaged from one tag
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -63,7 +63,7 @@ The flow becomes:
    - the `release.yml` run for that commit succeeded, when the `enabled` list is non-empty; otherwise only the tag check applies.
    
    It fetches the archives with `gh run download`, writes `SHA256SUMS` over everything, and creates the release as today. The `STRAY_TAG` refusal becomes the checks above.
-5. If `release.yml` fails, the tag exists without a release, which is the state `STRAY_TAG` used to prevent. Recovery: fix on `main`, delete the tag on origin (it has no release yet), and tag again, or bump the version. `publish-release.sh` refuses while the run is red.
+5. If `release.yml` fails, the tag exists without a release, which is the state `STRAY_TAG` used to prevent. Recovery: fix on `main`, delete the tag on origin (it has no release yet), and tag again, or bump the version. While targets are enabled, `publish-release.sh` refuses while the run is red.
 
 ## Decomposition
 
@@ -84,6 +84,17 @@ The flow becomes:
 - [ ] The release runbook (or the Makefile header): tag, wait for `release.yml`, `make dist`, publish, and the recovery from a failed `release.yml`. Who pushes the tag is stated.
 
 ## Implementation Plan
+
+Stage 1 lands now; stages 2 and 3 follow the stories they depend on.
+
+1. `scripts/build-cli.sh <target>`: the release build with `--remap-path-prefix`, then the unsigned checks (architecture, `--version`, no home, checkout or `CARGO_HOME` path, the `nm` and `DDC_OP_STATS` checks). `build-dist.sh`, the gate's release build and `release.yml` all call it.
+2. `gate.yml`: push trigger on branches only, so a tag push does not start a second Gate run. A `check` matrix (`x86_64-unknown-linux-gnu` on `ubuntu-24.04`, `x86_64-pc-windows-msvc` on `windows-latest`, native `cargo check --workspace --locked`, `continue-on-error`). A `release-build` job on `macos-26` running `build-cli.sh aarch64-apple-darwin`.
+3. `release.yml` on `v*` tags with `RELEASE_TARGETS: '[]'`. A `plan` job checks the tag against the Cargo version and emits the matrix and `any`; the `build` job runs only when `any` is true: wait for the Gate run, build, smoke test (`--version`, `scan --json` against the schema), flat archive, runner-path check, provenance attestation, upload as a workflow artifact.
+4. `ci-green.sh` takes an optional workflow file (default `gate.yml`).
+5. `scripts/tag-release.sh` and `make tag`: clean tree, on `main`, `HEAD` equals `origin/main`, Cargo version equals the app's `MARKETING_VERSION`, release notes exist, tag absent locally and on origin; then an annotated tag, pushed.
+6. `build-dist.sh` requires the peeled tag on origin at `HEAD`.
+7. `publish-release.sh`: "tag on origin at `HEAD`" replaces `STRAY_TAG`; reads `RELEASE_TARGETS` fail-closed; with targets enabled, requires a green `release.yml` run, downloads each archive (missing means refuse), checks its listing and attestation. `SHA256SUMS` (`<hex>  <name>`, sorted by name with `LC_ALL=C`, no entry for itself) over every asset; `gh release create --verify-tag`; a digest check per asset. A version with `-` is a pre-release (no cask, no tap).
+8. The Makefile and README give the order: `make tag` → `release.yml` → `make dist` → publish. The vault runbook "Cutting a release: tag, CI archives, dist and publish" gives the steps and the recovery.
 
 ## Acceptance Criteria
 
@@ -114,4 +125,4 @@ The flow becomes:
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*

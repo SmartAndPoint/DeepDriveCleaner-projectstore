@@ -29,8 +29,11 @@ Run the release as always, unsandboxed, from a fresh clone (the keychain is read
 ```bash
 git clone https://github.com/SmartAndPoint/DeepDriveCleaner.git <scratch>/pub-080
 cd <scratch>/pub-080 && set -a && . <code repo>/.env && set +a
-make dist && ./scripts/publish-release.sh
+make tag    # publish waits for release.yml when targets are enabled
+make dist && ./scripts/publish-release.sh --dry-run && ./scripts/publish-release.sh
 ```
+
+The tag comes first: `make dist` refuses until origin holds `v0.8.0` at `HEAD` (runbook [[ops/cutting-a-release-tag-ci-archives-dist-and-publish|Cutting a release: tag, CI archives, dist and publish]]).
 
 `publish-release.sh` signs the zip with `sign_update`, renders `appcast.xml`, attaches it to the release with the zip and the tarball, writes the tap's cask, then fetches the live feed and compares its version and signature. There is no previous appcast for this first release, so the build-number guard against the feed has nothing to compare; `check-build-number.sh` still compares against the last tag.
 
@@ -54,7 +57,7 @@ Before the second release, the same path can be rehearsed on a Debug build again
 ## Verification
 
 - [ ] The live-feed check at the end of `publish-release.sh` passed.
-- [ ] `brew info --cask deepdrivecleaner` shows the new version and `auto_updates`.
+- [ ] `brew info --cask smartandpoint/tap/deepdrivecleaner` shows the new version and `auto_updates`.
 
 ## Rollback
 

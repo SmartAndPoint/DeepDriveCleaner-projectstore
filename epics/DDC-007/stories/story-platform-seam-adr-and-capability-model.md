@@ -3,18 +3,18 @@ type: story
 id: "story-platform-seam-adr-and-capability-model"
 epic: "DDC-007"
 title: "Platform seam: ADR and capability model"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [rust, architecture, portability, adr, schema]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-10-30T07:36:37.778Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-10-30T07:36:37.778Z"
 ---
 
 # Platform seam: ADR and capability model
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -53,7 +53,7 @@ What sits behind the seam (from today's code):
 
 ## Decomposition
 
-- [ ] ADR "Platform seam: one platform module per OS with declared capabilities". Read `adr/README.md` first. It decides:
+- [x] ADR "Platform seam: one platform module per OS with declared capabilities". Read `adr/README.md` first. It decides:
   - `cfg`-selected modules with one shared signature set versus traits (proposal: `cfg` modules, no dynamic dispatch on the hot path; traits only where tests need fakes, as `exec::system` already has);
   - the capability list and its names;
   - the JSON change;
@@ -67,6 +67,17 @@ What sits behind the seam (from today's code):
 - [ ] The app's decoder (DDCKit) accepts the new fields; contract tests updated (`swift test`).
 
 ## Implementation Plan
+
+The how is ADR [[adr/platform-seam-one-platform-module-per-os-with-declared-capabilities|Platform seam: one platform module per OS with declared capabilities]] (accepted 2026-10-30). This is the route through it.
+
+1. `ddc-core/src/platform/` (ADR §1–§3, §5): `mod.rs` with `Platform`, `Capability` (ten, kebab-case), `PLATFORM`, `CAPABILITIES`, `SUPPORTED` (the `cfg!` form), `Unsupported { platform, simulated }`, `require_supported()`, `refusal_in()`, the `cfg` selection and `compile_error!`; `macos.rs` (`true`, all ten), `linux.rs` and `windows.rs` (`false`, `&[]`). The feature `simulate-unported` in `ddc-core`, forwarded by `ddc-cli`.
+2. Core gates (ADR §5): `walk_with_reader`, `scan_inner`, `disk::measure_with` (now a `Result`), `exec::preflight::preflight`, `exec::execute`, `free::run`; the `Unsupported(Unsupported)` variants of `WalkSetupError`, `ScanError` and `ExecError`; `io::Error::new(ErrorKind::Unsupported, …)` for `preflight` and `free::run`.
+3. JSON (ADR §4): `platform` and `capabilities` after `ddc_version` in `ScanReport`, `CleanReport` and `DiskReport`; versions 1→2, 3→4, 2→3; the `full_disk_access` doc; `docs/*.schema.json` regenerated; `make golden-record`, with a check that the golden diff adds only the two fields and the version.
+4. The envelope (ADR §7): `ddc_core::refusal::ErrorReport` with `error_schema_version`, `docs/error.schema.json` and its drift test.
+5. CLI (ADR §5–§6): `exit::UNSUPPORTED = 69`; the dispatch gate after clap and before `init_process`, an exhaustive match over `Command`, `rules` the only command allowed; the envelope on stdout under the JSON flags; `refusal_in` in `main`.
+6. Tests (ADR §8–§9): `make unported-check` (into `target/unported`) in `make gate`, with `ddc-core/tests/unported.rs` and `ddc-cli/tests/unported_cli.rs`; structure tests for the feature, the environment reads and the literal `SUPPORTED`/`CAPABILITIES`; a macOS test that `SUPPORTED` is true; the skip helper in `tests/common`; the scan smoke in `scripts/build-cli.sh`.
+7. DDCKit (ADR §4): `Platform` and `Capability` decoded strictly in the scan, clean and disk models; the fixtures and the contract test updated; `swift test`.
+8. Docs: README's exit-code table gains 69; the menu bar ADR §6 item 5 gains 69 (amendment); the move story's acceptance criterion names `ddc-cli/src/platform/`.
 
 ## Acceptance Criteria
 
@@ -91,4 +102,4 @@ What sits behind the seam (from today's code):
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*
