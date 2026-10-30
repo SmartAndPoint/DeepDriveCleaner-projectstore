@@ -33,7 +33,7 @@ plan_updated_at: null
 The checker's baseline records the code as it is. The epic is done only when the baseline is empty: every file, function and type within the limits, and every module within its allowed directions.
 
 Measured on 2026-10-28 against the proposed limits:
-- 3 files over 400 code lines: `rules/catalog.rs` 602, `scan/walker.rs` 573, `exec/mod.rs` 408.
+- 2 files over 400 code lines: `scan/walker.rs` 573, `exec/mod.rs` 408. `rules/catalog.rs` (602) is already split, see below.
 - 11 functions over 70 lines, including:
   - `disk/mod.rs` 160;
   - `scan/walker.rs` 156 and 112;
@@ -53,7 +53,7 @@ Every change here preserves behaviour. Each commit is a refactor only:
 
 - [ ] Order by risk: the CLI and report files first, the safety path (`exec/*`, `plan.rs`, `rules/classify.rs`) last, after the low-risk files have proven the routine.
 - [ ] Files: split along the cohesion components and the largest items `ddc-shape` reports. The baseline only shrinks.
-- [ ] `rules/catalog.rs`: DDC-007's story "Rule catalog split: shared and per-OS sections" splits it by platform. Split further by category if a section is still over the limit, or apply the ADR's data-table rule.
+- [x] `rules/catalog.rs`: DDC-007's story "Rule catalog split: shared and per-OS sections" split it into `rules/catalog/` (`mod.rs`, `macos.rs`, `linux.rs`, `windows.rs` and a `shared/` folder by category); every file there is under 400 lines.
 - [ ] Long functions: extract named steps. Never wrap the same code in a closure to dodge the counter. The reviewer checks for this.
 - [ ] Cycles: one commit per cycle. Start with the two cycles outside the safety path, `store↔disk` and `sys↔scan`, as they stand after DDC-007's move (move the shared types into `model` or a lower module). `exec↔plan↔report` comes last, after DDC-007's move behind the platform module, because it is a design change on the safety path, not a file split. Once the cycles are gone, the layer rules switch from warn to fail.
 - [ ] Before and after each batch, run `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile") on all S profiles.

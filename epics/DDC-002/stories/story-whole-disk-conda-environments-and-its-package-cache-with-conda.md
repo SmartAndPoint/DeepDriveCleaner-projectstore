@@ -10,7 +10,7 @@ created: 2026-10-29
 updated: 2026-10-30
 external_refs: {}
 tags: [core, app, whole-disk, conda, native-command, adr-amendment, user-report]
-code_refs: ["crates/ddc-core/src/conda.rs", "crates/ddc-core/src/disk/conda.rs", "crates/ddc-core/src/free/conda.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/tests/conda.rs", "crates/ddc-core/tests/disk_free.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk.schema.json", "docs/disk-free.schema.json", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift"]
+code_refs: ["crates/ddc-core/src/conda.rs", "crates/ddc-core/src/disk/conda.rs", "crates/ddc-core/src/free/conda.rs", "crates/ddc-core/src/exec/native.rs", "crates/ddc-core/src/rules/catalog/", "crates/ddc-core/tests/conda.rs", "crates/ddc-core/tests/disk_free.rs", "crates/ddc-cli/tests/structure.rs", "docs/disk.schema.json", "docs/disk-free.schema.json", "app/Packages/DDCKit/Sources/DDCKit/AreaActions.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskSummary.swift"]
 specs: []
 started_at: "2026-10-29T09:01:17.844Z"
 closed_at: "2026-10-30T06:45:43.803Z"

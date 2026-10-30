@@ -49,7 +49,7 @@ Measured on 2026-10-28 (workspace 0.3.0 with the uncommitted `disk/` work, 76 so
 
 | Measure | Value |
 |---|---|
-| Source files over 400 code lines (excluding blanks, comments and `#[cfg(test)]` modules) | 3: `rules/catalog.rs` 602, `scan/walker.rs` 573, `exec/mod.rs` 408 |
+| Source files over 400 code lines (excluding blanks, comments and `#[cfg(test)]` modules) | 2: `scan/walker.rs` 573, `exec/mod.rs` 408 (`rules/catalog.rs`, 602, was split into `rules/catalog/` by DDC-007's story "Rule catalog split: shared and per-OS sections"; every file there is under 400 lines) |
 | Source files over 250 code lines | 12 |
 | Functions over 100 lines (`clippy::too_many_lines`) | 7 |
 | Functions over 70 lines (proposed hard limit) / over 40 (soft) | 11 / 35 |
