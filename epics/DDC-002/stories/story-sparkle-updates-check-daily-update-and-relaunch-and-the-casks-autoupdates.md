@@ -118,6 +118,7 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 - The KVO of `canCheckForUpdates` and the Debug-feed end-to-end run are the owner's manual checks.
 - A postpone question after a quit is ignored on purpose: Sparkle finishes that install without a relaunch.
 - `CURRENT_PROJECT_VERSION` must be raised in every release commit.
+- Released in 0.8.0 (tag at 356564c). Its first `make dist` stopped at the zip: `ditto --sequesterRsrc` packed the `com.apple.provenance` attribute into `__MACOSX/`. 356564c zips with `--norsrc --noextattr` instead, and the check refuses `._` entries too.
 
 ## Technical Notes
 

@@ -117,7 +117,7 @@ The switch "Check for updates daily" binds straight to `SPUUpdater.automatically
 
 ### 6. One artifact for both channels
 
-The same notarized `DeepDriveCleaner-<v>.zip` is the cask's download and the Sparkle enclosure. `build-app.sh` zips it with `ditto -c -k --sequesterRsrc --keepParent`, as Sparkle's documentation advises.
+The same notarized `DeepDriveCleaner-<v>.zip` is the cask's download and the Sparkle enclosure. `build-app.sh` zips it with `ditto -c -k --norsrc --noextattr --keepParent`: a signed bundle holds no resource fork, and the `com.apple.provenance` attribute macOS can put on every file a build writes cannot be removed with `xattr -cr`. With `--sequesterRsrc`, as Sparkle's documentation advises, that attribute landed in `__MACOSX/` and stopped `make dist` for 0.8.0. (Amended 2026-10-30.)
 
 `build-app.sh --dist` refuses to build unless the app's `CURRENT_PROJECT_VERSION` is greater than the one in `project.pbxproj` at the last release tag. Sparkle compares `CFBundleVersion`, not the short version, so a build number that does not grow would never be offered.
 
@@ -263,7 +263,7 @@ The app shows "Version X is available" and the command or link; it installs noth
 - `app/DeepDriveCleaner.xcodeproj`: the Sparkle package; Info.plist keys.
 - `app/DeepDriveCleaner/`: the Sparkle adapter, the popover line, the Settings rows, the start on `showStatusItem`.
 - `app/Packages/DDCKit`: `UpdateFlow` and its tests; the install-pending check in `ScheduledWork.tick`.
-- `scripts/build-app.sh`: XPC removal, Sparkle signing, the per-binary check, `--sequesterRsrc`, the build-number check against the last tag.
+- `scripts/build-app.sh`: XPC removal, Sparkle signing, the per-binary check, the zip without extended attributes, the build-number check against the last tag.
 - `scripts/publish-release.sh` and `packaging/sparkle/appcast.xml.tmpl`: `sign_update`, the appcast as a release asset, the version and team guards, the check of the live feed.
 - `packaging/homebrew/deepdrivecleaner.rb.tmpl`: `auto_updates true`, the `zap` paths.
 - `README.md`: "Network", the update text under Install and Full Disk Access.
