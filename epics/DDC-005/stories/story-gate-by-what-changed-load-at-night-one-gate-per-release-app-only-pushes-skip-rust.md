@@ -3,17 +3,17 @@ type: story
 id: "story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust"
 epic: "DDC-005"
 title: "Gate by what changed: load at night, one gate per release, app-only pushes skip Rust"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-30
 updated: 2026-10-30
 external_refs: {}
 tags: [ci, quality, git-hooks, release]
-code_refs: []
+code_refs: [".config/rust-free-paths", "scripts/gate-scope.sh", "scripts/tests/test_gate_scope.py", ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", ".github/workflows/release.yml", "Makefile", "scripts/ci-green.sh", "scripts/tag-release.sh", "scripts/require-tag.sh", "fuzz/Cargo.lock", "crates/ddc-core/tests/matcher_reference.rs"]
 specs: []
 started_at: 2026-10-30
-closed_at: null
+closed_at: "2026-10-30T11:35:43.001Z"
 plan_updated_at: 2026-10-30
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: 2026-10-30
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -78,7 +78,7 @@ The guarantee `make dist` relies on does not depend on item 3. A release needs a
 
 ## Decomposition
 
-- [ ] `.config/rust-free-paths` holds the list.
+- [x] `.config/rust-free-paths` holds the list.
   - Entries:
     - `app/`, except `app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/` (read by `crates/ddc-core/tests/disk.rs`) and `app/DeepDriveCleaner.xcodeproj/project.pbxproj` (read by `packaging/install/test_install.py`);
     - `website/`;
@@ -89,7 +89,7 @@ The guarantee `make dist` relies on does not depend on item 3. A release needs a
     - An entry ending in `/` is a folder prefix; any other entry is one file.
     - `!` takes a path back off the list.
     - The list file itself is off the list.
-- [ ] `scripts/gate-scope.sh` is the one classifier. It prints `rust` or `skip`, and in `push` and `paths` mode also `swift`; `staged` and `ci` fold `swift` into `skip`. It exits 0, and a usage error prints `rust` and exits 2. Callers treat anything other than `skip` or `swift` as `rust`, empty output included. Modes:
+- [x] `scripts/gate-scope.sh` is the one classifier. It prints `rust` or `skip`, and in `push` and `paths` mode also `swift`; `staged` and `ci` fold `swift` into `skip`. It exits 0, and a usage error prints `rust` and exits 2. Callers treat anything other than `skip` or `swift` as `rust`, empty output included. Modes:
   - `paths`, newline-separated on stdin, for the guard test.
   - `staged`, for pre-commit. An empty staged set answers `rust`.
   - `push`, which reads git's pre-push lines on stdin:
@@ -101,17 +101,17 @@ The guarantee `make dist` relies on does not depend on item 3. A release needs a
     - `swift` means the Rust tiers are skipped but `app/Packages/` changed.
   - `ci <sha>`, for the Gate's `scope` job (see below).
   - Every diff uses `--no-renames`, so a file moved from `crates/` to `app/` shows its source path.
-- [ ] `scripts/tests/test_gate_scope.py` covers every mode in throwaway repos and runs `ci` against a fake `gh`. Its guard fails when a gate input names a listed path:
+- [x] `scripts/tests/test_gate_scope.py` covers every mode in throwaway repos and runs `ci` against a fake `gh`. Its guard fails when a gate input names a listed path:
   - every `.rs` file under `crates/` (sources too: `include_str!`), the Python and shell files under `bench/`, `scripts/tests/` and `packaging/`, the scripts those tests run, and the recipes reachable from `gate:` in the Makefile.
   - It looks only at literals anchored at the repo root, after stripping `../` and `./`.
   - Literals that name a temp-tree path carry an allow-list entry with a reason.
   - Every list entry must name a tracked path, so a renamed folder cannot leave a stale exclusion.
-- [ ] `.githooks/pre-commit` skips `gate-fast` on `skip` or `swift`, with one line saying why. This changes the hook's policy: it now decides on the staged paths, not on the whole working tree.
-- [ ] `.githooks/pre-push`:
+- [x] `.githooks/pre-commit` skips `gate-fast` on `skip` or `swift`, with one line saying why. This changes the hook's policy: it now decides on the staged paths, not on the whole working tree.
+- [x] `.githooks/pre-push`:
   - `skip`: no gate.
   - `swift`: `make ddckit-test`, which is `swift test` of DDCKit only. The full `make app-test` signs a fixture with `codesign`, which agent sessions must not run.
   - `rust`, or anything else: `make gate`.
-- [ ] `gate.yml`:
+- [x] `gate.yml`:
   - **`scope` job:** runs on ubuntu with `fetch-depth: 0` and `actions: read`.
     - It is never `continue-on-error`.
     - Base = the newest commit that is an ancestor of `HEAD` and whose push Gate run concluded `success` with `gate`, `coverage` and `release-build` all `success`. Candidates come from all branches, and ancestry decides. It reads one page of 50 runs and checks at most 20 ancestors.
@@ -119,23 +119,23 @@ The guarantee `make dist` relies on does not depend on item 3. A release needs a
   - **Rust jobs:** `gate`, `coverage`, `release-build` and `check` have `needs: scope` and `if: ${{ !cancelled() && needs.scope.outputs.scope != 'skip' }}`, so a failed `scope` runs them.
   - **`app`** always runs.
   - **`load`** moves to `nightly.yml` as `load-m`.
-- [ ] `scripts/ci-green.sh --full` is used by `make tag` (`tag-release.sh`), `make dist` and `release.yml`.
+- [x] `scripts/ci-green.sh --full` is used by `make tag` (`tag-release.sh`), `make dist` and `release.yml`.
   - It also requires a green run of `HEAD` whose `gate`, `coverage` and `release-build` jobs are `success`. That can be a push run or a `workflow_dispatch` run, any of the last 20, not only the newest.
   - When none qualifies, its message gives the way out: `gh workflow run gate.yml --ref main`, wait, rerun. A dispatched run always runs the Rust jobs.
-- [ ] `Makefile`:
+- [x] `Makefile`:
   - `dist: require-tag ci-green-full`, then the build.
   - `fuzz-lock` on stable goes into `gate` after `deny machete`, and `fuzz` depends on it.
   - `ddckit-test`, which `app-test` depends on.
   - `coverage-ratchet` picks the newest green `main` run whose `coverage` job succeeded.
   - The comments that say `dist` runs the gate are corrected, and so is `scripts/require-tag.sh`.
-- [ ] `fuzz/Cargo.lock` refreshed.
-- [ ] AGENTS.md "The gate" section (outside the projectstore block) and the README's development section:
+- [x] `fuzz/Cargo.lock` refreshed.
+- [x] AGENTS.md "The gate" section (outside the projectstore block) and the README's development section:
   - which pushes skip the Rust tiers;
   - that a green hook on an app-only push says nothing about Rust.
-- [ ] Vault runbook "Cutting a release: tag, CI, archives, dist and publish":
+- [x] Vault runbook "Cutting a release: tag, CI, archives, dist and publish":
   - the version bump refreshes `fuzz/Cargo.lock` and carries the release notes in the same commit;
   - `make dist` no longer re-runs the gate.
-- [ ] Measured after the change: one app-only push and one core push, with the duration of each job, recorded in this story.
+- [x] Measured after the change: one app-only push and one core push, with the duration of each job, recorded in this story.
 
 ## Implementation Plan
 
@@ -153,12 +153,21 @@ Planned with `projectstore:planner` on 2026-10-30. Critiqued by `projectstore:cr
 
 ## Acceptance Criteria
 
-- [ ] A push of only Rust-free paths, such as an app Swift file outside `app/Packages/`, behaves as follows:
+- [x] A push of only Rust-free paths, such as an app Swift file outside `app/Packages/`, behaves as follows:
   - the pre-push hook runs no gate;
   - CI skips `gate`, `coverage`, `release-build` and `check`, and runs `scope` and `app`;
   - the run is green, and its jobs together take under 5 minutes, not counting time queued for a runner.
-- [ ] A push touching a path off the list runs the full gate locally and every Rust job in CI. Example paths: a `crates/` file, `docs/scan.schema.json`, a DDCKit fixture, or a file renamed from `crates/` into `app/`.
-- [ ] `ci` mode, tested with a fake `gh` in `scripts/tests/test_gate_scope.py`:
+  - Evidence:
+    - Branch `gate-scope-proof` held commit 3f62f09, a comment in `app/DeepDriveCleaner/AppLog.swift`. The branch was deleted after the run.
+    - Pre-commit printed "only Rust-free paths staged … gate-fast skipped". Pre-push printed "… gate skipped", and `git push` took 3.5 s.
+    - Gate run 41048680391 concluded success. Its `scope` job logged `gate-scope: base 48f9fba (run 41047623783)` and took 0.1 min. `app` took 2.0 min. `gate`, `coverage`, `release-build` and `check` were skipped.
+    - The jobs took 2.1 min together, and the run took 2 min of wall time.
+- [x] A push touching a path off the list runs the full gate locally and every Rust job in CI. Example paths: a `crates/` file, `docs/scan.schema.json`, a DDCKit fixture, or a file renamed from `crates/` into `app/`.
+  - Evidence:
+    - The pushes of 3939793 and 48f9fba ran `make gate` in the pre-push hook. Gate runs 41044862295 and 41047623783 ran every Rust job.
+    - `Paths.test_paths_a_gate_step_reads_run_the_rust_tiers` covers `docs/scan.schema.json` and the DDCKit fixture.
+    - `Push.test_a_crate_change_runs_rust` covers a `crates/` file, and `Push.test_a_rename_out_of_crates_runs_rust` covers the rename.
+- [x] `ci` mode, tested with a fake `gh` in `scripts/tests/test_gate_scope.py`:
   - **Fail toward `rust`:**
     - a Rust-free X on Y whose run failed only in `coverage` → `rust`;
     - a `gh` failure, no runs, or no green ancestor → `rust`;
@@ -166,7 +175,15 @@ Planned with `projectstore:planner` on 2026-10-30. Critiqued by `projectstore:cr
   - **Skip:**
     - a Rust-free X on a Rust-free W on a green B → `skip`, with B as the base;
     - a candidate whose run is green but whose `gate` was skipped → not a base.
-- [ ] `push` mode, tested in throwaway repos:
+  - Evidence: these `Ci` tests pass in `python3 scripts/tests/test_gate_scope.py`, 39 tests OK:
+    - `test_a_base_whose_coverage_failed_is_not_a_base`
+    - `test_a_gh_failure_runs_rust`
+    - `test_no_runs_run_rust`
+    - `test_a_run_on_another_line_is_not_an_ancestor`
+    - `test_pull_requests_and_dispatches_run_rust`
+    - `test_a_chain_of_app_changes_finds_the_base_two_back` (it asserts `base <B>` on stderr)
+    - `test_a_green_run_that_skipped_its_rust_jobs_is_not_a_base`
+- [x] `push` mode, tested in throwaway repos:
   - deletion only → `skip`;
   - a tag → `skip`;
   - a tag beside a branch with a `crates/` change → `rust`;
@@ -176,16 +193,72 @@ Planned with `projectstore:planner` on 2026-10-30. Critiqued by `projectstore:cr
   - empty stdin → `rust`;
   - a rename from `crates/` to `app/` → `rust`;
   - a DDCKit source change → `swift`.
-- [ ] The guard fails when a Rust or Python test reads a listed path. This is shown by a temporary edit, which is then reverted.
-- [ ] `make tag` and `make dist` (`ci-green --full`) refuse a `HEAD` whose run skipped the Rust jobs, naming `gh workflow run`, and accept it once a dispatched run of `HEAD` passed them. This is shown by the script's tests with a fake `gh`.
-- [ ] Gate on a core commit is green with no `load` job. Nightly's `load-m` job is green.
-- [ ] `make -n dist` shows `require-tag`, `ci-green --full` and the build, with no `gate` and no `app-test`.
-- [ ] `make fuzz-lock` fails on the 0.7.0 lock and passes after the refresh. The next Nightly's `fuzz` job gets past `cargo metadata`.
-- [ ] Owner checks: none. Every criterion above is shown by a command or a CI run.
+  - Evidence: these `Push` tests pass, one per case:
+    - `test_a_deletion_alone_skips`
+    - `test_a_tag_skips`
+    - `test_a_tag_beside_a_branch_with_a_crate_change_runs_rust`
+    - `test_a_new_branch_with_nothing_new_runs_rust`
+    - `test_a_new_branch_is_judged_from_its_merge_base_with_origin_main`
+    - `test_an_unknown_remote_sha_runs_rust`
+    - `test_empty_stdin_runs_rust`
+    - `test_a_rename_out_of_crates_runs_rust`
+    - `test_a_ddckit_change_answers_swift`
+- [x] The guard fails when a Rust or Python test reads a listed path. This is shown by a temporary edit, which is then reverted.
+  - Evidence: on 2026-10-30, the literal `"website/index.html"` was appended to `crates/ddc-core/tests/disk.rs`.
+    - `Guard.test_no_gate_input_names_a_rust_free_path` then failed with `[('crates/ddc-core/tests/disk.rs', 'website/index.html')] != []`.
+    - The edit was reverted with `git checkout`, leaving the tree clean.
+- [x] `make tag` and `make dist` (`ci-green --full`) refuse a `HEAD` whose run skipped the Rust jobs, naming `gh workflow run`, and accept it once a dispatched run of `HEAD` passed them. This is shown by the script's tests with a fake `gh`.
+  - Evidence: these `CiGreenFull` tests pass:
+    - `test_full_refuses_a_run_that_skipped_its_rust_jobs`, which asserts the `gh workflow run` advice;
+    - `test_full_accepts_a_dispatched_run_of_head`;
+    - `test_full_passes_a_run_that_ran_them`;
+    - `test_without_full_the_run_conclusion_decides`.
+- [x] Gate on a core commit is green with no `load` job. Nightly's `load-m` job is green.
+  - Evidence:
+    - Gate run 41047623783 on 48f9fba concluded success and has no `load` job.
+    - Nightly run 41049050995, dispatched on 48f9fba: `load-m` succeeded in 17.7 min, and every other nightly job succeeded too.
+- [x] `make -n dist` shows `require-tag`, `ci-green --full` and the build, with no `gate` and no `app-test`.
+  - Evidence: `make -n dist` prints `./scripts/require-tag.sh`, `./scripts/ci-green.sh --full`, `./scripts/build-dist.sh` and `./scripts/build-app.sh --dist`, and nothing else.
+- [x] `make fuzz-lock` fails on the 0.7.0 lock and passes after the refresh. The next Nightly's `fuzz` job gets past `cargo metadata`.
+  - Evidence:
+    - With `git show 3939793^:fuzz/Cargo.lock` restored (`ddc-core` 0.7.0), `make fuzz-lock` exits with `make: *** [fuzz-lock] Error 1`. With the committed lock it passes.
+    - Nightly run 41049050995: `fuzz` succeeded in 54.3 min. Scheduled run 41034359935 had failed at `cargo metadata`.
+- [x] Owner checks: none. Every criterion above is shown by a command or a CI run.
 
 ## Final Summary
 
-<!-- Written at the done gate. -->
+**What changed.** Every check is kept, but each now runs where it pays.
+- M-size `load` moved from `gate.yml` to `nightly.yml` as `load-m`.
+- A release runs the gate once, in CI on the release commit. `make dist` and `make tag` require that run through `ci-green --full`.
+- A change whose every path is on `.config/rust-free-paths` (the app's own sources, `website/`, `docs/releases/`) skips the Rust tiers in both hooks and in CI. `scripts/gate-scope.sh` is the one classifier, and any doubt runs Rust.
+- `fuzz/Cargo.lock` is refreshed to 0.8.0, and `make gate` checks it.
+
+**Measured.**
+
+| Run | Jobs | Wall time |
+|---|---|---|
+| Before (average of 5 `main` runs) | `load` 16.5, `gate` 6.8, `coverage` 3.6, `app` 2.0, `release-build` 1.5 | about 17 min |
+| Core commit 3939793 (run 41044862295) | `scope` 0.1, `gate` 3.3, `coverage` 3.6, `app` 2.4, `release-build` 1.4 | 3.8 min |
+| Core commit 48f9fba (run 41047623783) | `scope` 0.1, `gate` 8.3, `coverage` 3.4, `app` 3.2, `release-build` 1.9 | about 8.5 min |
+| App-only commit 3f62f09 (run 41048680391) | `scope` 0.1, `app` 2.0, Rust jobs skipped | 2 min |
+
+`gate`'s time varies by run on the hosted macOS runner, from 3.3 to 8.3 min for the same work. Locally, an app-only push takes seconds instead of about 2 minutes.
+
+**Found on the way.** CI's first run on 3939793 failed in `matcher_reference`'s proptest.
+- The generator had made `.gradle/Caches` and `.gradle/caches`, which macOS folds into one folder. The bug predates this story; a random seed found it.
+- Fixed in 48f9fba: the generator now spells a name the way the tree already does. `names_that_differ_only_in_case_are_one_folder` pins the case.
+
+**Tests executed.**
+- `python3 scripts/tests/test_gate_scope.py`: 39 tests OK.
+- `make gate` in the pre-push hook of 3939793 and 48f9fba.
+- Gate runs 41044862295, 41047623783 and 41048680391.
+- Nightly run 41049050995.
+
+**Risks and follow-ups.**
+- The M-size correctness check (trees against their manifests, the CLI's exit and the items a clean leaves) now runs on `main` once a night. A fault that shows only at about 10^5 entries is found within 24 hours, not before the push. The owner chose this trade.
+- No CI job compiles the app host (`app/DeepDriveCleaner/`), and a GUI push now runs only `app` (DDCKit's `swift test` and the signing check). Follow-up: compile the app target in CI.
+- Nightly has no `release-build` (`scripts/build-cli.sh`).
+- Under load from parallel agent test runs, about 12 on 2026-10-30, `ddc-core::recheck` hit its 120 s timeout in the pre-push gate twice. The tests pass alone. The pushes went through on a retry.
 
 ## Technical Notes
 
