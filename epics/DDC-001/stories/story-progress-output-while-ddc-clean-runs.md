@@ -10,7 +10,7 @@ created: 2026-10-18
 updated: 2026-10-25
 external_refs: {}
 tags: [cli, ux, idea]
-code_refs: ["crates/ddc-core/src/exec/progress.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/sys/term.rs", "crates/ddc-core/src/sys/mod.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/clean_items.rs", "crates/ddc-core/tests/in_use.rs", "crates/ddc-core/tests/user_data.rs"]
+code_refs: ["crates/ddc-core/src/exec/progress.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/platform/macos/term.rs", "crates/ddc-core/src/platform/macos/mod.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/clean_items.rs", "crates/ddc-core/tests/in_use.rs", "crates/ddc-core/tests/user_data.rs"]
 specs: []
 started_at: "2026-10-24T20:31:17.888Z"
 closed_at: null

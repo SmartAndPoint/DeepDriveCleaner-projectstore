@@ -41,7 +41,7 @@ This story picks each lint deliberately, sets the thresholds the ADR decided, fi
 - [ ] From `restriction`:
   - `allow_attributes_without_reason`;
   - `unwrap_used` and `expect_used` (with `allow-unwrap-in-tests` and `allow-expect-in-tests`), only if the ADR adopts them after the design story's count (about 114 sites in `src/` today, outside the 399). If adopted, each becomes `?`, a checked match, or `#[expect(…, reason)]`;
-  - `undocumented_unsafe_blocks` for `sys/` (`platform/macos/` after DDC-007's move).
+  - `undocumented_unsafe_blocks` for `platform/macos/` and `platform/op_stats.rs` (DDC-007's story "Move OS calls behind the platform module" moved `sys/` there).
   
   No `as_conversions`: it fires on every `as`, lossless or not, and the pedantic `cast_possible_truncation`, `cast_sign_loss` and `cast_possible_wrap` already catch the lossy ones.
   
@@ -52,7 +52,7 @@ This story picks each lint deliberately, sets the thresholds the ADR decided, fi
   - the `disallowed_methods` ones in `src/` (`env.rs`, `store.rs`, `exec/delete.rs`, `launchd.rs`) become `#[expect(…, reason = "…")]`;
   - `cmd/schedule.rs` `install_with` carries `#[allow(clippy::too_many_arguments)]` (8 parameters). It is also a shape violation (hard limit 6): it goes to the burn-down list, or gets a `shape.toml` exception with a reason;
   - the 8 `#[allow(clippy::disallowed_methods)]` in `tests/` (the `DDC_UPDATE_SCHEMA` reads) become `#[expect(…, reason = "…")]`;
-  - `#![allow(unsafe_code)]` in `sys/mod.rs` gains a reason;
+  - `#![allow(unsafe_code)]` in `platform/macos/mod.rs` and `platform/op_stats.rs` gains a reason;
   - `tests/common`'s `#![allow(dead_code)]` stays an `allow` with a reason: `common/` is compiled into every test binary, and `#[expect]` would fail in whichever binary uses all of it.
 - [ ] Functions over the hard length limit go to the burn-down story's list. They do not get an `#[expect]` here.
 
@@ -62,7 +62,7 @@ This story picks each lint deliberately, sets the thresholds the ADR decided, fi
 
 - [ ] `make gate` runs clippy with the curated set and passes.
 - [ ] `grep -rnE '#!?\[(allow|expect)\(' crates` lists only attributes with a `reason`, enforced by `allow_attributes_without_reason`.
-- [ ] Every `unsafe` block in `sys/` has a `// SAFETY:` comment, enforced by `undocumented_unsafe_blocks`.
+- [ ] Every `unsafe` block in `platform/macos/` and `platform/op_stats.rs` has a `// SAFETY:` comment, enforced by `undocumented_unsafe_blocks`.
 - [ ] All tests pass. In tests, lint-only edits are allowed; no assertion, fixture or expected value changed (reviewer checks the diff).
 
 ## Final Summary

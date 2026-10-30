@@ -357,7 +357,7 @@ The profile or command has no row in `bench/load-limits.tsv`. Re-baseline (step 
 - Story "Complexity guard: operation counts and scaling exponents" (same epic): the counters and the scaling slopes (steps 8 and 9).
 - Code:
   - `crates/ddc-loadgen/src/{run,limits,leaks,heap,measure,isolate,scaling}.rs`, `crates/ddc-loadgen/tests/profiles.rs`
-  - `crates/ddc-core/src/stats.rs`, `crates/ddc-core/src/sys/op_stats.rs`
+  - `crates/ddc-core/src/stats.rs`, `crates/ddc-core/src/platform/op_stats.rs`
   - `crates/ddc-core/src/heap.rs`
   - `scripts/load-image.sh`
   - `bench/compare_load.py`

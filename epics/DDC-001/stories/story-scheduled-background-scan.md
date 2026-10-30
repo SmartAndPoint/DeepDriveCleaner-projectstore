@@ -10,7 +10,7 @@ created: 2026-10-17
 updated: 2026-10-19
 external_refs: {}
 tags: [background, launchd]
-code_refs: ["crates/ddc-cli/src/launchd.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/schedule.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/tests/background_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/visitor.rs"]
+code_refs: ["crates/ddc-cli/src/platform/launchd.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/cmd/schedule.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/tests/background_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/rules/visitor.rs"]
 specs: []
 started_at: "2026-10-17T10:44:36.821Z"
 closed_at: "2026-10-17T11:52:25.555Z"

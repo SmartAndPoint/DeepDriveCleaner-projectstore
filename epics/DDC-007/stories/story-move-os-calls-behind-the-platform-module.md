@@ -3,17 +3,17 @@ type: story
 id: "story-move-os-calls-behind-the-platform-module"
 epic: "DDC-007"
 title: "Move OS calls behind the platform module"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
 updated: 2026-10-30
 external_refs: {}
 tags: [rust, refactor, portability]
-code_refs: []
+code_refs: ["crates/ddc-core/src/platform/", "crates/ddc-core/src/scan/reader.rs", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/src/env.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/report/", "crates/ddc-core/src/disk/", "crates/ddc-core/src/agents/", "crates/ddc-core/src/conda.rs", "crates/ddc-core/src/stats.rs", "crates/ddc-core/Cargo.toml", "crates/ddc-core/tests/common/mod.rs", "crates/ddc-cli/src/platform/", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/cmd/", "crates/ddc-cli/tests/common/mod.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-loadgen/src/platform/", "crates/ddc-loadgen/src/build.rs", "crates/ddc-loadgen/src/lib.rs", "crates/ddc-loadgen/src/target.rs", "crates/ddc-loadgen/Cargo.toml", "Makefile", ".github/workflows/gate.yml"]
 specs: []
 started_at: "2026-10-30T10:15:51.106Z"
-closed_at: null
+closed_at: "2026-10-30T12:34:10.503Z"
 plan_updated_at: "2026-10-30T10:15:51.106Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-30T10:15:51.106Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -55,11 +55,11 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 
 ## Decomposition
 
-- [ ] `ddc-core/src/platform/{mod,macos,linux,windows}.rs` (or folders). `sys/` moves under `platform::macos`. Linux and Windows get stubs that compile and return `Unsupported` for each capability, with `SUPPORTED = false`.
-- [ ] Every row of the table above moves behind `platform`, or behind `crate::platform` (`ddc-cli/src/platform/`) for `ddc-cli`. Shared code calls only the seam.
-- [ ] The test harness: helpers that need Unix move behind `cfg(unix)` helpers in `tests/common`. Tests that are macOS-only by nature are marked `cfg(target_os = "macos")` with a one-line reason. Platform-neutral tests (rules, plan, report on fixtures, property tests) carry no `cfg`. Tests of a gated entry point (`report::scan*`, `scan::walk`, `disk::measure*`, `exec::execute`, `preflight`, `free::run`) start with `if common::unsupported("…") { return; }` (ADR "Platform seam: one platform module per OS with declared capabilities", §9). CLI integration tests that run `scan`, `clean`, `du`, `disk`, `schedule`, `notify` or `diag` skip the same way when `ddc_core::platform::SUPPORTED` is false.
-- [ ] `make tools` adds the targets (`rustup target add x86_64-unknown-linux-gnu x86_64-unknown-linux-musl x86_64-pc-windows-msvc`). The gate's full tier runs `cargo clippy --workspace --all-targets --target <t> -- -D warnings` for each (`make cross-check`), or CI runs it if a warm run exceeds step 8's time budget: clippy runs `check` and also fails on the per-target unused imports a `cfg` move leaves, which would otherwise first break stage 2's native jobs.
-- [ ] Before and after: `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile"), plus the full macOS test suite.
+- [x] `ddc-core/src/platform/{mod,macos,linux,windows}.rs` (or folders). `sys/` moves under `platform::macos`. Linux and Windows get stubs that compile and return `Unsupported` for each capability, with `SUPPORTED = false`.
+- [x] Every row of the table above moves behind `platform`, or behind `crate::platform` (`ddc-cli/src/platform/`) for `ddc-cli`. Shared code calls only the seam.
+- [x] The test harness: helpers that need Unix move behind `cfg(unix)` helpers in `tests/common`. Tests that are macOS-only by nature are marked `cfg(target_os = "macos")` with a one-line reason. Platform-neutral tests (rules, plan, report on fixtures, property tests) carry no `cfg`. Tests of a gated entry point (`report::scan*`, `scan::walk`, `disk::measure*`, `exec::execute`, `preflight`, `free::run`) start with `if common::unsupported("…") { return; }` (ADR "Platform seam: one platform module per OS with declared capabilities", §9). CLI integration tests that run `scan`, `clean`, `du`, `disk`, `schedule`, `notify` or `diag` skip the same way when `ddc_core::platform::SUPPORTED` is false.
+- [x] `make tools` adds the targets (`rustup target add x86_64-unknown-linux-gnu x86_64-unknown-linux-musl x86_64-pc-windows-msvc`). The gate's full tier runs `cargo clippy --workspace --all-targets --target <t> -- -D warnings` for each (`make cross-check`), or CI runs it if a warm run exceeds step 8's time budget: clippy runs `check` and also fails on the per-target unused imports a `cfg` move leaves, which would otherwise first break stage 2's native jobs.
+- [x] Before and after: `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile"), plus the full macOS test suite.
 
 ## Implementation Plan
 
@@ -125,13 +125,25 @@ Risks to macOS behaviour, each with a guard:
 
 ## Acceptance Criteria
 
-- [ ] `make cross-check` (`cargo clippy --workspace --all-targets --target <t> -- -D warnings`) passes for `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl` and `x86_64-pc-windows-msvc`, in the gate or, past the time budget in step 8, in CI.
-- [ ] On macOS the full test suite passes, and the golden outputs are byte-identical: `make golden-check` passes and `make golden-record` is never run by this story.
-- [ ] No file under `src/` outside `ddc-core/src/platform/`, `ddc-cli/src/platform/` and `ddc-loadgen/src/platform/` references `libc::`, `rustix::`, `windows_sys::`, `windows::` or `std::os::` (any submodule), nor a `cfg`, `cfg!` or `cfg_attr` on `target_os`, `target_family`, `unix` or `windows`; and no file in `ddc-cli` outside `ddc-cli/src/platform/`, nor in `ddc-loadgen`, references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it).
-- [ ] `unsafe_code` is denied everywhere; `#![allow(unsafe_code)]` appears only on `ddc-core/src/platform/macos/mod.rs` and `ddc-core/src/platform/op_stats.rs`, and nowhere in `tests/`.
-- [ ] `projectstore:reviewer` confirmed the move preserved behaviour.
+- [x] `make cross-check` (`cargo clippy --workspace --all-targets --target <t> -- -D warnings`) passes for `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl` and `x86_64-pc-windows-msvc`, in the gate or, past the time budget in step 8, in CI. — evidence: the reviewer ran clippy on all three targets, clean; `Makefile` `gate:` runs `cross-check` (about 24 s warm, under the 90 s budget); commit 2692c6a.
+- [x] On macOS the full test suite passes, and the golden outputs are byte-identical: `make golden-check` passes and `make golden-record` is never run by this story. — evidence: nextest 618/618 at cae0891 (gate-fast hook); golden 13/13 before step 1 and after every product step; `git diff 48f9fba..cae0891 -- bench` is empty.
+- [x] No file under `src/` outside `ddc-core/src/platform/`, `ddc-cli/src/platform/` and `ddc-loadgen/src/platform/` references `libc::`, `rustix::`, `windows_sys::`, `windows::` or `std::os::` (any submodule), nor a `cfg`, `cfg!` or `cfg_attr` on `target_os`, `target_family`, `unix` or `windows`; and no file in `ddc-cli` outside `ddc-cli/src/platform/`, nor in `ddc-loadgen`, references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it). — evidence: `crates/ddc-cli/tests/structure.rs` `no_file_outside_the_platform_folders_names_an_os`, which failed on planted violations in `ddc-core/src/plan.rs`, loadgen `lib.rs`, the CLI's `main.rs` and loadgen `tests/order.rs`; the reviewer's independent grep found nothing.
+- [x] `unsafe_code` is denied everywhere; `#![allow(unsafe_code)]` appears only on `ddc-core/src/platform/macos/mod.rs` and `ddc-core/src/platform/op_stats.rs`, and nowhere in `tests/`. — evidence: `structure.rs` `only_the_macos_module_and_the_counters_allow_unsafe_code`; `Cargo.toml:33`; `interrupt_cli.rs`'s `unsafe libc::kill` became `platform::signals::signal_group`.
+- [x] `projectstore:reviewer` confirmed the move preserved behaviour. — evidence: the reviewer's report checked each risk in the list against the diff (device ids, the signal handler, the spawn order, no new `stat` in procs, the two allocated-size sources, the directory-read counter, `EDEADLK`, `HOME`, the trash method); its two should-fix findings and five nits are fixed in cae0891.
 
 ## Final Summary
+
+**What changed.** The core's `sys/` module is now `ddc-core/src/platform/macos/`, behind a surface of mirrored submodules (`platform::<module>::<item>`), each item pinned by a `const _: fn(…)` to the selected OS module. Shared types live in `platform/types.rs`. The new `meta`, `process`, `trash`, `folders` and `errno` items replace the `std::os` and `libc` calls in shared code. Linux and Windows share one stub body (`platform/unported.rs`) that returns `Unsupported`, fails closed for `file_id`, and reads neither the disk nor the environment. The CLI's launchd, notifier and process setup moved to `ddc-cli/src/platform/`. The load generator's `rustix` tree builder moved to `ddc-loadgen/src/platform/`; on Windows `build()` returns `Unsupported`. Test harnesses compile on every target: gated tests skip on `!SUPPORTED`, and tests that need Unix permission bits, symlinks or signals are `cfg(unix)` with a reason. `make cross-check` clippies the three targets in `make gate`; the native Linux and Windows CI jobs run clippy and the test suite, still `continue-on-error`. Two structure tests enforce AC3 and AC4.
+
+**Why.** It is the move the seam ADR describes, and stage 2 of story "Build matrix: every target built, tested and packaged from one tag" waits on it.
+
+**Commits.** 6d6c6ee move `sys` under `platform::macos`; c2ec490 types and pins; e6cee3b shared core code off `std::os` and `libc`; 385be78 stubs; b44a072 the CLI's folder; 4a6b70c loadgen's folder; ed0e15e the test harness; efcb571 the structure tests; 0592774 `make cross-check`; 2692c6a the gate and the native jobs; cae0891 the reviewer's fixes; d9c3fba the install and app contract tests read `launchd.rs` at its new path (the first push's gate caught it). Pushed to main as 48f9fba..d9c3fba.
+
+**Tests executed.** nextest 618/618 on macOS; golden-check 13/13 before and after; `make coverage` with every floor unchanged (90.05% of lines); clippy `-D warnings` clean on linux-gnu, linux-musl and windows-msvc; the `simulate-unported` sweep ran 621 tests with none failing; each structure test failed on a planted violation.
+
+**Deviations.** `meta::mtime` was added for `StdReader`. Loadgen's `generate` checks `platform::builds()` first. The stub errno constants are Linux numbers, marked as placeholders the port replaces. The stub `folders::home` returns `None`. Vault: the Rust core ADR's `unsafe` rule was amended to `platform/macos/` and `platform/op_stats.rs`, the `sys/` code_refs across DDC-001, DDC-002 and DDC-005 now name the new paths, and DDC-006's clippy story uses them.
+
+**Risks and follow-ups.** The native Linux and Windows `cargo test` runs are not yet recorded; their first pass and skip counts belong to stage 2 of the build matrix story. The stub procs fail open (no processes, not root); `require_supported` and the dispatcher's capability check keep them unreachable, and the Windows story must fill them before it sets `SUPPORTED`. The Windows errno numbers and exit codes are placeholders until that story.
 
 ## Technical Notes
 
