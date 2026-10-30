@@ -11,7 +11,7 @@ Architecture Decision Records — significant technical decisions with context, 
 | [cleanup-safety-model-risk-classes-plan-and-confirmation](./cleanup-safety-model-risk-classes-plan-and-confirmation.md) | Cleanup safety model: risk classes, plan and confirmation | accepted | 2026-10-17 |
 | [rust-core-library-and-cli-with-json-output](./rust-core-library-and-cli-with-json-output.md) | Rust core: library + CLI with JSON output | accepted | 2026-10-17 |
 | [menu-bar-app-swift-shell-over-the-ddc-cli](./menu-bar-app-swift-shell-over-the-ddc-cli.md) | Menu bar app: Swift shell over the ddc CLI | proposed | 2026-10-18 |
-| [updates-through-sparkle-alongside-the-homebrew-cask](./updates-through-sparkle-alongside-the-homebrew-cask.md) | Updates through Sparkle, alongside the Homebrew cask | proposed | 2026-10-29 |
+| [updates-through-sparkle-alongside-the-homebrew-cask](./updates-through-sparkle-alongside-the-homebrew-cask.md) | Updates through Sparkle, alongside the Homebrew cask | accepted | 2026-10-29 |
 
 ---
 

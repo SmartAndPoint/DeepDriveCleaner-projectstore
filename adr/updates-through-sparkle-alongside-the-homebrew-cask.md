@@ -2,15 +2,15 @@
 type: adr
 id: "updates-through-sparkle-alongside-the-homebrew-cask"
 title: "Updates through Sparkle, alongside the Homebrew cask"
-status: proposed
+status: accepted
 date: 2026-10-29
 authors: ["Evgenii Konev"]
 tags: [app, updates, sparkle, homebrew, distribution, signing, network, privacy]
 external_refs: {}
 supersedes: null
 superseded_by: null
-review_status: pending
-reviewed_at: null
+review_status: approved
+reviewed_at: 2026-10-30
 ---
 
 # Updates through Sparkle, alongside the Homebrew cask
@@ -155,9 +155,9 @@ Notarization covers the framework with the rest of the app.
 
 ### 9. Homebrew, next to Sparkle
 
-- **The cask gains `auto_updates true`.** `brew upgrade` skips the app unless `--greedy` (or `--greedy-auto-updates`); `brew outdated` stops listing it.
+- **The cask gains `auto_updates true`.** Current Homebrew still upgrades such a cask on a plain `brew upgrade` when the installed bundle's version is older than the tap's (`Cask#auto_updates_bundle_outdated?`, on by default; `HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS` turns it off), and skips it when the bundle is already current, as after a Sparkle update. So brew and Sparkle never both install the same version, and someone who never opens the app still updates with `brew upgrade`. With the opt-out set, or on an older Homebrew, `brew upgrade --greedy deepdrivecleaner` is the way. (Amended 2026-10-30 after reading Homebrew's `cask.rb`; the first text said `brew upgrade` always skips it.)
 - **The `binary` links** point into `Contents/Helpers`, so `ddc` runs the new CLI after an in-place update.
-- **Caskroom's version** stays at the one brew installed until a `--greedy` upgrade. This is cosmetic: `brew list --versions` shows the old number. `brew uninstall --cask` removes the app by its path and the links by name, so it works. A `--greedy` upgrade to the version already running reinstalls it, harmlessly.
+- **Caskroom's version** stays at the one brew installed until brew next installs it. This is cosmetic: `brew list --versions` shows the old number. `brew uninstall --cask` removes the app by its path and the links by name, so it works. A `--greedy` upgrade to the version already running reinstalls it, harmlessly.
 - **`uninstall quit:`** keeps its meaning: brew quits the app before an uninstall, a `--greedy` upgrade or a reinstall. A Sparkle update does not go through brew and does not use it.
 - **`zap`** adds Sparkle's paths to `trash:`, keeping the list alphabetical: `~/Library/Caches/com.smartandpoint.deepdrivecleaner` (its download folder) and `~/Library/HTTPStorages/com.smartandpoint.deepdrivecleaner`. Its preference keys are in the app's preferences plist, which `zap` already trashes.
 - **Ownership.** brew installs the app as the user, so Sparkle replaces it without a password. A copy an administrator dragged in for another user asks for an administrator through Sparkle's own authorization.
@@ -254,7 +254,7 @@ The app shows "Version X is available" and the command or link; it installs noth
 - A third-party framework in the app, with three signed binaries to keep in the signing order.
 - A new secret, the EdDSA key, that only the owner holds. Losing both it and the Developer ID at once would strand existing installs on manual updates.
 - The app makes a network request by default. The switch turns it off.
-- `brew upgrade` no longer updates the app without `--greedy`, and `brew list --versions` shows an old version after a Sparkle update.
+- `brew list --versions` shows an old version after a Sparkle update. `brew upgrade` updates the app only when its bundle is older than the tap (by default; `--greedy` where the opt-out is set).
 - Users on 0.7.0 and earlier have no Sparkle: they reach the first Sparkle release through `brew upgrade` or by hand.
 - The appcast holds only the newest item. A Mac below a release's minimum macOS sees no update rather than an older compatible one; that is today's behaviour too. Rollback is by hand: `brew reinstall` of an older cask, or an older release page.
 - A quit while an install waits installs the update without a relaunch (§3).
