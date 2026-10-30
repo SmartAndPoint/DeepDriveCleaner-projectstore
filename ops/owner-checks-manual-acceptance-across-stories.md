@@ -168,6 +168,12 @@ Story: [Whole disk: Show in Finder and the honest action for each row](../epics/
 - [ ] Manual (owner): on the Whole disk view, each row's button or its absence matches the story's table; Show in Finder opens the right folder at its usual path, not under `/System/Volumes/Data`.
 - [ ] Manual (owner): in the Coding Agents section, Show in Finder on a harness and on a project folder visibly selects it, including a hidden folder such as `~/.claude` while Finder hides hidden files. If nothing is visibly selected, open a bug story.
 
+### Review window: Deselect All, then pick across groups and clean only that (DDC-002)
+
+Story: [Review window: Deselect All, then pick across groups and clean only that](../epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that.md)
+
+- [ ] Manual (owner): in 0.9.0, Deselect All clears every group's checkboxes and reads "0 items selected"; after ticking one row in each of two groups, "Clean 2 items…" lists only those two. The button is greyed out while the confirmation sheet is open.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
