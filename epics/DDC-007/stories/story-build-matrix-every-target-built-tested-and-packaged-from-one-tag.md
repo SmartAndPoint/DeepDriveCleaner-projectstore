@@ -14,7 +14,7 @@ code_refs: [".github/workflows/gate.yml", ".github/workflows/release.yml", "Make
 specs: []
 started_at: "2026-10-30T07:10:03.214Z"
 closed_at: null
-plan_updated_at: "2026-10-30T07:10:03.214Z"
+plan_updated_at: "2026-10-30T16:27:36.938Z"
 ---
 
 # Build matrix: every target built, tested and packaged from one tag
@@ -96,6 +96,81 @@ Stage 1 lands now; stages 2 and 3 follow the stories they depend on.
 6. `build-dist.sh` requires the peeled tag on origin at `HEAD`.
 7. `publish-release.sh`: "tag on origin at `HEAD`" replaces `STRAY_TAG`; reads `RELEASE_TARGETS` fail-closed; with targets enabled, requires a green `release.yml` run, downloads each archive (missing means refuse), checks its listing and attestation. `SHA256SUMS` (`<hex>  <name>`, sorted by name with `LC_ALL=C`, no entry for itself) over every asset; `gh release create --verify-tag`; a digest check per asset. A version with `-` is a pre-release (no cask, no tap).
 8. The Makefile and README give the order: `make tag` → `release.yml` → `make dist` → publish. The vault runbook "Cutting a release: tag, CI archives, dist and publish" gives the steps and the recovery.
+
+### Stage 2 plan (2026-10-30)
+
+Stage 2 starts now. Story "Move OS calls behind the platform module" is done, and since PR #4 the native jobs run `cargo test --workspace --no-fail-fast`.
+
+**Baseline.** Gate run 41082747167 on 642cf39 failed 36 tests on Ubuntu and 59 on Windows, and none in the macOS gate. PR #10 fixed one Windows failure after that run. The implementation re-baselines on the first run of its own branch and works from that list.
+
+**The rule.** Every test either passes natively or skips with a printed reason. There is no third kind.
+
+**Skip** when a test exercises something not ported. There are four channels, all decided at run time from `PLATFORM`, so none skips on macOS:
+- `unsupported()` (`ddc-core/tests/common`, `ddc_loadgen::unsupported`, the CLI tests' `common`): an entry point that `require_supported` refuses, or platform code that is unported today and portable later. Examples: the bulk reader (`bulk_reader_matches_lstat_per_entry_across_batches`), `fsops`-backed readers such as `report::backups`, `exec::delete`, `exec::system`.
+- `lacks(Capability::X)`, a new form beside it: a test of a capability the platform does not declare. Examples: Homebrew (`brew.rs`), WholeDisk (`disk_free.rs`), CodingAgents (`agents.rs` session tests). It stays meaningful after a flip: a supported Linux without Homebrew still skips the brew tests. Capabilities are only those of the closed `Capability` enum; nothing new is added.
+- In-crate unit tests (`#[cfg(test)]` modules under `src/`) cannot reach `tests/common`. A `#[cfg(test)] pub(crate) fn skipped(test: &str) -> bool` beside `require_supported` in `ddc-core/src/platform/mod.rs` prints the same line; loadgen's in-crate tests call the existing `crate::unsupported`. This covers the unit-test failures in `agents/running.rs`, `exec/system.rs`, `exec/delete.rs`, `report/backups.rs`, `free/probe.rs`, loadgen `leaks.rs` and `measure.rs`. `agents/claude.rs` is the overflow fix below, not a skip.
+- Tool dependencies of tests.
+  - In-source unit tests use `platform::testing`, which is `#[cfg(test)]` and already holds `symlink` (`macos/testing.rs`, `unported.rs`). It returns `Unsupported` where the tool is missing, and the test skips on that. Example: `/usr/bin/plutil` for the binary-plist backups tests, which would otherwise hard-fail after the Linux flip.
+  - Integration and CLI tests cannot reach `platform::testing`: it is test-only, and `ddc-cli` has no library. They keep their `tests/common` twins (`common::symlink`, a `script` driver). Those twins may use an OS `cfg`, as ADR §9 allows and as `structure.rs`, which scans only `src/`, permits. A twin returns `io::Result<()>`, and the test skips on `ErrorKind::Unsupported`. A twin that still panics (today's `common::symlink`) is only called after the test has skipped through `unsupported()` or `lacks()`.
+
+**Fix** when the failure is in portable code or in the harness.
+- **Line endings.**
+  - Windows checks out text files with CRLF. That turns every `committed_*_schema_is_current` stale. It also fails `structure.rs` on `Cargo.toml`'s `[lints]` block and on the Makefile's `target/unported` line (`only_the_macos_module_and_the_counters_allow_unsafe_code`, `only_the_unported_check_builds_the_simulated_platform`).
+  - A global `.gitattributes` fixes this: `* text=auto eol=lf`, with the fuzz regression inputs `-text` and images `binary`.
+  - `git ls-files --eol` shows no CRLF file in the index, so no renormalization commit is needed. That includes `*.pbxproj`, `.strings` and `.jsonl` fixtures.
+- **Absolute paths.**
+  - On Windows, `/Users/...` is not absolute (`Path::is_absolute` needs a drive). The parsers keep native semantics: `ListedItems` (`plan.rs` `normalised`), settings (`settings.rs`), and the `agents::running` and `free::probe` filters.
+  - So macOS-shaped data does not parse on Windows. Until story "Windows scanner and rule catalog" adds Windows-shaped inputs, the tests that feed it skip through `unsupported()`: `a_malformed_list_is_refused_before_anything_runs`, `running.rs` and `probe.rs`.
+  - The two fuzz-regression tests keep their no-panic half on every OS: every kept input still runs. Only the "at least one input is accepted" assertion is gated, because Windows path handling is where a new panic would appear.
+  - That story records the debt. So does `exec::system`'s test, which spawns `/bin/sleep` literally.
+- **The overflow.** The `agents/claude.rs` test computes `procs::uid() + 1`, which overflows when the stub's uid is `u32::MAX`. It uses `wrapping_add`.
+- **The load generator.**
+  - `real_home()` is `None` off macOS, and the generator builds macOS trees by design (catalog split). Its tests skip through `ddc_loadgen::unsupported`, `isolation.rs` included.
+  - `tests/guard.rs` keeps its `#![cfg(unix)]`, which ADR §9 allows for tests that are OS-specific by nature. Its body gains the same runtime skip, so it stops failing on Ubuntu.
+- **The disclaimer tests** check product behaviour on every platform, so they are not skipped on Linux.
+  - The harness drives util-linux `script` with its own argument order on Linux (`script -qec "<cmd>" /dev/null`) and keeps BSD's on macOS. The test file's driver picks with `cfg!(target_os = ...)`.
+  - Windows skips. A ConPTY harness is debt for the Windows story.
+- **Missing guards.** `there_is_no_yes` (`disk_free_cli.rs`) lacks the `unsupported()` guard its sibling has. The PR greps for every `Fx::new()` caller, and every other entry-point fixture, that has no guard.
+
+**Make skips observable.** `cargo test` hides a passing test's output, so a skip line never reaches the log today. Instead:
+- The native jobs run nextest pinned to `tools.mk`'s version (`tool: nextest@0.9.150`), with the gate's `ci` profile. That adds the profile's slow-test timeout and termination, and `success-output = "immediate"` goes into `[profile.ci]`.
+- nextest does not run doctests, so each leg also runs `cargo test --workspace --doc --locked --target <t>`.
+- A step after the tests compares the `skipped <test>:` lines with a committed list, `.config/native-skips/<os>.txt`. It is keyed by OS, not by triple, so stage 3's extra Linux targets share one list.
+  - It runs with `shell: bash`; the Windows default is pwsh.
+  - The comparison is `LC_ALL=C sort -u`, then `diff -u`, so the log shows the change.
+  - A test checks that every skip label equals its enclosing fn name, so a stale or duplicate label cannot hide a new skip.
+  - A new skip, or a listed one that no longer skips, fails the job with the difference.
+  - The counts go to `$GITHUB_STEP_SUMMARY`.
+- A new skip is therefore a visible diff in a PR.
+- On macOS, `ddc-core/tests/platform.rs` `macos_is_supported_with_every_capability` (`SUPPORTED`, `CAPABILITIES == Capability::ALL`) is the guarantee that nothing skips, since every channel above decides from `PLATFORM`.
+
+**CI and the ruleset.**
+- The matrix legs get stable names: `name: check-${{ matrix.target }}`, giving `check-x86_64-unknown-linux-gnu` and `check-x86_64-pc-windows-msvc`. A later runner-label bump then does not rename a required check.
+- Windows pins `windows-2025`, as Ubuntu pins `ubuntu-24.04`.
+- `continue-on-error` goes. The gate.yml header and job comments, the README and Makefile gate sections, and the vault runbook "Cutting a release: tag, CI archives, dist and publish" stop calling the legs advisory.
+- `scripts/ci-green.sh` adds the two names to its required list (5 jobs, not 3). `scripts/gate-scope.sh` adds them to `BASE_JOBS`, and its fixtures in `scripts/tests/test_gate_scope.py` follow.
+- The two contexts are added to the ruleset by API, because the UI lists only names it has recently seen.
+- A skipped leg, on a Rust-free push, satisfies a required check as `gate` does today.
+- A flaky required leg is re-run with `gh run rerun --failed`. Profile `ci` has no retries, so a flaky test is fixed, not retried.
+
+**Order.**
+1. Harness:
+   - `.gitattributes`;
+   - the skip channels (`lacks`, the in-crate `skipped`, the `platform::testing` tool functions);
+   - the nextest native step, the skip-list check and the stable job names.
+
+   One commit each.
+2. Iterate on a pushed branch, since the native legs run only in CI:
+   - gate or fix by area: core unit, core integration, CLI, loadgen;
+   - commit the skip lists from the run where everything else is green.
+3. Remove `continue-on-error`, then update ci-green.sh, gate-scope.sh and the docs.
+4. Before opening the PR, add the two required checks to ruleset 26206449.
+   - Auto-merge then waits for both native legs on the PR's own run.
+   - An in-flight PR from another session is blocked until it rebases onto the fix. Tell that session.
+   - The ruleset change is reversible, so if the PR stalls, the checks come off again.
+5. Confirm on the next push to `main` that all three are green and required.
+
+ADR "Platform seam: one platform module per OS with declared capabilities" §9 gains an amendment: the capability form `lacks()`, the in-crate `skipped()`, tool helpers (`platform::testing` in-source, `tests/common` twins elsewhere), and the committed skip lists.
 
 ## Acceptance Criteria
 
