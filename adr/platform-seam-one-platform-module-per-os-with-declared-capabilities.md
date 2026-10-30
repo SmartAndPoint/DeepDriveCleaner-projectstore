@@ -249,6 +249,14 @@ Core tests that call a gated entry point skip when `!platform::SUPPORTED`, throu
 
 The rule for choosing between the two mechanisms: a test of something macOS-only by nature (APFS clones, TCC, launchd, `getattrlistbulk`) is compiled only there with `#[cfg(target_os = "macos")]`. A test of a gated entry point that will run on the other platforms after their switch flips uses the runtime skip.
 
+*Amendment, 2026-10-30 (story "Build matrix: every target built, tested and packaged from one tag", stage 2).* The runtime skip has four channels. Each decides from `PLATFORM` at run time, so none ever skips on macOS:
+- `unsupported()`: a gated entry point, or unported platform code.
+- `lacks(Capability::X)`: a test of a declared capability the platform lacks. It stays meaningful after a switch flips.
+- An in-crate `#[cfg(test)] skipped()` beside `require_supported`: for unit tests under `src/`, which cannot reach `tests/common`.
+- Tool helpers that return `Unsupported` where a tool the test needs is missing. In-source unit tests use the `#[cfg(test)]` `platform::testing` (`plutil`, symlinks). Integration and CLI tests use their `tests/common` twins (symlinks, a pty driver), which may use an OS `cfg` under the rule below.
+
+Each prints `skipped <test>: <reason>`. The native jobs run under nextest with passing output shown, and compare those lines with a committed per-OS list (`.config/native-skips/`). A new skip is therefore a reviewed diff, not a silent loss of coverage. The `#[cfg(target_os = "macos")]` rule above stays for tests that are macOS-only by nature.
+
 ## Rationale
 
 1. **No layer that buys nothing.** A binary only ever holds one platform. A `cfg`-chosen free function compiles to a direct call, inlinable under thin LTO. A `dyn Platform` would add a second dispatch layer under the walker's existing `DirReader` and `Visitor` ones, and a generic `P: Platform` would spread a type parameter through `scan`, `report`, `exec` and `disk`, both for no gain.
