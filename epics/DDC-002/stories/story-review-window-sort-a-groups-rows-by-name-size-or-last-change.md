@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-sort-a-groups-rows-by-name-size-or-last-change"
 epic: "DDC-002"
 title: "Review window: sort a group's rows by name, size or last change"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
 updated: 2026-10-30
 external_refs: {}
 tags: [core, app, review, sorting, user-report]
-code_refs: []
+code_refs: ["crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/src/platform/macos/bulk.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/after_clean.rs", "crates/ddc-core/src/model.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-core/src/platform/types.rs", "crates/ddc-core/src/scan/reader.rs", "crates/ddc-core/src/scan/mod.rs", "crates/ddc-core/src/report/recheck.rs", "docs/scan.schema.json", "app/Packages/DDCKit/Sources/DDCKit/ReviewSort.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift", "app/DeepDriveCleaner/SortHeader.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/ReviewGroupsView.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReviewSortTests.swift", "crates/ddc-core/tests/report.rs", "crates/ddc-core/tests/scanner.rs", "crates/ddc-core/tests/after_clean.rs", "crates/ddc-cli/tests/scan_cli.rs", "crates/ddc-cli/tests/golden_cli.rs"]
 specs: []
 started_at: "2026-10-30T14:46:34.935Z"
-closed_at: null
+closed_at: "2026-10-30T18:33:42.593Z"
 plan_updated_at: "2026-10-30T14:46:34.935Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-30T14:46:34.935Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -83,11 +83,11 @@ Clicking a column title sorts by it. Clicking it again reverses the order, and t
 
 ## Decomposition
 
-- [ ] Core, part 1: MODTIME in the bulk request inside claims (split from the added time), `StdReader`'s `lstat` time, the root's `modified` on `DirListing`, the `WalkOptions` toggle and the hidden `scan --no-times`.
-- [ ] Measure (gate, before slice 1 merges): `mixed` at M under the protocol in *The cost*; record the noise floor, the medians and the load average. Over the bar: stop and go to the owner.
-- [ ] Core, part 2: `Finding.modified` aggregated in the walk; `Measure` (seconds) and `after_clean` keep it; the schema regenerated; the golden normalizer and `make golden-record`.
-- [ ] DDCKit: `ScanReport.Finding.modified` (optional); `ReviewSort` (column and direction) in place of `ReviewItems.Sort`; one ordering function used by `GroupLayout` for items and subgroups and by `items(matching:sort:)`; the subgroup's newest date; `CleanWording` for the Changed text and the tooltips, with the scan time passed in; the entry line without "Last changed"; `AppPreferences.reviewSortKey`.
-- [ ] App: the column header in both views, which replaces the Items-view Picker, with the arrows, the accessibility labels and keyboard access; the Changed column in rows and subgroup headings.
+- [x] Core, part 1: MODTIME in the bulk request inside claims (split from the added time), `StdReader`'s `lstat` time, the root's `modified` on `DirListing`, the `WalkOptions` toggle and the hidden `scan --no-times`.
+- [x] Measure (gate, before slice 1 merges): `mixed` at M under the protocol in *The cost*; record the noise floor, the medians and the load average. Over the bar: stop and go to the owner.
+- [x] Core, part 2: `Finding.modified` aggregated in the walk; `Measure` (seconds) and `after_clean` keep it; the schema regenerated; the golden normalizer and `make golden-record`.
+- [x] DDCKit: `ScanReport.Finding.modified` (optional); `ReviewSort` (column and direction) in place of `ReviewItems.Sort`; one ordering function used by `GroupLayout` for items and subgroups and by `items(matching:sort:)`; the subgroup's newest date; `CleanWording` for the Changed text and the tooltips, with the scan time passed in; the entry line without "Last changed"; `AppPreferences.reviewSortKey`.
+- [x] App: the column header in both views, which replaces the Items-view Picker, with the arrows, the accessibility labels and keyboard access; the Changed column in rows and subgroup headings.
 
 ## Implementation Plan
 
@@ -123,20 +123,28 @@ Footprint (proposed `code_refs`): `crates/ddc-core/src/platform/types.rs`, `crat
 
 ## Acceptance Criteria
 
-- [ ] Test (core): a scan of a temp HOME with a `.venv` whose newest file sits three levels down with a set `mtime` reports that time as the finding's `modified`; a finding whose root cannot be opened has none; a region and every user-data finding (Downloads, Pictures) have none.
-- [ ] Test (core): a `Post::Claim` finding whose newest file is a direct child of its root, and one whose newest file is hard-linked, report that file's time; `scan --no-times` gives no finding a `modified`, while a Downloads entry keeps its own.
-- [ ] Test (core): the scan schema keeps version 2; the schema file has the optional `modified`.
-- [ ] Test (DDCKit): a report without `modified` still decodes.
-- [ ] Test (core): after a clean that skips an item, the saved report holds the re-check's `modified` for it; after a tool clean, the item holds its re-measure's `modified`.
-- [ ] Test (core): the goldens pass with `modified` normalized, and an OLD file's time is kept.
-- [ ] Measurement recorded in the Implementation Plan: the noise floor, the median walk time with and without the times, and the load average, under the protocol above.
-- [ ] Test (DDCKit): each column in each direction orders a fixture's items and subgroups as described, after the filter: Name in Finder's order; Size with ties by id; Changed oldest first, with undated rows and undated subgroups last both ways and ties by size, then id; the Items heading (`CleanWording.itemsHeading`) names the sort.
-- [ ] Test (DDCKit): the default sort is Size, largest first, and gives today's order in both `GroupLayout` and the Items view; an unreadable stored sort reads as the default; the old "Biggest First" and "By Path" orders are Size descending and Name ascending.
-- [ ] Test (DDCKit): sorting leaves the selection, the Select all state and a group's clean scope unchanged.
-- [ ] Test (DDCKit): the Changed wording against a given scan time: "Today", "Yesterday", an abbreviated date, "—" with no date; the second line says "Project untouched N days"; the finding and entry tooltips; "at least" for an incomplete finding.
-- [ ] Manual (owner, to the owner-checks runbook at close): in Python environments, click Changed: the oldest environments come first; click again: the newest; in Items the same header works; quit and reopen: the sort is kept.
+- [x] Test (core): a scan of a temp HOME with a `.venv` whose newest file sits three levels down with a set `mtime` reports that time as the finding's `modified`; a finding whose root cannot be opened has none; a region and every user-data finding (Downloads, Pictures) have none. — evidence: `crates/ddc-core/tests/report.rs::a_finding_reports_the_newest_change_inside_it`; `crates/ddc-core/tests/scanner.rs::a_claim_holds_the_newest_time_inside_and_a_region_none`; `crates/ddc-core/tests/scanner.rs::a_claim_whose_root_cannot_be_opened_has_no_time_and_an_unreadable_folder_inside_keeps_its_own`
+- [x] Test (core): a `Post::Claim` finding whose newest file is a direct child of its root, and one whose newest file is hard-linked, report that file's time; `scan --no-times` gives no finding a `modified`, while a Downloads entry keeps its own. — evidence: `report.rs::a_finding_reports_the_newest_change_inside_it` (a direct child at OLD+20, a hard link at OLD+30, the `claim_times=false` loop); `crates/ddc-cli/tests/scan_cli.rs::a_scan_without_times_reports_the_same_findings_without_their_dates`
+- [x] Test (core): the scan schema keeps version 2; the schema file has the optional `modified`. — evidence: `report.rs::a_report_without_the_new_fields_still_decodes_and_they_stay_optional`; `docs/scan.schema.json` (optional `modified`, schema 2)
+- [x] Test (DDCKit): a report without `modified` still decodes. — evidence: `ReviewSortTests.swift` "decodes"; `ScanReport.swift` reads it with `decodeIfPresent`
+- [x] Test (core): after a clean that skips an item, the saved report holds the re-check's `modified` for it; after a tool clean, the item holds its re-measure's `modified`. — evidence: `crates/ddc-core/tests/after_clean.rs::skipped_and_not_run_items_take_the_rechecks_finding_or_leave`, `::a_tool_cleaned_item_is_at_its_new_size_or_gone`, `::a_tool_cleaned_item_is_measured_as_the_scan_measures_it`
+- [x] Test (core): the goldens pass with `modified` normalized, and an OLD file's time is kept. — evidence: `crates/ddc-cli/tests/golden_cli.rs::normalise` maps only non-OLD times; `bench/golden/*/scan*.json` keep `2024-01-01T00:00:00Z`
+- [x] Measurement recorded in the Implementation Plan: the noise floor, the median walk time with and without the times, and the load average, under the protocol above. — evidence: Implementation Plan item 2, "Measured 2026-10-30": floor 2.5 % wall / 1.5 % CPU, excess +0.5 % / +3.6 %, under the 5 % bar, load 6.4–9.0
+- [x] Test (DDCKit): each column in each direction orders a fixture's items and subgroups as described, after the filter: Name in Finder's order; Size with ties by id; Changed oldest first, with undated rows and undated subgroups last both ways and ties by size, then id; the Items heading (`CleanWording.itemsHeading`) names the sort. — evidence: `ReviewSortTests.swift` "groupsTable", "itemsTable", "comparator", "headings"
+- [x] Test (DDCKit): the default sort is Size, largest first, and gives today's order in both `GroupLayout` and the Items view; an unreadable stored sort reads as the default; the old "Biggest First" and "By Path" orders are Size descending and Name ascending. — evidence: `ReviewSortTests.swift` "defaultOrder", "stored" (five kinds of bad stored value)
+- [x] Test (DDCKit): sorting leaves the selection, the Select all state and a group's clean scope unchanged. — evidence: `ReviewSortTests.swift` "selectionUnchanged" (every column twice, the sheet's items, the user-data pick scope)
+- [x] Test (DDCKit): the Changed wording against a given scan time: "Today", "Yesterday", an abbreviated date, "—" with no date; the second line says "Project untouched N days"; the finding and entry tooltips; "at least" for an incomplete finding. — evidence: `ReviewSortTests.swift` "changedWording", "tooltips"; `ReviewGroupsTests.swift` ("Project untouched N days" in both views)
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-30): in Python environments, click Changed: the oldest environments come first; click again: the newest; in Items the same header works; quit and reopen: the sort is kept.
 
 ## Final Summary
+
+**What changed.** Each group in the Review window has a header with Name, Size and Changed; a click sorts by that column, a second click reverses it, and the Items view uses the same header in place of its Picker. Changed is the newest change inside a finding: the walk reads modification times inside claims (PR #11, 6c75a7e), and the report carries an optional `Finding.modified` that `after_clean` keeps (PR #13, bd94cbf and 3922bc5; schema stays 2). One comparator, `ReviewSort`, orders the Items view, the rows in subgroups and the blocks; undated rows go last both ways, ties fall to size, then id. VoiceOver reads a row's "—" as "No date". The sort is stored in `AppPreferences` and read tolerantly. The second line of a project row says "Project untouched N days" in both views, so it is not read as the Changed date. PR #15 (8ac9ab7), released in 0.10.0.
+
+**Why.** The owner wanted the environments untouched longest to come first, to pick them for cleaning; the size order alone hid them.
+
+**Tests.** The core tests above (report, scanner, after_clean, golden, scan_cli) on main; DDCKit 396 tests, `ReviewSortTests.swift` for the order, the default, the stored sort, the selection and the wording; the unsigned `xcodebuild` build passed before PR #15; its Gate ran the app tier only (`scope`, `app` with `make ddckit-test`; the Rust tiers were skipped as rust-free paths), and the core tests ran green on main's Gate for PR #11 (6c75a7e) and PR #13 (3922bc5). The cost of the times was measured on the `mixed` load image under the protocol in item 2: +0.5 % wall over the noise floor.
+
+**Risks and follow-ups.** The header's keyboard reach and its VoiceOver labels, and the width of the longest abbreviated date the app's locale can give (en_GB "25 Sept 2026") in the 92 pt column, are checked by hand only; they are in the owner-checks runbook. A filter narrows a subgroup's date and size to the rows it shows. A Name sort of many thousands of rows in the Items view was not measured.
 
 ## Dependencies
 

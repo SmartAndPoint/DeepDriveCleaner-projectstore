@@ -174,6 +174,14 @@ Story: [Review window: Deselect All, then pick across groups and clean only that
 
 - [ ] Manual (owner): in 0.9.0, Deselect All clears every group's checkboxes and reads "0 items selected"; after ticking one row in each of two groups, "Clean 2 items…" lists only those two. The button is greyed out while the confirmation sheet is open.
 
+### Review window: sort a group's rows by name, size or last change (DDC-002)
+
+Story: [Review window: sort a group's rows by name, size or last change](../epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md)
+
+- [ ] Manual (owner): in 0.10.0, in Python environments, click Changed: the oldest environments come first; click again: the newest; in Items the same header works; quit and reopen: the sort is kept.
+- [ ] Manual (owner): with keyboard navigation on (System Settings → Keyboard), Tab reaches Name, Size and Changed with a focus ring and Space sorts; VoiceOver reads the sorted column as "Changed, sorted oldest first" and a row without a date as "No date".
+- [ ] Manual (owner): with Region set to United Kingdom (System Settings → General → Language & Region), a date such as "25 Sept 2026" fits the Changed column without being cut; if the app ever shows Russian month names with a Russian system language, "25 сент. 2026 г." too.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
