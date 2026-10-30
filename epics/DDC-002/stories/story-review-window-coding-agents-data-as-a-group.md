@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [core, app, review, agents, adr-amendment, owner-decision, user-report]
 code_refs: []
@@ -61,7 +61,7 @@ The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are
 
 ## Decomposition
 
-- [ ] The owner's decision (asked 2026-10-29): (A) or (B), and stale transcripts.
+- [x] The owner's decision (asked 2026-10-29): (A) or (B), and stale transcripts. — answered 2026-10-30: **(A)**, rebase DDC-003 and amend its ADR; stale transcripts are **review, to the Trash after a liveness check**.
 - [ ] The ADR work of the chosen way, with the plan-time liveness refusal and the liveness check before the Trash (critic-reviewed).
 - [ ] Core: the harness rules (or DDC-003's, merged), with the liveness checks; a "Coding agents" group in `GROUPS`; goldens, the rules JSON and the DDCKit fixture.
 - [ ] App: the group in the sidebar; the section's "Review…" link; the section's total from findings.
