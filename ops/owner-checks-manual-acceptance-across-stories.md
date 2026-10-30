@@ -182,6 +182,14 @@ Story: [Review window: sort a group's rows by name, size or last change](../epic
 - [ ] Manual (owner): with keyboard navigation on (System Settings → Keyboard), Tab reaches Name, Size and Changed with a focus ring and Space sorts; VoiceOver reads the sorted column as "Changed, sorted oldest first" and a row without a date as "No date".
 - [ ] Manual (owner): with Region set to United Kingdom (System Settings → General → Language & Region), a date such as "25 Sept 2026" fits the Changed column without being cut; if the app ever shows Russian month names with a Russian system language, "25 сент. 2026 г." too.
 
+### Protected by you: say what it is, and Remove Protection (DDC-002)
+
+Story: [Protected by you: say what it is, and Remove Protection](../epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md)
+
+- [ ] Manual (owner): in 0.11.0, protect a folder from the Review window, scan, then Remove Protection… on its row in "Protected by you": the confirmation names the folder and the rule that would claim it, the row says "Protection removed. Scanning…", and after the scan the folder is in its own group and can be cleaned there.
+- [ ] Manual (owner): on a row that holds a folder skipped in Settings, Remove Protection… removes that entry from Settings → Folders, and the next scan lists the row's folder in its own group, the skipped subfolder inside it. Both Protect… (on another group's row) and Remove Protection… open their confirmations.
+- [ ] Manual (owner): protect a folder inside a git checkout and commit its `.ddc-keep`: Remove Protection… warns that git tracks it. With the marker uncommitted, no warning. With no git at the four fixed paths (a Mac without the developer tools), no warning and no install dialog.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
