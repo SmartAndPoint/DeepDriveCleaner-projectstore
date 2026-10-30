@@ -33,7 +33,7 @@ The flow comes from story "Build matrix: every target built, tested and packaged
 - [ ] `.env` with the signing identity and the notary profile, loaded into the shell (`set -a && . <code repo>/.env && set +a`).
 - [ ] `gh` authenticated, plus `jq`, `xmllint` and `python3`, and the Xcode and Homebrew that previous releases used (`build-app.sh`; `ruby -c` and `brew style` in publish).
 - [ ] Sparkle's tools under `build/DerivedData` of this clone (`make dist` resolves them; publish names the `xcodebuild -resolvePackageDependencies` command when they are missing), and the EdDSA key in the login keychain: `sign_update` signs the appcast with it.
-- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, and they are equal. `CURRENT_PROJECT_VERSION` (the app's build number, equal in Debug and Release) is above the previous release's: Sparkle compares build numbers, not versions. A pre-release tag counts too, so a release after `0.8.0-rc.1` needs a build number above the rc's. `docs/releases/<version>.md` exists. All of it is pushed to `main`.
+- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, and they are equal. `CURRENT_PROJECT_VERSION` (the app's build number, equal in Debug and Release) is above the previous release's: Sparkle compares build numbers, not versions. A pre-release tag counts too, so a release after `0.8.0-rc.1` needs a build number above the rc's. `docs/releases/<version>.md` exists. `fuzz/Cargo.lock` is refreshed (`cargo update -p ddc-core --manifest-path fuzz/Cargo.toml`; `make gate` checks it as `fuzz-lock`). All of it is one commit, pushed to `main`: a commit of release notes alone changes only Rust-free paths, its Gate run skips the Rust jobs, and `make tag` refuses it until a dispatched Gate run (`gh workflow run gate.yml --ref main`) passes (story "Gate by what changed: load at night, one gate per release, app-only pushes skip Rust", DDC-005).
 
 ## Steps
 
@@ -46,7 +46,7 @@ make tag
 `scripts/tag-release.sh` refuses unless all of these hold:
 - the tree is clean and on `main`;
 - `HEAD` equals `origin/main` after a fetch;
-- the Gate run for `HEAD` is green (`scripts/ci-green.sh` waits for it if it is still running);
+- the Gate run for `HEAD` is green and ran its Rust jobs (`scripts/ci-green.sh --full` waits for it if it is still running);
 - the Cargo version equals `MARKETING_VERSION`, and the release notes exist;
 - `v<version>` exists neither locally nor on origin;
 - `CURRENT_PROJECT_VERSION` is above the one at the highest earlier release tag (`scripts/check-build-number.sh`). A release sorts above its own pre-release: `v0.8.0` is above `v0.8.0-rc.1`.
@@ -80,7 +80,7 @@ make dist
 ```
 
 - `make dist` first runs `scripts/require-tag.sh`: origin must hold `v<version>` at `HEAD`, so the commonest mistake costs seconds, not a whole gate.
-- Then `ci-green`, the full `gate` and `app-test` run.
+- Then `ci-green --full`: the Gate run of this very commit ran `make gate` and `make app-test`, so neither runs here again.
 - Then `build-dist.sh` builds, signs and notarizes the CLI tarball, and `build-app.sh --dist` does the same for the app zip. Each first runs `scripts/check-build-number.sh` again. It compares against the highest release tag that does not contain `HEAD`, so the tag step 1 pushed does not count.
 
 ### 4. Publish
@@ -142,6 +142,8 @@ It must print `release not found`. A draft counts as a release: delete the draft
 
 | Message | Cause | Fix |
 |---|---|---|
+| `no gate.yml run for <sha> ran its Rust jobs` | The release commit changed only paths on `.config/rust-free-paths`, typically release notes pushed after the version bump, so its push run skipped them | `gh workflow run gate.yml --ref main` (a dispatched run always runs the Rust jobs), wait for it to pass, rerun. Next time, notes and bump in one commit |
+| `fuzz/Cargo.lock is stale` | The version bump did not refresh the fuzz lock | `cargo update -p ddc-core --manifest-path fuzz/Cargo.toml`, amend the bump commit, push |
 | `origin has no tag v<version>: run 'make tag' first` | `make dist` before `make tag` | Run step 1 |
 | `tag v<version> on origin points at <sha>, not HEAD` | This clone is behind, or a commit landed after the tag | `git pull` if behind. A checkout of the tag cannot be published (publish needs `HEAD` = `origin/main`). Otherwise bump the version, or, after the no-release check, delete the tag and tag again |
 | `tag v<version> exists here: remove it with 'git tag -d …'` | A local tag left from an earlier attempt, or fetched by `make dist` (its build-number check fetches tags) | If origin still holds it: the no-release check, then delete it there, or bump the version if a release exists (Rollback). Then `git tag -d v<version>` |
