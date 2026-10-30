@@ -13,6 +13,7 @@ Architecture Decision Records — significant technical decisions with context, 
 | [agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents](./agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md) | Agent footprint: worktrees, harness data and bounded consent for agents | proposed | 2026-10-18 |
 | [menu-bar-app-swift-shell-over-the-ddc-cli](./menu-bar-app-swift-shell-over-the-ddc-cli.md) | Menu bar app: Swift shell over the ddc CLI | proposed | 2026-10-18 |
 | [updates-through-sparkle-alongside-the-homebrew-cask](./updates-through-sparkle-alongside-the-homebrew-cask.md) | Updates through Sparkle, alongside the Homebrew cask | accepted | 2026-10-29 |
+| [platform-seam-one-platform-module-per-os-with-declared-capabilities](./platform-seam-one-platform-module-per-os-with-declared-capabilities.md) | Platform seam: one platform module per OS with declared capabilities | accepted | 2026-10-30 |
 
 ---
 

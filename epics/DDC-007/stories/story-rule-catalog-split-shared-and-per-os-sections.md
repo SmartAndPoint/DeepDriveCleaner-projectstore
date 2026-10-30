@@ -3,17 +3,17 @@ type: story
 id: "story-rule-catalog-split-shared-and-per-os-sections"
 epic: "DDC-007"
 title: "Rule catalog split: shared and per-OS sections"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
 updated: 2026-10-30
 external_refs: {}
 tags: [rust, rules, portability]
-code_refs: []
+code_refs: ["crates/ddc-core/src/rules/catalog/", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/toolchain.rs", "crates/ddc-core/src/exec/guard.rs", "crates/ddc-core/src/exec/preflight.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/rules.rs", "crates/ddc-cli/tests/rules_cli.rs", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/tests/rules.rs", "crates/ddc-core/tests/matcher_reference.rs", "crates/ddc-loadgen/src/fixtures.rs", "crates/ddc-loadgen/src/manifest.rs", "crates/ddc-loadgen/src/items.rs", "crates/ddc-loadgen/tests/properties.rs", "README.md", "app/Packages/DDCKit/Sources/DDCKit/SkipSummary.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift"]
 specs: []
 started_at: "2026-10-30T13:29:14.929Z"
-closed_at: null
+closed_at: "2026-10-30T15:12:30.015Z"
 plan_updated_at: "2026-10-30T13:29:14.929Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-30T13:29:14.929Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -38,11 +38,11 @@ The protected-folder list of the safety ADR §6 is also macOS-shaped. This story
 
 ## Decomposition
 
-- [ ] Classify every rule: shared (same relative path everywhere), shared with per-OS paths (one rule id, a path per OS, e.g. pip's cache), or OS-only.
-- [ ] The catalog becomes `rules/catalog/{shared,macos,linux,windows}.rs`. Linux and Windows start empty except the shared rules. Rule ids are unchanged, so settings that disable rules keep working.
-- [ ] The protected-folder list splits the same way. The safety ADR §6 list stays the macOS list.
-- [ ] `ddc rules` prints the rules of the running platform, and `--platform <os>` prints another platform's, for review.
-- [ ] Golden test: `ddc rules --json` and `scan --json` on all S profiles are identical on macOS before and after.
+- [x] Classify every rule: shared (same relative path everywhere), shared with per-OS paths (one rule id, a path per OS, e.g. pip's cache), or OS-only.
+- [x] The catalog becomes `rules/catalog/{shared,macos,linux,windows}.rs`. Linux and Windows start empty except the shared rules. Rule ids are unchanged, so settings that disable rules keep working.
+- [x] The protected-folder list splits the same way. The safety ADR §6 list stays the macOS list.
+- [x] `ddc rules` prints the rules of the running platform, and `--platform <os>` prints another platform's, for review.
+- [x] Golden test: `ddc rules --json` and `scan --json` on all S profiles are identical on macOS before and after.
 
 ## Implementation Plan
 
@@ -102,12 +102,26 @@ Risks, each with a guard:
 
 ## Acceptance Criteria
 
-- [ ] On macOS, `ddc rules --json` and the S-profile scans are golden-equal before and after: `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile") passes with the same rule ids in the same order and the same fields, and `make golden-record` is never run.
-- [ ] Every rule id appears in exactly one section, or in the shared section with per-OS paths (test, as defined in step 2).
-- [ ] `ddc rules --platform linux` and `--platform windows` list the shared rules with their per-OS paths (in the human output; the JSON is unchanged, see the plan).
-- [ ] The protected folders are split into a shared section and per-OS sections; the macOS set equals the safety ADR §6 list, and the flip guard of step 3 holds (tests).
+- [x] On macOS, `ddc rules --json` and the S-profile scans are golden-equal before and after: `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile") passes with the same rule ids in the same order and the same fields, and `make golden-record` is never run. — evidence: `golden_cli.rs` `golden_rules` (`rules --platform macos --json`, and plain `rules --json` on macOS, against `bench/golden/rules.json`); `make golden-check` 13/13 on the final tree; `git diff 72c3765 -- bench/golden` empty; the reviewer's dump of every rule's `Debug` output and both protected lists, before and after, is identical (77 rules, same order)
+- [x] Every rule id appears in exactly one section, or in the shared section with per-OS paths (test, as defined in step 2). — evidence: `rules/catalog/mod.rs` `every_rule_id_is_in_one_section_or_shared` (unique ids; linux == windows; linux an order-preserving subsequence of macos; `ids(linux) ⊆ SHARED_IDS ⊆ ids(macos)`; each entry Debug-equal to `shared::all(p)`; per-OS rules differ only in matcher paths) and `rules_is_the_list_of_this_platform`
+- [x] `ddc rules --platform linux` and `--platform windows` list the shared rules with their per-OS paths (in the human output; the JSON is unchanged, see the plan). — evidence: `rules_cli.rs` `every_platform_lists_the_shared_rules_and_only_its_own`, `the_text_shows_each_platforms_paths`, `another_platforms_json_holds_the_contract`, `an_unknown_platform_is_a_usage_error`; `readme_cli` names `--platform`
+- [x] The protected folders are split into a shared section and per-OS sections; the macOS set equals the safety ADR §6 list, and the flip guard of step 3 holds (tests). — evidence: `rules/catalog/mod.rs` `the_macos_protected_folders_are_the_safety_adrs_list` (item by item against §6, no folder in two sections) and the flip-guard test (`may_be_supported(Macos)`, `!may_be_supported(Linux|Windows)` on every OS, and it reads each platform module's `SUPPORTED` line, so the required macOS job fails a flip without system folders); all six consumers call `protected_in_home(PLATFORM)` / `protected_system(PLATFORM)`
 
 ## Final Summary
+
+**What changed.** `rules/catalog.rs` became `rules/catalog/`: `macos.rs` (77 rules, order unchanged), `linux.rs` and `windows.rs` (48 each, built by `shared::all(p)`), and a `shared/` folder by category (`caches`, `projects`, `tools`, `user`) whose per-OS paths come from `const fn`s. `RULES` is `rules_of(PLATFORM)`; the lists are named statics because `Catalog::tag_of` finds a rule by address. The protected folders split the same way (`protected_in_home(p)`, `protected_system(p)`), with Linux and Windows holding only the shared section until their stories. `ddc rules --platform macos|linux|windows` prints another platform's catalog, and every human listing prints each rule's home paths; `rules --json` is unchanged (schema 1). The load generator names the macOS catalog (`fixtures::catalog()`), so the S trees, their pinned hashes and `bench/golden` describe macOS on every OS.
+
+**Why.** The Linux and Windows catalog stories add rules to their own sections without touching macOS, and the flip guard keeps either from being switched on before its system folders exist.
+
+**Tests executed.**
+- `make gate` green on the final tree (626/626 Rust tests, the Python suites), `make cross-check` (Linux gnu and musl, Windows msvc), `make golden-check` 13/13, `make ddckit-test` 379 tests. Code PRs #8 (the story) and #10 (follow-up) merged; Gate run 41082747167 on main green.
+- Native CI, compared with the run on PR #4 before the split (`--no-fail-fast`): Linux 36 failures against 37 before, none new; Windows 59 against 59, one new — `rules.rs` `verify_uses_the_same_matching`, which built the running platform's catalog and expected `~/.cache/uv`. PR #10 pins it to the macOS catalog. `names_that_differ_only_in_case_are_one_folder` now skips where walking is unsupported.
+- The reviewer simulated Linux on macOS (`PLATFORM` Linux, `SUPPORTED` false) and caught four loadgen proptests that built an empty `select` before their skip and the S-hash pin reading the platform's catalog; both were fixed before merge and the simulation then matched the pre-story baseline.
+
+**Risks and follow-ups.**
+- The remaining native failures (36 Linux, 58 Windows) predate this story; they are the work of stage 2 of story "Build matrix: every target built, tested and packaged from one tag", which makes the native jobs required. Until then the flip guard binds through its macOS-job half.
+- Windows paths in `shared/caches.rs` are documented placeholders; story "Windows scanner and rule catalog" replaces them and decides `APPDATA`/`TEMP` and an `Env`-based protected set.
+- `user.movies` resolves to `~/Videos` on Linux and Windows, which no section protects yet; the Linux and Windows stories add their own protected folders.
 
 ## Technical Notes
 
