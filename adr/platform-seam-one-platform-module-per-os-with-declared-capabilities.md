@@ -62,6 +62,8 @@ Exit codes are 0, 1, 2 and 75 (`ddc-cli/src/exit.rs`; [[adr/menu-bar-app-swift-s
   Their `System*` implementations call `platform::`. There is no trait for the platform as a whole.
 - A target other than macOS, Linux or Windows does not compile: `compile_error!` in `platform/mod.rs`.
 
+Amended 2026-10-30, story "Move OS calls behind the platform module" (epic DDC-007): the surface is `platform::<module>::<item>` (`platform::statfs::statfs(path)`, `platform::procs::…`, `platform::signals::…`), mirroring today's `sys::` modules, not one flat namespace. The move is then a mechanical rename, and each pin names its module: `const _: fn(&Path) -> io::Result<VolumeStats> = imp::statfs::statfs;`. Everything else in this section holds. Per-OS values such as errno numbers are per-OS items, never shared types: `EDEADLK` is 11 on macOS and 35 on Linux, where 11 is `EAGAIN`.
+
 ### 2. Where the code lives
 
 `ddc-core`:
@@ -75,6 +77,12 @@ Exit codes are 0, 1, 2 and 75 (`ddc-cli/src/exit.rs`; [[adr/menu-bar-app-swift-s
 - `src/platform/{mod,macos,linux,windows}.rs`, crate path `crate::platform`. It holds launchd, the `osascript` notifier and `init_process`'s process setup.
 - It is not under `crate::cli`, which is clap's argument definitions. The epic's stories call it "`cli::platform`".
 - `ddc-cli` and `ddc-loadgen` reach OS calls only through `ddc_core::platform::*` (the surface `cfg` selects) or `crate::platform`, never through `ddc_core::platform::macos`.
+
+Amended 2026-10-30, story "Move OS calls behind the platform module" (epic DDC-007):
+- `ddc-loadgen` gets its own folder, `src/platform/{mod,unix,windows}.rs`. Its tree builder uses `rustix`'s `*at` calls, and every CLI test depends on it, so it must compile on every target.
+- The folders are `ddc-core/src/platform/`, `ddc-cli/src/platform/` and `ddc-loadgen/src/platform/`.
+- The list of what appears only inside them widens to `libc::`, `rustix::`, `windows_sys::`, `windows::` and `std::os::` (any submodule, including `std::os::macos` and `std::os::fd`), and to every `cfg`, `cfg!` and `cfg_attr` on `target_os`, `target_family`, `unix` or `windows`.
+- `unsafe_code` is allowed in `platform/macos/` and in the shared `platform/op_stats.rs` (the allocation counter), not in `platform/mod.rs`, `types.rs` or the stubs.
 
 ### 3. Capabilities
 
