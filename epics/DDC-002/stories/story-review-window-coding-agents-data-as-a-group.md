@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-coding-agents-data-as-a-group"
 epic: "DDC-002"
 title: "Review window: coding agents' data as a group"
-status: planned
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-30
+updated: 2026-10-31
 external_refs: {}
 tags: [core, app, review, agents, adr-amendment, owner-decision, user-report]
-code_refs: []
+code_refs: ["app/DeepDriveCleaner/AgentsSection.swift", "app/DeepDriveCleaner/DiskView.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewRouting.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Tests/DDCKitTests/AgentsReviewTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift"]
 specs: []
-started_at: null
-closed_at: null
+started_at: "2026-10-30T21:16:56.390Z"
+closed_at: "2026-10-30T21:42:54.061Z"
 plan_updated_at: null
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -64,22 +64,37 @@ The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are
 ## Decomposition
 
 - [x] The owner's decision (asked 2026-10-29): (A) or (B), and stale transcripts. — answered 2026-10-30: **(A)**, rebase DDC-003 and amend its ADR; stale transcripts are **review, to the Trash after a liveness check**.
-- [ ] The ADR work of the chosen way, with the plan-time liveness refusal and the liveness check before the Trash (critic-reviewed).
-- [ ] Core: the harness rules (or DDC-003's, merged), with the liveness checks; a "Coding agents" group in `GROUPS`; goldens, the rules JSON and the DDCKit fixture.
-- [ ] App: the group in the sidebar; the section's "Review…" link; the section's total from findings.
-- [ ] Vault: amend "Coding agents in the Whole disk view".
+- [x] The ADR work of the chosen way, with the plan-time liveness refusal and the liveness check before the Trash: ADR "Agent footprint: worktrees, harness data and bounded consent for agents" §3, revised for this story on 2026-10-30 (its **Liveness** paragraph amends safety ADR §5), and the dated amendment entry in the safety ADR, added at the close of "Harness data rules" (DDC-003).
+- [x] Core: the harness rules (or DDC-003's, merged), with the liveness checks; a "Coding agents" group in `GROUPS`; goldens, the rules JSON and the DDCKit fixture.
+- [x] App: the group in the sidebar; the section's "Review…" link; the section's total from findings. — PR #23 (89f84a6)
+- [x] Vault: amend "Coding agents in the Whole disk view". — its Dependencies now point here.
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] Test (core): in a temp HOME with fake harness folders, the scratch and history folders are findings in "Coding agents" with the classes of the table; memory, `~/.cursor/extensions`, `plugins` and `worktrees` are never findings; `ide.cursor-cache` still claims the desktop app's caches.
-- [ ] Test (core): a finding whose harness has a live session (a fake live process or lock, as `disk agents` detects it) is refused at plan time and again before it is moved.
-- [ ] Test (core): stale transcripts follow the owner's choice: no finding, or a review finding that a live session refuses.
-- [ ] Test (DDCKit): the group's place in the sidebar and its labels; the section's link; `ContractTests.agentsCallers` still passes.
-- [ ] Manual (owner): the Review window shows "Coding agents" with sizes; cleaning a scratch row frees it; a live session's data is not offered.
+- [x] Test (core): in a temp HOME with fake harness folders, the scratch and history folders are findings in "Coding agents" with the classes of the table; memory, `~/.cursor/extensions`, `plugins` and `worktrees` are never findings; `ide.cursor-cache` still claims the desktop app's caches. — evidence: DDC-003's `crates/ddc-core/tests/agent_rules.rs::each_path_of_the_eight_rules_is_found_with_its_rule_and_origin`, `::sealed_folders_and_auto_memory_are_never_findings` (memory, `.cursor/extensions`, `plugins`, `worktrees`, `ide.cursor-cache` kept)
+- [x] Test (core): a finding whose harness has a live session (a fake live process or lock, as `disk agents` detects it) is refused at plan time and again before it is moved. — evidence: `crates/ddc-core/tests/harness_clean.rs::a_live_harness_keeps_its_folders` (plan, dry run and guard), `::a_record_written_after_the_plan_keeps_the_session`
+- [x] Test (core): stale transcripts follow the owner's choice: no finding, or a review finding that a live session refuses. — evidence: the owner chose review, to the Trash after a liveness check: `crates/ddc-core/tests/session_entries.rs::a_live_record_or_an_open_file_locks_its_session_alone`, `harness_clean.rs::a_session_entry_goes_to_the_trash_companions_first_transcript_last`, `::a_session_whose_liveness_is_unknown_stays`
+- [x] Test (DDCKit): the group's place in the sidebar and its labels; the section's link; `ContractTests.agentsCallers` still passes. — evidence: `AgentsReviewTests.label`, `.sidebar`, `.selectAndClean`, `.linkKeepsSelection`, `.linkOpensFresh`, `.linkLeavesWindowAlone`, `.linkRequest`, `.total`, `.popoverTotal`, `.noTotal`; `ContractTests.agentsCallers`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the Review window shows "Coding agents" with sizes; cleaning a scratch row frees it; a live harness's folder is skipped with "<Harness> is running".
 
 ## Final Summary
+
+**What changed.** The coding agents' data has its own group in the Review window, and the Whole disk view leads to it.
+- The core is story "Harness data rules" (DDC-003), the way (A) the owner chose on 2026-10-30: eight rules in a "Coding agents" group, sessions as entries, liveness at the plan and before each move, stale transcripts to the Trash after the check.
+- In the app the group appears under Safe and under Review like any group; its rows select and clean through the usual path. Claude Code's transcripts and file-history rows are shown but locked "Manual only"; their sessions can be moved only with `ddc clean --items` (a session folder stays one row: DDC-003's f4a6364). The Review… link also sits in the window's own Whole disk detail.
+- The Whole disk view's Coding Agents section says "In Review: <size> in <n> folders", from the last scan's findings in the group, counted as the sidebar counts them; nothing for a missing or foreign report. Its **Review…** link opens the Review window on the group; with the window open it keeps the person's selection (PR #23, 89f84a6).
+- The section stays non-destructive: `ContractTests.agentsCallers` now counts the link and holds DiskView to one `.review(` call.
+
+**Why.** The owner (2026-10-29): the Coding Agents section showed sizes and a Refresh button, nothing else; the data should sit in Review beside node_modules, with a way to remove it.
+
+**Tests.** The evidence above. DDCKit 433 tests on PR #23; the unsigned `xcodebuild` build passed before it; its Gate's required jobs were green. The implementing agent ran the reviewer before its commit and applied its should-fixes (the selection kept only while the window is open, the total computed in PopoverModel).
+
+**Risks and follow-ups.**
+- The owner's chosen outcome for stale transcripts (to the Trash from Review) is not reachable in the window yet: the transcripts and file-history rows are locked "Manual only: ddc has no command for it", which is also wrong for them. Follow-up: story "Review window: pick a coding agent's sessions one by one" (DDC-002), next after 0.11.0.
+- The section's total counts findings, the rest of its sizes come from `ddc disk agents`; the two can differ (different paths, different times).
+- The manual check is in the owner-checks runbook; the app part ships in 0.11.0.
 
 ## Technical Notes
 
@@ -90,8 +105,8 @@ The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are
 - The owner's decision between (A) and (B)
 - Research note "Removal wherever a size is shown: coding agents, protected folders and the whole disk" (Finding 3, open questions 2 and 3)
 - Research note "Coding-agent harnesses on macOS: where their data lives and how to tell a live session"
-- DDC-003 (branch `ddc-003-agent-footprint`): ADR "Agent footprint: worktrees, harness data and bounded consent for agents", story "Harness data rules"
-- "Coding agents in the Whole disk view" (DDC-002): amended by this story; this story waits for it to close
+- DDC-003, on main (PRs #12, #18, #21, #22): ADR "Agent footprint: worktrees, harness data and bounded consent for agents", story "Harness data rules"
+- "Coding agents in the Whole disk view" (DDC-002): amended by this story; closed 2026-10-30
 
 ## Attachments
 
@@ -99,4 +114,4 @@ The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-10-31*

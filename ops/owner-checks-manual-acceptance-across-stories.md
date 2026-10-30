@@ -198,6 +198,14 @@ Story: [Harness data rules](../epics/DDC-003/stories/story-harness-data-rules.md
 - [ ] Manual (owner): in 0.11.0, run `ddc scan`, then `ddc clean --items` with one stale Claude Code session's `<s>.jsonl` from the report: the transcript and its companions are in the Trash; after Put Back, `claude --resume` of it works. (The Review window keeps a session folder as one row; it does not pick sessions one by one.)
 - [ ] Manual (owner): with Codex (or its app-server) running, a clean of the Codex folders is refused "Codex is running"; after quitting it, they move to the Trash.
 
+### Review window: coding agents' data as a group (DDC-002)
+
+Story: [Review window: coding agents' data as a group](../epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md)
+
+- [ ] Manual (owner): in 0.11.0, the Review window shows "Coding agents" under Safe and under Review with sizes; cleaning a scratch row frees it. Claude Code's transcripts and file-history rows are locked "Manual only" and cannot be selected (story "Review window: pick a coding agent's sessions one by one" changes that).
+- [ ] Manual (owner): with Codex (or opencode, cursor-agent) running, select its folder under Review → Coding agents and clean: the check or the result says "<Harness> is running" and nothing moves. Quit it and clean again: the folder goes to the Trash.
+- [ ] Manual (owner): in the Whole disk view, the Coding Agents section shows "In Review: …" and its Review… link opens the Review window on the Coding agents group: with the window already open it keeps what was selected; closed, it opens with the default selection.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
