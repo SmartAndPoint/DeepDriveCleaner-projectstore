@@ -15,7 +15,9 @@ human-started or spawned.
   uncommitted edits in it. Never switch its branch and never `git reset --hard` it.
   1. Commit on `main`, listing your files; never `git add -A`.
   2. `git push origin HEAD:refs/heads/<topic>`.
-  3. `gh pr create --head <topic> --fill`.
+  3. `gh pr create --base main --head <topic> --title "$(git log -1 --format=%s)"
+     --body "$(git log -1 --format=%b)"`. `--fill` fails here: the topic branch exists
+     only on GitHub.
   4. `gh pr merge <topic> --rebase`, with no `--auto`: there are no checks, and GitHub can
      refuse auto-merge on a clean PR. Retry once if it is still computing mergeability.
      Never pass `--delete-branch`; GitHub deletes the remote branch.
