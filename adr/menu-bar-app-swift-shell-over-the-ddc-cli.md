@@ -243,9 +243,12 @@ These changes are additive. One change is visible in the terminal: a held lock e
    - 0: done;
    - 1: error;
    - 2: refused, both the existing refusals and the new `--items` ones;
+   - 69 (`EX_UNAVAILABLE`): the platform is not supported, or a capability is absent (ADR "Platform seam: one platform module per OS with declared capabilities");
    - 75 (`EX_TEMPFAIL`): another scan or clean holds the lock (today 1).
 
    `scan --background` keeps exiting 0 on a held lock and logs "skipped". With `--notify json` it also prints `{"status": "skipped", "reason": "busy"}`.
+
+   Amended 2026-10-30, story "Platform seam: ADR and capability model" (epic DDC-007): exit 69 joins the list. A platform that is not supported is refused at dispatch, before any `Env`, lock or signal handler; there only `--version`, `--help` and `rules` run. A capability the platform does not declare is refused at dispatch for `disk`, `disk agents`, `disk brew-packages` and `schedule`, and for `disk free` only when neither `whole-disk` nor `homebrew` is declared. A `disk free` list that names an action whose capability is absent is refused whole by the core, after the settings are read but before the lock or the journal. A core refusal that reaches `main` exits 69 the same way (ADR "Platform seam: one platform module per OS with declared capabilities", §3, §5–§7). Under `--json`, and under `scan --background --notify json`, it prints the error envelope of `docs/error.schema.json` on stdout instead of the command's output. The macOS CLI the app embeds supports its platform and declares every capability, so the app does not get 69 from it. If it ever did, `RunOutcome` reads it as `.error(status: 69)` and the notice shows the `ddc:` line. Exits 2 and 75 keep their stderr-only output; the envelope is for 69 alone.
 6. **A settings file**, `<data-dir>/settings.json`, with its own `schema_version`. It holds what the CLI reads:
    - scan roots and excludes;
    - `disabled_rules`, `min_age_days` and `min_size`;
@@ -458,4 +461,4 @@ The owner's questions (minimum macOS, the notification's second action, the sign
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

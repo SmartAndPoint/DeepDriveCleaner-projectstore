@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [rust, tooling, conventions, ast]
 code_refs: []
@@ -57,7 +57,7 @@ crates/ddc-core/src/scan/walker.rs:1: shape::file-length: 573 code lines > 400 (
   - LCOM4 per type with fields, warn-only. Methods are connected when both touch the same field through `self.x` or a `Self { x, .. }` pattern, or when one calls the other through `self.f()` or `Self::f(`. Constructors, trivial accessors, trait impls, unit structs and field-less enums are skipped.
   - `pub` items per module, warn-only;
   - module directions and cycles, from the graph source the ADR chose (`cargo modules` DOT, or its own `use` graph with `super::`/`self::` resolution and its stated limits). Any strongly connected component of more than one module fails the cycle rule, not only two-module cycles;
-  - OS APIs per module, a path-prefix rule per crate: `libc::`, `rustix::`, `windows_sys::`, `std::os::unix::` and `std::os::windows::` only under `platform/` in `ddc-core` and `cli/platform` in `ddc-cli` (the rule DDC-007's story "Move OS calls behind the platform module" relies on). `cfg(target_os = …)` outside those folders is a separate attribute rule.
+  - OS APIs per module, a path-prefix rule per crate: `libc::`, `rustix::`, `windows_sys::`, `std::os::unix::` and `std::os::windows::` only under `ddc-core/src/platform/` and `ddc-cli/src/platform/` (the rule DDC-007's story "Move OS calls behind the platform module" relies on). `cfg(target_os = …)`, `cfg(unix)` and `cfg(windows)` outside those folders are a separate attribute rule.
 - [ ] Messages: for each rule, the measured value, the limit and the facts that help (the largest items for file length; the method groups for cohesion; the `use` line and the allowed direction for a layer violation). No invented destinations.
 - [ ] Output: human text (default), and `--format cargo`, cargo-compatible `compiler-message` JSON lines that rust-analyzer and the hook read.
 - [ ] Baseline `shape-baseline.json`, keyed by (rule, crate, item path such as `ddc_core::scan::walker::walk_dir`), not by file path. It fails on a new violation or a baselined one that got worse, and prints "baseline can shrink" when one got better. `--update-baseline` only shrinks it. A move is defined: a baselined key that disappears, plus a new finding with the same (rule, crate, item kind, last path segment) and a value ≤ the old one. `--update-baseline` rewrites the key and prints `moved a -> b`. Anything else is a new violation. The baseline's entry count never grows.
@@ -96,4 +96,4 @@ crates/ddc-core/src/scan/walker.rs:1: shape::file-length: 573 code lines > 400 (
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*

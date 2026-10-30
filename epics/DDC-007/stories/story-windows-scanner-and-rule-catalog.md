@@ -61,6 +61,7 @@ As for Linux, a research note comes first: where dev disk space goes on Windows,
 - [ ] Catalog (Windows section): rules from the research note. Protected folders: `%USERPROFILE%\.ssh`, `%APPDATA%\Microsoft\Protect` (DPAPI master keys: deleting them is irrecoverable), `%APPDATA%\Microsoft\Crypto`, `%APPDATA%\Microsoft\Credentials`, `%LOCALAPPDATA%\Microsoft\Credentials`, `%LOCALAPPDATA%\Microsoft\Windows\INetCookies`, browser profiles, and every folder protected by kind.
 - [ ] Data and logs: `%LOCALAPPDATA%\DeepDriveCleaner`, through `env::Env`.
 - [ ] Non-UTF-8 names: Windows names can hold unpaired surrogates (WTF-8). Represent them the way the schema does for other non-UTF-8 names.
+- [ ] Honour the "when absent" column of ADR "Platform seam: one platform module per OS with declared capabilities", §3, for every capability this platform does not declare: `notifications` (`scan --background` decides but does not notify), `full-disk-access` (`full_disk_access` is true), `private-size` (no `private_bytes`) and `local-snapshots` (`local_snapshots` is 0). Story "Platform seam: ADR and capability model" left them unimplemented: no supported platform lacked one. If `in-use-check` is not declared, the flip commit also amends the safety ADR §5 to name the sharing-violation guard that replaces it (seam ADR §3).
 - [ ] Flip `SUPPORTED` for Windows and add the target to `release.yml`'s enabled list, in one commit.
 
 ## Implementation Plan

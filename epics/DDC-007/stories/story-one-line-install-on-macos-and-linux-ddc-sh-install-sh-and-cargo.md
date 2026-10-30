@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-30
 external_refs: {}
 tags: [distribution, install, macos, linux, website]
-code_refs: []
+code_refs: ["packaging/install/", ".github/workflows/install.yml", "crates/ddc-cli/Cargo.toml", "scripts/build-cli.sh", "scripts/build-app.sh", "scripts/publish-release.sh", "Makefile", "README.md"]
 specs: []
 started_at: "2026-10-30T07:37:33.282Z"
 closed_at: null
@@ -37,7 +37,7 @@ curl -fsSL https://ddc.sh/install.sh | sh
 curl -fsSL https://ddc.sh/install.sh | sh -s -- --prefix "$HOME/bin"   # with flags
 ```
 
-This is decision 3 of [[research/distribution-through-agents|Distribution through agents]]. On macOS it needs no port: the signed, notarized `aarch64-apple-darwin` tarball already exists, in the layout the script expects. It does need one more release, the first that carries `SHA256SUMS` (decomposition item 1). Releases up to 0.3.0 have nothing to verify against. The Linux half turns on when story "Linux scanner and rule catalog" publishes the Linux archives. Until then the script says plainly that Linux is not released yet.
+This is decision 3 of [[research/distribution-through-agents|Distribution through agents]]. On macOS it needs no port: the signed, notarized `aarch64-apple-darwin` tarball already exists, in the layout the script expects. It does need one more release, the first that carries `SHA256SUMS` (decomposition item 1). Releases up to 0.7.0 have nothing to verify against; 0.8.0 is the first that carries `SHA256SUMS`. The Linux half turns on when story "Linux scanner and rule catalog" publishes the Linux archives. Until then the script says plainly that Linux is not released yet.
 
 The script:
 - detects the OS and architecture;
@@ -66,12 +66,12 @@ Two more install routes need no script:
 
 ## Decomposition
 
-- [ ] `publish-release.sh` attaches `SHA256SUMS` (all archives) to every release, starting with the next macOS release. Today's sidecar `.sha256` files stay local.
-- [ ] `packaging/install/install.sh`: POSIX `sh` (checked with `shellcheck -s sh` and run under `dash`). Download with `curl` or `wget`; verify with `sha256sum` or `shasum -a 256`.
+- [x] `publish-release.sh` attaches `SHA256SUMS` (all archives) to every release, starting with the next macOS release. Today's sidecar `.sha256` files stay local.
+- [x] `packaging/install/install.sh`: POSIX `sh` (checked with `shellcheck -s sh` and run under `dash`). Download with `curl` or `wget`; verify with `sha256sum` or `shasum -a 256`.
   - Latest version from the redirect of `https://github.com/SmartAndPoint/DeepDriveCleaner/releases/latest`, with no API token and no rate limit.
   - Flags: `--version <v>`, `--prefix <dir>` (default `~/.local/bin`), `--force`, `--uninstall`, `--modify-path` (off by default; otherwise it only prints the line to add).
   - `DDC_INSTALL_BASE_URL` overrides the download host, for tests only.
-- [ ] Documented exit codes, in the script header and the CLI guide:
+- [x] Documented exit codes, in the script header and the CLI guide:
   - 0 installed or already current;
   - 2 unsupported platform;
   - 3 verification failed;
@@ -79,17 +79,21 @@ Two more install routes need no script:
   - 5 download failed.
 
   `--version` of a release without `SHA256SUMS` exits 3 (nothing to verify against) and names the first verifiable version. The CLI guide keeps one table of all exit codes: the install scripts', the CLI's (`exit.rs`: `REFUSED`, `BUSY`) and the platform-not-supported code from story "Platform seam: ADR and capability model".
-- [ ] Upgrade = run again. Same path, atomic rename. It prints old → new version.
-- [ ] `--uninstall` removes exactly the two files it installed (it checks that `ddc` is its own symlink). If a LaunchAgent of `ddc schedule` exists, it tells the user to run `ddc schedule uninstall` first. It does not run it on their behalf.
-- [ ] `[package.metadata.binstall]` in `crates/ddc-cli/Cargo.toml`:
+
+  Done with one change, decided 2026-10-30: the README keeps two tables, the CLI's and the script's, under the same heading. The codes overlap (2 means a refusal to the CLI and an unsupported platform to the script), so one table would have to say which program each row is for. The script also exits 1 for any other error.
+- [x] Upgrade = run again. Same path, atomic rename. It prints old → new version.
+- [x] `--uninstall` removes exactly the two files it installed (it checks that `ddc` is its own symlink). If a LaunchAgent of `ddc schedule` exists, it tells the user to run `ddc schedule uninstall` first. It does not run it on their behalf.
+- [x] `[package.metadata.binstall]` in `crates/ddc-cli/Cargo.toml`:
   - `pkg-url = "{ repo }/releases/download/v{ version }/deepdrivecleaner-{ version }-{ target }.tar.gz"` (hardcoded: binstall's `{ archive-suffix }` for `tgz` is `.tgz`);
   - `bin-dir = "{ bin }{ binary-ext }"`;
   - `pkg-fmt = "tgz"`, and `zip` for the Windows target;
   - with `--git`, binstall reads the version from `main`. Between a version bump and its release it falls back to compiling. Keep that window short (bump, tag, release in one sitting) and say so in the README. The Windows override uses `.zip` the same way.
-- [ ] README: three install routes per OS (script, manual download with `shasum -a 256 -c`, cargo), and the `ddc` link line for cargo installs. The manual route notes that a browser download is quarantined and the bare binary is notarized but not stapled, so the first run does an online Gatekeeper check. The cask section says to remove a script install first: the cask cannot refuse, and two `ddc`s would land on `PATH`.
-- [ ] Provenance of `SHA256SUMS`: checksums prove integrity, not origin. A compromised GitHub account could replace both archive and sums. On macOS the team-pinned `codesign` check covers it. For Linux, decide in this story between checksum only (accepted risk, written down), a minisign signature of `SHA256SUMS` with an owner-held key whose public half is on the site, or `gh attestation verify` when `gh` is present.
+- [x] README: three install routes per OS (script, manual download with `shasum -a 256 -c`, cargo), and the `ddc` link line for cargo installs. The manual route notes that a browser download is quarantined and the bare binary is notarized but not stapled, so the first run does an online Gatekeeper check. The cask section says to remove a script install first: the cask cannot refuse, and two `ddc`s would land on `PATH`.
+- [x] Provenance of `SHA256SUMS`: checksums prove integrity, not origin. A compromised GitHub account could replace both archive and sums. On macOS the team-pinned `codesign` check covers it. For Linux, decide in this story between checksum only (accepted risk, written down), a minisign signature of `SHA256SUMS` with an owner-held key whose public half is on the site, or `gh attestation verify` when `gh` is present.
+
+  Decided 2026-10-30: checksum only on Linux, an accepted risk written in the script header and the README. The README's manual route names `gh attestation verify <archive> --repo SmartAndPoint/DeepDriveCleaner` for whoever wants to check provenance by hand.
 - [ ] Hosting, handed to DDC-004: the website build copies `packaging/install/install.sh` from the tagged release into the site, so `https://ddc.sh/install.sh` serves the exact script of the latest release, with no redirect and no drift. Note on DDC-004's story that its install-command criterion gains this script.
-- [ ] CI tests (`install.yml`, on macOS and Ubuntu runners), run against a local fake release served by `python3 -m http.server` through `DDC_INSTALL_BASE_URL`:
+- [x] CI tests (`install.yml`, on macOS and Ubuntu runners), run against a local fake release served by `python3 -m http.server` through `DDC_INSTALL_BASE_URL`:
   - fresh install;
   - upgrade;
   - checksum mismatch;
@@ -129,6 +133,8 @@ The macOS half lands now; the Linux half closes after story "Linux scanner and r
 
 - `curl | sh` is only as trustworthy as `ddc.sh`'s hosting and TLS. The script verifies the archive. The site also shows the manual route for people who do not pipe into a shell (research note, decision 3).
 - Agents run install commands too. Stable exit codes and a non-interactive default matter more than colour.
+- Until `ddc.sh` serves the script, the README's one-liner fetches `packaging/install/install.sh` from `main` on GitHub. So `main`'s script must always install the latest published release; the weekly `real-macos` job in `install.yml` checks that, and `real-ubuntu` does for Linux once its archives exist. Once the site is live, `https://ddc.sh/install.sh` is the canonical URL and the README switches to it.
+- Hosting handoff (decomposition item 9): DDC-004's story folder is another session's work in progress, not yet in the vault's history, so the note is here instead of on DDC-004's story: its install-command criterion gains `https://ddc.sh/install.sh`, copied from the tagged release's `packaging/install/install.sh`. The owner check in the acceptance criteria covers it.
 - `codesign` ships with macOS itself (`/usr/bin/codesign`). If it is missing, the script refuses rather than skipping the check.
 
 ## Dependencies

@@ -5,10 +5,10 @@ title: "Standalone CLI on macOS, Linux and Windows: portable core, release build
 status: planned
 priority: p2
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [rust, cli, linux, windows, macos, distribution, release, ci]
-code_refs: []
+code_refs: ["packaging/install/", ".github/workflows/install.yml", "crates/ddc-cli/Cargo.toml", "scripts/build-cli.sh", "scripts/build-app.sh", "scripts/publish-release.sh", "Makefile", "README.md", ".github/workflows/gate.yml", ".github/workflows/release.yml", "crates/ddc-cli/tests/structure.rs", "scripts/build-dist.sh", "scripts/ci-green.sh", "scripts/require-tag.sh", "scripts/tag-release.sh", "scripts/check-build-number.sh", "scripts/tests/"]
 review_status: reviewed
 reviewed_at: 2026-10-28
 ---

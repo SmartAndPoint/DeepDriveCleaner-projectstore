@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-30
 external_refs: {}
 tags: [ci, release, build, linux, windows]
-code_refs: []
+code_refs: [".github/workflows/gate.yml", ".github/workflows/release.yml", "Makefile", "README.md", "crates/ddc-cli/tests/structure.rs", "scripts/build-cli.sh", "scripts/build-dist.sh", "scripts/ci-green.sh", "scripts/publish-release.sh", "scripts/require-tag.sh", "scripts/tag-release.sh", "scripts/check-build-number.sh", "scripts/tests/"]
 specs: []
 started_at: "2026-10-30T07:10:03.214Z"
 closed_at: null
@@ -69,6 +69,7 @@ The flow becomes:
 
 - [ ] Stage 1: `gate.yml` gains the `cargo check` jobs for Linux and Windows (`continue-on-error`) and a macOS `cargo build --release` job.
 - [ ] Stage 2: make the Linux and Windows jobs required, and run the gate natively on both. Test harness portability is done in story "Move OS calls behind the platform module".
+  - Core tests of the gated entry points (`report::scan*`, `scan::walk`, `disk::measure*`, `exec::execute`, `preflight`, `free::run`) skip through `crates/ddc-core/tests/common/mod.rs` `unsupported()` on a native job of a platform not yet supported (ADR "Platform seam: one platform module per OS with declared capabilities", §9). Story "Platform seam: ADR and capability model" added the helper; story "Move OS calls behind the platform module" applies it, in its test-harness item, to the core tests and to the CLI integration tests. Stage 2 waits for that.
 - [ ] `release.yml` on `v*` tags, created in stage 1 with an empty `enabled` list, so the catalog stories only add to it. A `plan` job emits the matrix and the build job carries an `if:` on a non-empty list, because an empty matrix fails the run while a skipped job does not. One job per enabled target:
   - waits for, or requires, a green `gate.yml` run for the same commit;
   - `cargo build --release --locked --target <t>` with `--remap-path-prefix` as in `build-dist.sh`;

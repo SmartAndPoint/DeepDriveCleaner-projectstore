@@ -69,7 +69,7 @@ Exit codes are 0, 1, 2 and 75 (`ddc-cli/src/exit.rs`; [[adr/menu-bar-app-swift-s
 - `src/platform/macos/`: today's `sys/*`, moved by the story "Move OS calls behind the platform module". Until then `platform/macos.rs` holds only the constants of §3 and §5.
 - `src/platform/linux.rs` and `src/platform/windows.rs`, each becoming a folder when it grows.
 - `unsafe_code` is allowed only under `platform/`. This takes over the Rust core ADR's rule for `sys`; the move story records it there as an amendment.
-- `libc::`, `std::os::unix`, `std::os::windows` and `cfg(target_os)` appear only under `platform/`.
+- `libc::`, `rustix::`, `windows_sys::`, `std::os::unix`, `std::os::windows`, `cfg(target_os)`, `cfg(unix)` and `cfg(windows)` appear only under `platform/`.
 
 `ddc-cli`:
 - `src/platform/{mod,macos,linux,windows}.rs`, crate path `crate::platform`. It holds launchd, the `osascript` notifier and `init_process`'s process setup.
@@ -171,7 +171,7 @@ Exit codes are 0, 1, 2 and 75 (`ddc-cli/src/exit.rs`; [[adr/menu-bar-app-swift-s
   - `--help`, `--version` and usage errors are handled by clap first (exit 0, 0 and 2).
   - Next, before `init_process` (the process setup is OS code too) and before any `Env`, lock or signal handler, the dispatcher refuses every command except `rules` when `SUPPORTED` is false. That covers `scan` (with `--background`), `clean`, `du`, `disk` and its subcommands, `schedule`, `notify` and `diag`.
   - The match over `Command` is exhaustive, with no wildcard, so a new command has to choose.
-  - A core refusal that reaches `main` (a path the dispatcher missed) exits with the same code. `ddc_core::platform::refusal_in(err: &(dyn std::error::Error + 'static))` walks `source()` and recognises `Unsupported` itself, the three variants above, and an `io::Error` whose `get_ref()` downcasts to `Unsupported`. The kind alone is never enough: std maps `ENOTSUP` to `io::ErrorKind::Unsupported`, and the core already returns that kind for other reasons. `preflight` and `free::run` build their refusal with `io::Error::new(ErrorKind::Unsupported, unsupported)`. `ddc-core` has no `anyhow`, so `main` passes `err.as_ref()`, beside its `LockError::Busy` check.
+  - A core refusal that reaches `main` (a path the dispatcher missed) exits with the same code. `ddc_core::platform::refusal_in(err: &(dyn std::error::Error + 'static))` walks `source()` and recognises `Unsupported` itself, the three variants above, and an `io::Error` whose `get_ref()` downcasts to `Unsupported`. The kind alone is never enough: std maps `ENOSYS` and `EOPNOTSUPP` to `io::ErrorKind::Unsupported`, and the core already returns that kind for other reasons. `preflight` and `free::run` build their refusal with `io::Error::new(ErrorKind::Unsupported, unsupported)`. `ddc-core` has no `anyhow`, so `main` passes `err.as_ref()`, beside its `LockError::Busy` check.
 
 ### 6. Exit code 69
 

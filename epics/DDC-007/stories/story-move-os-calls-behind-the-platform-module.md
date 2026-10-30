@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [rust, refactor, portability]
 code_refs: []
@@ -51,8 +51,8 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 ## Decomposition
 
 - [ ] `ddc-core/src/platform/{mod,macos,linux,windows}.rs` (or folders). `sys/` moves under `platform::macos`. Linux and Windows get stubs that compile and return `Unsupported` for each capability, with `SUPPORTED = false`.
-- [ ] Every row of the table above moves behind `platform`, or behind `cli::platform` for `ddc-cli`. Shared code calls only the seam.
-- [ ] The test harness: helpers that need Unix move behind `cfg(unix)` helpers in `tests/common`. Tests that are macOS-only by nature are marked `cfg(target_os = "macos")` with a one-line reason. Platform-neutral tests (rules, plan, report on fixtures, property tests) carry no `cfg`.
+- [ ] Every row of the table above moves behind `platform`, or behind `crate::platform` (`ddc-cli/src/platform/`) for `ddc-cli`. Shared code calls only the seam.
+- [ ] The test harness: helpers that need Unix move behind `cfg(unix)` helpers in `tests/common`. Tests that are macOS-only by nature are marked `cfg(target_os = "macos")` with a one-line reason. Platform-neutral tests (rules, plan, report on fixtures, property tests) carry no `cfg`. Tests of a gated entry point (`report::scan*`, `scan::walk`, `disk::measure*`, `exec::execute`, `preflight`, `free::run`) start with `if common::unsupported("…") { return; }` (ADR "Platform seam: one platform module per OS with declared capabilities", §9). CLI integration tests that run `scan`, `clean`, `du`, `disk`, `schedule`, `notify` or `diag` skip the same way when `ddc_core::platform::SUPPORTED` is false.
 - [ ] `make tools` adds the targets (`rustup target add x86_64-unknown-linux-gnu x86_64-unknown-linux-musl x86_64-pc-windows-msvc`). The gate's full tier runs `cargo check --workspace --all-targets --target <t>` for each.
 - [ ] Before and after: `make golden-check` (DDC-005 story "Synthetic load trees: large, wide, deep and hostile"), plus the full macOS test suite.
 
@@ -62,7 +62,7 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 
 - [ ] `cargo check --workspace --all-targets` passes for `x86_64-unknown-linux-gnu`, `x86_64-unknown-linux-musl` and `x86_64-pc-windows-msvc`, in the gate.
 - [ ] On macOS the full test suite passes, and the golden outputs are identical except for the fields the seam ADR added.
-- [ ] No file under `src/` outside `platform/` (in `ddc-core`) and `cli/platform` (in `ddc-cli`) references `libc::`, `std::os::unix`, `std::os::windows` or `cfg(target_os)`, and no file in `ddc-cli` outside `cli/platform`, nor in `ddc-loadgen`, references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it).
+- [ ] No file under `src/` outside `ddc-core/src/platform/` and `ddc-cli/src/platform/` (`crate::platform`) references `libc::`, `rustix::`, `windows_sys::`, `std::os::unix`, `std::os::windows`, `cfg(target_os)`, `cfg(unix)` or `cfg(windows)`, and no file in `ddc-cli` outside `ddc-cli/src/platform/`, nor in `ddc-loadgen`, references `ddc_core::sys::` or `ddc_core::platform::macos::`, enforced by a gate check (a grep, or a `ddc-shape` layer rule once DDC-006 has it).
 - [ ] `unsafe_code` is denied everywhere except `platform/`.
 - [ ] `projectstore:reviewer` confirmed the move preserved behaviour.
 
@@ -85,4 +85,4 @@ OS-specific code today, found by `grep -rn 'libc::\|std::os::unix\|osascript\|la
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*
