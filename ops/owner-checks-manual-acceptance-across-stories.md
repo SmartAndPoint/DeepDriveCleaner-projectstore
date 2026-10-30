@@ -190,6 +190,14 @@ Story: [Protected by you: say what it is, and Remove Protection](../epics/DDC-00
 - [ ] Manual (owner): on a row that holds a folder skipped in Settings, Remove Protection… removes that entry from Settings → Folders, and the next scan lists the row's folder in its own group, the skipped subfolder inside it. Both Protect… (on another group's row) and Remove Protection… open their confirmations.
 - [ ] Manual (owner): protect a folder inside a git checkout and commit its `.ddc-keep`: Remove Protection… warns that git tracks it. With the marker uncommitted, no warning. With no git at the four fixed paths (a Mac without the developer tools), no warning and no install dialog.
 
+### Harness data rules (DDC-003)
+
+Story: [Harness data rules](../epics/DDC-003/stories/story-harness-data-rules.md)
+
+- [ ] Manual (owner): on the reference machine, `ddc scan ~` lists each confirmed coding-agent path under "Coding agents", and `python3 -I bench/check_baseline.py` passes.
+- [ ] Manual (owner): in 0.11.0, run `ddc scan`, then `ddc clean --items` with one stale Claude Code session's `<s>.jsonl` from the report: the transcript and its companions are in the Trash; after Put Back, `claude --resume` of it works. (The Review window keeps a session folder as one row; it does not pick sessions one by one.)
+- [ ] Manual (owner): with Codex (or its app-server) running, a clean of the Codex folders is refused "Codex is running"; after quitting it, they move to the Trash.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.

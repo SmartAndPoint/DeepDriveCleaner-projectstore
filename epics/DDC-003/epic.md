@@ -2,13 +2,13 @@
 type: epic
 id: "DDC-003"
 title: "Agent footprint"
-status: planned
+status: in-progress
 priority: p2
 created: 2026-10-18
 updated: 2026-10-18
 external_refs: {}
 tags: [agents, worktrees, cli, rules]
-code_refs: []
+code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/rules/entries.rs", "crates/ddc-core/src/rules/catalog/macos.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/plan.rs", "app/Packages/DDCKit/"]
 review_status: pending
 reviewed_at: null
 ---
