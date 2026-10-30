@@ -3,17 +3,17 @@ type: story
 id: "story-protected-by-you-say-what-it-is-and-remove-protection"
 epic: "DDC-002"
 title: "Protected by you: say what it is, and Remove Protection"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-30
+updated: 2026-10-31
 external_refs: {}
 tags: [core, cli, app, review, user-data, keep-marker, adr-amendment, user-report]
-code_refs: []
+code_refs: ["app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/RemoveProtectionDialog.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/FolderList.swift", "app/Packages/DDCKit/Sources/DDCKit/GitTracking.swift", "app/Packages/DDCKit/Sources/DDCKit/GroupLayout.swift", "app/Packages/DDCKit/Sources/DDCKit/KeepReport.swift", "app/Packages/DDCKit/Sources/DDCKit/RemoveProtection.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewItems.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ProtectionTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ScanReportTests.swift", "crates/ddc-cli/src/cmd/keep.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/gate.rs", "crates/ddc-cli/tests/keep_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/keep.rs", "crates/ddc-core/src/exec/journal.rs", "crates/ddc-core/src/model.rs", "crates/ddc-core/src/settings.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/rules/classify.rs", "crates/ddc-core/src/platform/macos/fsops.rs", "crates/ddc-core/tests/keep.rs", "crates/ddc-core/tests/protection.rs", "docs/keep.schema.json", "docs/scan.schema.json", "clippy.toml", "crates/ddc-core/src/platform/unported.rs", "crates/ddc-core/src/platform/mod.rs", "crates/ddc-cli/tests/unported_cli.rs", "README.md", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/src/cmd/mod.rs", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/keep-removed.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/keep-refused.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/scan-report-protection.json"]
 specs: []
 started_at: "2026-10-30T14:44:22.789Z"
-closed_at: null
+closed_at: "2026-10-30T19:48:14.433Z"
 plan_updated_at: "2026-10-30T14:44:22.789Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-30T14:44:22.789Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -78,11 +78,11 @@ The fields are one optional `protection` object on a kept finding; the scan sche
 
 ## Decomposition
 
-- [ ] ADR amendments (safety §2, §7; menu bar §6, §7), critic-reviewed.
-- [ ] Core: the kept finding's new fields from the three sites (`visitor.rs`, `classify.rs`), with the skip's origin; schema and goldens.
-- [ ] Core/CLI: `ddc keep remove` with the lock, the roots check, the identity check, the regular-file unlink, the journal line; `--json`.
-- [ ] DDCKit: decode the fields; the Settings entry whose `realpath(3)` equals the reported path, then `removeExclusion` with the entry as written; the row wording; the blurb; the confirmation text with the git warning; the git binary lookup by path.
-- [ ] App: Remove Protection… in the row's context menu and as a row button, the confirmation, Scan Now after, the row while it scans; the Settings route; the contract test.
+- [x] ADR amendments (safety §2, §7; menu bar §6, §7), critic-reviewed: critic round 1 (2026-10-30, Implementation Plan); both ADRs carry the 2026-10-30 amendments. Their `reviewed_at` stays 2026-10-28, which dates a review of the whole ADR, not of one amendment.
+- [x] Core: the kept finding's new fields from the three sites (`visitor.rs`, `classify.rs`), with the skip's origin; schema and goldens.
+- [x] Core/CLI: `ddc keep remove` with the lock, the roots check, the identity check, the regular-file unlink, the journal line; `--json`.
+- [x] DDCKit: decode the fields; the Settings entry whose `realpath(3)` equals the reported path, then `removeExclusion` with the entry as written; the row wording; the blurb; the confirmation text with the git warning; the git binary lookup by path.
+- [x] App: Remove Protection… in the row's context menu and as a row button, the confirmation, Scan Now after, the row while it scans; the Settings route; the contract test.
 
 ## Implementation Plan
 
@@ -117,18 +117,34 @@ Decisions taken at this gate: the owner chose two steps. Every decision under th
 
 ## Acceptance Criteria
 
-- [ ] Test (core): in a temp HOME, a `node_modules` folder with a `.ddc-keep` at its top is a kept finding whose report names the marker's folder (with device and inode) and the rule `node.node_modules`; a marker deeper inside a claim names its own folder; a folder excluded in Settings names the exclusion, one excluded by `--exclude` the flag; a finding holding a folder skipped in Settings names the skip's path, the origin Settings and its own rule; one holding a `--skip` folder names the origin flag; a finding holding an excluded folder names that path and its own rule; a known-path folder that is excluded names its rule.
-- [ ] Test (CLI): `keep remove` removes a regular-file marker and writes the journal line; refuses a marker whose folder's identity changed, a symlink marker, a folder marker, a marker outside the roots, and a run while a clean holds the lock.
-- [ ] Test (CLI): after `keep remove`, a scan lists the folder in its own group.
-- [ ] Test (CLI): every refusal under the lock (`changed-since-scan`, `no-folder`, `not-a-file`, `outside-scan-roots`) writes a `keep-remove` journal line with that reason and exits 0 with `--json`; a folder with no marker is `absent`, journaled, exit 0; a held lock exits 75 and writes none; without `--folder-dev`/`--folder-ino` and without a terminal it exits 2 before the lock; the journal lines carry `schema_version` 4.
-- [ ] Test (CLI): the `--json` report validates against `docs/keep.schema.json`; a structure test finds `unlink_child` called once, with `KEEP_MARKER`, and no removal, trash or executor call in the keep code.
-- [ ] Test (DDCKit): the row wording for each kind of protection (marker, Settings exclusion, flag exclusion, a held Settings skip, a held flag skip, a held exclusion), with and without the underlying rule; the blurb; the git warning when the check says tracked, none when it fails, says untracked, or no git binary exists (and then nothing is executed).
-- [ ] Test (DDCKit): the Settings edit removes an entry written through a symlink whose `realpath(3)` equals the reported path.
-- [ ] Test (DDCKit): the contract test finds exactly one caller of `keep remove`; `keepContracts` validates the fixture against `docs/keep.schema.json`; `schemaEnums` covers the new enums.
-- [ ] Test (DDCKit): `canRemoveProtection` is false for a row with two protections, for a flag-origin row, and when the report's scope is outside the app's roots; the `scan-report.json` fixture with `protection` decodes; the app rescans on `removed` and `absent` and not on `refused` or `failed`.
-- [ ] Manual (owner): protect a folder from the app, then Remove Protection: the confirmation names it, the app rescans, the folder is in its own group and can be cleaned. On a finding holding a skipped folder, Remove Protection removes the skip from Settings → Folders.
+- [x] Test (core): in a temp HOME, a `node_modules` folder with a `.ddc-keep` at its top is a kept finding whose report names the marker's folder (with device and inode) and the rule `node.node_modules`; a marker deeper inside a claim names its own folder; a folder excluded in Settings names the exclusion, one excluded by `--exclude` the flag; a finding holding a folder skipped in Settings names the skip's path, the origin Settings and its own rule; one holding a `--skip` folder names the origin flag; a finding holding an excluded folder names that path and its own rule; a known-path folder that is excluded names its rule. — evidence: `crates/ddc-core/tests/protection.rs::a_kept_finding_names_what_protects_it_and_the_rule_it_displaced`, `::a_marker_at_the_top_names_its_folders_own_identity_on_every_route` (7387c45)
+- [x] Test (CLI): `keep remove` removes a regular-file marker and writes the journal line; refuses a marker whose folder's identity changed, a symlink marker, a folder marker, a marker outside the roots, and a run while a clean holds the lock. — evidence: `crates/ddc-cli/tests/keep_cli.rs::a_regular_marker_is_removed_journaled_and_the_folder_returns_to_its_group`, `::every_refusal_under_the_lock_is_reported_and_journaled`, `::a_held_lock_or_a_call_refused_before_the_lock_removes_and_journals_nothing` (1f37e19)
+- [x] Test (CLI): after `keep remove`, a scan lists the folder in its own group. — evidence: `keep_cli.rs::a_regular_marker_is_removed_journaled_and_the_folder_returns_to_its_group` (the rescan finds `rule == "node.node_modules"` and no `protection`)
+- [x] Test (CLI): every refusal under the lock (`changed-since-scan`, `no-folder`, `not-a-file`, `outside-scan-roots`) writes a `keep-remove` journal line with that reason and exits 0 with `--json`; a folder with no marker is `absent`, journaled, exit 0; a held lock exits 75 and writes none; without `--folder-dev`/`--folder-ino` and without a terminal it exits 2 before the lock; the journal lines carry `schema_version` 4. — evidence: `keep_cli.rs::every_refusal_under_the_lock_is_reported_and_journaled`, `::a_folder_without_a_marker_is_absent`, `::a_held_lock_or_a_call_refused_before_the_lock_removes_and_journals_nothing`; `assert_line` checks `schema_version` 4
+- [x] Test (CLI): the `--json` report validates against `docs/keep.schema.json`; a structure test finds `unlink_child` called once, with `KEEP_MARKER`, and no removal, trash or executor call in the keep code. — evidence: `keep_cli.rs` `remove_json` through `contract::holds::<KeepReport>("keep", …)`; `crates/ddc-cli/tests/structure.rs::keep_remove_unlinks_only_its_marker`
+- [x] Test (DDCKit): the row wording for each kind of protection (marker, Settings exclusion, flag exclusion, a held Settings skip, a held flag skip, a held exclusion), with and without the underlying rule; the blurb; the git warning when the check says tracked, none when it fails, says untracked, or no git binary exists (and then nothing is executed). — evidence: `ProtectionTests.rowWording`, `.secondLine`, `.blurb`, `.gitAnswers`, `.gitNothingRuns`, `.gitWarning`, `.gitBinaries` (PR #17)
+- [x] Test (DDCKit): the Settings edit removes an entry written through a symlink whose `realpath(3)` equals the reported path. — evidence: `ProtectionTests.settingsThroughSymlink`
+- [x] Test (DDCKit): the contract test finds exactly one caller of `keep remove`; `keepContracts` validates the fixture against `docs/keep.schema.json`; `schemaEnums` covers the new enums. — evidence: `ContractTests.keepCallers`, `.keepContracts`, `.schemaEnums`
+- [x] Test (DDCKit): `canRemoveProtection` is false for a row with two protections, for a flag-origin row, and when the report's scope is outside the app's roots; the `scan-report.json` fixture with `protection` decodes; the app rescans on `removed` and `absent` and not on `refused` or `failed`. — evidence: `ProtectionTests.canRemove`, `.decodes`, `.removeMarker`, `.unreadableReport`, `.rowWhileScanning`; `ScanReportTests.decodesReportWithProtection` (fixture `scan-report-protection.json`); `protection.rs::the_apps_protection_fixture_is_a_report_the_cli_could_write`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): protect a folder from the app, then Remove Protection: the confirmation names it, the app rescans, the folder is in its own group and can be cleaned. On a finding holding a skipped folder, Remove Protection removes the skip from Settings → Folders.
 
 ## Final Summary
+
+**What changed.** A kept finding now says what keeps it, and one protection can be removed from its row.
+- The report gives a kept finding an optional `protection` object: the `.ddc-keep` markers with their folders' device and inode, the exclusion or the held skip with its path and its origin (Settings or a flag), and the rule that would have claimed the folder when the walker knows it. The scan schema stays at version 2 (7387c45).
+- `ddc keep remove <folder> --folder-dev --folder-ino --json` unlinks one regular-file marker under the data-dir lock, after the roots and identity checks, and journals every decision, refusals included. Its report is `docs/keep.schema.json`; the journal is at schema version 4 with a `keep-remove` line (1f37e19). Both shipped in 0.10.0.
+- The app names the protection on each row's second line ("Protected by .ddc-keep in …", "Excluded in Settings", "Holds a folder skipped in Settings: …", "otherwise: <rule id>"), under a new blurb for the group. **Remove Protection…** sits in the row's context menu and as a row button when the row has exactly one removable protection. Its confirmation names the findings and the rule, and warns when git, looked up only at four fixed paths, says the marker is tracked. A marker goes through `ddc keep remove`; a Settings exclusion or skip goes through the same edit as Settings → Folders, matched by `realpath(3)`. The app rescans on `removed` and `absent`, the row says "Protection removed. Scanning…", and a refusal or failure is said on the row until the next reload (PR #17: 33fc027, 81010e7, d2a1c6c, dcbeb9a).
+
+**Why.** The owner (2026-10-29) saw "Protected by you" rows with disabled checkboxes and no way out. The safety ADR never removes a kept folder, so the way out removes the protection, and the next scan lists the folder in its own group: two steps, as the owner chose on 2026-10-30.
+
+**Tests.** The Rust tests above ran green in main's Gate for 7387c45 and 1f37e19. DDCKit: 415 tests at PR #17. The unsigned `xcodebuild` build passed before PR #17, and its Gate's required jobs (scope, gate, coverage, app, release-build) were green; the advisory Linux and Windows `check` jobs were red before and after this PR (build-matrix plan, DDC-007). The reviewer (2026-10-30) found all nine automated criteria met. Its two should-fixes were applied in d2a1c6c: a refusal is said on the row, and Scan Again, Clean and Protect wait while a removal runs. So were its nits: the model's default `GitTracking` is `.off` and only the app passes the real one; a git that ignores SIGTERM gets SIGKILL; the rule is named by its full id; a row kept by a marker and a flag says to remove both (dcbeb9a); every Settings entry resolving to the reported path is removed, from both lists.
+
+**Risks and follow-ups.**
+- The app part ships in the next release (0.11.0); the manual check is in the owner-checks runbook.
+- A row with a marker and a flag exclusion gets no button, since the flag would still protect the folder after the marker went; it says to remove both. If the owner reads "exactly one removable protection" as a button for the marker alone, that is a follow-up.
+- Two `confirmationDialog`s hang on one row (Protect and Remove Protection). They never apply to the same row; the manual check covers them on the target macOS.
+- While `keep remove` runs, the runner reports its activity as cleaning, so the quit and update wording says a clean is running.
+- The limit stays as written: an exclude at or above a matcher-rule folder (such as `node_modules`) does not name the rule.
 
 ## Technical Notes
 
@@ -148,4 +164,4 @@ Decisions taken at this gate: the owner chose two steps. Every decision under th
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-10-31*
