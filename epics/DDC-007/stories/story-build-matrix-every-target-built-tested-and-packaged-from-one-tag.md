@@ -7,10 +7,10 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-30
+updated: 2026-10-31
 external_refs: {}
 tags: [ci, release, build, linux, windows]
-code_refs: [".github/workflows/gate.yml", ".github/workflows/release.yml", "Makefile", "README.md", "crates/ddc-cli/tests/structure.rs", "scripts/build-cli.sh", "scripts/build-dist.sh", "scripts/ci-green.sh", "scripts/publish-release.sh", "scripts/require-tag.sh", "scripts/tag-release.sh", "scripts/check-build-number.sh", "scripts/tests/"]
+code_refs: [".github/workflows/gate.yml", ".github/workflows/release.yml", "Makefile", "README.md", "crates/ddc-cli/tests/structure.rs", "scripts/build-cli.sh", "scripts/build-dist.sh", "scripts/ci-green.sh", "scripts/publish-release.sh", "scripts/require-tag.sh", "scripts/tag-release.sh", "scripts/check-build-number.sh", "scripts/tests/", "scripts/native-skips.sh", "scripts/gate-scope.sh", ".config/native-skips/", ".config/nextest.toml", ".gitattributes", "crates/ddc-core/src/platform/", "crates/ddc-core/tests/common/mod.rs", "crates/ddc-cli/tests/common/", "crates/ddc-cli/tests/disclaimer_cli.rs", "crates/ddc-loadgen/src/lib.rs"]
 specs: []
 started_at: "2026-10-30T07:10:03.214Z"
 closed_at: null
@@ -67,10 +67,11 @@ The flow becomes:
 
 ## Decomposition
 
-- [ ] Stage 1: `gate.yml` gains the `cargo check` jobs for Linux and Windows (`continue-on-error`) and a macOS `cargo build --release` job.
-- [ ] Stage 2: make the Linux and Windows jobs required, and run the gate natively on both. Test harness portability is done in story "Move OS calls behind the platform module".
+- [x] Stage 1: `gate.yml` gains the `cargo check` jobs for Linux and Windows (`continue-on-error`) and a macOS `cargo build --release` job. — evidence: commit 0a88802 "ci: build matrix stage 1 and a tag-first release flow"
+- [x] Stage 2: make the Linux and Windows jobs required, and run the gate natively on both. Test harness portability is done in story "Move OS calls behind the platform module".
   - Core tests of the gated entry points (`report::scan*`, `scan::walk`, `disk::measure*`, `exec::execute`, `preflight`, `free::run`) skip through `crates/ddc-core/tests/common/mod.rs` `unsupported()` on a native job of a platform not yet supported (ADR "Platform seam: one platform module per OS with declared capabilities", §9). Story "Platform seam: ADR and capability model" added the helper; story "Move OS calls behind the platform module" applies it, in its test-harness item, to the core tests and to the CLI integration tests. Stage 2 waits for that.
-- [ ] `release.yml` on `v*` tags, created in stage 1 with an empty `enabled` list, so the catalog stories only add to it. A `plan` job emits the matrix and the build job carries an `if:` on a non-empty list, because an empty matrix fails the run while a skipped job does not. One job per enabled target:
+  - Evidence: PR #19 (head a8fc79d, rebase-merged as 0b6d327); `main`'s Gate run 41125669660 green on all seven jobs; ruleset 26206449 requires `check-x86_64-unknown-linux-gnu` and `check-x86_64-pc-windows-msvc`. See "Stage 2 outcome" below.
+- [x] `release.yml` on `v*` tags, created in stage 1 with an empty `enabled` list, so the catalog stories only add to it. A `plan` job emits the matrix and the build job carries an `if:` on a non-empty list, because an empty matrix fails the run while a skipped job does not. One job per enabled target:
   - waits for, or requires, a green `gate.yml` run for the same commit;
   - `cargo build --release --locked --target <t>` with `--remap-path-prefix` as in `build-dist.sh`;
   - smoke test: `--version` equals the tag, and `scan --json` on a small generated tree validates against the schema;
@@ -78,11 +79,12 @@ The flow becomes:
   - check that no runner path or home folder appears in the binary;
   - `actions/attest-build-provenance`;
   - upload as a workflow artifact.
-- [ ] A per-target `enabled` list in `release.yml`: Linux and Windows are added by their catalog stories, in the same commit that flips the platform's `SUPPORTED` switch.
-- [ ] `make tag`: refuses unless the tree is clean, `HEAD` equals `origin/main`, and the version in `Cargo.toml` matches. Then creates and pushes the annotated tag.
-- [ ] `build-dist.sh`: require the tag on origin at `HEAD` (`git ls-remote`).
-- [ ] `publish-release.sh`: the checks and download above, `SHA256SUMS` over all assets, and refusal when an enabled target's artifact is missing.
-- [ ] The release runbook (or the Makefile header): tag, wait for `release.yml`, `make dist`, publish, and the recovery from a failed `release.yml`. Who pushes the tag is stated.
+  - Evidence: commit 0a88802: `.github/workflows/release.yml` (`RELEASE_TARGETS: '[]'`, `scripts/ci-green.sh --full`, the `--version` and `scan --json` smoke test, the flat archive, "No runner paths in the archive", `actions/attest-build-provenance@v4`, `actions/upload-artifact@v7`). It ran on the v0.9.0 and v0.10.0 tags (runs 41075547893, 41115665055): `plan` ran and `build` was skipped on the empty list. It has not run with a target enabled yet. That is stage 3's AC, and it waits for the first `RELEASE_TARGETS` entry from story "Linux scanner and rule catalog", so this story stays in progress until then.
+- [ ] A per-target `enabled` list in `release.yml`: Linux and Windows are added by their catalog stories, in the same commit that flips the platform's `SUPPORTED` switch. (The list, `RELEASE_TARGETS`, exists since 0a88802 and is empty; the entries land with the catalog stories.)
+- [x] `make tag`: refuses unless the tree is clean, `HEAD` equals `origin/main`, and the version in `Cargo.toml` matches. Then creates and pushes the annotated tag. — evidence: commit 0a88802, `scripts/tag-release.sh` and the Makefile's `tag:` target
+- [x] `build-dist.sh`: require the tag on origin at `HEAD` (`git ls-remote`). — evidence: commit 0a88802, `scripts/require-tag.sh`, called from `scripts/build-dist.sh`
+- [x] `publish-release.sh`: the checks and download above, `SHA256SUMS` over all assets, and refusal when an enabled target's artifact is missing. — evidence: commit 0a88802, `scripts/publish-release.sh` (`RELEASE_TARGETS`, `SHA256SUMS`); its run on a real pre-release is stage 3's AC
+- [x] The release runbook (or the Makefile header): tag, wait for `release.yml`, `make dist`, publish, and the recovery from a failed `release.yml`. Who pushes the tag is stated. — evidence: runbook "Cutting a release: tag, CI archives, dist and publish" (`ops/`), "Who pushes the tag: the owner, with `make tag`"
 
 ## Implementation Plan
 
@@ -172,10 +174,26 @@ Stage 2 starts now. Story "Move OS calls behind the platform module" is done, an
 
 ADR "Platform seam: one platform module per OS with declared capabilities" §9 gains an amendment: the capability form `lacks()`, the in-crate `skipped()`, tool helpers (`platform::testing` in-source, `tests/common` twins elsewhere), and the committed skip lists.
 
+### Stage 2 outcome (2026-10-31)
+
+PR #19 merged. The plan held, with these differences:
+- **A skipped matrix job posts no check names.** When a job-level `if:` skips a matrix job, GitHub does not expand it, so a Rust-free push would never report `check-<target>`, and a PR requiring them would wait for good. The `check` job now always runs and the scope decides each step instead. A Rust-free run (41121811937) posts both names as success. It still skips gate, coverage and release-build, so it is never a scope base, and `ci-green --full` refuses it. The plan's line "a skipped leg satisfies a required check as `gate` does today" holds only for non-matrix jobs.
+- **Windows temp folder.** With `shell: bash`, the runner's temp folder lies inside `HOME`, and the test trees' guard refused 11 integration tests. The Tests step sets `TMP` and `TEMP` to `runner.temp`.
+- **Hand-printed skip lines.** `no_system_process_owns_a_cache` printed two unlabelled `skipped:` lines that neither the list compare nor the label test saw. It now fails when it has nothing to check. `every_skip_names_its_own_test` also refuses any `eprintln!("skipped` outside a helper that takes `test`.
+- **The overflow fix** was dropped in the rebase: `main` now injects a fixed uid into that test.
+- **Main's new tests during the stage**:
+  - four tests in `keep`, `agents::running`, `agents::liveness` and `agents::codex` skip through `platform::skipped`; codex skips only its real-reader tail;
+  - eleven skips that main's new tests already printed (`ddc keep remove`, finding dates, the liveness facts) and five from `agent_rules.rs` joined both lists.
+- **Lists at merge:** `linux.txt` 431 names, `windows.txt` 417. In `main`'s run 41125669660, Linux ran 649 tests and Windows 617, with no failures. The lists grow until each platform's flip: every new test that skips off macOS adds a line, and within hours of the merge both lists had grown by seven. A new test prefers platform-neutral fixtures. When it must skip, its line names an unported reader, a macOS-shaped input or an absent capability, and the reviewer of that PR sees the line. The file, not a count, is the baseline.
+- **A flaky native leg** blocks every merge now that the legs are required, and profile `ci` has no retries. Re-run it with `gh run rerun --failed`, then fix the test.
+- **Runners:** `ubuntu-24.04` and `windows-2025`.
+- **`there_is_no_yes` and the macOS-path tests also skip on Linux, where they pass.** They return with the Linux flip. The reviewer's open question was whether to check path shape instead of `unsupported()` to keep Linux coverage now; it is left to story "Linux scanner and rule catalog".
+- **Faster Linux iteration.** A CI round, counting the local pre-push gate, the queue and the run, took about half an hour. The Linux leg was rerun on an Ubuntu 24.04 x86_64 machine over ssh, in `rust:1.99.1-bookworm` as a non-root user, with the same nextest profile and `scripts/native-skips.sh`, in about a minute, and its counts matched CI's (641 tests, 426 skips on the same tree). Its image has glibc 2.36, older than the runner's 2.39. Once the Linux flip un-skips the statfs and /proc tests, CI stays the judge. Story "Linux scanner and rule catalog" iterates there. Windows still runs only in CI.
+
 ## Acceptance Criteria
 
-- [ ] Stage 1: on `main`, the macOS gate job is green; the Linux and Windows check jobs run (red is allowed until stage 2); the macOS release build job is green.
-- [ ] Stage 2: every push runs the gate on macOS, Ubuntu and Windows, and all three are required and green on `main`.
+- [x] Stage 1: on `main`, the macOS gate job is green; the Linux and Windows check jobs run (red is allowed until stage 2); the macOS release build job is green. — evidence: Gate run 41082747167 on 642cf39: gate and release-build green, both check legs ran (red, as allowed)
+- [x] Stage 2: every push runs the gate on macOS, Ubuntu and Windows, and all three are required and green on `main`. As built, a push whose scope is Rust runs the macOS gate job, while the Ubuntu and Windows legs run clippy, nextest (profile `ci`), doc tests and the skip-list compare. `make gate`'s other tiers (deny, machete, msrv, leaks and the rest) run on macOS only. — evidence: `main`'s Gate run 41125669660 on 0b6d327 (PR #19): scope, gate, coverage, app, release-build, `check-x86_64-unknown-linux-gnu` and `check-x86_64-pc-windows-msvc` all green; ruleset 26206449 lists all seven as required; Rust-free run 41121811937 posted both native checks as success
 - [ ] Stage 3: a pre-release test tag produces the enabled targets' archives, each smoke-tested on its runner; `gh attestation verify <archive> --repo SmartAndPoint/DeepDriveCleaner` passes for each CI-built archive.
 - [ ] `publish-release.sh` on that tag produces one release with the CI archives, the macOS archive, the app zip and `SHA256SUMS`, and refuses when an enabled target's artifact is missing or the run failed (tested on a throwaway pre-release).
 - [ ] No archive contains a runner path or a home folder (checked in the workflow).

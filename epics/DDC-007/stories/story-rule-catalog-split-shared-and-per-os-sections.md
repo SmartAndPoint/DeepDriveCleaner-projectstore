@@ -81,7 +81,7 @@ Steps:
    - Diff the old and new macOS id sequences in review.
 3. **Protected folders by section.** `protected_in_home(p)` and `protected_system(p)` replace the two constants. All six consumers change: `Catalog.protected` in `rules/mod.rs`, `exec/guard.rs`, `exec/preflight.rs`, `report/contents.rs`, `ddc-core/tests/matcher_reference.rs`, and `ddc-loadgen/tests/properties.rs` (another crate). Tests:
    - the macOS set equals the §6 list, and no entry sits in two sections;
-   - **the flip guard**, which runs on every CI OS: `SUPPORTED` may be true only where `protected_system(PLATFORM)` holds the filesystem root (`/`, or a drive root on Windows) and `protected_in_home(PLATFORM)` holds more than the shared section. This test, not prose, stops a platform from being switched on with empty system folders. It binds once stage 2 of story "Build matrix: every target built, tested and packaged from one tag" makes the native CI jobs required, which is a dependency of the Linux story; until then those jobs are continue-on-error.
+   - **the flip guard**, which runs on every CI OS: `SUPPORTED` may be true only where `protected_system(PLATFORM)` holds the filesystem root (`/`, or a drive root on Windows) and `protected_in_home(PLATFORM)` holds more than the shared section. This test, not prose, stops a platform from being switched on with empty system folders. It binds once stage 2 of story "Build matrix: every target built, tested and packaged from one tag" makes the native CI jobs required, which is a dependency of the Linux story. Stage 2 made them required on 2026-10-31 (PR #19).
 4. **`ddc rules --platform <os>`.**
    - Paths under each rule in the human output.
    - Tests in `rules_cli.rs`:

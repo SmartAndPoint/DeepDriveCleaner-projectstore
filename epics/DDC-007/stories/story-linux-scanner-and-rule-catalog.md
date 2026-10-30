@@ -78,6 +78,17 @@ Before the catalog is written, a research note records where dev disk space goes
 ## Technical Notes
 
 - `ext4` and `btrfs` report allocated size the same way. btrfs reflinks are like APFS clones: private size is out of scope, stated as an absent capability.
+- Iterate on the owner's Ubuntu 24.04 x86_64 machine over ssh, not through CI rounds:
+  - It runs the Gate's Linux leg in about a minute: clippy, nextest with profile `ci`, doc tests and `scripts/native-skips.sh linux`, in `rust:1.99.1-bookworm` as a non-root user. Root reads unreadable folders, so it changes results.
+  - The same machine serves the manual-VM AC.
+- The flip burns down `.config/native-skips/linux.txt`. It held 431 names when the build matrix's stage 2 merged, and it grows with each new test that skips off macOS. After it, only skips through `lacks()` should remain: Homebrew, the whole disk, the coding agents. Plus whatever the research note shows Linux does not have.
+- Stage 2 also skipped some tests on Linux that pass there:
+  - `there_is_no_yes`;
+  - the macOS-path tests (`agents::running`, `agents::liveness`, `free::probe`, `keep`, the malformed-list test);
+  - the fuzz regressions' "accepted" half.
+
+  They come back with the flip, unless they are re-gated on path shape first. The in-crate ones (`keep`, `agents::running`, `agents::liveness`, `free::probe`) skip through `platform::skipped()`. `there_is_no_yes`, the malformed-list test and the fuzz half skip through `common::unsupported()`.
+- `report::backups`' truncation and bit-flip tests get their binary property lists from `/usr/bin/plutil`, so they skip without it. To keep that coverage after the flip, commit the two binary plists as fixture bytes.
 
 ## Dependencies
 

@@ -84,6 +84,14 @@ As for Linux, a research note comes first: where dev disk space goes on Windows,
 
 - `GetCompressedFileSizeW` is not the allocated size: it returns the on-disk size only for compressed or sparse files, and the logical size otherwise. `AllocationSize` from the directory information class is the comparable number.
 - `unsafe` for Win32 calls stays inside `platform::windows`, each block with a `// SAFETY:` comment (enforced by DDC-006's clippy story).
+- Test debt from stage 2 of story "Build matrix: every target built, tested and packaged from one tag" (2026-10-31). `.config/native-skips/windows.txt` held 417 names when stage 2 merged, and it grows until the flip. The flip should leave only the skips for capabilities Windows does not declare. Beyond the walker and `fsops`:
+  - The disclaimer tests (`disclaimer_cli.rs`) need a ConPTY driver; Windows has no `script`.
+  - `exec::system` `waiting_for_a_tool_does_not_spin` spawns `/bin/sleep` literally.
+  - Some tests feed macOS-shaped absolute paths, which Windows does not read as absolute, and need Windows-shaped inputs: `a_malformed_list_is_refused_before_anything_runs`, `agents::running` (`codex_is_a_cli_or_its_app_server`, `cursor_is_its_main_binary_only`, `cursor_agent_is_cursors_cli_by_its_install_folder`), `agents::liveness` `a_harness_runs_by_its_process_or_a_held_codex_lock`, `free::probe` (two tests), `keep` `only_an_absolute_path_without_parent_steps_is_plain`, and the fuzz regressions' "at least one accepted" half.
+  - Fixtures that make symlinks skip without the privilege (`common::try_symlink`): `disk_free.rs` `last_disk_*` and `settings.rs`. `there_is_no_yes` (`disk_free_cli.rs`) failed on Windows on its fixture's symlink too, and skips through `unsupported()`.
+  - `no_system_process_owns_a_cache` reads the live process table, which is unported, and checks `/System`, `/usr` and app-bundle paths. It needs a Windows meaning, or a reason to stay macOS-only. On a developer machine that takes Developer Mode; the CI runner (`windows-2025`) has no such privilege.
+  - The native job's Tests step sets `TMP` and `TEMP` to `runner.temp`. Under bash the temp folder lies inside `HOME`, and the test trees' guard refuses that.
+- There is no local Windows machine. Two options: a QEMU/KVM VM on the owner's Linux box, or a separate session on a Windows machine working from this vault through PRs. The owner picks when this story starts.
 
 ## Dependencies
 
