@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-10-30
 external_refs: {}
 tags: [rules, worktrees, safety, git]
 code_refs: []
@@ -38,7 +38,7 @@ The rule fires for every linked worktree in the scan roots. Only a harness's wor
 
 Rough until the plan gate.
 
-- [ ] Model: `Finding.origin: Option<Origin { harness, kind }>`, `Finding.worktree: Option<WorktreeState { branch, detached, clean, ignored_content, own_commits, submodules, locked, in_use, idle_days, probe }>` and `Project.worktree_of: Option<PathBuf>`, all optional; the `Note` enum is **not** touched, so `schema_version` stays 1; `docs/scan.schema.json` regenerated, plus a fixture report of the committed version-1 schema that a strict reader of today's model still decodes
+- [ ] Model: `Finding.origin: Option<Origin { harness, kind }>`, `Finding.worktree: Option<WorktreeState { branch, detached, clean, ignored_content, own_commits, submodules, locked, in_use, idle_days, probe }>` and `Project.worktree_of: Option<PathBuf>`, all optional; the `Note` enum is **not** touched, so `schema_version` does not rise for them; `Origin` itself arrives with the story "Harness data rules" (ADR §3, settled at the plan gate 2026-10-30), and this story fills it for worktrees; `docs/scan.schema.json` regenerated, plus a fixture report of the committed version-1 schema that a strict reader of today's model still decodes
 - [ ] Matcher `Worktree`: `.git` is a file with `gitdir:`; the gitdir exists → `git.worktree`, else `git.worktree-orphan`; the main checkout from `<gitdir>/commondir`. Checked in `after_read` before the project-manifest exclusion, because a worktree is a project root and must still be claimed as a **region**: rules keep firing inside it, findings inside get `project.root = worktree` and `project.worktree_of = main`
 - [ ] Provenance: `origin.harness = claude-code` when the path is under `<main>/.claude/worktrees/` or the gitdir carries the marker Claude Code writes (decided at the plan gate by reading a real worktree's gitdir on the reference machine); otherwise `git`
 - [ ] Git probe module (`ddc-core/src/git.rs`, no `unsafe`): one function that runs `git` through the `CommandRunner` with `--no-optional-locks`, `GIT_OPTIONAL_LOCKS=0`, `GIT_TERMINAL_PROMPT=0` and the `-c` overrides of the ADR (`core.fsmonitor=false`, `core.untrackedCache=false`, `core.hooksPath=/dev/null`, `status.submoduleSummary=false`, `core.pager=cat`, `core.askPass=`), a 30 s timeout, and a typed result; any failure is `Probe::Unknown`, never retried with fewer guards. Used by scan, `footprint` (next story) and the executor's re-check
