@@ -45,7 +45,7 @@ Either way the ADR work states two new semantics: a liveness refusal at plan tim
 
 | Data | Class and action |
 |---|---|
-| Scratch: debug logs, shell snapshots, todos | safe, deleted |
+| Scratch: debug logs, todos (shell snapshots dropped, see below) | safe, deleted |
 | History, file history, Codex sessions and runtimes, opencode data | review, to the Trash |
 | Cursor's agent data (`~/.cursor`, about 2.8 GB): `projects`, `ai-tracking` | to be classified under (A) or (B) |
 | `~/.cursor/extensions`, `plugins`, `worktrees` | never: what the user installed, and agent work on the user's repositories |
@@ -56,6 +56,8 @@ Either way the ADR work states two new semantics: a liveness refusal at plan tim
 The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are already the rule `ide.cursor-cache` ("IDE caches"); the new rules do not claim them again.
 
 **The group in Review.** "Coding agents", one row per harness folder kind. The sidebar has one section per class, so the group appears under Safe (scratch) and under Review (history), like any group with rules of both classes, with the class's usual checkbox, Select all and Clean. The Whole disk section stays an overview: its total counts the group's findings, and it gets a "Review…" link that opens the group. Show in Finder on its rows comes earlier, with story "Whole disk: Show in Finder and the honest action for each row".
+
+**Amended 2026-10-30 by DDC-003.** Its ADR §3, revised for this story, is the design these rows follow: eight rules in one "Coding agents" group; sessions as entries of their project folder, to the Trash one by one; liveness at plan time and before each move (`entry-locked` with `live-session` for a session, `agent-live` for a whole harness folder); `shell-snapshots` never claimed, because a live session sources its snapshot without holding it open; opencode claimed by subfolder, never its `auth.json`. Where this table and that section differ, the section holds.
 
 **The amended story.** "Coding agents in the Whole disk view" says of DDC-003's "Harness data rules": "not a dependency in either direction", and `ContractTests.agentsCallers` forbids a destructive call in the section's files. This story amends the first; the section itself stays non-destructive, because the delete happens in Review.
 
@@ -97,4 +99,4 @@ The Cursor desktop app's caches under `~/Library/Application Support/Cursor` are
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

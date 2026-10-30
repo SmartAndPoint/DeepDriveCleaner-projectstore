@@ -2,16 +2,19 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-30T06:48:53.059Z
+generated_at: 2026-10-30T15:32:23.318Z
 
 ---
 
 ## Backlog
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
-- [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group|DDC-002: Review window: coding agents' data as a group]] #p2
-- [ ] [[epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change|DDC-002: Review window: sort a group's rows by name, size or last change]] #p2
+- [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
+- [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
+- [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
+- [ ] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2
+- [ ] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
@@ -20,12 +23,7 @@ generated_at: 2026-10-30T06:48:53.059Z
 - [ ] [[epics/DDC-006/stories/story-code-shape-conventions-and-the-checkers-design|DDC-006: Code shape conventions and the checker's design]] #p2
 - [ ] [[epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries|DDC-006: ddc-shape: a syn-based checker for size, nesting, cohesion and boundaries]] #p2
 - [ ] [[epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app|DDC-006: SwiftLint with the same limits for the app]] #p3
-- [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-linux-scanner-and-rule-catalog|DDC-007: Linux scanner and rule catalog]] #p2
-- [ ] [[epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module|DDC-007: Move OS calls behind the platform module]] #p1
-- [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
-- [ ] [[epics/DDC-007/stories/story-platform-seam-adr-and-capability-model|DDC-007: Platform seam: ADR and capability model]] #p2
-- [ ] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2
 - [ ] [[epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary|DDC-007: Windows install: PowerShell script, winget and a signed binary]] #p2
 - [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
 
@@ -47,12 +45,13 @@ generated_at: 2026-10-30T06:48:53.059Z
 - [ ] [[epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash|DDC-002: User data: pick your own files for the Trash]] #p2
 - [ ] [[epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus|DDC-002: HIG pass: keyboard, colour, empty states and menus]] #p2
 - [ ] [[epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group|DDC-002: Review window: clean only the selection in this group]] #p2
-- [ ] [[epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view|DDC-002: Coding agents in the Whole disk view]] #p2
-- [ ] [[epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates|DDC-002: Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates]] #p1
-- [ ] [[epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row|DDC-002: Whole disk: Show in Finder and the honest action for each row]] #p2
+- [ ] [[epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection|DDC-002: Protected by you: say what it is, and Remove Protection]] #p2
+- [ ] [[epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change|DDC-002: Review window: sort a group's rows by name, size or last change]] #p2
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
-- [ ] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
+- [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
+- [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
+- [ ] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2
 
 ## Review
 
@@ -70,6 +69,7 @@ generated_at: 2026-10-30T06:48:53.059Z
 - [x] [[epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision|DDC-002: CLI: shared settings, types and the notify decision]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-settings-folders-types-notifications|DDC-002: Settings: folders, types, notifications]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs|DDC-002: Faster clean: re-check only what the selection needs]] #p2 #done
+- [x] [[epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view|DDC-002: Coding agents in the Whole disk view]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings|DDC-002: Popover: the Next scan line opens the Schedule settings]] #p3 #done
 - [x] [[epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected|DDC-002: Review window: after a clean, only skips that can clear stay selected]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped|DDC-002: Review window: Clean is not offered when every item would be skipped]] #p1 #done
@@ -81,11 +81,18 @@ generated_at: 2026-10-30T06:48:53.059Z
 - [x] [[epics/DDC-002/stories/story-whole-disk-in-the-app|DDC-002: Whole disk in the app]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder|DDC-002: Whole disk: what lies outside the home folder]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder|DDC-002: Review window: say when the saved scan is not of the home folder]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates|DDC-002: Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda|DDC-002: Whole disk: Conda environments and its package cache, with conda]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-whole-disk-homebrew-packages-their-sizes-and-brew-uninstall|DDC-002: Whole disk: Homebrew packages, their sizes, and brew uninstall]] #p2 #done
-- [x] [[epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust|DDC-005: Gate by what changed: load at night, one gate per release, app-only pushes skip Rust]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row|DDC-002: Whole disk: Show in Finder and the honest action for each row]] #p2 #done
+- [x] [[epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that|DDC-002: Review window: Deselect All, then pick across groups and clean only that]] #p2 #done
+- [x] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1 #done
+- [x] [[epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust|DDC-005: Gate by what changed: load at night, one gate per release, app-only pushes skip Rust]] #p1 #done
+- [x] [[epics/DDC-005/stories/story-main-only-through-pull-requests-in-the-code-and-the-vault|DDC-005: Main only through pull requests, in the code and the vault]] #p1 #done
+- [x] [[epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module|DDC-007: Move OS calls behind the platform module]] #p1 #done
+- [x] [[epics/DDC-007/stories/story-platform-seam-adr-and-capability-model|DDC-007: Platform seam: ADR and capability model]] #p2 #done
 
 
 
