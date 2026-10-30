@@ -3,17 +3,17 @@ type: story
 id: "story-coding-agents-in-the-whole-disk-view"
 epic: "DDC-002"
 title: "Coding agents in the Whole disk view"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-30
 external_refs: {}
 tags: [cli, app, agents, whole-disk]
 code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/platform/macos/procs.rs", "crates/ddc-core/src/disk/visitor.rs", "crates/ddc-core/src/disk/mod.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/tests/agents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/mod.rs", "crates/ddc-cli/src/cmd/disk_agents.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/tests/disk_agents_cli.rs", "crates/ddc-cli/tests/readme_cli.rs", "crates/ddc-cli/tests/structure.rs", "docs/agents.schema.json", "README.md", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsReport.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsSummary.swift", "app/Packages/DDCKit/Sources/DDCKit/AgentsModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/AgentsTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CLIRunnerTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/agents-report.json", "app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/agents-fast.json", "app/DeepDriveCleaner/AgentsSection.swift", "app/DeepDriveCleaner/DiskView.swift", "app/DeepDriveCleaner/DiskWindowController.swift", "app/DeepDriveCleaner/AppDelegate.swift"]
 specs: []
 started_at: "2026-10-28T14:35:35.291Z"
-closed_at: null
+closed_at: "2026-10-30T14:28:50.924Z"
 plan_updated_at: "2026-10-28T14:35:35.291Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-28T14:35:35.291Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -61,7 +61,6 @@ It takes no lock.
 
 ## Decomposition
 
-Rough until the plan gate.
 
 - [x] **Amendment to the menu bar ADR, "Menu bar app: Swift shell over the ddc CLI"**, before any code. — done: vault commit dc92fc1 (ADR §1 lane rule, §6.10)
   - **§1, the lane rule** (amends the 2026-10-28 amendment for `disk`). A kind that takes no lock and writes nothing another command reads runs beside the queue. Each such kind has one running process at a time, and kinds never wait for each other. Today these kinds are `disk` and `disk agents`. A whole-disk walk of several minutes must not hold up a session list.
@@ -92,7 +91,7 @@ Rough until the plan gate.
   - An empty `sessions/` folder is readable with no sessions: Claude Code removes records on exit. `records: unknown` is for a missing folder, or for candidate records none of which parses.
   - Records are parsed key by key from a JSON map, with a size cap, and only files named `<digits>.json` are read. The per-session key files are named `<pid>.<hex>.key`.
   - An npm-installed Claude Code runs as `node` and does not show under `running`; its sessions are still found from the records.
-- [x] **Liveness, Codex.** A thread is open when any process of the current user holds `thread-writer-locks/<id>.lock` open. — done: `agents/codex.rs`, `sys/procs.rs::open_vnodes`
+- [x] **Liveness, Codex.** A thread is open when any process of the current user holds `thread-writer-locks/<id>.lock` open. — done: `agents/codex.rs`, `sys/procs.rs::open_vnodes` (now `platform/macos/procs.rs`)
   - `sys::procs` gains `open_vnodes(pid)`, which returns `(dev, ino, path)` for each open file from the fd's vnode info (`PROC_PIDFDVNODEPATHINFO`, `vst_dev` and `vst_ino`). It is called per pid, because the process snapshot leaves the open files of the caller's children empty.
   - Only the lock files in `thread-writer-locks/` are ever `stat`ed, to get their `(dev, ino)`; no open path of any process is `stat`ed, since a file in a protected folder could make macOS ask.
   - Only names of the form `<thread-id>.lock` count; `.coordination.lock` and other hidden files are ignored.
@@ -161,11 +160,22 @@ From the planner's pass (2026-10-28), in this order:
 - [x] `ContractTests`: the app runs `disk agents` only from the Whole disk view; `ScheduledWork` and `PopoverModel` never run it; nothing in the section sends a destructive command. — evidence: `ContractTests.agentsCallers`, `ContractTests.agentsContracts`
 
 **Manual (owner)**
-- [ ] On the reference machine, with a few Claude Code and Codex sessions open, the section lists them as live with their project folders. After a session is closed, Refresh no longer lists it, and the count of remaining transcripts rises by one.
-- [ ] The harness sizes in the section are within 5 % of `du -sk` on the same folders.
-- [ ] `ddc disk agents --json` finishes in under 10 s on the reference machine, and `ddc disk agents --json --no-sizes` in under 1 s. Record the time and the entry count in the Final Summary; the research note measured 5.1 s for about 124,000 entries without the Claude desktop folder.
+- [ ] On the reference machine, with a few Claude Code and Codex sessions open, the section lists them as live with their project folders. After a session is closed, Refresh no longer lists it, and the count of remaining transcripts rises by one. — moved to the runbook "Owner checks: manual acceptance across stories"
+- [ ] The harness sizes in the section are within 5 % of `du -sk` on the same folders. — moved to the runbook "Owner checks: manual acceptance across stories"
+- [ ] `ddc disk agents --json` finishes in under 10 s on the reference machine, and `ddc disk agents --json --no-sizes` in under 1 s. Record the time and the entry count in the Final Summary; the research note measured 5.1 s for about 124,000 entries without the Claude desktop folder. — moved to the runbook "Owner checks: manual acceptance across stories"
 
 ## Final Summary
+
+**What changed.** `ddc disk agents [--json] [--no-sizes]` reports the coding-agent harnesses on the Mac (Claude Code, Codex, Cursor, opencode) from one table, `agents::HARNESSES`: what of each runs, its folders with allocated sizes, its live sessions and the transcripts no live session writes. Liveness is read again on each run, never stored. For Claude Code it comes from the session records against the process table, with the reused-pid and resumed-session cases. For Codex it comes from the thread lock files held open, read from the fd vnode info with no `flock` and no `stat` of an open path. The command is read-only, takes no lock and honours `skips`. The menu bar ADR was amended first (§1's lane rule, §6.10). The Whole disk view shows a Coding agents section under the area rows, fed by a fast `--no-sizes` run and then a sized one in their own lane. A failed run keeps the area rows. The README describes the command and says its output shows project folders and session names. Show in Finder on a folder or a harness came later, with story "Whole disk: Show in Finder and the honest action for each row" (PR #5).
+
+**Why.** The owner asked, on artboard 13 of the design canvas, for the Whole disk view to single out what the harnesses keep (about 11 GB on the reference machine, shown until then only inside "Rest of the home folder") and to say which session is still live. The section is an overview; deleting belongs to story "Review window: coding agents' data as a group".
+
+**Tests executed.** Every automated criterion is backed by the tests named beside it: `crates/ddc-core/tests/agents.rs`, `crates/ddc-cli/tests/disk_agents_cli.rs`, the unit tests in `agents/`, `CLIRunnerTests` and the DDCKit `Agents*` suites, plus `ContractTests.agentsCallers` and `agentsContracts`. The last Gate that ran the Rust jobs on main was 41065887647 (72c3765), and Gate 41068463547 (`app`, 385 tests) covers the app side. The reviewer re-ran the DDCKit suites on 2026-10-30: 59 tests in 6 suites passed.
+
+**Risks and follow-ups.**
+- The three manual criteria need the reference machine and the real HOME, which no agent may read. They are in the runbook "Owner checks: manual acceptance across stories", and the timing check says where to record its numbers.
+- The harnesses' record formats are other programs' internals. A changed format reads as `records: unknown`, never as "every session is stale".
+- No load profile covers `disk agents`, so its timing is only measured by hand.
 
 ## Technical Notes
 
@@ -195,4 +205,4 @@ From the planner's pass (2026-10-28), in this order:
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-30*
