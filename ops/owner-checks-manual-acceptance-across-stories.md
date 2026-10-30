@@ -153,6 +153,21 @@ Story: [Whole disk: what lies outside the home folder](../epics/DDC-002/stories/
 
 - [ ] Manual (owner): on the reference machine, `ddc disk` finishes in under 3 minutes. Each named area that is not partial is within 5% of a `du -skx` of the same paths taken the same day, less the `du` of the areas nested in it; a partial area is at most its `du`; and "not counted" is within 10 GB of the Data volume's consumed bytes minus everything counted.
 
+### Coding agents in the Whole disk view (DDC-002)
+
+Story: [Coding agents in the Whole disk view](../epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md)
+
+- [ ] Manual (owner): on the reference machine, with a few Claude Code and Codex sessions open, the section lists them as live with their project folders. After a session is closed, Refresh no longer lists it, and the count of remaining transcripts rises by one.
+- [ ] Manual (owner): the harness sizes in the section are within 5 % of `du -sk` on the same folders.
+- [ ] Manual (owner): `ddc disk agents --json` finishes in under 10 s on the reference machine, and `ddc disk agents --json --no-sizes` in under 1 s. Write the two times and the entry count on this line when ticking it; the research note measured 5.1 s for about 124,000 entries without the Claude desktop folder.
+
+### Whole disk: Show in Finder and the honest action for each row (DDC-002)
+
+Story: [Whole disk: Show in Finder and the honest action for each row](../epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md)
+
+- [ ] Manual (owner): on the Whole disk view, each row's button or its absence matches the story's table; Show in Finder opens the right folder at its usual path, not under `/System/Volumes/Data`.
+- [ ] Manual (owner): in the Coding Agents section, Show in Finder on a harness and on a project folder visibly selects it, including a hidden folder such as `~/.claude` while Finder hides hidden files. If nothing is visibly selected, open a bug story.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
