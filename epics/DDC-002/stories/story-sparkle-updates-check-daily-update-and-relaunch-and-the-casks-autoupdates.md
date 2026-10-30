@@ -3,17 +3,17 @@ type: story
 id: "story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates"
 epic: "DDC-002"
 title: "Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-29
+updated: 2026-10-30
 external_refs: {}
 tags: [app, updates, sparkle, homebrew, distribution, signing, network, adr-amendment]
-code_refs: []
+code_refs: ["app/DeepDriveCleaner.xcodeproj/project.pbxproj", "app/DeepDriveCleaner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/GeneralSettingsView.swift", "app/DeepDriveCleaner/Info.plist", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/SparkleUpdater.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/DeepDriveCleaner/UpdateLineView.swift", "app/DeepDriveCleaner/UpdaterSettings.swift", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/LaunchMode.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/RunnerActivity.swift", "app/Packages/DDCKit/Sources/DDCKit/ScheduledWork.swift", "app/Packages/DDCKit/Sources/DDCKit/UpdateFlow.swift", "app/Packages/DDCKit/Sources/DDCKit/UpdateModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/LaunchModeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReviewSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RunnerActivityTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ScheduledScanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/UpdateFlowTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/UpdateModelTests.swift", "Makefile", "packaging/homebrew/deepdrivecleaner.rb.tmpl", "packaging/sparkle/appcast.xml.tmpl", "README.md", "scripts/build-app.sh", "scripts/build-dist.sh", "scripts/check-build-number.sh", "scripts/check-signatures.sh", "scripts/debug-feed.sh", "scripts/publish-release.sh", "scripts/render-appcast.sh", "scripts/tests/test_appcast.py", "scripts/tests/test_build_number.py", "scripts/tests/test_cask.py", "scripts/tests/test_debug_feed.py", "scripts/tests/test_signing_check.py"]
 specs: []
 started_at: "2026-10-29T15:26:21.323Z"
-closed_at: null
+closed_at: "2026-10-30T07:25:02.515Z"
 plan_updated_at: "2026-10-29T15:26:21.323Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-29T15:26:21.323Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -45,27 +45,27 @@ The story has two parts that can ship in one release: the release tooling (key, 
 
 **Release tooling**
 
-- [ ] The owner runs `generate_keys` once and exports an offline backup (`generate_keys -x`). The public key goes into Info.plist as `SUPublicEDKey`.
-- [ ] Add Sparkle 2 to the app target as a Swift package, pinned to an exact version. Info.plist: `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks` YES, `SUScheduledCheckInterval` 86400, `SUAutomaticallyUpdate` NO, `SUAllowsAutomaticUpdates` NO, `SUVerifyUpdateBeforeExtraction` NO (the default, kept explicit).
-- [ ] `build-app.sh`: delete the framework's XPC services; sign `Autoupdate`, `Updater.app`, then `Sparkle.framework` with the Developer ID, hardened runtime and timestamp, keeping Sparkle's identifiers; then the CLI and the app as today.
-- [ ] `build-app.sh`: a check that every Mach-O file in the bundle carries the expected team and the hardened runtime flag; `make dist` fails otherwise. Zip with `ditto -c -k --sequesterRsrc --keepParent`.
-- [ ] `build-app.sh --dist`: refuse unless `CURRENT_PROJECT_VERSION` is greater than the one in `project.pbxproj` at the last release tag.
-- [ ] `packaging/sparkle/appcast.xml.tmpl` (the root declares the `sparkle` and `ddc` namespaces) and a render step: a script `publish-release.sh` calls, with the `sign_update` path injectable for the test.
-- [ ] `publish-release.sh`, before the release exists: run `sign_update`, render the appcast, check it with `xmllint --noout`, refuse a `CFBundleVersion` that is not greater than the previous appcast's, refuse a team change unless `--team-change` (which renders `informationalUpdate`). Pass `appcast.xml` to `gh release create` as a third asset. Upload a missing appcast on the resume and "tap current" paths. `--dry-run` prints the rendered appcast.
-- [ ] `publish-release.sh`, after the tap write: fetch the live `releases/latest/download/appcast.xml`, check it with `xmllint`, and compare its `sparkle:version` and `edSignature` with the rendered file; fail with a message on a mismatch. This runs only in the release script.
-- [ ] Cask template: `auto_updates true`; `zap trash:` adds `~/Library/Caches/com.smartandpoint.deepdrivecleaner` and `~/Library/HTTPStorages/com.smartandpoint.deepdrivecleaner` in alphabetical order (paths confirmed on a built app).
-- [ ] An ops note for the first real pair of Sparkle releases: the first ships the updater and is reached through `brew upgrade` or by hand; the second is the first update through Sparkle, checked on a Homebrew copy and a hand-dragged copy; what to do if the live-feed check fails.
+- [x] The owner runs `generate_keys` once and exports an offline backup (`generate_keys -x`). The public key goes into Info.plist as `SUPublicEDKey`. — evidence: `SUPublicEDKey` in `app/DeepDriveCleaner/Info.plist:39` (4784317); the offline backup is the owner's check
+- [x] Add Sparkle 2 to the app target as a Swift package, pinned to an exact version. Info.plist: `SUFeedURL`, `SUPublicEDKey`, `SUEnableAutomaticChecks` YES, `SUScheduledCheckInterval` 86400, `SUAutomaticallyUpdate` NO, `SUAllowsAutomaticUpdates` NO, `SUVerifyUpdateBeforeExtraction` NO (the default, kept explicit). — evidence: caa8ce0, c1ae725; Sparkle 2.10.1 exact in `Package.resolved`; Info.plist keys
+- [x] `build-app.sh`: delete the framework's XPC services; sign `Autoupdate`, `Updater.app`, then `Sparkle.framework` with the Developer ID, hardened runtime and timestamp, keeping Sparkle's identifiers; then the CLI and the app as today. — evidence: c1ae725; signed `make app`: "5 Mach-O files signed by team … with the hardened runtime"
+- [x] `build-app.sh`: a check that every Mach-O file in the bundle carries the expected team and the hardened runtime flag; `make dist` fails otherwise. Zip with `ditto -c -k --sequesterRsrc --keepParent`. — evidence: 97f595b, `scripts/check-signatures.sh`, `scripts/tests/test_signing_check.py`
+- [x] `build-app.sh --dist`: refuse unless `CURRENT_PROJECT_VERSION` is greater than the one in `project.pbxproj` at the last release tag. — evidence: 0238e11, `scripts/check-build-number.sh` called from `build-app.sh:65` and `build-dist.sh:45`
+- [x] `packaging/sparkle/appcast.xml.tmpl` (the root declares the `sparkle` and `ddc` namespaces) and a render step: a script `publish-release.sh` calls, with the `sign_update` path injectable for the test. — evidence: b9cb548, `scripts/render-appcast.sh`, `scripts/tests/test_appcast.py`
+- [x] `publish-release.sh`, before the release exists: run `sign_update`, render the appcast, check it with `xmllint --noout`, refuse a `CFBundleVersion` that is not greater than the previous appcast's, refuse a team change unless `--team-change` (which renders `informationalUpdate`). Pass `appcast.xml` to `gh release create` as a third asset. Upload a missing appcast on the resume and "tap current" paths. `--dry-run` prints the rendered appcast. — evidence: ffbddd4, 9f95dff (team from the zip)
+- [x] `publish-release.sh`, after the tap write: fetch the live `releases/latest/download/appcast.xml`, check it with `xmllint`, and compare its `sparkle:version` and `edSignature` with the rendered file; fail with a message on a mismatch. This runs only in the release script. — evidence: ffbddd4; `check_live_feed` retries 6 times, 10 s apart (9f95dff)
+- [x] Cask template: `auto_updates true`; `zap trash:` adds `~/Library/Caches/com.smartandpoint.deepdrivecleaner` and `~/Library/HTTPStorages/com.smartandpoint.deepdrivecleaner` in alphabetical order (paths confirmed on a built app). — evidence: ffbddd4, `scripts/tests/test_cask.py`
+- [x] An ops note for the first real pair of Sparkle releases: the first ships the updater and is reached through `brew upgrade` or by hand; the second is the first update through Sparkle, checked on a Homebrew copy and a hand-dragged copy; what to do if the live-feed check fails. — evidence: vault runbook "First Sparkle releases: shipping the updater, then proving it" (3d7985b)
 
 **App integration**
 
-- [ ] DDCKit: `UpdateFlow`, the pure state machine of the ADR's §4. "Busy" comes from `CLIRunner`'s state only; there is no data-dir lock probe.
-- [ ] DDCKit: `ScheduledWork.tick` (`ScheduledWork.swift:85`) starts no scan while an install waits.
-- [ ] DDCKit: `LaunchMode` reports when the updater may start (the first `showStatusItem`), so the gating is tested where `LaunchMode` is.
-- [ ] App: `SparkleUpdater.swift`, the `SPUUserDriver` and `SPUUpdaterDelegate` adapter. Found → record and Dismiss; press → user-initiated check, then Install with no second press; information only → never Install; `shouldPostponeRelaunchForUpdate` holds while the runner has work and resumes when it is idle. `userAgentString` = `DeepDriveCleaner`.
-- [ ] App: the Debug-only feed override, under `#if DEBUG`: `feedURLStringForUpdater` returns `http://127.0.0.1:<port>/appcast.xml`, with an App Transport Security exception for that host in the Debug build only, and a hand-rendered appcast and test zip to serve. Debug builds never read the production feed.
-- [ ] App: the popover line ("Version X is available", notes link, **Update and Relaunch**, progress, "Waiting for the scan to finish", errors), Scan Now and the clean and free buttons disabled while an install waits, and the Settings (General) rows: the switch bound to `automaticallyChecksForUpdates`, the last check time, **Check Now**, and "Updates are unavailable in this build" when `SPUUpdater.start()` throws.
-- [ ] `AppDelegate`: create the updater at launch, start it on the first `showStatusItem` effect, on the main thread, and handle a thrown start as above.
-- [ ] README: a "Network" section (GitHub sees the IP address, the time, the `User-Agent` `DeepDriveCleaner` with no version, and the system language through `Accept-Language`; the release's download counter for `appcast.xml` gives the maintainers a total count only; system profiling is off; one request at the first launch of the first Sparkle release, then at most daily; the Settings switch is the opt-out). The Install text says the app updates itself and that CLI-only Homebrew users run `brew upgrade --greedy deepdrivecleaner`; the Full Disk Access text mentions Sparkle updates next to `brew upgrade`; rollback is `brew reinstall` or an older release page.
+- [x] DDCKit: `UpdateFlow`, the pure state machine of the ADR's §4. "Busy" comes from `CLIRunner`'s state only; there is no data-dir lock probe. — evidence: 8f4df6d, 9f95dff; busy from `RunnerActivity` (430b989)
+- [x] DDCKit: `ScheduledWork.tick` (`ScheduledWork.swift:85`) starts no scan while an install waits. — evidence: 2e2145e
+- [x] DDCKit: `LaunchMode` reports when the updater may start (the first `showStatusItem`), so the gating is tested where `LaunchMode` is. — evidence: 2e2145e, `LaunchModeTests`
+- [x] App: `SparkleUpdater.swift`, the `SPUUserDriver` and `SPUUpdaterDelegate` adapter. Found → record and Dismiss; press → user-initiated check, then Install with no second press; information only → never Install; `shouldPostponeRelaunchForUpdate` holds while the runner has work and resumes when it is idle. `userAgentString` = `DeepDriveCleaner`. — evidence: df5017a, 9f95dff
+- [x] App: the Debug-only feed override, under `#if DEBUG`: `feedURLStringForUpdater` returns `http://127.0.0.1:<port>/appcast.xml`, with an App Transport Security exception for that host in the Debug build only, and a hand-rendered appcast and test zip to serve. Debug builds never read the production feed. — evidence: df5017a, `scripts/debug-feed.sh`, `scripts/tests/test_debug_feed.py`
+- [x] App: the popover line ("Version X is available", notes link, **Update and Relaunch**, progress, "Waiting for the scan to finish", errors), Scan Now and the clean and free buttons disabled while an install waits, and the Settings (General) rows: the switch bound to `automaticallyChecksForUpdates`, the last check time, **Check Now**, and "Updates are unavailable in this build" when `SPUUpdater.start()` throws. — evidence: 70a7838; Check Now enabled only at rest (9f95dff)
+- [x] `AppDelegate`: create the updater at launch, start it on the first `showStatusItem` effect, on the main thread, and handle a thrown start as above. — evidence: 2e2145e, df5017a
+- [x] README: a "Network" section (GitHub sees the IP address, the time, the `User-Agent` `DeepDriveCleaner` with no version, and the system language through `Accept-Language`; the release's download counter for `appcast.xml` gives the maintainers a total count only; system profiling is off; one request at the first launch of the first Sparkle release, then at most daily; the Settings switch is the opt-out). The Install text says the app updates itself and that CLI-only Homebrew users run `brew upgrade --greedy deepdrivecleaner`; the Full Disk Access text mentions Sparkle updates next to `brew upgrade`; rollback is `brew reinstall` or an older release page. — evidence: 4478e83, b8a4d38 (plain `brew upgrade` upgrades a cask that is behind; `--greedy` only with `HOMEBREW_NO_UPGRADE_AUTO_UPDATES_CASKS`)
 
 ## Implementation Plan
 
@@ -92,24 +92,32 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 
 ## Acceptance Criteria
 
-- [ ] Test (app): `UpdateFlow`: a found item becomes "available" and is replied Dismiss; a press while idle leads to Install on the next found reply and on ready-to-install, with no second press; a press while the runner has work installs nothing until it is idle; an information-only item is never answered Install; an error returns to "available" with the release link; a start that throws gives "unavailable".
-- [ ] Test (app): postponing: with the runner busy, the postpone decision is "hold"; when the runner becomes idle, the stored handler is called exactly once.
-- [ ] Test (app): "waiting for idle" followed by "app quits" ends in "installing on quit": no relaunch is asked for and the handler is not called twice.
-- [ ] Test (app): `ScheduledWork.tick` starts no scan while an install waits, and starts one again after.
-- [ ] Test (app): launch-mode gating: a `--scheduled` launch that finishes its work never reaches "start updater"; a `--scheduled` launch promoted by reopen, activate or a notification response reaches it once; a normal launch reaches it once.
-- [ ] Test (app): the found version kept in `UserDefaults` is cleared when the running `CFBundleVersion` reaches or exceeds it.
-- [ ] Test (app): a Release build never reads the Debug feed override (the override is compiled out, and the feed is `SUFeedURL`).
-- [ ] Test (script): the appcast render, with a fake `sign_update` that prints a fixed `sparkle:edSignature="…" length="…"`, produces XML that passes `xmllint --noout`, in which `xmllint --xpath` finds `enclosure/@sparkle:edSignature`, with the version, short version, `minimumSystemVersion` `26.0.0`, the versioned enclosure URL, length, the full release notes link and the `ddc:team` element; it refuses a `CFBundleVersion` not greater than the previous appcast's; it refuses a team change without `--team-change` and renders `informationalUpdate` with it. No network.
-- [ ] Test (build): the per-binary signing check fails on a fixture bundle signed ad hoc (`codesign -s -`) inside `Sparkle.framework`; this runs anywhere, in `make app-test`. The pass case runs on a Developer ID build in `make dist`.
-- [ ] Test (build): `build-app.sh --dist` refuses a `CURRENT_PROJECT_VERSION` not greater than the last tag's.
-- [ ] Test (build): the rendered cask contains `auto_updates true` and the two `zap` paths in alphabetical order, and passes `ruby -c` and `brew style` (the existing publish checks).
-- [ ] Manual (owner): `generate_keys` run once, the public key in Info.plist, the private key backed up offline and in no file of the repository or the vault.
-- [ ] Manual (owner): on a Debug build against a local feed, **Update and Relaunch** updates a copy installed with the Homebrew cask layout and a hand-dragged copy; after each, the app relaunches at the same path, Full Disk Access still holds, the scheduler agent is registered again, Login Items still lists the app (the login item is not re-registered; it survives because `SMAppService.mainApp` is keyed to the bundle at the same path), and `ddc --version` prints the new version.
-- [ ] Manual (owner): during a running scan, **Update and Relaunch** is disabled; a postponed install proceeds after the scan ends. A `ddc scan` started from Terminal during the install finishes normally.
-- [ ] Manual (owner): on the first launch of the first Sparkle release, exactly one request is made; with the Settings switch off, no request is made for a day (Little Snitch, `nettop`, or the app log); **Check Now** makes one.
-- [ ] Manual (owner): a Homebrew copy one release behind is updated by a plain `brew upgrade`; after a Sparkle update `brew upgrade` leaves the app alone, `brew upgrade --greedy deepdrivecleaner` reinstalls cleanly, and `brew uninstall --cask deepdrivecleaner` removes the app and both links.
+- [x] Test (app): `UpdateFlow`: a found item becomes "available" and is replied Dismiss; a press while idle leads to Install on the next found reply and on ready-to-install, with no second press; a press while the runner has work installs nothing until it is idle; an information-only item is never answered Install; an error returns to "available" with the release link; a start that throws gives "unavailable". — evidence: `app/Packages/DDCKit/Tests/DDCKitTests/UpdateFlowTests.swift`: aFoundItemBecomesAvailableAndIsDismissed, onePressInstallsOnTheFoundReplyAndOnReadyToInstall, aPressWhileTheRunnerHasWorkInstallsNothingUntilItIsIdle, anInformationOnlyItemIsNeverInstalled, anErrorAfterAPressReturnsToAvailableWithTheReleaseLink, aStartThatThrowsGivesUnavailable
+- [x] Test (app): postponing: with the runner busy, the postpone decision is "hold"; when the runner becomes idle, the stored handler is called exactly once. — evidence: UpdateFlowTests.theHeldRelaunchResumesOnceWhenTheRunnerIsIdle, UpdateModelTests.withTheRunnerBusyTheRelaunchIsHeldAndResumesOnce
+- [x] Test (app): "waiting for idle" followed by "app quits" ends in "installing on quit": no relaunch is asked for and the handler is not called twice. — evidence: UpdateFlowTests.aQuitWhileWaitingEndsInInstallingOnQuit, UpdateModelTests.aQuitWhileWaitingDropsTheHandler
+- [x] Test (app): `ScheduledWork.tick` starts no scan while an install waits, and starts one again after. — evidence: ScheduledScanTests "a tick starts no scan while an update's install waits, and scans again after"
+- [x] Test (app): launch-mode gating: a `--scheduled` launch that finishes its work never reaches "start updater"; a `--scheduled` launch promoted by reopen, activate or a notification response reaches it once; a normal launch reaches it once. — evidence: LaunchModeTests: "a --scheduled launch that finishes its work never starts the updater", "… promoted by a user's event starts the updater once", "a normal launch starts the updater once, after the status item"
+- [x] Test (app): the found version kept in `UserDefaults` is cleared when the running `CFBundleVersion` reaches or exceeds it. — evidence: UpdateModelTests.theKeptUpdateIsClearedWhenTheRunningBuildReachesIt, theKeptUpdateIsComparedAsANumber
+- [x] Test (app): a Release build never reads the Debug feed override (the override is compiled out, and the feed is `SUFeedURL`). — evidence: the override is under `#if DEBUG` (`SparkleUpdater.swift:58-63`); `scripts/build-app.sh:162-170` fails a Release binary that names 127.0.0.1 and a Debug one that does not; Release and Debug xcodebuild green 2026-10-30
+- [x] Test (script): the appcast render, with a fake `sign_update` that prints a fixed `sparkle:edSignature="…" length="…"`, produces XML that passes `xmllint --noout`, in which `xmllint --xpath` finds `enclosure/@sparkle:edSignature`, with the version, short version, `minimumSystemVersion` `26.0.0`, the versioned enclosure URL, length, the full release notes link and the `ddc:team` element; it refuses a `CFBundleVersion` not greater than the previous appcast's; it refuses a team change without `--team-change` and renders `informationalUpdate` with it. No network. — evidence: `scripts/tests/test_appcast.py`: test_renders_one_signed_item_that_xmllint_accepts, test_refuses_a_version_not_greater_than_the_previous_one, test_refuses_a_team_change_without_the_flag, test_a_team_change_renders_information_only_with_no_enclosure
+- [x] Test (build): the per-binary signing check fails on a fixture bundle signed ad hoc (`codesign -s -`) inside `Sparkle.framework`; this runs anywhere, in `make app-test`. The pass case runs on a Developer ID build in `make dist`. — evidence: `scripts/tests/test_signing_check.py` test_fails_on_one_file_signed_ad_hoc_inside_the_framework; pass case on the Developer ID `make app` 2026-10-30
+- [x] Test (build): `build-app.sh --dist` refuses a `CURRENT_PROJECT_VERSION` not greater than the last tag's. — evidence: `scripts/tests/test_build_number.py` test_refuses_a_build_number_equal_to_or_below_the_last_tag
+- [x] Test (build): the rendered cask contains `auto_updates true` and the two `zap` paths in alphabetical order, and passes `ruby -c` and `brew style` (the existing publish checks). — evidence: `scripts/tests/test_cask.py`: test_zap_trashes_sparkles_cache_and_http_storage_in_alphabetical_order, test_the_rendered_cask_is_valid_ruby, test_the_rendered_cask_passes_brew_style (with `DDC_TEST_BREW_STYLE=1`)
+- Manual checks (5) moved to [Owner checks: manual acceptance across stories](../../../ops/owner-checks-manual-acceptance-across-stories.md) on 2026-10-30, by the owner's decision.
 
 ## Final Summary
+
+**What changed.** The app updates itself through Sparkle 2.10.1 next to the Homebrew cask. A custom `SPUUserDriver` drives the popover's update line through the pure `UpdateFlow` state machine in DDCKit: a found update is recorded and dismissed, **Update and Relaunch** checks and installs with one press, an information-only item (a team change) never installs, and Sparkle's postpone question holds the relaunch while the runner has work, from any path into it. Scheduled scans and the clean and free buttons wait while an install runs. Settings → General has the daily-check switch, the last check time and **Check Now** (enabled only when the line is at rest). The release builds sign Sparkle's binaries, check every Mach-O file for the team and the hardened runtime, refuse a build number that does not grow, render and sign `appcast.xml`, attach it to the release, and read the live feed back. The cask says `auto_updates true` and zaps Sparkle's cache and HTTP storage. The README has a Network section.
+
+**Why.** The owner wanted updates in the app that still work with Homebrew. A plain `brew upgrade` upgrades the cask while the app is behind the tap and leaves it alone after a Sparkle update.
+
+**Tests executed (2026-10-30, at b8a4d38; on main through the merge e3f7eb9).** `swift test` in DDCKit: 378 tests in 41 suites passed. Script tests: 31 run, OK, 2 skipped (`brew style` is opt-in). `xcodebuild` Debug and Release unsigned: no errors. Signed Debug `make app`: valid, "5 Mach-O files signed by team … with the hardened runtime". The reviewer's findings F1–F3, N1, N2, N4, N5 and O1 were fixed in 9f95dff; the push ran `make gate`. The merge e3f7eb9 fits the appcast into the tag-first release flow: `appcast.xml` is a release asset beside `SHA256SUMS`, not in it, and a pre-release carries none.
+
+**Risks and follow-ups.**
+- The update path is first exercised by the release after 0.8.0; the runbook "First Sparkle releases: shipping the updater, then proving it" covers it.
+- The KVO of `canCheckForUpdates` and the Debug-feed end-to-end run are the owner's manual checks.
+- A postpone question after a quit is ignored on purpose: Sparkle finishes that install without a relaunch.
+- `CURRENT_PROJECT_VERSION` must be raised in every release commit.
 
 ## Technical Notes
 
@@ -134,4 +142,4 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*

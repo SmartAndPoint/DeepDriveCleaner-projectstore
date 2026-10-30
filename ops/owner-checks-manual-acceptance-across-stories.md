@@ -85,6 +85,18 @@ Story: [Settings: folders, types, notifications](../epics/DDC-002/stories/story-
   - a "Not readable" row opens Files and Folders.
 - [ ] Manual check: Open at login reflects System Settings.
 
+### Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates (DDC-002)
+
+Story: [Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates](../epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md)
+
+See also the runbook [First Sparkle releases: shipping the updater, then proving it](./first-sparkle-releases-shipping-the-updater-then-proving-it.md).
+
+- [ ] Manual (owner): `generate_keys` run once, the public key in Info.plist, the private key backed up offline and in no file of the repository or the vault.
+- [ ] Manual (owner): on a Debug build against a local feed, **Update and Relaunch** updates a copy installed with the Homebrew cask layout and a hand-dragged copy; after each, the app relaunches at the same path, Full Disk Access still holds, the scheduler agent is registered again, Login Items still lists the app (the login item is not re-registered; it survives because `SMAppService.mainApp` is keyed to the bundle at the same path), and `ddc --version` prints the new version.
+- [ ] Manual (owner): during a running scan, **Update and Relaunch** is disabled; a postponed install proceeds after the scan ends. A `ddc scan` started from Terminal during the install finishes normally.
+- [ ] Manual (owner): on the first launch of the first Sparkle release, exactly one request is made; with the Settings switch off, no request is made for a day (Little Snitch, `nettop`, or the app log); **Check Now** makes one.
+- [ ] Manual (owner): a Homebrew copy one release behind is updated by a plain `brew upgrade`; after a Sparkle update `brew upgrade` leaves the app alone, `brew upgrade --greedy deepdrivecleaner` reinstalls cleanly, and `brew uninstall --cask deepdrivecleaner` removes the app and both links.
+
 ### The Trash: its own row, not Your data (DDC-002)
 
 Story: [The Trash: its own row, not Your data](../epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md)

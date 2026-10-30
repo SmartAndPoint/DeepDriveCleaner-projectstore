@@ -24,18 +24,15 @@ The release that first carries Sparkle (0.8.0) cannot update itself into existen
 
 ### 1. The first Sparkle release (0.8.0)
 
-Run the release as always, unsandboxed, from a fresh clone (the keychain is read by notarytool, `generate_keys -p` and `sign_update`):
+Run the release as always, in the tag-first order: `make tag` on `main` at `origin/main` with a green Gate, wait for `release.yml` on the tag, then, unsandboxed, from a fresh clone (the keychain is read by notarytool, `generate_keys -p` and `sign_update`):
 
 ```bash
 git clone https://github.com/SmartAndPoint/DeepDriveCleaner.git <scratch>/pub-080
 cd <scratch>/pub-080 && set -a && . <code repo>/.env && set +a
-make tag    # publish waits for release.yml when targets are enabled
 make dist && ./scripts/publish-release.sh --dry-run && ./scripts/publish-release.sh
 ```
 
-The tag comes first: `make dist` refuses until origin holds `v0.8.0` at `HEAD` (runbook [[ops/cutting-a-release-tag-ci-archives-dist-and-publish|Cutting a release: tag, CI archives, dist and publish]]).
-
-`publish-release.sh` signs the zip with `sign_update`, renders `appcast.xml`, attaches it to the release with the zip and the tarball, writes the tap's cask, then fetches the live feed and compares its version and signature. There is no previous appcast for this first release, so the build-number guard against the feed has nothing to compare; `check-build-number.sh` still compares against the last tag.
+`publish-release.sh` signs the zip with `sign_update`, renders `appcast.xml`, attaches it to the release with the zip, the tarball and `SHA256SUMS` (the appcast is not in `SHA256SUMS`; a pre-release carries no appcast), writes the tap's cask, then fetches the live feed and compares its version and signature. There is no previous appcast for this first release, so the build-number guard against the feed has nothing to compare; `check-build-number.sh` still compares against the last tag.
 
 Copies on 0.7.0 reach 0.8.0 the old way: `brew upgrade` (current Homebrew upgrades an `auto_updates` cask whose bundle is older than the tap), or a download from the release page.
 
