@@ -10,7 +10,7 @@ created: 2026-10-17
 updated: 2026-10-17
 external_refs: {}
 tags: [rust, scanner]
-code_refs: ["Cargo.toml", "rust-toolchain.toml", "clippy.toml", "rustfmt.toml", "Makefile", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/env.rs", "crates/ddc-core/src/sys/", "crates/ddc-core/src/scan/", "crates/ddc-core/tests/scanner.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/cmd/du.rs", "crates/ddc-cli/src/cmd/diag.rs", "crates/ddc-cli/tests/du_cli.rs", "crates/ddc-cli/tests/diag_cli.rs", "bench/"]
+code_refs: ["Cargo.toml", "rust-toolchain.toml", "clippy.toml", "rustfmt.toml", "Makefile", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/env.rs", "crates/ddc-core/src/platform/macos/", "crates/ddc-core/src/scan/", "crates/ddc-core/tests/scanner.rs", "crates/ddc-cli/src/main.rs", "crates/ddc-cli/src/cmd/du.rs", "crates/ddc-cli/src/cmd/diag.rs", "crates/ddc-cli/tests/du_cli.rs", "crates/ddc-cli/tests/diag_cli.rs", "bench/"]
 specs: []
 started_at: "2026-10-17T09:24:26.866Z"
 closed_at: "2026-10-17T10:03:12.674Z"

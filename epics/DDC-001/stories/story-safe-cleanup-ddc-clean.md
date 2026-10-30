@@ -10,7 +10,7 @@ created: 2026-10-17
 updated: 2026-10-18
 external_refs: {}
 tags: [cli, cleanup, safety]
-code_refs: ["crates/ddc-core/src/plan.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-core/src/sys/fsops.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/tests/clean_cli.rs", "bench/make_baseline.py"]
+code_refs: ["crates/ddc-core/src/plan.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/platform/macos/procs.rs", "crates/ddc-core/src/platform/macos/fsops.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/catalog.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/tests/clean_cli.rs", "bench/make_baseline.py"]
 specs: []
 started_at: "2026-10-17T10:16:47.568Z"
 closed_at: "2026-10-18T06:36:35.298Z"

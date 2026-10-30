@@ -10,7 +10,7 @@ created: 2026-10-28
 updated: 2026-10-28
 external_refs: {}
 tags: [rust, testing, performance, load]
-code_refs: [".config/nextest.toml", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Cargo.toml", "Makefile", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/src/sys/procs.rs", "crates/ddc-loadgen/**", "scripts/load-image.sh"]
+code_refs: [".config/nextest.toml", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", "Cargo.toml", "Makefile", "bench/golden/**", "crates/ddc-cli/Cargo.toml", "crates/ddc-cli/tests/golden_cli.rs", "crates/ddc-core/src/platform/macos/procs.rs", "crates/ddc-loadgen/**", "scripts/load-image.sh"]
 specs: []
 started_at: 2026-10-28
 closed_at: "2026-10-28T20:28:41.935Z"
