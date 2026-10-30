@@ -168,9 +168,9 @@ Story "Whole disk: free the checked areas in one sheet" (p3) says only runtimes 
 
 ## Open questions for the owner
 
-1. Remove Protection in two steps (protection gone, the app rescans, then clean in its own group), or one flow that also cleans under the underlying rule? The second uses the rule that story 5 adds to the report, and works only where there is one.
-2. Coding agents: rebase and amend DDC-003's ADR, or a narrow DDC-002 amendment now?
-3. Stale-session transcripts: report only (DDC-003 as written), or to the Trash after a liveness check?
+1. Remove Protection in two steps (protection gone, the app rescans, then clean in its own group), or one flow that also cleans under the underlying rule? The second uses the rule that story 5 adds to the report, and works only where there is one. **Answered 2026-10-30: two steps** (recorded in story "Protected by you: say what it is, and Remove Protection" and the safety ADR's amendment of that story).
+2. Coding agents: rebase and amend DDC-003's ADR, or a narrow DDC-002 amendment now? **Answered 2026-10-30: rebase and amend DDC-003** (recorded in story "Review window: coding agents' data as a group", Decomposition; the DDC-003 ADR amendment follows).
+3. Stale-session transcripts: report only (DDC-003 as written), or to the Trash after a liveness check? **Answered 2026-10-30: review, to the Trash after a liveness check**, moved only when a person cleans it in the Review window (recorded in the same story).
 
 ## References
 
@@ -183,4 +183,4 @@ Story "Whole disk: free the checked areas in one sheet" (p3) says only runtimes 
 
 ---
 
-*Last updated: 2026-10-29*
+*Last updated: 2026-10-30*
