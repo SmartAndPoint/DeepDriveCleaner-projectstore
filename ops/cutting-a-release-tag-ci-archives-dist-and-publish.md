@@ -15,7 +15,8 @@ tags: [release, ci, build, tag, ddc-007]
 Use this runbook to publish a DeepDriveCleaner release. One release holds:
 - the macOS CLI tarball and the app zip, built, signed and notarized on the owner's Mac;
 - the Linux and Windows archives that `release.yml` builds on the tag, once their targets are enabled;
-- `SHA256SUMS` over all of them.
+- `SHA256SUMS` over all of them;
+- `appcast.xml`, Sparkle's signed update feed. `SHA256SUMS` does not cover it, and a pre-release has none.
 
 The release starts with a tag, and the tag comes first. `make dist` and `publish-release.sh` both refuse until origin holds the tag at the commit they build.
 
@@ -30,8 +31,9 @@ The flow comes from story "Build matrix: every target built, tested and packaged
 - [ ] An unsandboxed shell. `notarytool` reads the keychain, which the sandbox blocks.
 - [ ] A fresh clone of `main`, or the main clone with a clean tree. Untracked files count as dirty.
 - [ ] `.env` with the signing identity and the notary profile, loaded into the shell (`set -a && . <code repo>/.env && set +a`).
-- [ ] `gh` authenticated, plus `jq` and `python3`, and the Xcode and Homebrew that previous releases used (`build-app.sh`; `ruby -c` and `brew style` in publish).
-- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, they are equal, and `docs/releases/<version>.md` exists. All three are pushed to `main`.
+- [ ] `gh` authenticated, plus `jq`, `xmllint` and `python3`, and the Xcode and Homebrew that previous releases used (`build-app.sh`; `ruby -c` and `brew style` in publish).
+- [ ] Sparkle's tools under `build/DerivedData` of this clone (`make dist` resolves them; publish names the `xcodebuild -resolvePackageDependencies` command when they are missing), and the EdDSA key in the login keychain: `sign_update` signs the appcast with it.
+- [ ] The version is bumped in `Cargo.toml` and in the app's `MARKETING_VERSION`, and they are equal. `CURRENT_PROJECT_VERSION` (the app's build number, equal in Debug and Release) is above the previous release's: Sparkle compares build numbers, not versions. A pre-release tag counts too, so a release after `0.8.0-rc.1` needs a build number above the rc's. `docs/releases/<version>.md` exists. All of it is pushed to `main`.
 
 ## Steps
 
@@ -46,7 +48,8 @@ make tag
 - `HEAD` equals `origin/main` after a fetch;
 - the Gate run for `HEAD` is green (`scripts/ci-green.sh` waits for it if it is still running);
 - the Cargo version equals `MARKETING_VERSION`, and the release notes exist;
-- `v<version>` exists neither locally nor on origin.
+- `v<version>` exists neither locally nor on origin;
+- `CURRENT_PROJECT_VERSION` is above the one at the highest earlier release tag (`scripts/check-build-number.sh`). A release sorts above its own pre-release: `v0.8.0` is above `v0.8.0-rc.1`.
 
 It then creates the annotated tag `v<version>` at `HEAD` and pushes it. If the push fails, it removes the local tag, so a rerun starts clean.
 
@@ -78,7 +81,7 @@ make dist
 
 - `make dist` first runs `scripts/require-tag.sh`: origin must hold `v<version>` at `HEAD`, so the commonest mistake costs seconds, not a whole gate.
 - Then `ci-green`, the full `gate` and `app-test` run.
-- Then `build-dist.sh` builds, signs and notarizes the CLI tarball, and `build-app.sh --dist` does the same for the app zip.
+- Then `build-dist.sh` builds, signs and notarizes the CLI tarball, and `build-app.sh --dist` does the same for the app zip. Each first runs `scripts/check-build-number.sh` again. It compares against the highest release tag that does not contain `HEAD`, so the tag step 1 pushed does not count.
 
 ### 4. Publish
 
@@ -87,7 +90,7 @@ make dist
 ./scripts/publish-release.sh
 ```
 
-A pre-release (a version such as `0.8.0-rc.1`, in `Cargo.toml` and `MARKETING_VERSION`) takes the same steps. It is how the build matrix story's stage-3 criteria are exercised.
+A pre-release (a version with a suffix such as `0.8.0-rc.1`, in `Cargo.toml` and `MARKETING_VERSION`) takes the same steps, with the differences noted below. It is how the build matrix story's stage-3 criteria are exercised.
 
 `publish-release.sh`:
 1. Requires the tag on origin at `HEAD`.
@@ -98,17 +101,21 @@ A pre-release (a version such as `0.8.0-rc.1`, in `Cargo.toml` and `MARKETING_VE
    - checks each archive's listing;
    - runs `gh attestation verify` with the repository, the signer workflow and the tag commit.
 4. Writes `SHA256SUMS`: one line per asset, `<64 hex>  <name>`, sorted by name with `LC_ALL=C`, with no entry for itself. It checks the file with `shasum -a 256 -c`.
-5. Runs `gh release create v<version> --verify-tag` with every asset, then compares each uploaded asset's digest.
-6. Writes the tap's cask. A pre-release (a version with a suffix such as `0.8.0-rc.1`) is published as a pre-release and stops before the cask and the tap.
+5. Renders the appcast and signs it with `sign_update`. It checks the keychain's public key against the app's `SUPublicEDKey`, and the appcast's build against the zip's. When the newest earlier release has an appcast, it also refuses a build number that is not above that release's, and a different signing team. `--team-change` publishes a team change as information only: a link, never an install (ADR "Updates through Sparkle, alongside the Homebrew cask", §6).
+6. Runs `gh release create v<version> --verify-tag` with every asset and the appcast, then compares each uploaded asset's digest.
+7. Writes the tap's cask, then reads the live feed (`releases/latest/download/appcast.xml`) until it offers this build with this signature.
 
-The dry run lists every asset and `SHA256SUMS`, and stops before anything is written.
+A pre-release skips item 5: no appcast is rendered, and Sparkle never offers it. It is published as a pre-release and stops before the cask and the tap.
+
+The dry run lists every asset and `SHA256SUMS`, plus the cask and the appcast for a release. It stops before anything is published, but it does render and sign the appcast, so the keychain may ask for the EdDSA key (not for a pre-release).
 
 ## Verification
 
-- [ ] `gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner` lists the tarball, the zip, every enabled CI archive and `SHA256SUMS`.
+- [ ] `gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner` lists the tarball, the zip, every enabled CI archive, `SHA256SUMS` and, unless it is a pre-release, `appcast.xml`.
 - [ ] In an empty folder, `gh release download v<version> --repo SmartAndPoint/DeepDriveCleaner && shasum -a 256 -c SHA256SUMS` reports every asset OK.
 - [ ] For each CI archive: `gh attestation verify <archive> --repo SmartAndPoint/DeepDriveCleaner` passes.
 - [ ] `brew update && brew info --cask smartandpoint/tap/deepdrivecleaner` shows the new version (not for a pre-release).
+- [ ] `curl -fsSL https://github.com/SmartAndPoint/DeepDriveCleaner/releases/latest/download/appcast.xml | xmllint --xpath "string(//*[local-name()='version'])" -` prints the app's `CURRENT_PROJECT_VERSION` (not for a pre-release). The runbook "First Sparkle releases: shipping the updater, then proving it" checks the update in the app itself.
 
 ## Rollback
 
@@ -124,10 +131,11 @@ It must print `release not found`. A draft counts as a release: delete the draft
 
 - **release.yml failed, or the fix needs a commit:** after the check above, fix it on `main`. Then delete the tag on origin (`git push origin :refs/tags/v<version>`) and locally (`git tag -d v<version>`), and run `make tag` again. Bumping the version also works. While targets are enabled, publish refuses a red run.
 - **make dist or publish failed for an outside reason** (credentials, network, Apple's notary service): fix it and rerun. The tag stays, as long as nothing was committed.
-- **The release exists but publish stopped later** (for example at the tap): first run `gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner --json isDraft`. If it is published, rerun `publish-release.sh`. It resumes at the cask with the release's own assets after checking their digests, and never rebuilds them. Resume has three conditions:
+- **The release exists but publish stopped later** (for example at the tap): first run `gh release view v<version> --repo SmartAndPoint/DeepDriveCleaner --json isDraft`. If it is published, rerun `publish-release.sh`. It resumes at the cask with the release's own assets after checking their digests, and never rebuilds them. A release without its appcast gets one uploaded. Resume has three conditions:
   - `HEAD` descends from the tag;
-  - only `packaging/homebrew/` or `scripts/publish-release.sh` changed since the tag;
+  - only the cask and feed files changed since the tag: `packaging/homebrew/`, `packaging/sparkle/`, `scripts/publish-release.sh`, `scripts/render-appcast.sh` or `scripts/tests/`;
   - the release holds `SHA256SUMS`, so resume works only for releases published by this flow.
+- **Publish stopped at the live feed:** the cask is already written. Rerun; it reads the feed again, which covers GitHub's CDN lag. If the feed still offers another build, check that `v<version>` is GitHub's latest release: Sparkle offers whatever `releases/latest` points at.
 - **A draft release was left behind:** `publish-release.sh` refuses any draft, complete or not. Delete it and keep the tag: `gh release delete v<version> --repo SmartAndPoint/DeepDriveCleaner --yes`. Then rerun.
 
 ## Common Issues
@@ -136,20 +144,29 @@ It must print `release not found`. A draft counts as a release: delete the draft
 |---|---|---|
 | `origin has no tag v<version>: run 'make tag' first` | `make dist` before `make tag` | Run step 1 |
 | `tag v<version> on origin points at <sha>, not HEAD` | This clone is behind, or a commit landed after the tag | `git pull` if behind. A checkout of the tag cannot be published (publish needs `HEAD` = `origin/main`). Otherwise bump the version, or, after the no-release check, delete the tag and tag again |
-| `tag v<version> exists here: remove it with 'git tag -d …'` | A local tag left from an earlier attempt | `git tag -d v<version>` once origin's tag is gone |
+| `tag v<version> exists here: remove it with 'git tag -d …'` | A local tag left from an earlier attempt, or fetched by `make dist` (its build-number check fetches tags) | If origin still holds it: the no-release check, then delete it there, or bump the version if a release exists (Rollback). Then `git tag -d v<version>` |
 | `tag v<version> exists on origin: bump the version, or …` | Rerunning `make tag` after a failed `release.yml` | Run the no-release check, delete the tag on origin, rerun |
 | `release v<version> is a draft: …` | `gh release create` was stopped before it published | Delete the draft, keep the tag, rerun |
-| `since v<version>, files outside the cask changed: …` | Resuming after a commit that touched more than the cask | Bump the version |
+| `since v<version>, files outside the cask changed: …` | Resuming after a commit that touched more than the cask or feed files | Bump the version |
 | `HEAD is not origin/main` | Unpushed or unpulled commits | Push or pull, then rerun |
 | `the app's MARKETING_VERSION (…) is not the CLI's version (…)` | Only one of them was bumped | Bump both, push, rerun |
 | `release.yml holds no single RELEASE_TARGETS line` | `release.yml` was edited by hand | Restore the single `  RELEASE_TARGETS: '<json>'` line |
 | `release v<version> is published but holds no SHA256SUMS` | Resuming a release made before this flow | Fix the cask by hand for that release |
+| `CURRENT_PROJECT_VERSION is N, not greater than M at v<…>` | The app's build number was not bumped | Raise it in Debug and Release, push, rerun. From `make tag` this costs nothing. From `make dist`, the tag is already out: run the no-release check, delete the tag, then tag again |
+| `Sparkle's sign_update is missing from …` | Publish runs in a clone where `make dist` did not run, or after `build/` was removed | Run the `xcodebuild -resolvePackageDependencies` command the message names |
+| `generate_keys -p failed: is the EdDSA key in the login keychain?` | A sandboxed shell, or the key is not in this Mac's keychain | Run unsandboxed on the owner's Mac |
+| `the keychain's EdDSA public key (…) is not the app's SUPublicEDKey (…)` | The keychain holds another key than the one the app ships | Stop: Sparkle would reject the update. Find the right key; never change `SUPublicEDKey` to match |
+| `CFBundleVersion N is not greater than the previous release's M` | The build number is not above the newest release's appcast | Raise `CURRENT_PROJECT_VERSION`, then as for the `CURRENT_PROJECT_VERSION is N, not greater than M` row |
+| `the app is signed by team …, the previous release by …` | The signing team changed | See ADR "Updates through Sparkle, alongside the Homebrew cask", §6, before using `--team-change` |
+| `the app's SUFeedURL is …, not …` | The app's `Info.plist` names another feed | Fix `SUFeedURL`, which needs a commit (first Rollback bullet) |
+| `the live feed … offers build '…', not …` | CDN lag, or this release is not GitHub's latest | Rerun; see the live-feed bullet under Rollback |
 
 ## References
 
 - Story "Build matrix: every target built, tested and packaged from one tag" (epic DDC-007).
-- `Makefile`, the comment above `tag:`; `scripts/tag-release.sh`, `scripts/require-tag.sh`, `scripts/build-dist.sh`, `scripts/publish-release.sh`, `.github/workflows/release.yml`.
+- `Makefile`, the comment above `tag:`; `scripts/tag-release.sh`, `scripts/require-tag.sh`, `scripts/check-build-number.sh`, `scripts/build-dist.sh`, `scripts/publish-release.sh`, `scripts/render-appcast.sh`, `.github/workflows/release.yml`.
 - Runbook "First Sparkle releases: shipping the updater, then proving it", whose release step now starts with `make tag`.
+- ADR "Updates through Sparkle, alongside the Homebrew cask", §6: why the release becomes latest with its feed already in place.
 
 ---
 
