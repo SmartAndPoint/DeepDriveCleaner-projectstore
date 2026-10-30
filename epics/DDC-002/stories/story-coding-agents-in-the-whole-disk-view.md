@@ -195,9 +195,8 @@ From the planner's pass (2026-10-28), in this order:
 - "Whole disk: what lies outside the home folder" (DDC-002): the size-only visitor.
 - The research note [[research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session|Coding-agent harnesses on macOS: where their data lives and how to tell a live session]].
 - "Harness data rules" (DDC-003): the cleaning side.
-  - It is not a dependency in either direction.
-  - Its path list differs from the research note in `.codex/log`, `.cache/opencode`, `.config/opencode` and the Claude desktop folder.
-  - When that branch is next touched, its plan gate should take the paths from `agents::HARNESSES`.
+  - It is not a dependency in either direction. Amended 2026-10-31 by story "Review window: coding agents' data as a group" (DDC-002): the cleaning side now exists, and this section links to it. It shows the Coding agents group's total from the last scan's findings and a Review… link that opens that group in the Review window. The section itself still removes nothing (`ContractTests.agentsCallers`).
+  - Its path list differs from the research note in `.codex/log` (rules only), `.config/opencode` and the Claude desktop folder (note only); `.cache/opencode` joined the rules on 2026-10-30. Settled 2026-10-31: `agents::HARNESSES` was not adopted; the paths were confirmed on the reference machine (ADR "Agent footprint: worktrees, harness data and bounded consent for agents" §3, "Settled at the plan gate").
 
 ## Attachments
 
