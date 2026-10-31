@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-31
 external_refs: {}
 tags: [rust, windows, scanner, rules, safety]
 code_refs: []
@@ -91,7 +91,11 @@ As for Linux, a research note comes first: where dev disk space goes on Windows,
   - Fixtures that make symlinks skip without the privilege (`common::try_symlink`): `disk_free.rs` `last_disk_*` and `settings.rs`. `there_is_no_yes` (`disk_free_cli.rs`) failed on Windows on its fixture's symlink too, and skips through `unsupported()`.
   - `no_system_process_owns_a_cache` reads the live process table, which is unported, and checks `/System`, `/usr` and app-bundle paths. It needs a Windows meaning, or a reason to stay macOS-only. On a developer machine that takes Developer Mode; the CI runner (`windows-2025`) has no such privilege.
   - The native job's Tests step sets `TMP` and `TEMP` to `runner.temp`. Under bash the temp folder lies inside `HOME`, and the test trees' guard refuses that.
-- There is no local Windows machine. Two options: a Windows VM, or a separate session on a Windows machine working from this vault through PRs. The owner picks when this story starts.
+- **Iterate on the owner's Windows machine, not through CI rounds** (the owner, 2026-10-31). `DDC_WINDOWS_HOST=<alias> scripts/native-windows.sh` runs the Gate's Windows leg there in minutes. It runs clippy, nextest with profile `ci`, the doc tests and `scripts/native-skips.sh windows`, for `x86_64-pc-windows-msvc` as the CI job does. With filter arguments it runs only the matching tests. Its runs on `main` at 0.13.1 matched CI: every test passed, and the skips equalled `.config/native-skips/windows.txt`. Each step's pull request is pushed after a green whole native run, and CI's `check-x86_64-pc-windows-msvc` is the last check. Setup, the one-folder rule and failures are in runbook "Native runs: the Linux and Windows legs on the owner's machines".
+  - The machine is private. Nothing that describes it goes into this vault or the code repository: no host, address, user, OS build, hardware or run times. The research note's numbers likewise state findings about the tools, not about the machine.
+  - Everything there stays inside `ddc-native` in its home. Measuring a real home for the research note reads outside that folder, and a scan or clean of the real home writes outside it. Both need the owner's go-ahead first. Until then, tests use the folder's own home.
+  - `native-windows.sh` points `HOME`, `USERPROFILE`, `HOMEDRIVE` and `HOMEPATH`, `APPDATA` and `LOCALAPPDATA` into the folder. The "Home and paths" and "Data and logs" items must take the home and the data folder from these variables. If one uses an API that ignores them, such as the known-folder lookup, a test run there writes into the owner's real profile, and no test catches it. `crates/ddc-cli/tests/structure.rs` already confines reading `HOME`, `USERPROFILE`, `HOMEDRIVE`, `HOMEPATH` and `LOCALAPPDATA` to the platform's `folders` code. `APPDATA` is not on that list yet.
+  - OpenSSH gives an administrator's session an elevated token, as CI's runner has, so an elevated run has the symlink privilege. A test of what an unelevated person meets needs an unelevated run, and this setup does not give one.
 
 ## Dependencies
 
@@ -104,4 +108,4 @@ As for Linux, a research note comes first: where dev disk space goes on Windows,
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-31*

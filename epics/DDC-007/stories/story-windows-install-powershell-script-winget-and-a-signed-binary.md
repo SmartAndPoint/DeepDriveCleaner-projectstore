@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-28
+updated: 2026-10-31
 external_refs: {}
 tags: [distribution, install, windows, signing, adr]
 code_refs: []
@@ -87,6 +87,7 @@ Signing belongs to the owner, as it does on macOS.
 
 ## Technical Notes
 
+- The owner's Windows machine (2026-10-31) builds and tests the code through `scripts/native-windows.sh`. See runbook "Native runs: the Linux and Windows legs on the owner's machines". It is not an install test bed: an install, winget or Smart App Control check writes outside its `ddc-native` folder, and the owner allows nothing there. The research note's checks run on a clean VM or Windows Sandbox, or on that machine only with the owner's go-ahead for that run. The machine is private: nothing that describes it goes into the note.
 - `irm | iex` runs the script text without saving a file, so the execution policy does not apply to the script itself. The downloaded `.exe` is a different matter, which is why the binary's signature decides the result.
 
 ## Dependencies
@@ -101,4 +102,4 @@ Signing belongs to the owner, as it does on macOS.
 
 ---
 
-*Last updated: 2026-10-28*
+*Last updated: 2026-10-31*
