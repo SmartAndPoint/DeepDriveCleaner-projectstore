@@ -84,6 +84,8 @@ Amended 2026-10-30, story "Move OS calls behind the platform module" (epic DDC-0
 - The list of what appears only inside them widens to `libc::`, `rustix::`, `windows_sys::`, `windows::` and `std::os::` (any submodule, including `std::os::macos` and `std::os::fd`), and to every `cfg`, `cfg!` and `cfg_attr` on `target_os`, `target_family`, `unix` or `windows`.
 - `unsafe_code` is allowed in `platform/macos/` and in the shared `platform/op_stats.rs` (the allocation counter), not in `platform/mod.rs`, `types.rs` or the stubs.
 
+Amended 2026-10-31, story "Linux scanner and rule catalog" (epic DDC-007): `platform/linux.rs` becomes the folder `platform/linux/`, and `unsafe_code` is also allowed there, for the calls `rustix` does not wrap (`wait4` with its resource usage, signal handlers), each block with a `// SAFETY:` comment.
+
 ### 3. Capabilities
 
 `Capability` is a closed enum, kebab-case in JSON, in this declaration order:
@@ -102,6 +104,7 @@ Amended 2026-10-30, story "Move OS calls behind the platform module" (epic DDC-0
 | `notifications` | The background scan notifies (`osascript`) | `scan --background` decides but does not show anything; `--notify json` still prints the decision |
 
 - **Per platform.** macOS declares all ten. Linux and Windows are decided by their catalog stories. The expectation is `in-use-check` on Linux (`/proc`), and on Windows whatever its research note supports. `coding-agents` and `homebrew` are separate from `whole-disk` because they do not depend on APFS, Time Machine or simulators: Linux can declare them without the whole-disk report.
+- **Linux** (amended 2026-10-31, story "Linux scanner and rule catalog"): declares `in-use-check` only, with the limits the safety ADR's 2026-10-31 amendment names. The other nine follow their "when absent" column.
 - **`disk free` is gated per action.** Each action needs the capability in the table. A list that names an action whose capability is absent is refused whole, with `capability-absent` naming that capability (§7). At the terminal, `free::available` offers only the actions whose capability is declared. The command itself is refused only when neither `whole-disk` nor `homebrew` is declared.
 - **Where `capability-absent` is checked.** The dispatcher refuses whole commands (`disk`, `disk agents`, `disk brew-packages`, `schedule`). The per-action check for `disk free` lives in the core (`free::run`, `free::dry_run`, `free::available`), so the terminal prompt and the app's list agree. `disk::Sources` (the tool paths: `diskutil`, `tmutil`, `simctl`, `brew`) is macOS-shaped today; each OS module provides its own, so Linux can name Linuxbrew without the others.
 - **A Windows check that answers only sometimes** (the Restart Manager) is declared and reports "unknown" per item, or is not declared. The Windows story picks one; it is never probed per run (next bullet).
