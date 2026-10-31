@@ -1,7 +1,7 @@
 ---
 type: story
 id: "story-dev-challenge-entry-ghostbusters-for-coding-agents"
-epic: "DDC-003"
+epic: "DDC-009"
 title: "DEV challenge entry: Ghostbusters for coding agents"
 status: in-progress
 priority: p1
@@ -21,7 +21,7 @@ plan_updated_at: null
 
 | Field | Value |
 |---|---|
-| **Epic** | [DDC-003](../epic.md) |
+| **Epic** | [DDC-009](../epic.md) |
 | **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
@@ -30,7 +30,7 @@ plan_updated_at: null
 
 ## Description
 
-The owner enters DeepDriveCleaner in the DEV "Hacktoberfest Open Source AI Challenge: Ghost in the Machine" (2026-10-31). Submissions close on 2026-10-31 at 23:59 PDT. The pitch is "Ghostbusters for coding agents". AI coding agents leave ghosts on the disk:
+The owner enters DeepDriveCleaner in the DEV "Hacktoberfest Open-Source AI Challenge Week 4: Ghost in the Machine" (2026-10-31). Submissions close on 2026-10-31 at 23:59 PDT. The pitch is "Ghostbusters for coding agents". AI coding agents leave ghosts on the disk:
 - transcripts of sessions nobody will reopen;
 - abandoned worktrees with their own `node_modules` and `target`;
 - downloaded runtimes and caches.
@@ -56,7 +56,8 @@ Facts the post must keep straight:
 
 - [x] Read the challenge rules and the submission template (2026-10-31).
 - [x] A demo home folder with synthetic agent data, and `ddc disk agents` output from it.
-- [ ] The post draft, in English, following the template:
+- [x] The post draft v1 and v2 (2026-10-31): v2 carries the owner's real numbers as totals only, with no project names or session ids, the `/private/tmp` finding, and links to ProjectStore.
+- [ ] Post v3 in two variants, "released" and "not released" (the default), ready early on the morning before the deadline, following the template:
   - What I Built;
   - Demo;
   - Code;
@@ -64,13 +65,18 @@ Facts the post must keep straight:
   - Why Does Open Innovation Matter?;
   - The Spirit of It.
 - [ ] The owner reviews the post, decides the licence wording, adds screenshots or a short screen recording of the app, and publishes it from their DEV account before the deadline.
-- [ ] Follow-up, if the owner wants it after the challenge: a story for the agent-facing interface (a skill or an MCP server over `ddc --json`).
+- [ ] Before publication, every number and date is re-checked against `git log`, the releases and the vault. A feature that is not released is worded as "next".
+- [ ] Tags: `devchallenge` and `hf26challenge` (both required by the template), plus two of `opensource`, `ai`, `rust`, `macos`. The cover image from story "Launch demo assets".
+- [ ] "My Agent Session": a public link, the vault PR of this epic with the critic's review folded in. No transcript is uploaded, and no third-party session recorder is used.
+- [ ] "Prize Categories": removed (D2: overall only), unless the owner decides otherwise.
+- [ ] The "How I Built It" section names the open-source pieces: Codex CLI and ProjectStore.
+- [ ] The owner's checklist, with minute budgets: D1, D2, screenshots, storefront approvals, the variant to publish, publication, and the post URL recorded here.
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] The post is published on DEV before 2026-10-31 23:59 PDT, with the challenge tag (manual, owner).
+- [ ] The post is published on DEV before 2026-10-31 23:59 PDT, with the tags `devchallenge` and `hf26challenge`. Evidence: the post URL.
 - [ ] Every number and date in the post matches `git log`, the releases and the vault on the day it is published.
 
 ## Final Summary
@@ -78,10 +84,13 @@ Facts the post must keep straight:
 ## Technical Notes
 
 - Only the owner publishes: the post goes out under their name.
+- The session re-checks the post's numbers just before handing it over; the owner checks them again at publication.
 
 ## Dependencies
 
-- None.
+- Story "Launch demo assets" (the demo block and the cover).
+- Story "Repository storefronts for the launch" (where the links land).
+- DDC-003 story "Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees" (only for the "released" variant).
 
 ## Attachments
 
