@@ -30,7 +30,7 @@ plan_updated_at: "2026-10-20T11:04:49.221Z"
 
 ## Description
 
-DeepDriveCleaner 0.2.0 ships as one cask, `deepdrivecleaner`, with the app and the CLI linked from inside the bundle (ADR "Menu bar app: Swift shell over the ddc CLI", §8). It is signed by the existing team, 8MSDJTBW2D. The 0.1.0 release tooling is extended to a zipped, stapled app, and the reference machine is upgraded from 0.1.0.
+DeepDriveCleaner 0.2.0 ships as one cask, `deepdrivecleaner`, with the app and the CLI linked from inside the bundle (ADR "Menu bar app: Swift shell over the ddc CLI", §8). It is signed by the owner's existing team. The 0.1.0 release tooling is extended to a zipped, stapled app, and the reference machine is upgraded from 0.1.0.
 
 **Scope of 0.2.0 (the owner's decision, 2026-10-20): what is built now.** The menu bar popover, the Review and clean window and picking the user's own files ship. "Settings: folders, types, notifications" and "Background scan and notifications in the app" do not: they ship in 0.3.0. So in 0.2.0:
 - the Settings window holds only Open at login;
