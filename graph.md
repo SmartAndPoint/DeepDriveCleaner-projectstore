@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-30T15:56:47.266Z
+generated_at: 2026-10-31T14:20:20.847Z
 
 ---
 
@@ -32,34 +32,35 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
 | epics/DDC-002/epic.md | Menu bar app | epic | in-progress |
-| epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | in-progress |
+| epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | done |
 | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | parked |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | done |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
-| epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | in-progress |
+| epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | done |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | done |
-| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | in-progress |
+| epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | done |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
-| epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | in-progress |
-| epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | in-progress |
+| epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
+| epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
-| epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | in-progress |
-| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | in-progress |
-| epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | in-progress |
+| epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | done |
+| epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | done |
+| epics/DDC-002/stories/story-review-and-clean-window.md | Review and clean window | story | done |
 | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md | Review window: after a clean, only skips that can clear stay selected | story | done |
 | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md | Review window: Clean is not offered when every item would be skipped | story | done |
-| epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | in-progress |
-| epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md | Review window: coding agents' data as a group | story | planned |
+| epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | Review window: clean only the selection in this group | story | done |
+| epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md | Review window: coding agents' data as a group | story | done |
 | epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that.md | Review window: Deselect All, then pick across groups and clean only that | story | done |
+| epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one.md | Review window: pick a coding agent's sessions one by one | story | done |
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | Review window: say when the saved scan is not of the home folder | story | done |
-| epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | in-progress |
-| epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | in-progress |
+| epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | done |
+| epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | done |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | done |
 | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates | story | done |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | done |
 | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md | User data: move a folder's picked files to the Trash from that folder | story | done |
-| epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | in-progress |
+| epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md | User data: pick your own files for the Trash | story | done |
 | epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md | VM images: Docker prune runs only while Docker Desktop answers | story | done |
 | epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md | Whole disk: Conda environments and its package cache, with conda | story | done |
 | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md | Whole disk: free space with the owning tool | story | done |
@@ -68,11 +69,11 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-in-the-app.md | Whole disk in the app | story | done |
 | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md | Whole disk: Show in Finder and the honest action for each row | story | done |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | done |
-| epics/DDC-003/epic.md | Agent footprint | epic | planned |
+| epics/DDC-003/epic.md | Agent footprint | epic | in-progress |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
-| epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | in-progress |
+| epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | planned |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
@@ -93,15 +94,16 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | SwiftLint with the same limits for the app | story | planned |
 | epics/DDC-007/epic.md | Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers | epic | planned |
 | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | Build matrix: every target built, tested and packaged from one tag | story | in-progress |
-| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | planned |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | in-progress |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | Move OS calls behind the platform module | story | done |
 | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | in-progress |
 | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | Platform seam: ADR and capability model | story | done |
-| epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | in-progress |
+| epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | done |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | Windows install: PowerShell script, winget and a signed binary | story | planned |
 | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |
+| ops/native-runs-the-linux-and-windows-legs-on-the-owners-machines.md | Native runs: the Linux and Windows legs on the owner's machines | runbook | draft |
 | ops/owner-checks-manual-acceptance-across-stories.md | Owner checks: manual acceptance across stories | runbook | draft |
 | ops/profiling-the-core.md | Profiling the core | runbook | draft |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | Coding-agent harnesses on macOS: where their data lives and how to tell a live session | research | final |
@@ -109,6 +111,7 @@ full typed neighborhood, both directions, in one call.
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | Removal wherever a size is shown: coding agents, protected folders and the whole disk | research | final |
 | research/update-check-and-update-in-place.md | Update check and update in place | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
+| research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 
 ## Edges
@@ -125,6 +128,7 @@ full typed neighborhood, both directions, in one call.
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
@@ -206,6 +210,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
@@ -305,6 +310,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | mdlink | epics/DDC-002/epic.md |
@@ -468,6 +474,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/epic.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
@@ -483,18 +490,31 @@ full typed neighborhood, both directions, in one call.
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-and-clean-window.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-after-a-clean-only-skips-that-can-clear-stay-selected.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-clean-is-not-offered-when-every-item-would-be-skipped.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-user-data-move-a-folders-picked-files-to-the-trash-from-that-folder.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-vm-images-docker-prune-runs-only-while-docker-desktop-answers.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-conda-environments-and-its-package-cache-with-conda.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-free-space-with-the-owning-tool.md |
@@ -503,6 +523,8 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-in-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | wikilink | epics/DDC-002/epic.md |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
@@ -519,3 +541,4 @@ full typed neighborhood, both directions, in one call.
 | research/update-check-and-update-in-place.md | wikilink | research/distribution-through-agents.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| research/where-developer-disk-space-goes-linux.md | wikilink | research/where-developer-disk-space-goes-macos.md |
