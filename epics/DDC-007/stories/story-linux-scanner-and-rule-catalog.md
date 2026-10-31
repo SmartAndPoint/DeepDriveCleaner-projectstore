@@ -36,7 +36,7 @@ Before the catalog is written, a research note records where dev disk space goes
 
 ## Decomposition
 
-- [ ] Research note "Where a developer's disk space goes (Linux)". Measure on a real or VM Ubuntu developer setup:
+- [x] Research note [[research/where-developer-disk-space-goes-linux|Where a developer's disk space goes (Linux)]], critic-approved 2026-10-31. Measure on a real or VM Ubuntu developer setup:
   - XDG cache and data (`~/.cache`, `~/.local/share`);
   - per-tool caches (pip, uv, npm, pnpm, yarn, bun, cargo, go, gradle, maven, Hugging Face, JetBrains, VS Code);
   - rootless Docker and Podman storage under `~/.local/share` (VM class: reported, never deleted; root Docker is outside the home);
