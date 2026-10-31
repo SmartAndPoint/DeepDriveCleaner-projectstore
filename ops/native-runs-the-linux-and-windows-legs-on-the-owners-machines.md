@@ -12,14 +12,14 @@ tags: [linux, windows, ci, testing, ddc-007]
 
 ## Purpose
 
-The Gate runs the workspace natively on Linux and Windows in its `check-<target>` jobs. A CI round for one fix takes tens of minutes. The owner has a Linux machine and a Windows machine reachable over ssh, and two scripts run the same leg on them in minutes:
+The Gate runs the workspace natively on Linux and Windows in its `check-<target>` jobs. A CI round for one fix takes tens of minutes. The owner has a Linux machine and two Windows machines reachable over ssh, and two scripts run the same leg on them in minutes:
 
 - `scripts/native-linux.sh` for Linux;
 - `scripts/native-windows.sh` for Windows.
 
 Use them for every Linux or Windows change of epic DDC-007, in particular stories "Linux scanner and rule catalog", "Windows scanner and rule catalog" and "Build matrix: every target built, tested and packaged from one tag". Iterate there, and push once a whole native run is green. CI stays the last check, not the loop: the `check-<target>` jobs remain required on `main`.
 
-**The machines are private.** The code repository and this vault are public, and nothing that describes these machines goes into either. That covers host names, addresses, user names, OS builds, hardware, what else runs on them, and measurements that describe them. It applies to commit messages, pull request bodies and release notes as well. Write "a Linux machine with docker" or "a Windows machine". Counts are fine: tests run, tests skipped, the skip list's length. Anything that describes the machine is not: run times, core counts, disk sizes, its filesystem, its accounts, or what else is installed on it. The scripts take the host only from the environment (`DDC_LINUX_HOST`, `DDC_WINDOWS_HOST`) and have no default. The ssh alias lives only in the developer machine's `~/.ssh/config`.
+**The machines are private.** The code repository and this vault are public, and nothing that describes these machines goes into either. That covers host names, addresses, user names, OS builds, hardware, what else runs on them, and measurements that describe them. It applies to commit messages, pull request bodies and release notes as well. Write "a Linux machine with docker" or "a Windows machine". Counts are fine: tests run, tests skipped, the skip list's length. Anything that describes the machine is not: run times, core counts, disk sizes, its filesystem, its accounts, or what else is installed on it. One carve-out: fixtures this project makes on the lab machine for the scanner may be listed by path relative to the home, and what the scanner finds in them may be reported. What was on the machine before us may not be listed. The scripts take the host only from the environment (`DDC_LINUX_HOST`, `DDC_WINDOWS_HOST`) and have no default. The ssh alias lives only in the developer machine's `~/.ssh/config`.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ Use them for every Linux or Windows change of epic DDC-007, in particular storie
   - docker, with the ssh user in the `docker` group;
   - rustup, with the toolchain of `rust-toolchain.toml` and cargo-nextest at the version `.config/tools.mk` pins, in the user's `~/.rustup` and `~/.cargo/bin`. Nothing checks the nextest version on Linux. After the pin changes, update it by hand: another version can change the log format, and the skip compare reads that log.
   - No sudo and no C compiler on the host are needed: the tests run in `rust:<toolchain>-bookworm`.
-- [ ] **Windows machine**, prepared once by its owner. Copy `scripts/windows-host-setup.ps1` to the machine, open PowerShell as Administrator and run:
+- [ ] **Each Windows machine**, prepared once by its owner. Copy `scripts/windows-host-setup.ps1` to the machine, open PowerShell as Administrator and run:
 
   ```powershell
   Set-ExecutionPolicy -Scope Process Bypass -Force
@@ -87,9 +87,16 @@ With nextest filter arguments, a script runs only the matching tests. It skips c
 
 Push only after a whole native run is green. The CI job on the pull request is the final check.
 
-## The Windows machine: one folder, nothing else
+## The Windows machines: the build in one folder
 
-The owner's rule (2026-10-31): on the Windows machine everything stays inside `ddc-native` in the home. Nothing goes on the machine's PATH or anywhere else.
+The owner sets a rule per Windows machine (2026-10-31):
+
+- **A build machine.** Everything stays inside `ddc-native` in the home. Nothing goes on the machine's PATH or anywhere else.
+- **A lab machine.** The build stays inside `ddc-native` the same way. Outside it, the machine may also hold test projects, tools and environments (Python, Node and the like), so the Windows scanner has a developer's disk to find. Make them with a purpose and keep them in a few known places. The story that made them lists them by path relative to the home, as the carve-out above allows. Use the lab machine for Windows development by default. An install script or winget check of `ddc` there still needs the owner's go-ahead for that run.
+
+Which alias is which machine cannot be written in either repo. It is recorded only on the developer machine, as a comment beside each `Host` in `~/.ssh/config`. Read that comment before any run of `ddc` against a real home.
+
+On both machines the build itself lives here:
 
 | Folder | Holds | Set by |
 |---|---|---|
@@ -105,7 +112,7 @@ OpenSSH gives an administrator's session an elevated token, as CI's runner has. 
 
 `TMP` and `TEMP` sit beside the tests' `HOME`, never inside it, as on the CI runner: the test trees' guard refuses a temp folder inside the home.
 
-Never run `ddc` against that machine's real home. Only `--version`, `--help` and `rules` are allowed until the owner says otherwise. Installing anything else there is the owner's call: that includes an install script under test and a research measurement of the real home.
+On a build machine, never run `ddc` against the real home: only `--version`, `--help` and `rules` are allowed until the owner says otherwise. Installing anything else there is the owner's call. That includes an install script under test and a research measurement of the real home. On a lab machine, scanning and measuring its home are fine. A real clean there needs the owner's go-ahead each time.
 
 ## Verification
 
@@ -121,7 +128,7 @@ Never run `ddc` against that machine's real home. Only `--version`, `--help` and
 
 ## Rollback
 
-The scripts write nothing on the developer machine. To remove everything from the Windows machine:
+The scripts write nothing on the developer machine. On the lab machine, first remove the fixtures the stories list. Then, to remove everything from either Windows machine:
 
 1. Delete `ddc-native`. Settings → Apps may still list a Rustup whose `UninstallString` points into `ddc-native`. If it does, delete `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\Rustup`.
 2. At the machine's own console, not over ssh (this step ends ssh), in PowerShell as administrator:

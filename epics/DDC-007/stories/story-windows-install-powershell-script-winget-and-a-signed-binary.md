@@ -87,7 +87,7 @@ Signing belongs to the owner, as it does on macOS.
 
 ## Technical Notes
 
-- The owner's Windows machine (2026-10-31) builds and tests the code through `scripts/native-windows.sh`. See runbook "Native runs: the Linux and Windows legs on the owner's machines". It is not an install test bed: an install, winget or Smart App Control check writes outside its `ddc-native` folder, and the owner allows nothing there. The research note's checks run on a clean VM or Windows Sandbox, or on that machine only with the owner's go-ahead for that run. The machine is private: nothing that describes it goes into the note.
+- The owner's Windows machines (2026-10-31) build and test the code through `scripts/native-windows.sh`. See runbook "Native runs: the Linux and Windows legs on the owner's machines". The build machine is not an install test bed: the owner allows nothing outside its `ddc-native` folder. An install or winget check of `ddc` may run on the lab machine with the owner's go-ahead for that run; record what it left (a PATH entry, an Apps entry, a winget package) and remove it after. Smart App Control is on only after a clean Windows 11 install, so its check runs in a VM; whether Windows Sandbox has it is unverified. SmartScreen's verdict depends on Mark-of-the-Web and the file's reputation, not on a clean machine. The machines are private: nothing that describes them goes into the note.
 - `irm | iex` runs the script text without saving a file, so the execution policy does not apply to the script itself. The downloaded `.exe` is a different matter, which is why the binary's signature decides the result.
 
 ## Dependencies
