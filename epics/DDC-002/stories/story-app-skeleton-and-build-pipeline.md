@@ -63,7 +63,7 @@ Rough until the plan gate.
   - a reopen or activate event, a further launch (Finder, Spotlight, the login item) or a notification response promotes a `--scheduled` instance to normal: it creates the status item and keeps running, so a scheduled instance never swallows a user launch
 - [x] Login item through `SMAppService.mainApp`; the toggle shows `SMAppService.status` (including `requiresApproval`, with a button that opens Login Items settings), never a stored bool
 - [x] Log file `~/Library/Logs/DeepDriveCleaner/app.log`, next to the CLI's logs
-- [x] `make app`: release-build the CLI, copy it into `Contents/Helpers`, build the app. `make app-dist`: sign the CLI as `com.smartandpoint.deepdrivecleaner.cli`, then the app, notarize, staple, zip, with the `.env` identity, the notary profile and the team of `make dist` (team 8MSDJTBW2D, ADR §8)
+- [x] `make app`: release-build the CLI, copy it into `Contents/Helpers`, build the app. `make app-dist`: sign the CLI as `com.smartandpoint.deepdrivecleaner.cli`, then the app, notarize, staple, zip, with the `.env` identity, the notary profile and the team of `make dist` (ADR §8)
 
 ## Implementation Plan
 
