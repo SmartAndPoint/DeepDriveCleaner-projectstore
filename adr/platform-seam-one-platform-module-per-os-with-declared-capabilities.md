@@ -260,6 +260,13 @@ The rule for choosing between the two mechanisms: a test of something macOS-only
 
 Each prints `skipped <test>: <reason>`. The native jobs run under nextest with passing output shown, and compare those lines with a committed per-OS list (`.config/native-skips/`). A new skip is therefore a reviewed diff, not a silent loss of coverage. The `#[cfg(target_os = "macos")]` rule above stays for tests that are macOS-only by nature.
 
+*Amendment, 2026-10-31 (story "Linux scanner and rule catalog", the flip).* With Linux supported, besides `lacks`, three kinds of test stay skipped there by design, and the skip channels name them:
+- `no_rule(test, id)` in `tests/common`: a test of a rule this platform's catalog does not list (Xcode, the iOS backups, Telegram, the cloud folders, app bundles). `has_rule(id)` lets a test of the shared rules add a platform's own rule to what it checks, without skipping. Tests of shared rules build their fixtures where this platform's catalog looks (`rule_path(id)`), not at macOS paths.
+- `off_macos(test)`, beside the goldens (`golden_cli.rs`) and the pinned trees (`determinism.rs`): they are macOS's recordings, so another platform skips them. Its load trees are built from its own catalog (`ddc_loadgen::fixtures::catalog`), and its load profiles check them against their manifests.
+- More tool helpers of the fourth channel: `user_immutable` (no user-settable immutable flag off macOS), `try_clone_file` (no `cp -c`), and a pseudo-terminal driver per OS.
+
+`no_rule` and `off_macos` join the helpers whose labels the structure test checks. A test of something only one platform has by nature is compiled only there, whichever platform that is: the freedesktop Trash under a temporary `HOME` is tested with `#[cfg(target_os = "linux")]`, as the macOS-only tests are with theirs.
+
 ## Rationale
 
 1. **No layer that buys nothing.** A binary only ever holds one platform. A `cfg`-chosen free function compiles to a direct call, inlinable under thin LTO. A `dyn Platform` would add a second dispatch layer under the walker's existing `DirReader` and `Visitor` ones, and a generic `P: Platform` would spread a type parameter through `scan`, `report`, `exec` and `disk`, both for no gain.
