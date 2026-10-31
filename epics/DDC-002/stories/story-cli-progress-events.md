@@ -3,17 +3,17 @@ type: story
 id: "story-cli-progress-events"
 epic: "DDC-002"
 title: "CLI: progress events"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-25
+updated: 2026-10-31
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [cli, contract, json, ux]
 code_refs: ["README.md", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanProgress.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/Confirmation.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ProgressEvent.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CLIRunnerTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/FakeCLI.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ProgressTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RealCLIDryRunTests.swift", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/cmd/clean.rs", "crates/ddc-cli/src/cmd/clean_items.rs", "crates/ddc-cli/src/cmd/scan.rs", "crates/ddc-cli/src/progress.rs", "crates/ddc-cli/tests/clean_items_cli.rs", "crates/ddc-cli/tests/scan_cli.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/progress.rs", "crates/ddc-core/src/lib.rs", "crates/ddc-core/src/progress.rs", "crates/ddc-core/src/store.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/progress.rs", "docs/progress.schema.json"]
 specs: []
 started_at: "2026-10-24T20:32:04.261Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.358Z"
 plan_updated_at: "2026-10-24T20:32:04.261Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-24T20:32:04.261Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -158,45 +158,66 @@ Each line is one JSON object on stderr with `schema_version: 1` and an `event` f
 
 ## Acceptance Criteria
 
-- [ ] **AC 1. Scan events.** `scan --json --progress json` on a temp tree:
+- [x] **AC 1. Scan events.** `scan --json --progress json` on a temp tree:
   - every stderr line that starts with `{` decodes as `ProgressLine` and encodes back to the same value, and the other lines start with `ddc:`;
   - the staleness test ties `docs/progress.schema.json` to that type;
   - every event is `walk` with step `scan`, and the last one's `files`, `dirs` and `bytes` equal the report's `totals.files`, `totals.dirs` and `totals.scanned_bytes`.
-- [ ] **AC 2. Clean events in order.** `clean --items --json --progress json` over a temp tree emits:
+
+  Evidence: `crates/ddc-cli/tests/scan_cli.rs::a_scan_with_progress_json_emits_walk_ticks_ending_at_the_report_totals` (each event line checked against the progress schema, other lines start with `ddc:`); `crates/ddc-core/tests/progress.rs::committed_progress_schema_is_current`.
+- [x] **AC 2. Clean events in order.** `clean --items --json --progress json` over a temp tree emits:
   - `phase preparing`;
   - `walk recheck`, the last tick with `files` equal to the saved report's `totals.files` and `files_expected` equal to the previous report's;
   - `walk markers`, the last tick with `files` equal to `files_expected`;
   - `phase cleaning`;
-  - one `item` per executed item, `i` going from 1 to `n`, each with `action`, `outcome` (and `reason` when skipped) and `bytes`;
+  - one `item` per executed item, `i` going from 1 to `n`, each with `action`, `outcome` (and `reason` when skipped) and `bytes` (as shipped, no test has a skipped item, so `reason` is not asserted: a follow-up);
   - a final `items` tick with `done` equal to `n` and `bytes_done` equal to `bytes_total`;
   - no `items` tick before `phase cleaning`, and no `walk` tick after it.
-- [ ] **AC 3. The event before the first action.** While a fake tool's command runs, stderr already holds `phase cleaning` and the journal is still empty; then SIGTERM ends the run (CLI test, stderr read on a thread).
-- [ ] **AC 4. Hook order.** A core test with a recording hook and a journal sharing one log shows:
+
+  Evidence: `crates/ddc-cli/tests/clean_items_cli.rs::a_clean_emits_its_phases_walks_and_items_in_order`; `crates/ddc-cli/src/progress.rs::no_items_tick_before_cleaning_and_no_walk_tick_after_it`. `files_expected` of `walk recheck` changed meaning with "Faster clean: re-check only what the selection needs" (DDC-002): it is now the listed findings' files, since the re-check walks only what the selection needs, and the test asserts that. The test does not assert `reason` on a skipped item's event (its items are all deleted); see the follow-ups.
+- [x] **AC 3. The event before the first action.** While a fake tool's command runs, stderr already holds `phase cleaning` and the journal is still empty; then SIGTERM ends the run (CLI test, stderr read on a thread). — evidence: `crates/ddc-cli/tests/clean_items_cli.rs::cleaning_is_on_stderr_before_the_first_action`
+- [x] **AC 4. Hook order.** A core test with a recording hook and a journal sharing one log shows:
   - `cleaning` comes once, before the first journal entry;
   - there is one `item` per plan item, and the hook is also called with no items;
   - nothing is called when `execute` refuses `review` with `--yes`;
-  - a walk cancelled through `cancel_walk` leaves its target kept and every item `not-run`;
+  - a walk cancelled through `cancel_walk` leaves its target kept and every item `not-run` (as shipped, the test asserts the target `kept`; every item `not-run` is not asserted: a follow-up);
   - a `native-only` item carries `bytes` on its `item` event but is not in `bytes_total`.
-- [ ] **AC 5. Throttle.** A CLI unit test with an injected `Instant` feeds a changing snapshot every 10 ms for 2 s. Between 15 and 21 ticks are written, and no two ticks are less than 100 ms apart except a step's final one. `phase` and `item` lines are never held back.
-- [ ] **AC 6. No JSON without the flag.** Piped `scan` and `clean --items` write no stderr line starting with `{`. The assertion of "Progress output while ddc clean runs" still holds.
-- [ ] **AC 7. Popover.** `walk scan` lines from a fake runner set the popover's file count; without events the count stays empty and the elapsed time shows (DDCKit test).
-- [ ] **AC 8. Sheet.** DDCKit test, with a fake CLI printing recorded event lines to stderr:
+
+  Evidence: `crates/ddc-core/tests/clean_safety.rs::the_hook_says_cleaning_before_the_first_action_and_each_item_after_its_record` (order, one `item` per plan item, the `native-only` bytes), `::the_hook_says_cleaning_with_no_items_and_nothing_when_execute_refuses`, `::a_cancelled_marker_walk_keeps_its_target`, `::progress_reaches_the_totals_with_native_only_bytes_left_out`. The cancelled walk's item is skipped as `kept`, as the Technical Notes decided (a cancel mid-walk fails closed), not `not-run`; the test asserts the target is kept and still on disk.
+- [x] **AC 5. Throttle.** A CLI unit test with an injected `Instant` feeds a changing snapshot every 10 ms for 2 s. Between 15 and 21 ticks are written, and no two ticks are less than 100 ms apart except a step's final one. `phase` and `item` lines are never held back. — evidence: `crates/ddc-cli/src/progress.rs::ticks_are_at_least_100_ms_apart_but_last_ticks_phases_and_items_never_wait` (15 to 21 ticks, no gap under 100 ms, an `item` line written at once)
+- [x] **AC 6. No JSON without the flag.** Piped `scan` and `clean --items` write no stderr line starting with `{`. The assertion of "Progress output while ddc clean runs" still holds. — evidence: `crates/ddc-cli/tests/clean_items_cli.rs::without_the_flag_no_event_reaches_stderr` (piped `scan --json` and `clean --items --json`)
+- [x] **AC 7. Popover.** `walk scan` lines from a fake runner set the popover's file count; without events the count stays empty and the elapsed time shows (DDCKit test). — evidence: `PopoverModelTests.scanFileCount`
+- [x] **AC 8. Sheet.** DDCKit test, with a fake CLI printing recorded event lines to stderr:
   - the step-1 counters appear;
   - `cleaning` switches the phase with no change of `last-scan.json`;
   - the sheet shows item `i` of `n` with its path, the bytes fraction and the skipped count;
   - a `native-only` item in flight adds no stripe;
   - a crash after `cleaning` with no saved file points to the journal;
   - the existing modification-date tests still pass, which covers a clean without events.
-- [ ] **AC 9. `native-only` totals.** `reclaimable`, `selectedReclaimable` and `counted` leave `native-only` items out; `bytes`, `selectedBytes` and the class rows do not change; the explanatory line appears only when a `native-only` item is listed (unit test).
-- [ ] **AC 10. Contracts.**
+
+  Evidence: `CleanRunTests.events` (step-1 counters, `cleaning` with `last-scan.json` unchanged, item i of n), `.crashAfterCleaningEvent` (points to the journal), `.flow`; `ProgressTests.stepOne`, `.items`, `.fraction`, `.nativeOnlyInFlight` (no stripe).
+- [x] **AC 9. `native-only` totals.** `reclaimable`, `selectedReclaimable` and `counted` leave `native-only` items out; `bytes`, `selectedBytes` and the class rows do not change; the explanatory line appears only when a `native-only` item is listed (unit test). — evidence: `ProgressTests.nativeOnlyTotals`
+- [x] **AC 10. Contracts.**
   - `ContractTests`: the schema version, the event names and the phase and step values match the decoder.
   - `CLIRunnerTests`: event lines stay out of the stderr tail.
-- [ ] **AC 11.** `make check` and `make app-test` pass.
+
+  Evidence: `ContractTests.progressContracts` (version, event names, phases, walk steps, reasons and actions), `.schemaEnums`; `CLIRunnerTests.eventsLeaveTheTail`.
+- [x] **AC 11.** `make check` and `make app-test` pass. — evidence: the work landed in a25c1d4 and shipped in 0.2.3 (430d82c), whose `make dist` then required `check` and `app-test`; there was no CI Gate yet. The same tests run today in the Gate's `gate` and `app` jobs, green on main at 2cdae98 (run 41191429282, 2026-10-31).
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The CLI's machine-readable progress, and the app's use of it. Shipped in 0.2.3 (a25c1d4).
+- Core: `crates/ddc-core/src/progress.rs` with `PROGRESS_SCHEMA_VERSION` and the event types, `docs/progress.schema.json` generated from them; an `ExecEvents` hook called once before the first action and once per item after its journal record; the marker walk reports into the clean's progress and can be cancelled.
+- CLI: `--progress json` on `scan` and `clean` (and `clean --items`), with a 100 ms throttle that never holds back a phase, an item or a step's last tick; without the flag nothing new reaches stderr.
+- DDCKit and the app: the event decoder and clean-progress reducer, the popover's file count, the sheet's two steps and the determinate bar (artboard 11), the `cleaning` event switching the phase, `native-only` items left out of "frees about" and of the bar's byte total; the runner keeps event lines out of its stderr tail.
+
+**Why.** ADR "Menu bar app: Swift shell over the ddc CLI", §6 item 3, and the owner's design review of 2026-10-21: a determinate bar for the clean, with item i of n and why an item was skipped.
+
+**Tests.** The evidence above, all on origin/main; the Gate's `gate` and `app` jobs run them on macOS and were green on main at 2cdae98 (2026-10-31). Closed under the owner's rule of 2026-10-30; this story had no manual criteria.
+
+**Risks and follow-ups.**
+- No test asserts `reason` on the `item` event of a skipped item. The field is in the schema and the app decodes it; a CLI test with one skipped item would close the gap.
+- The cancelled-walk test asserts that the target is kept; criterion 4 said every item `not-run`. The code follows the Technical Notes (a cancelled walk fails closed as `kept`); the wording of the criterion was not updated before the code shipped.
+- "Faster clean: re-check only what the selection needs" (DDC-002) changed what `files_expected` of `walk recheck` counts and replaced the rescan's `last-scan.json` signal with the `cleaning` event.
 
 ## Technical Notes
 
@@ -229,4 +250,4 @@ Each line is one JSON object on stderr with `schema_version: 1` and an `event` f
 
 ---
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-10-31*

@@ -3,17 +3,17 @@ type: story
 id: "story-distribution-the-020-cask-with-the-app"
 epic: "DDC-002"
 title: "Distribution: the 0.2.0 cask with the app"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-20
+updated: 2026-10-31
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [release, homebrew, distribution, disclaimer]
 code_refs: []
 specs: []
 started_at: "2026-10-20T10:50:33.966Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.461Z"
 plan_updated_at: "2026-10-20T11:04:49.221Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-20T11:04:49.221Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -46,24 +46,24 @@ DeepDriveCleaner 0.2.0 ships as one cask, `deepdrivecleaner`, with the app and t
 
 Rough until the plan gate.
 
-- [ ] `make dist` builds both assets from one commit: the CLI tarball (as in 0.1.0, now with `DISCLAIMER.md`) and the zipped, stapled app (`scripts/build-app.sh --dist`, story "App skeleton and build pipeline"), which refuses a version mismatch between Cargo and the app's `MARKETING_VERSION`, and refuses unless `dist/BUILD_COMMIT` (written by `build-dist.sh`) is HEAD. `make app-dist` stays as an alias
-- [ ] The tarball's CLI is signed as `com.smartandpoint.deepdrivecleaner.cli`, as the CLI inside the app is (ADR "Menu bar app: Swift shell over the ddc CLI", §4), so no executable but the app carries the app's bundle id; a manual install from the tarball needs its Full Disk Access grant once more, and the release notes say so
+- [x] `make dist` builds both assets from one commit: the CLI tarball (as in 0.1.0, now with `DISCLAIMER.md`) and the zipped, stapled app (`scripts/build-app.sh --dist`, story "App skeleton and build pipeline"), which refuses a version mismatch between Cargo and the app's `MARKETING_VERSION`, and refuses unless `dist/BUILD_COMMIT` (written by `build-dist.sh`) is HEAD. `make app-dist` stays as an alias
+- [x] The tarball's CLI is signed as `com.smartandpoint.deepdrivecleaner.cli`, as the CLI inside the app is (ADR "Menu bar app: Swift shell over the ddc CLI", §4), so no executable but the app carries the app's bundle id; a manual install from the tarball needs its Full Disk Access grant once more, and the release notes say so
 - [ ] Deferred to a later story: extracting the signing, notarization and retry helpers into `scripts/lib/release.sh`. Both scripts work and notarized 0.1.0; a refactor of them is not a step of this release
-- [ ] `scripts/publish-release.sh`:
+- [x] `scripts/publish-release.sh`:
   - assets `DeepDriveCleaner-<version>.zip` (the cask's) and the CLI tarball (for a manual install, and for Macs before macOS 26, which the 0.2.0 cask does not reach);
   - checks the zip holds `DeepDriveCleaner.app` alone, the app's signature (`--deep --strict`), identifier, team, stapled ticket, version, bundle id and `LSMinimumSystemVersion` (26.0, the cask's `depends_on macos:`), the embedded CLI's identifier, team and version, and the tarball's listing (with `DISCLAIMER.md`) and binary as in 0.1.0, now with the `.cli` identifier. Nothing opens the app;
   - keeps the 0.1.0 resume path (the cask's checksum comes from the release's zip); the tap is written through `gh api`
-- [ ] Cask template:
+- [x] Cask template:
   - `app "DeepDriveCleaner.app"`;
   - two `binary` stanzas from `#{appdir}/DeepDriveCleaner.app/Contents/Helpers/deepdrivecleaner`, one of them `target: "ddc"`;
   - `depends_on macos: :tahoe` (as GrammarHelper's cask) and `depends_on arch: :arm64`;
   - `uninstall quit: "com.smartandpoint.deepdrivecleaner"`;
   - `zap` the data, logs and preferences, with `launchctl:` for `com.smartandpoint.deepdrivecleaner` (0.1.0) and `com.smartandpoint.deepdrivecleaner.scheduler` (named now, so a later zap needs no cask change);
   - caveats: Full Disk Access goes to the app; a CLI started by launchd (`ddc schedule install`) has a new path inside the app and needs its grant once more; the disclaimer, in three short lines with its link
-- [ ] Version 0.2.0 in the workspace and the app; release notes `docs/releases/0.2.0.md` (what ships, what waits for 0.3.0, the disclaimer); README leads with the app, has the detailed CLI guide and the Disclaimer section, and says that `brew uninstall` without `--zap` can leave the app's entries in Login Items until macOS drops them
-- [ ] `DISCLAIMER.md`, and the CLI's terminal warning with its tests. `LICENSE.md` and `DISCLAIMER.md` also go into the app's `Contents/Resources` (`scripts/build-app.sh`), since a cask install has no other copy; the publish script checks they match the repository's
-- [ ] Release notes: a way back to 0.1.0 (uninstall the cask, install the 0.1.0 tarball by hand), and not to upgrade while the app is cleaning (`uninstall quit:` waits 10 s, a tool's own clean command can run longer)
-- [ ] Reference machine: `brew upgrade --cask deepdrivecleaner` from 0.1.0 (the owner's)
+- [x] Version 0.2.0 in the workspace and the app; release notes `docs/releases/0.2.0.md` (what ships, what waits for 0.3.0, the disclaimer); README leads with the app, has the detailed CLI guide and the Disclaimer section, and says that `brew uninstall` without `--zap` can leave the app's entries in Login Items until macOS drops them
+- [x] `DISCLAIMER.md`, and the CLI's terminal warning with its tests. `LICENSE.md` and `DISCLAIMER.md` also go into the app's `Contents/Resources` (`scripts/build-app.sh`), since a cask install has no other copy; the publish script checks they match the repository's
+- [x] Release notes: a way back to 0.1.0 (uninstall the cask, install the 0.1.0 tarball by hand), and not to upgrade while the app is cleaning (`uninstall quit:` waits 10 s, a tool's own clean command can run longer)
+- [x] Reference machine: `brew upgrade --cask deepdrivecleaner` from 0.1.0 (the owner's) — superseded, as its acceptance criterion: the Homebrew upgrade path is checked under "Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates" (DDC-002)
 
 ## Implementation Plan
 
@@ -87,25 +87,38 @@ The public texts about Full Disk Access (README, release notes, caveats) say the
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] `brew style` reports no offenses on the rendered cask; `brew audit --cask --online --strict` reports none on a machine with current Command Line Tools
-- [ ] `scripts/publish-release.sh --dry-run` prints the rendered cask and notes; the 0.1.0 refusals still hold (dirty tree, HEAD not on `origin/main`, missing notes, stale build, an asset not signed by the configured team)
-- [ ] Manual check on the reference machine: `brew upgrade --cask deepdrivecleaner` from 0.1.0 installs `/Applications/DeepDriveCleaner.app`, `ddc --version` prints 0.2.0, and `/opt/homebrew/bin/ddc` resolves into the bundle's `Contents/Helpers`. Full Disk Access is granted once, to the app
-- [ ] Manual check on the reference machine, which runs the 0.1.0 agent of `ddc schedule install`: after the upgrade, with Full Disk Access on the app only, `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner` and read `full_disk_access` from `~/Library/Logs/DeepDriveCleaner/background.log`; then add `/Applications/DeepDriveCleaner.app/Contents/Helpers/deepdrivecleaner` as the caveats say and read it again. If the first run already has access, or the file picker adds the app instead of the path, the caveats, the README and the release notes are reworded from the result (the caveats are a cask-only fix: commit the template change and rerun the publish script, whose resume path re-renders the cask for the same release; only after that, commit the README change on `main` and edit the release's notes with `gh release edit`, since a README or notes commit before the resume run trips its guard)
-- [ ] Rust test: under a pseudo-terminal a representative set of commands (no arguments, `--help`, `-h`, `help`, a usage error, the help of `scan`, `clean`, `schedule`, `schedule status` and `notify`, `rules`, `scan`, `clean --dry-run`) starts with the warning on stderr; the warning precedes dispatch in `main.rs`, so the commands the test cannot run safely (`schedule install|uninstall|status`, `notify ack|snooze`) get it the same way; and `--version` prints only the version; with stderr a pipe (as the app runs it) or a file (as launchd runs it) there is no warning. `scan --json` stdout is the saved report plus a newline both with stderr on a terminal and on a pipe, and the two reports are equal but for `generated_at`, `duration_ms` and the volumes' free space, which change between runs
-- [ ] `DISCLAIMER.md` is in the repository beside `LICENSE.md`, in the CLI tarball, and linked from the README's Disclaimer section and from the release notes; the license text is unchanged
-- [ ] The README's CLI guide names every subcommand and option that `ddc --help` and each `ddc <command> --help` print (checked by a test that compares them), with an example for each command
-- [ ] Manual check: after `brew reinstall --cask deepdrivecleaner` (which quits the app), the app's Full Disk Access grant still holds when it is opened again
-- [ ] Manual check: `brew uninstall --zap --cask deepdrivecleaner` leaves no `com.smartandpoint.deepdrivecleaner` agent: `launchctl print` finds no job
-- [ ] Manual check on a second Mac or a fresh user account: the downloaded app opens without a Gatekeeper warning (`spctl` accepted, Notarized Developer ID)
-- [ ] Clean-machine access check on the owner's work laptop after `brew install --cask deepdrivecleaner` (owner's decision, 2026-10-18; it replaces the spike of "App skeleton and build pipeline"). Terminal has no Full Disk Access there, and the grant goes to DeepDriveCleaner.app only. Read from the app's own status and `~/Library/Logs/DeepDriveCleaner/app.log`:
+- [ ] `brew style` reports no offenses on the rendered cask; `brew audit --cask --online --strict` reports none on a machine with current Command Line Tools — `brew style`: evidence: `scripts/publish-release.sh` renders the cask under `Casks/` and fails the publish on any `brew style` offense (since 73f87f7); every tagged release from v0.2.0 to v0.12.1 was published through it; `scripts/tests/test_cask.py::test_the_rendered_cask_passes_brew_style` runs it on demand (`DDC_TEST_BREW_STYLE=1`). `brew audit`: not run. Tried on 2026-10-31 against the published cask (the tap at 0.12.1): Homebrew refused to run because the Mac's Command Line Tools are outdated (it asks for those of Xcode 27). Moved to the owner-checks runbook at close (2026-10-31): update the Command Line Tools, then run the audit.
+- [x] `scripts/publish-release.sh --dry-run` prints the rendered cask and notes; the 0.1.0 refusals still hold (dirty tree, HEAD not on `origin/main`, missing notes, stale build, an asset not signed by the configured team) — evidence: by code, with no automated test of the script: `scripts/publish-release.sh` fails on a dirty tree (`git status --porcelain`), on HEAD not `origin/main`, on missing `docs/releases/<version>.md`, on `dist/BUILD_COMMIT` missing or not HEAD, and on an app or CLI whose `TeamIdentifier` is not the configured team; `--dry-run` prints the release, the notes and the tap write and stops. Every tagged release from v0.2.0 to v0.12.1 went through its dry run, then its publish
+- [x] Manual check on the reference machine: `brew upgrade --cask deepdrivecleaner` from 0.1.0 installs `/Applications/DeepDriveCleaner.app`, `ddc --version` prints 0.2.0, and `/opt/homebrew/bin/ddc` resolves into the bundle's `Contents/Helpers`. Full Disk Access is granted once, to the app — superseded: the reference machine left 0.1.0 with the 0.2.0 release and has been upgraded through every release since, so the upgrade from 0.1.0 can no longer be run there. The way off 0.1.0 is now the offered migration of "Background scan and notifications in the app" (DDC-002; `ScheduledScanTests.replaceIt`, `.migrationRefusals`, `.legacyRead`, its manual checks in the owner-checks runbook), and the cask's upgrade path is that of "Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates" (DDC-002; `auto_updates true`, its `brew upgrade` check in the runbook). The grant to the app alone is part of the clean-machine check below
+- [x] Manual check on the reference machine, which runs the 0.1.0 agent of `ddc schedule install`: after the upgrade, with Full Disk Access on the app only, `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner` and read `full_disk_access` from `~/Library/Logs/DeepDriveCleaner/background.log`; then add `/Applications/DeepDriveCleaner.app/Contents/Helpers/deepdrivecleaner` as the caveats say and read it again. If the first run already has access, or the file picker adds the app instead of the path, the caveats, the README and the release notes are reworded from the result (the caveats are a cask-only fix: commit the template change and rerun the publish script, whose resume path re-renders the cask for the same release; only after that, commit the README change on `main` and edit the release's notes with `gh release edit`, since a README or notes commit before the resume run trips its guard) — superseded: "Background scan and notifications in the app" (DDC-002) replaces the 0.1.0 agent with the app's own scheduler (Replace It, offered, never silent), so an app user no longer runs the 0.1.0 agent. The caveat for `ddc schedule install` users (add the Helpers path to Full Disk Access) stays in the cask and was never checked on a machine; see the follow-ups
+- [x] Rust test: under a pseudo-terminal a representative set of commands (no arguments, `--help`, `-h`, `help`, a usage error, the help of `scan`, `clean`, `schedule`, `schedule status` and `notify`, `rules`, `scan`, `clean --dry-run`) starts with the warning on stderr; the warning precedes dispatch in `main.rs`, so the commands the test cannot run safely (`schedule install|uninstall|status`, `notify ack|snooze`) get it the same way; and `--version` prints only the version; with stderr a pipe (as the app runs it) or a file (as launchd runs it) there is no warning. `scan --json` stdout is the saved report plus a newline both with stderr on a terminal and on a pipe, and the two reports are equal but for `generated_at`, `duration_ms` and the volumes' free space, which change between runs — evidence: `crates/ddc-cli/tests/disclaimer_cli.rs::every_command_but_version_starts_with_the_warning_in_a_terminal`, `::version_has_no_warning`, `::the_label_is_colored_unless_no_color_is_set`, `::nothing_that_reads_the_output_sees_the_warning_and_json_is_unchanged`
+- [x] `DISCLAIMER.md` is in the repository beside `LICENSE.md`, in the CLI tarball, and linked from the README's Disclaimer section and from the release notes; the license text is unchanged — evidence: `crates/ddc-cli/tests/readme_cli.rs::the_disclaimer_sits_beside_the_license_and_the_readme_links_it`; `scripts/build-dist.sh` packs it and fails on any other tarball listing; `docs/releases/0.2.0.md` links it at v0.2.0; `LICENSE.md` has not changed since fdb579d
+- [x] The README's CLI guide names every subcommand and option that `ddc --help` and each `ddc <command> --help` print (checked by a test that compares them), with an example for each command — evidence: `crates/ddc-cli/tests/readme_cli.rs::the_guide_covers_every_command_and_option_of_the_help`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): after `brew reinstall --cask deepdrivecleaner` (which quits the app), the app's Full Disk Access grant still holds when it is opened again
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): `brew uninstall --zap --cask deepdrivecleaner` leaves no `com.smartandpoint.deepdrivecleaner` agent: `launchctl print` finds no job
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): on a second Mac or a fresh user account: the downloaded app opens without a Gatekeeper warning (`spctl` accepted, Notarized Developer ID)
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the most important open manual check. Clean-machine access check on the owner's work laptop after `brew install --cask deepdrivecleaner` (owner's decision, 2026-10-18; it replaces the spike of "App skeleton and build pipeline"). Terminal has no Full Disk Access there, and the grant goes to DeepDriveCleaner.app only. Read from the app's own status and `~/Library/Logs/DeepDriveCleaner/app.log`:
   - before the grant the app shows no Full Disk Access; after it, a Scan now reports `full_disk_access: true`;
   - after `brew reinstall --cask deepdrivecleaner`, which removes the app and copies the new one, the grant still holds.
   The scheduled-scan half of this check (a tick launching the app with `--scheduled`, the notification's name and icon) moves to "Background scan and notifications in the app", which builds the scheduler (0.3.0). If the grant does not survive the remove-then-copy, Rationale 1 and this cask are revised
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** 0.2.0 shipped as one cask with the app and the CLI inside it, and every release since has used the same pipeline.
+- `make dist` builds the CLI tarball and the stapled app zip from one commit; the tarball's CLI is signed as `com.smartandpoint.deepdrivecleaner.cli`, like the one in the app.
+- `scripts/publish-release.sh` checks both assets (signature, identifier, team, ticket, versions, listing), renders the cask, runs `ruby -c` and `brew style` on it, and writes the tap. Its 0.1.0 refusals hold.
+- The cask template: the app, two `binary` links into `Contents/Helpers`, `depends_on` arm64 and Tahoe, `uninstall quit:`, a `zap` with the agents' labels, caveats with the disclaimer. Sparkle later added `auto_updates true`.
+- `DISCLAIMER.md` beside `LICENSE.md`, the README's Disclaimer section and CLI guide, and the CLI's two-line warning when stderr is a terminal.
+
+**Why.** ADR "Menu bar app: Swift shell over the ddc CLI", §8, and the owner's decisions of 2026-10-18 and 2026-10-20 (scope of 0.2.0, the disclaimer, the warning, the CLI guide).
+
+**Tests.** `disclaimer_cli.rs` and `readme_cli.rs` as above; the publish script's checks on every tagged release from v0.2.0 to v0.12.1. The script itself has no automated test. Closed under the owner's rule of 2026-10-30: the manual checks and `brew audit` moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- The clean-machine access check on the work laptop has never been run. It is the only check of ADR Rationale 1 ("one grant that survives upgrades") on a Mac where Terminal has no Full Disk Access, and it is marked as the most important item in the runbook.
+- `brew audit --cask --online --strict` has not run: Homebrew refused on 2026-10-31 for outdated Command Line Tools.
+- The cask's caveat for `ddc schedule install` users (add `Contents/Helpers/deepdrivecleaner` to Full Disk Access) was never checked on a machine; it concerns CLI-only users now.
+- Extracting the shared release helpers into `scripts/lib/release.sh` was deferred and has not been done.
 
 ## Technical Notes
 
@@ -136,4 +149,4 @@ The public texts about Full Disk Access (README, release notes, caveats) say the
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-31*

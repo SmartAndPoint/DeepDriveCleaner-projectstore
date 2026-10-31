@@ -3,17 +3,17 @@ type: story
 id: "story-user-data-pick-your-own-files-for-the-trash"
 epic: "DDC-002"
 title: "User data: pick your own files for the Trash"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-20
-updated: 2026-10-20
+updated: 2026-10-31
 external_refs: {}
 tags: [cli, app, safety, user-data]
 code_refs: []
 specs: []
 started_at: "2026-10-20T07:19:01.485Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:47.181Z"
 plan_updated_at: "2026-10-20T07:19:01.485Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-20T07:19:01.485Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -44,7 +44,7 @@ The rules are in the safety ADR's amendment of 2026-10-20, and board 9 of the de
 
 **CLI: what the scan lists**
 
-- [ ] **`scan` lists each folder's entries.**
+- [x] **`scan` lists each folder's entries.**
   - It covers each finding of `user.downloads` (the remainder), `user.pictures`, `user.movies`, `user.music` and `user.ios-backups`.
   - `user.imazing-backups` stays report only until its backup layout is checked on a Mac with iMazing: without that, the fail-closed `Status.plist` check below could lock every iMazing backup for good.
   - The report lists the finding's entries as an optional `contents` list.
@@ -53,7 +53,7 @@ The rules are in the safety ADR's amendment of 2026-10-20, and board 9 of the de
   - Only regular files and directories are listed: never a symlink or another kind, and never a dataless (`SF_DATALESS`) entry.
   - An entry whose own metadata cannot be read is not listed. An entry with parts it may not read is listed with "partly unreadable", its size a lower bound, and stays pickable: the Trash keeps it.
   - The field is additive. `SCHEMA_VERSION` of the scan report stays: a new optional field keeps it (`model.rs`), and the Swift decoder ignores unknown keys (verified). `LISTED_SCHEMA_VERSION` of the item list stays as well, because the app and the CLI ship together.
-- [ ] **Locked entries** are listed with their reason, and can never be picked.
+- [x] **Locked entries** are listed with their reason, and can never be picked.
   - **Managed by an app**, from a maintained list, named by the app:
     - library packages by extension: `.photoslibrary`, `.photolibrary`, `.musiclibrary`, `.tvlibrary`, `.imovielibrary`, `.fcpbundle`, `.lrcat`, `.lrcat-data`, `.lrcat-wal`, `.lrdata`, `.lrlibrary` (Lightroom), `.aplibrary` (Aperture), `.cocatalog`, `.cosessiondb` (Capture One);
     - fixed paths: `Music/Music`, `Music/iTunes` (a library upgraded from older macOS keeps its media there), `Music/GarageBand`, `Music/Audio Music Apps`, `Movies/TV`, `Movies/Motion Templates.localized`, `Movies/Final Cut Backups.localized`, `Pictures/Photo Booth Library` and `Pictures/Lightroom` (Lightroom Classic keeps its catalog one level down, so the extensions alone would miss it).
@@ -73,23 +73,23 @@ The rules are in the safety ADR's amendment of 2026-10-20, and board 9 of the de
     - an entry added (`ATTR_CMN_ADDEDTIME`) or modified within 10 minutes of the scan's start (`Env::now`), either side. A time further in the future (a camera with a wrong clock) is not "recent", so such a file does not stay locked forever. A time the filesystem does not report is left out and the other decides; with neither, the entry is locked "recent" (fails closed). For a folder this sees only changes to its direct children: an archive expanding deep inside an old folder is not seen. That limit is accepted. `Env::now` is the process start, so a rescan longer than 10 minutes can list a file changed after its start as not recent; the picked identity must still match, so this is accepted. The dry run, which has no scan, measures against its own start; the window shows locks as of its last scan until Scan now, and the clean's fresh scan decides;
     - a partial download (`*.download`, `*.crdownload`, `*.part`);
     - a backup whose `Status.plist` does not say it finished. A missing or unreadable `Status.plist` locks the backup (fails closed).
-- [ ] **No contents at all** for these findings, and none for the cloud folders:
+- [x] **No contents at all** for these findings, and none for the cloud folders:
   - `user.telegram` and `user.whatsapp`: their files belong to the app's database, so the app's own cache settings clean them;
   - `user.kept`: the user's own protection;
   - the cloud folders are a skip, not a finding: still not traversed, because a file there may live only in the cloud, and the Trash would remove it from every device;
   - the `trash` rule (the Trash itself).
-- [ ] **Downloads and other findings.**
+- [x] **Downloads and other findings.**
   - Another rule's finding inside Downloads is not a Downloads entry: a downloaded `node_modules` stays its own finding in its own group, and a folder with `.ddc-keep` at its top is a `user.kept` finding (above).
   - An application bundle (`Foo.app`), which the scan claims without listing it as a finding, is an ordinary entry: its bytes fold into the entry, it is pickable, and it does not count as a finding inside. The in-use check skips it while it runs.
   - A folder entry that holds such findings is listed with its whole size (their bytes folded back in), and says how many findings it holds.
   - The Downloads group's own size is still the finding's bytes (the remainder), for the sidebar order and "selected of total", so nothing counts twice across groups.
   - A folder entry with a `.git` is listed with the note "a project (has .git)", and stays pickable: the Trash keeps it.
-- [ ] **A backup entry** shows the device name (`Device Name`) and the date of the last backup, from the backup's `Info.plist`, when they can be read.
+- [x] **A backup entry** shows the device name (`Device Name`) and the date of the last backup, from the backup's `Info.plist`, when they can be read.
   - The plists are read by a small bounds-checked reader of binary and XML property lists: top-level keys with string and date values only, never through a symlink, with capped reads, failing closed. Not the `plist` crate: the scan needs three keys, and a new crate could not be fetched offline when the done story "CLI: clean an explicit item list" tried one.
 
 **CLI: what the clean accepts**
 
-- [ ] **A `user-data` item in `clean --items` gets its own checks.** They replace the rule-marker checks of the safety ADR's §5, which apply to directories found by rules. The executor relaxes the `none` method only for an entry of one of the five findings, never for `none` in general: the Trash, the messenger containers and iMazing backups are `none` too.
+- [x] **A `user-data` item in `clean --items` gets its own checks.** They replace the rule-marker checks of the safety ADR's §5, which apply to directories found by rules. The executor relaxes the `none` method only for an entry of one of the five findings, never for `none` in general: the Trash, the messenger containers and iMazing backups are `none` too.
   - **Folder:** the item's parent is one of the five folders, the item's `rule` is that folder's rule, and the parent's identity equals that of the fresh scan's finding. Otherwise the item is skipped as `not-an-entry`, or as `kept` when the whole folder is kept now.
   - **Entry:** a regular file or directory, never a symlink or another kind, opened through the parent's file descriptor with the same `dev` and `ino` as listed.
   - **Still listed:** the fresh scan still holds it as an unlocked entry. The check runs against the folder's full list of entries, kept in memory, not against the report's top 100, so new large downloads cannot push a picked entry out.
@@ -97,27 +97,27 @@ The rules are in the safety ADR's amendment of 2026-10-20, and board 9 of the de
   - **Skip reasons:** three new ones. A picked entry that is no longer an entry is skipped as `not-an-entry`; one that is locked now is skipped as `entry-locked`, with its lock reason (app-managed, kept, protected, other volume, recent, partial download, unfinished backup); an item inside an entry that went to the Trash is skipped as `inside-another-item` (see Nested items).
   - **Order of the checks:** the action and what the fresh scan says of the path itself (the folder, a `user.kept` entry, a kept folder) come first, then the path checks every item gets (inside the scan roots, no symlink above the parent), then the entry checks, then the lock, then the rest of §5. The executor derives the lock again with the same `lock_of`: the plan is not trusted input. So the dry run and the clean give the same reason: an entry replaced since the scan is `changed-since-scan`, not `recent`, and a marker in or at an entry, or an exclude at or in a Downloads entry, is `entry-locked` (kept), never the plain `kept` that §5's marker walk would give. A Downloads folder that became a `user.kept` finding this way is `entry-locked` too, not `not-an-entry`: that check comes first. In the four folders the scan claims whole, an exclude anywhere inside keeps the whole folder, so its entries are skipped as `kept`.
   - **The clean report.** These are new `SkipReason` values. Following the app's own rule that a new reason comes with a new schema version, `CLEAN_SCHEMA_VERSION` is raised and `docs/clean.schema.json` gains them. `CleanReport.swift`, which refuses an unknown reason, and `CleanWording` learn them in the same change.
-- [ ] **Refusals, each as the done story "CLI: clean an explicit item list" already does them:**
+- [x] **Refusals, each as the done story "CLI: clean an explicit item list" already does them:**
   - `action: delete` on a `user-data` item is skipped as `action-not-allowed`, and the rest of the list runs;
   - `permanent: true` on a `user-data` item refuses the whole list when it is read (exit 2, nothing runs), as for any item that is not `review`;
   - `--permanent` together with `--items` is refused by the argument parser (exit 2).
-- [ ] **Nested items.** The app never sends both a folder entry and a finding inside it, because the outer one covers the inner. The sheet says so: "includes 1 item selected on its own; it goes to the Trash with the folder, and its space returns when the Trash is emptied."
+- [x] **Nested items.** The app never sends both a folder entry and a finding inside it, because the outer one covers the inner. The sheet says so: "includes 1 item selected on its own; it goes to the Trash with the folder, and its space returns when the Trash is emptied."
   - If a list holds both, the CLI runs the entry first. It skips the inner item as `inside-another-item` only when the entry went to the Trash; if the entry was skipped or failed, the inner item runs (after a cancel, neither runs).
   - Entry first is deliberate: the user picked the folder for the Trash, and Put Back must bring it back whole. A cache inside it then frees its space only when the Trash is emptied.
   - After the clean, the window shows a finding inside a trashed entry as cleaned, like the entry.
-- [ ] **The dry run** predicts these items and their skips like any other.
-- [ ] **CLI text output** escapes control and bidirectional format characters in the names it prints, as the app does: Downloads names become first-class CLI output here.
-- [ ] **ADRs.**
+- [x] **The dry run** predicts these items and their skips like any other.
+- [x] **CLI text output** escapes control and bidirectional format characters in the names it prints, as the app does: Downloads names become first-class CLI output here.
+- [x] **ADRs.**
   - The safety ADR's amendment of 2026-10-20 states these rules.
   - The menu bar ADR, §6 item 1 (matching) and §7 (refusals), says how a `user-data` entry is matched and that it is the one exception.
 
 **App**
 
-- [ ] **Sidebar: a User data section**, on a grey tint, ordered by size like the other classes ("Review window: sorted sidebar, Select all and folder groups").
+- [x] **Sidebar: a User data section**, on a grey tint, ordered by size like the other classes ("Review window: sorted sidebar, Select all and folder groups").
   - It has one entry per listed user-data rule found. Downloads, Pictures, Movies, Music and iPhone and iPad backups have pickable entries; iMazing backups, Telegram, WhatsApp, Xcode archives, editor workspace storage and Protected by you are report only, as today.
   - "Cloud folders" is the last entry and reads "not scanned". No finding stands behind it: the app makes it from the report's skipped areas under `Library/CloudStorage` and `Library/Mobile Documents` (reason `excluded`), told apart from the background-skip areas by path.
   - If the report came from a background scan that skipped the protected areas, the section says that a Scan now lists these folders. The signal is the report's list of skipped areas, which `ScanReport.swift` learns to decode with all four skip reasons. The background scan skips these areas with reason `excluded`, the same as the cloud folders, and for iPhone and iPad backups it skips the parent `Library/Application Support/MobileSync`; the app matches by path prefix.
-- [ ] **A user-data group's view.**
+- [x] **A user-data group's view.**
   - It shows the listed entries, largest first, each picked one by one: no Select all, no heading checkbox, nothing picked by default.
   - A row says "last changed N days ago", and for a backup, the device name and the date of the last backup.
   - A locked entry shows a lock and its reason.
@@ -128,15 +128,15 @@ The rules are in the safety ADR's amendment of 2026-10-20, and board 9 of the de
   - "Protect this folder" applies to folder entries of Downloads, Pictures, Movies and Music only. A file entry has no protection action, because `.ddc-keep` lives in a directory; a backup entry has none, because a stray file inside a device backup is not known to be harmless to a restore or to the next backup (the whole Backup folder stays protectable as a finding, as today).
     - Its outcome differs by folder kind. In Pictures, Movies and Music the entry stays in its group, locked "kept", after the next scan. In Downloads it becomes a `user.kept` finding: it moves to "Protected by you", and its bytes leave the Downloads total.
     - The app holds the row locked until a scan reports it protected: a `user.kept` finding at its path, or an entry row locked "kept".
-- [ ] **Never elsewhere.**
+- [x] **Never elsewhere.**
   - User files are not in the Items view.
   - They are not in the popover's "Selected to clean", Biggest finds or notification amounts.
   - The scheduled path never touches them.
   - `ReviewItems.Lock.userData`'s text ("Your data · report only") is reworded for what is still report-only.
-- [ ] **Confirmation sheet.**
+- [x] **Confirmation sheet.**
   - A block of its own, "Your own files", comes first, with its count and size, and the line "They go to the Trash; nothing of yours is deleted permanently." `Confirmation` therefore orders user data first, not last.
   - These items have no "Delete permanently" switch, and the preference never applies to them.
-- [ ] **Result.** User files count under "to the Trash", and the journal lists them.
+- [x] **Result.** User files count under "to the Trash", and the journal lists them.
 
 ## Implementation Plan
 
@@ -170,7 +170,7 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
 
 ## Acceptance Criteria
 
-- [ ] Rust test: the scan lists entries over a temporary home.
+- [x] Rust test: the scan lists entries over a temporary home.
   - The Downloads, Pictures and Movies entries come largest first, with the cap and the floor, and the rest as a count and bytes.
   - Symlinks and dataless entries are not listed.
   - A `.photoslibrary` entry, `Music/Music`, an entry holding `.ddc-keep` (while Pictures stays `user.pictures`), an entry modified a minute ago, a `*.part` file and a backup without a finished `Status.plist` are listed locked.
@@ -180,8 +180,10 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
   - An entry changed a minute before the scan's start is locked "recent"; one changed an hour before it is not, nor is one dated a day ahead.
   - An entry with an unreadable part is listed "partly unreadable" and pickable; an entry where the reader reports another filesystem is locked (a fake reader).
   - A backup shows its device name and last backup date; `user.imazing-backups` lists no contents.
-- [ ] Rust test: the plist reader reads `SnapshotState` from binary and XML `Status.plist` fixtures (finished, and not), and `Device Name` and `Last Backup Date` from `Info.plist`; a truncated, garbage or missing file reads as not finished, without a panic.
-- [ ] Rust test (the core's `FakeTrash`, never the real Trash): `clean --items` moves a listed user-data entry, file and folder, to the Trash. It also gives each of the following its expected outcome:
+
+  Evidence: `crates/ddc-core/tests/user_data.rs::the_scan_lists_entries_largest_first_with_the_cap_and_the_floor_and_sums_the_rest`, `::the_default_limits_list_a_hundred_entries_of_at_least_ten_mebibytes`, `::locked_entries_are_listed_with_their_reason`, `::a_fresh_entry_is_recent_against_the_scans_start`, `::a_marker_at_the_folders_top_or_an_exclude_inside_still_keeps_the_whole_folder`, `::a_downloads_folder_holds_findings_with_their_size_and_an_app_is_an_ordinary_entry`, `::backups_show_their_device_and_lock_until_they_finished`, `::messengers_imazing_kept_and_the_trash_list_nothing_and_cloud_folders_stay_closed`, `::an_entry_with_an_unreadable_part_is_listed_partly_unreadable_and_stays_pickable`; `crates/ddc-core/src/report/contents.rs::what_the_walk_could_not_see_decides_the_state` (another volume locked, dataless and symlink entries not listed, with a fake reader).
+- [x] Rust test: the plist reader reads `SnapshotState` from binary and XML `Status.plist` fixtures (finished, and not), and `Device Name` and `Last Backup Date` from `Info.plist`; a truncated, garbage or missing file reads as not finished, without a panic. — evidence: `crates/ddc-core/src/report/backups.rs::a_finished_backup_reads_as_finished_in_both_formats`, `::the_device_and_last_backup_come_from_the_top_level_only`, `::missing_truncated_or_garbage_files_read_as_not_finished_without_a_panic`, `::a_symlink_or_a_fifo_is_never_read`
+- [x] Rust test (the core's `FakeTrash`, never the real Trash): `clean --items` moves a listed user-data entry, file and folder, to the Trash. It also gives each of the following its expected outcome:
   - a symlink entry, an entry replaced since the scan (new `ino`), an entry that is now locked (a marker put inside it: `entry-locked`, kept), and the folder itself: skipped with their reasons;
   - `--exclude` of a Downloads folder entry, and of a file inside another: `entry-locked` (kept), never the plain `kept`; an exclude inside a Pictures entry keeps all of Pictures: `kept`;
   - a path that is not an entry (a file two levels down): skipped as `not-an-entry`;
@@ -194,8 +196,10 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
   - `build_plan` over a scan with `contents` plans no entry and no user-data finding, and `execute` with `--yes` consent touches none.
 
   The dry run predicts the same outcomes. It has no scan, so it cannot see that a direct child of Downloads became another rule's finding: there it predicts a move to the Trash, and the clean's rescan skips it as `not-an-entry`.
-- [ ] Contract test: the JSON schemas cover the scan report's `contents`, a `user-data` item of the `--items` list, and the clean report's new skip reasons at the raised `CLEAN_SCHEMA_VERSION`; `CleanReport.swift` decodes every reason and every lock and `CleanWording` words them; every listed user-data rule of the catalog has a sidebar name
-- [ ] DDCKit unit tests:
+
+  Evidence: `crates/ddc-core/tests/user_data.rs::a_picked_file_and_folder_go_to_the_trash`, `::a_symlink_a_replaced_entry_a_locked_one_and_the_folder_itself_are_skipped`, `::an_exclude_locks_a_downloads_entry_and_keeps_a_folder_claimed_whole`, `::a_path_that_is_no_entry_is_skipped_and_one_beyond_the_listed_hundred_is_not`, `::another_rules_finding_in_downloads_is_no_entry_in_the_clean`, `::delete_and_permanent_are_refused_for_a_picked_entry`, `::a_finding_inside_a_trashed_entry_is_skipped_and_runs_when_the_entry_was_skipped`, `::a_symlink_above_the_folder_or_a_path_outside_the_roots_is_skipped_as_for_any_item`, `::a_plan_never_holds_an_entry_and_yes_touches_none`, `::the_executor_derives_an_entrys_lock_again_right_before_the_trash` (each through the dry run and the clean); `crates/ddc-cli/tests/clean_items_cli.rs::items_with_permanent_or_a_malformed_list_are_refused_untouched` (`--permanent` with `--items`, exit 2).
+- [x] Contract test: the JSON schemas cover the scan report's `contents`, a `user-data` item of the `--items` list, and the clean report's new skip reasons at the raised `CLEAN_SCHEMA_VERSION`; `CleanReport.swift` decodes every reason and every lock and `CleanWording` words them; every listed user-data rule of the catalog has a sidebar name — evidence: `crates/ddc-core/tests/report.rs::committed_json_schema_is_current`, `crates/ddc-core/tests/clean_items.rs::committed_clean_schema_is_current` (the report, the item list and the dry-run lines); `ContractTests.cleanContracts`, `.schemaEnums`, `.skipReasonsHaveText`, `.userDataNames`; `UserDataTests.locks`
+- [x] DDCKit unit tests:
   - a user-data row is selectable only when listed and unlocked, and never selected by default;
   - its view has no Select all;
   - the item list sends `class: user-data`, `action: trash` and `permanent: false` whatever the preference;
@@ -207,16 +211,31 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
   - the background-skip line shows when the report skipped the protected areas;
   - the Cloud folders row comes from `skipped` by path: `~/Library/CloudStorage` (excluded) gives the row; `~/Downloads` and `~/Library/Containers` (excluded, a background scan) give the Scan-now line and no Cloud row;
   - after a clean, a finding inside a trashed entry shows as cleaned.
-- [ ] Real-CLI dry run over a temporary home: a backdated Downloads entry the window lists is accepted (exit 0, would move to the Trash), and a fresh one would be skipped as `entry-locked` (recent)
-- [ ] Manual check:
+
+  Evidence: `UserDataTests.selectable`, `.layout`, `.listed`, `.confirmation`, `.escaped`, `.amounts`, `.popover`, `.skippedAreas`, `.cleanedInside`; `ReviewGroupsTests.userDataNoSelectAll`.
+- [x] Real-CLI dry run over a temporary home: a backdated Downloads entry the window lists is accepted (exit 0, would move to the Trash), and a fresh one would be skipped as `entry-locked` (recent) — evidence: `RealCLIDryRunTests.picksADownload`; in the CLI's own tests, `crates/ddc-cli/tests/clean_items_cli.rs::a_picked_download_would_go_to_the_trash_unless_it_is_recent_and_names_are_escaped`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31):
   - pick a file in Downloads, clean, find it in the Trash and put it back;
   - Photos Library shows as locked;
   - Cloud folders explains why they are not scanned.
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The user can pick their own files in five user-data folders and move them to the Trash from the Review window. Shipped in 0.2.0.
+- The scan lists the entries of Downloads, Pictures, Movies, Music and iPhone and iPad backups as an optional `contents` list (largest first, at most 100 of at least 10 MiB, the rest summed), with a lock reason where one applies: managed by an app, kept, protected, another volume, recent, a partial download, an unfinished backup. Messengers, iMazing backups, `user.kept`, the Trash and the cloud folders list nothing.
+- `clean --items` accepts a picked entry to the Trash only, checked against the fresh scan's full list of that folder and its identity; three new skip reasons (`not-an-entry`, `entry-locked`, `inside-another-item`) at a raised clean-report schema version. `delete`, `permanent` and `--permanent` are refused.
+- A bounds-checked reader of binary and XML property lists for the backups' `Status.plist` and `Info.plist`.
+- The app: a User data section in the sidebar, entries picked one by one with escaped names, a "Your own files" block first in the sheet with no Delete permanently, Cloud folders explained, nothing of this in the popover's amounts or the scheduled path.
+- The safety ADR's amendment of 2026-10-20 and the menu bar ADR's §6 and §7 state the rules.
+
+**Why.** The owner's decision of 2026-10-20: the Review window opens User data, and the user picks their own files for the Trash, rather than browsing only or treating them as ordinary `review` items.
+
+**Tests.** The evidence above; the Rust tests run in the Gate's `gate` job on macOS and the DDCKit tests in its `app` job, both green on main at 2cdae98 (2026-10-31). Closed under the owner's rule of 2026-10-30: the manual check moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- `user.imazing-backups` stays report only until its backup layout is checked on a Mac with iMazing.
+- "Recent" is judged against the start of the scan; a folder entry sees only changes to its direct children.
+- A later story, "User data: move a folder's picked files to the Trash from that folder" (DDC-002), added a scoped button per folder.
 
 ## Technical Notes
 
@@ -260,4 +279,4 @@ Planned by `projectstore:planner` against the codebase after "Review window: sor
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-31*

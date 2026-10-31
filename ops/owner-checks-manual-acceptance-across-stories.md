@@ -18,11 +18,14 @@ Use this list when a release is installed on the reference machine and there is 
 
 ## Prerequisites
 
-- [ ] The current release, 0.7.0, installed through Homebrew on the reference machine.
+- [ ] The current release, 0.12.1, installed through Homebrew on the reference machine.
 - [ ] Full Disk Access granted to DeepDriveCleaner.app, and the app started from Finder, not from Terminal or Xcode.
 - [ ] For a check that needs a tool or an app (Docker Desktop, Google Chrome, conda, Xcode simulator runtimes, Homebrew formulae): that tool installed.
+- [ ] For the checks that name another machine: the owner's work laptop, where Terminal has no Full Disk Access, and a second Mac or a fresh user account.
 
 ## Steps
+
+**Most important:** the clean-machine access check on the work laptop, under "Distribution: the 0.2.0 cask with the app" below. It is the only check of Rationale 1 of the ADR "Menu bar app: Swift shell over the ddc CLI" (one Full Disk Access grant, to the app, that survives upgrades) on a Mac where Terminal has no grant. Run it first.
 
 ### Background scan and notifications in the app (DDC-002)
 
@@ -214,6 +217,94 @@ Story: [Review window: pick a coding agent's sessions one by one](../epics/DDC-0
 - [ ] Manual (owner): with a Claude Code session running, its row says why it is locked and cannot be ticked; Select all never ticks a session; the folder row itself cannot be ticked.
 - [ ] Manual (owner): the confirmation for picked sessions offers no Delete permanently and says that `--resume` of a transcript fails until it is put back from the Trash, and that /rewind cannot use moved file history.
 
+### App skeleton and build pipeline (DDC-002)
+
+Story: [App skeleton and build pipeline](../epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md)
+
+- [ ] Manual (owner): Finder (`/Applications`, Get Info) and a notification the app posts (a scheduled scan's) show the app's icon, the drive in its ring of class colours, not a generic one. Login Items is checked under "Background scan and notifications in the app"; the status glyph in light and dark menu bars under "Menu bar popover".
+- [ ] Manual (owner): with no window of the app open, it shows its status item and no Dock icon; Quit in the right-click menu exits it. (The Dock icon while a window is open is checked under "Release 0.2.1: the Review window in the Dock, and skip what a running process holds open".)
+- [ ] Manual (owner): turning Settings → Open at login on lists DeepDriveCleaner in System Settings → General → Login Items & Extensions; turning it off removes it. That the switch follows a change made in System Settings is checked under "Settings: folders, types, notifications".
+- [ ] Manual (owner), Debug build only: Debug → Probe Full Disk Access writes its result and errno to the app log, and Debug → Post Test Notification posts one. If neither is wanted any more, remove both from `app/DeepDriveCleaner/DebugMenu.swift` instead.
+
+### Distribution: the 0.2.0 cask with the app (DDC-002)
+
+Story: [Distribution: the 0.2.0 cask with the app](../epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md)
+
+- [ ] **Most important open check.** Clean-machine access check on the owner's work laptop, where Terminal has no Full Disk Access:
+  - `brew install --cask smartandpoint/tap/deepdrivecleaner`, then open the app from Finder;
+  - before any grant, the popover's footer shows Full Disk Access missing;
+  - grant it to DeepDriveCleaner.app only (System Settings → Privacy & Security → Full Disk Access), then Scan Now: `~/Library/Logs/DeepDriveCleaner/app.log` and the report show `full_disk_access: true`;
+  - `brew reinstall --cask deepdrivecleaner`, which removes the app and copies it again, then open it: the grant still holds and a Scan Now still reports `full_disk_access: true`.
+
+  If the grant does not survive the reinstall, open a bug story: Rationale 1 of the ADR "Menu bar app: Swift shell over the ddc CLI" and the cask are revised.
+- [ ] Manual (owner): update the Command Line Tools (Homebrew asked for those of Xcode 27 on 2026-10-31), then `brew audit --cask --online --strict smartandpoint/tap/deepdrivecleaner` reports no offenses.
+- [ ] Manual (owner): on the reference machine, `brew reinstall --cask deepdrivecleaner` (it quits the app), open the app again: Full Disk Access still shows granted, and a Scan Now reports `full_disk_access: true`.
+- [ ] Manual (owner): `brew uninstall --zap --cask deepdrivecleaner`, then `launchctl print` of `gui/$UID/com.smartandpoint.deepdrivecleaner.scheduler`, `…scheduler-open` and `gui/$UID/com.smartandpoint.deepdrivecleaner` (the 0.1.0 agent) finds no job. Reinstall afterwards.
+- [ ] Manual (owner): on a second Mac or a fresh user account, download `DeepDriveCleaner-<version>.zip` from the release page, unzip it and open the app: no Gatekeeper warning; `spctl --assess --type execute -vv DeepDriveCleaner.app` says accepted, `source=Notarized Developer ID`.
+
+### HIG pass: keyboard, colour, empty states and menus (DDC-002)
+
+Story: [HIG pass: keyboard, colour, empty states and menus](../epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md)
+
+- [ ] Manual (owner): on the second Mac, where the bug was seen, with a terminal frontmost, the first click on the icon opens the popover active, with blue switches and a blue Clean Selected. The `app.log` line after the click says the app is active and the window key.
+- [ ] Manual (owner), keyboard in the Review window:
+  - Esc in a non-empty filter clears it and the window stays open; Esc with an empty filter closes the window and opens the popover;
+  - Return while typing a filter opens nothing; with an empty filter it opens the Clean sheet;
+  - during a clean, Esc shows "Stopping…";
+  - ⌘F focuses the filter;
+  - with keyboard navigation on, Tab moves through the popover with a visible focus ring.
+- [ ] Manual (owner), colour: with a red system accent (System Settings → Appearance), the Review footer's "Clean N items…" is red; with Multicolor it is the brand blue. Warning text is readable in Dark Mode.
+- [ ] Manual (owner): Help → DeepDriveCleaner Help opens the README; with Reduce Motion on (System Settings → Accessibility → Display), the menu bar arc does not turn during a scan.
+
+### Menu bar popover (DDC-002)
+
+Story: [Menu bar popover](../epics/DDC-002/stories/story-menu-bar-popover.md)
+
+- [ ] Manual (owner): with no report (move `~/Library/Application Support/DeepDriveCleaner/last-scan.json` aside, and put it back after), the popover offers the first scan.
+- [ ] Manual (owner): with Full Disk Access turned off for the app, the footer says it is missing and its button opens the Privacy pane. Turn it on again.
+- [ ] Manual (owner): the icon reads in a light and a dark menu bar in every state: idle, busy, warning, paused, paused while busy, and with the badge; the popover reads in Dark Mode.
+- [ ] Manual (owner): Pause Scans in the right-click menu greys the icon and turns Scan Now off there and in the footer, which shows "Scans paused" with Resume; Resume restores both.
+
+### Release 0.2.1: the Review window in the Dock, and skip what a running process holds open (DDC-002)
+
+Story: [Release 0.2.1: the Review window in the Dock, and skip what a running process holds open](../epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md)
+
+- [ ] Manual (owner): with the Review window open, the app is in the Dock and in Cmd-Tab; the same with only Settings or only the About panel open (Settings alone is also under "Settings: folders, types, notifications"). Close the last one with its close box or ⌘W: the app leaves the Dock and Cmd-Tab, and the app that was in front before is active again with its own menu bar.
+- [ ] Manual (owner): the popover opens from the menu bar icon both with a window of the app open and with none. (A Dock click bringing the Review window forward is under "Background scan and notifications in the app"; the Close button returning to the popover under "Review and clean window".)
+- [ ] Manual (owner): with a window of the app open, ⌘Q quits, ⌘W closes the window, and ⌘C, ⌘V and ⌘A work in the Review window's filter field.
+- [ ] Manual (owner): with `uv run` servers running, select `~/.cache/uv` with a few other items and clean: within seconds the uv cache is skipped as in use by `uv`, and the clean goes on with the rest. (The Docker check of this story is the one under "VM images: Docker prune runs only while Docker Desktop answers".)
+
+### Review and clean window (DDC-002)
+
+Story: [Review and clean window](../epics/DDC-002/stories/story-review-and-clean-window.md)
+
+- [ ] Manual (owner): on the reference machine, clean a few selected `safe` items from the window: the result shows free space before and after, and `~/Library/Logs/DeepDriveCleaner/actions.jsonl` lists exactly those items.
+- [ ] Manual (owner): search, sort, the Groups and Items toggle, Check Again in the sheet and Show in Finder each work.
+- [ ] Manual (owner): Stop during a clean of several items stops after the current one, and the result lists what was done.
+- [ ] Manual (owner): the window's Close button returns to the popover, which stays open after the window is gone.
+
+### Review window: clean only the selection in this group (DDC-002)
+
+Story: [Review window: clean only the selection in this group](../epics/DDC-002/stories/story-review-window-clean-only-the-selection-in-this-group.md)
+
+- [ ] Manual (owner): with rows selected in "Browser and app caches" (called "App caches" in the story) and in Python environments, the "Clean N from Browser and app caches…" button on the group's Select all row opens a sheet listing only that group's items; after the clean the Python environments are still on disk and still selected.
+
+### Review window: sorted sidebar, Select all and folder groups (DDC-002)
+
+Story: [Review window: sorted sidebar, Select all and folder groups](../epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md)
+
+- [ ] Manual (owner): the sidebar's class tints read in light and dark mode.
+- [ ] Manual (owner): a subgroup heading collapses and expands at once; Select all and a heading's checkbox tick and untick their rows.
+- [ ] Manual (owner): a group of about 500 items opens and scrolls without visible lag. Write the group and its item count on this line when ticking it.
+
+### User data: pick your own files for the Trash (DDC-002)
+
+Story: [User data: pick your own files for the Trash](../epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md)
+
+- [ ] Manual (owner): pick a file in Downloads that you can spare, clean it: it is in the Trash, and Put Back returns it to Downloads.
+- [ ] Manual (owner): in Pictures, Photos Library is listed locked, with the app that manages it as the reason.
+- [ ] Manual (owner): User data → Cloud folders says why they are not scanned and points to Remove Download in Finder.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
@@ -234,4 +325,4 @@ Some checks change the disk (a clean, a Trash move, a runtime delete, a formula 
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-10-31*
