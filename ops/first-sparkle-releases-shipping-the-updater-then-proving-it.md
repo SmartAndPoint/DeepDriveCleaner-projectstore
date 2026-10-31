@@ -17,7 +17,7 @@ The release that first carries Sparkle (0.8.0) cannot update itself into existen
 ## Prerequisites
 
 - [ ] The Sparkle EdDSA private key is in the owner's login keychain, and its offline backup exists (`generate_keys -x`, done 2026-10-30).
-- [ ] `CURRENT_PROJECT_VERSION` in `app/DeepDriveCleaner.xcodeproj/project.pbxproj` is greater than at the last tag. `scripts/check-build-number.sh` refuses the build otherwise. Raise it in every release commit from now on, together with `MARKETING_VERSION` and the Cargo version.
+- [ ] `CURRENT_PROJECT_VERSION` in `app/DeepDriveCleaner.xcodeproj/project.pbxproj` is greater than at the last tag. `scripts/check-build-number.sh` refuses the build otherwise. `make bump` raises it with the version (runbook "Cutting a release: tag, CI archives, dist and publish").
 - [ ] CI Gate is green for the release commit.
 
 ## Steps
@@ -66,7 +66,7 @@ Before the second release, the same path can be rehearsed on a Debug build again
 
 ### `check-build-number.sh` refuses the build
 
-`CURRENT_PROJECT_VERSION` was not raised. Raise it in the release commit.
+`CURRENT_PROJECT_VERSION` was not raised: the version was bumped by hand. Bump with `make bump`.
 
 ### `generate_keys -p` does not match the zip's `SUPublicEDKey`
 
@@ -80,4 +80,4 @@ The keychain holds another key, or Info.plist was changed. Do not publish. Resto
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-10-31*
