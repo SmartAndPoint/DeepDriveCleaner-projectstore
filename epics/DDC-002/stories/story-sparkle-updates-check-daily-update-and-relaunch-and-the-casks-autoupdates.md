@@ -7,7 +7,7 @@ status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-29
-updated: 2026-10-30
+updated: 2026-10-31
 external_refs: {}
 tags: [app, updates, sparkle, homebrew, distribution, signing, network, adr-amendment]
 code_refs: ["app/DeepDriveCleaner.xcodeproj/project.pbxproj", "app/DeepDriveCleaner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/GeneralSettingsView.swift", "app/DeepDriveCleaner/Info.plist", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/SettingsWindowController.swift", "app/DeepDriveCleaner/SparkleUpdater.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/DeepDriveCleaner/UpdateLineView.swift", "app/DeepDriveCleaner/UpdaterSettings.swift", "app/Packages/DDCKit/Sources/DDCKit/AppPreferences.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskFreeRun.swift", "app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift", "app/Packages/DDCKit/Sources/DDCKit/LaunchMode.swift", "app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Sources/DDCKit/RunnerActivity.swift", "app/Packages/DDCKit/Sources/DDCKit/ScheduledWork.swift", "app/Packages/DDCKit/Sources/DDCKit/UpdateFlow.swift", "app/Packages/DDCKit/Sources/DDCKit/UpdateModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/DiskFreeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/LaunchModeTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ReviewSupport.swift", "app/Packages/DDCKit/Tests/DDCKitTests/RunnerActivityTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ScheduledScanTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/UpdateFlowTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/UpdateModelTests.swift", "Makefile", "packaging/homebrew/deepdrivecleaner.rb.tmpl", "packaging/sparkle/appcast.xml.tmpl", "README.md", "scripts/build-app.sh", "scripts/build-dist.sh", "scripts/check-build-number.sh", "scripts/check-signatures.sh", "scripts/debug-feed.sh", "scripts/publish-release.sh", "scripts/render-appcast.sh", "scripts/tests/test_appcast.py", "scripts/tests/test_build_number.py", "scripts/tests/test_cask.py", "scripts/tests/test_debug_feed.py", "scripts/tests/test_signing_check.py"]
@@ -120,6 +120,8 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 - `CURRENT_PROJECT_VERSION` must be raised in every release commit.
 - Released in 0.8.0 (tag at 356564c). Its first `make dist` stopped at the zip: `ditto --sequesterRsrc` packed the `com.apple.provenance` attribute into `__MACOSX/`. 356564c zips with `--norsrc --noextattr` instead, and the check refuses `._` entries too.
 
+**Amendment, 2026-10-31 (the owner).** A Check Now that found nothing left Settings → General unchanged, so the press looked like it did nothing. Settings → General now has a "Current version" row above the daily check: the running version and build, and under it what the last check found ("Up to date", "<version> is available", "Checking…", "Not checked yet", "The last check failed"). `UpdateModel.versionStatus(lastCheck:)`; tests `UpdateModelTests.theVersionRowSaysWhatTheLastCheckFound`, `.theVersionRowNamesAKeptUpdateAndAFailedCheck`. PR #26 (d4d674f), shipped in 0.12.0.
+
 ## Technical Notes
 
 - **Order in `publish-release.sh`.** Sign and render the appcast, then `gh release create` with the zip, the tarball and `appcast.xml`, then digests, then the cask to the tap, then the live-feed check. The release becomes "latest" with its feed in place, so the feed URL never returns 404 during a publish. Until the tap is written, the cask is one version behind; a `brew upgrade --greedy` in those minutes reinstalls the previous version, and the next check offers the update again.
@@ -143,4 +145,4 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-10-31*
