@@ -15,6 +15,7 @@ Large bodies of work broken into stories. Each epic gets its own subfolder with 
 | [DDC-006](./DDC-006/epic.md) | Code shape gate: measurable conventions that guide humans and agents | planned | 2026-10-28 |
 | [DDC-007](./DDC-007/epic.md) | Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers | planned | 2026-10-28 |
 | [DDC-008](./DDC-008/epic.md) | Native installers and the Windows tray app | planned | 2026-10-31 |
+| [DDC-009](./DDC-009/epic.md) | Ghostbusters launch: the DEV challenge and a first audience | in-progress | 2026-10-31 |
 
 ---
 

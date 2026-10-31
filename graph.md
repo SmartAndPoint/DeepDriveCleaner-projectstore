@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-31T14:46:25.446Z
+generated_at: 2026-10-31T15:08:13.983Z
 
 ---
 
@@ -71,10 +71,12 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | Whole disk: what lies outside the home folder | story | done |
 | epics/DDC-003/epic.md | Agent footprint | epic | in-progress |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
+| epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | Agent skill v0: ask ddc before guessing about the disk | story | planned |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
+| epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | Coding agents' temporary folders outside the home | story | planned |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
-| epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | in-progress |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
+| epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | planned |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | planned |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
@@ -108,6 +110,11 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | Windows scheduled scans through Task Scheduler | story | planned |
 | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | Windows signing and distribution route: research and ADR | story | planned |
 | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | Windows tray app: a minimal scheduling icon | story | planned |
+| epics/DDC-009/epic.md | Ghostbusters launch: the DEV challenge and a first audience | epic | in-progress |
+| epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | in-progress |
+| epics/DDC-009/stories/story-launch-demo-assets.md | Launch demo assets | story | planned |
+| epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | Launch measurement and follow-up | story | planned |
+| epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | Repository storefronts for the launch | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |
 | ops/native-runs-the-linux-and-windows-legs-on-the-owners-machines.md | Native runs: the Linux and Windows legs on the owner's machines | runbook | draft |
@@ -366,15 +373,20 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md | wikilink | research/what-fills-system-data-on-a-developers-mac.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
-| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-harness-data-rules.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/epic.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
@@ -385,21 +397,23 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | wikilink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
+| epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
-| epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
+| epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
@@ -519,6 +533,20 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | mdlink | epics/DDC-008/epic.md |
 | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | mdlink | epics/DDC-008/epic.md |
 | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md |
+| epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-launch-demo-assets.md |
+| epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md |
+| epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md |
+| epics/DDC-009/epic.md | mdlink | epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md |
+| epics/DDC-009/epic.md | mdlink | epics/DDC-009/stories/story-launch-demo-assets.md |
+| epics/DDC-009/epic.md | mdlink | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md |
+| epics/DDC-009/epic.md | mdlink | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md |
+| epics/DDC-009/epic.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-009/epic.md | wikilink | epics/DDC-003/epic.md |
+| epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | mdlink | epics/DDC-009/epic.md |
+| epics/DDC-009/stories/story-launch-demo-assets.md | mdlink | epics/DDC-009/epic.md |
+| epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | mdlink | epics/DDC-009/epic.md |
+| epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | mdlink | epics/DDC-009/epic.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |

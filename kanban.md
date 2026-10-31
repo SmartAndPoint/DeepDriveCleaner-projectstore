@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-31T14:46:25.031Z
+generated_at: 2026-10-31T15:20:30.116Z
 
 ---
 
@@ -13,6 +13,9 @@ generated_at: 2026-10-31T14:46:25.031Z
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1
+- [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
+- [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
+- [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
@@ -28,6 +31,9 @@ generated_at: 2026-10-31T14:46:25.031Z
 - [ ] [[epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler|DDC-008: Windows scheduled scans through Task Scheduler]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr|DDC-008: Windows signing and distribution route: research and ADR]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon|DDC-008: Windows tray app: a minimal scheduling icon]] #p1
+- [ ] [[epics/DDC-009/stories/story-launch-demo-assets|DDC-009: Launch demo assets]] #p1
+- [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
+- [ ] [[epics/DDC-009/stories/story-repository-storefronts-for-the-launch|DDC-009: Repository storefronts for the launch]] #p1
 
 ## ToDo
 
@@ -37,12 +43,12 @@ generated_at: 2026-10-31T14:46:25.031Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-003: DEV challenge entry: Ghostbusters for coding agents]] #p1
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-linux-scanner-and-rule-catalog|DDC-007: Linux scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
+- [ ] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1
 
 ## Review
 
