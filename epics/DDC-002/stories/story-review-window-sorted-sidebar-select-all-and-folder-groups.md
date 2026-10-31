@@ -3,17 +3,17 @@ type: story
 id: "story-review-window-sorted-sidebar-select-all-and-folder-groups"
 epic: "DDC-002"
 title: "Review window: sorted sidebar, Select all and folder groups"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-20
-updated: 2026-10-20
+updated: 2026-10-31
 external_refs: {}
 tags: [app, review-window, ux]
 code_refs: []
 specs: []
 started_at: "2026-10-20T06:20:37.075Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:47.080Z"
 plan_updated_at: "2026-10-20T06:20:37.075Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-20T06:20:37.075Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -41,17 +41,17 @@ This story changes how the Groups view is laid out and ordered. What can be sele
 
 ## Decomposition
 
-- [ ] **Sidebar on the window's own background**, not a grey source list.
+- [x] **Sidebar on the window's own background**, not a grey source list.
   - Each class section (Safe, Rebuildable, Review) sits on a light tint of its class colour: about 7 % of `ReportClassStyle` in light mode, a matching tint in dark mode.
   - The selected entry gets a stronger tint (about 16 %) and a semibold name.
   - The section header is a darker shade of the class colour that passes 4.5:1 on its tint.
   - This is board 9's `tint`; its `glow` variant was not chosen.
-- [ ] **Sidebar order.** Within each class, entries are ordered by the group's total bytes, largest first; ties keep the `rules --json` group order. The order uses the total, not the selected amount, so an entry does not move while the user ticks.
-- [ ] **Select all.** The first row of a group's view is "Select all": a tri-state checkbox with the group's folder count and size. In a group with one rule it replaces the rule's header row.
-- [ ] **No repeated words on item rows.**
+- [x] **Sidebar order.** Within each class, entries are ordered by the group's total bytes, largest first; ties keep the `rules --json` group order. The order uses the total, not the selected amount, so an entry does not move while the user ticks.
+- [x] **Select all.** The first row of a group's view is "Select all": a tri-state checkbox with the group's folder count and size. In a group with one rule it replaces the rule's header row.
+- [x] **No repeated words on item rows.**
   - The rule id, the action, the class and "not selected by default" are said once: in the group's description, or on the rule's subgroup heading when the group has several rules. The recreate hint moves there too.
   - An item row keeps only what is its own: how long it has been untouched, why it is locked or will be skipped, and "frees ~" when that differs from its size.
-- [ ] **Subgroups, file-manager style.**
+- [x] **Subgroups, file-manager style.**
   - **A group with one rule:** its items fall into folder subgroups, one per first folder under the home folder (`~/temp`, `~/Projects`). Each item's path is shown relative to its subgroup.
     - Items carrying the report's `app-owned` note form one subgroup of their own, "Inside apps' own folders", with full paths.
     - A path outside the home folder falls under a subgroup named by its volume (`/Volumes/Work`), or by its first component elsewhere (`/opt`).
@@ -61,8 +61,8 @@ This story changes how the Groups view is laid out and ordered. What can be sele
     - subgroups are ordered by size, largest first, and items by size within each subgroup;
     - every subgroup is expanded when the group opens;
     - what is collapsed lasts while the window stays open.
-- [ ] **The group's header** shows "selected of total", as the sidebar does.
-- [ ] **Accessibility.**
+- [x] **The group's header** shows "selected of total", as the sidebar does.
+- [x] **Accessibility.**
   - The chevron is a button that reports expanded or collapsed and names its subgroup.
   - Every checkbox is labelled.
   - A tint never carries meaning alone: the class name heads each section.
@@ -141,14 +141,16 @@ New `ReviewGroupsTests.swift`, with builders in `ReviewSupport.swift`; one test 
 
 ## Acceptance Criteria
 
-- [ ] Unit test: sidebar entries within a class are ordered by total bytes, largest first, and the order does not change when the selection does
-- [ ] Unit test: subgroups follow the decomposition and are ordered by size, as are the items in each:
+- [x] Unit test: sidebar entries within a class are ordered by total bytes, largest first, and the order does not change when the selection does — evidence: `ReviewGroupsTests.sidebarOrder`
+- [x] Unit test: subgroups follow the decomposition and are ordered by size, as are the items in each:
   - a one-rule group's subgroups are the first folders under home, with `app-owned` items in a subgroup of their own and paths relative to their subgroup;
   - a several-rule group has one subgroup per rule, titled by the id's last part;
   - a one-item rule is a single row.
-- [ ] Unit test: Select all and a subgroup heading are off, mixed or on over their selectable rows; toggling one changes only its selectable rows; locked rows never change
-- [ ] Unit test: an item row's detail line holds none of the rule id, the action, the class or "not selected by default"
-- [ ] Manual check:
+
+  Evidence: `ReviewGroupsTests.foldersShape`, `.rulesShape`.
+- [x] Unit test: Select all and a subgroup heading are off, mixed or on over their selectable rows; toggling one changes only its selectable rows; locked rows never change — evidence: `ReviewGroupsTests.triState`
+- [x] Unit test: an item row's detail line holds none of the rule id, the action, the class or "not selected by default" — evidence: `ReviewGroupsTests.ownDetail`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31):
   - the sidebar tints in light and dark mode;
   - collapsing and expanding;
   - Select all and a heading's checkbox;
@@ -156,8 +158,18 @@ New `ReviewGroupsTests.swift`, with builders in `ReviewSupport.swift`; one test 
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The Review window's Groups view, re-laid out after the owner's first try (board 9, `tint`). Shipped in 0.2.0.
+- The sidebar sits on the window's background, each class section on a light tint of its colour, ordered by each group's total bytes; ticking never moves an entry.
+- A group's view starts with a tri-state Select all row; item rows keep only what is their own, and the rule, action, class and default note move to the group's description or the subgroup heading.
+- A one-rule group falls into folder subgroups (the first folder under home, a volume, `app-owned` apart, paths relative); a several-rule group has one subgroup per rule. Headings fold, carry a tri-state checkbox, and keep their state while the window is open.
+- The group's header and the sidebar say "selected of total"; the chevron and every checkbox carry accessibility labels and values.
+
+**Why.** The owner's feedback of 2026-10-20 on "Review and clean window" (DDC-002): a grey sidebar in catalog order, rows that repeat their rule, and flat lists of dozens of folders.
+
+**Tests.** `ReviewGroupsTests` as above (also `.collapse`, `.amount`, `.userDataNoSelectAll`), run by the Gate's `app` job (green on main at 2cdae98, 2026-10-31). Closed under the owner's rule of 2026-10-30: the manual check moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- The tints in light and dark mode and the speed of a 500-item group are manual checks in the runbook; no test measures the scrolling.
 
 ## Technical Notes
 
@@ -175,4 +187,4 @@ New `ReviewGroupsTests.swift`, with builders in `ReviewSupport.swift`; one test 
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-31*

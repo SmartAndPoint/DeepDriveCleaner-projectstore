@@ -3,17 +3,17 @@ type: story
 id: "story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open"
 epic: "DDC-002"
 title: "Release 0.2.1: the Review window in the Dock, and skip what a running process holds open"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-20
-updated: 2026-10-20
+updated: 2026-10-31
 external_refs: {}
 tags: [release, app, safety, in-use]
 code_refs: []
 specs: []
 started_at: "2026-10-20T14:18:21.245Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.770Z"
 plan_updated_at: "2026-10-20T14:18:21.245Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-20T14:18:21.245Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -45,16 +45,16 @@ Two problems the owner hit on the first day of 0.2.0 (2026-10-20), on the refere
 
 ## Decomposition
 
-- [ ] App: the activation policy follows the app's titled windows (Review, Settings, About; never the popover or the status item). On open: `.regular` first, then `makeKeyAndOrderFront`, then `activate()`. On the last `willClose`: `.accessory`. After the close box or ⌘W, then yield the activation, so the previous app and its menu bar come back; after the Review window's Close button, whose destination is the popover, stay active as today (a yield followed by an immediate re-activation can be refused under cooperative activation). The Settings window gets the close observer it lacks today
-- [ ] App: a click on the Dock icon (a reopen event) brings the open windows to the front, in addition to the existing "scan if due"; the reopen cannot be told from the scheduler's `open`, so the effect is additive. `LaunchMode` covers `(.normal, .reopen)` with a window open
-- [ ] App: a main menu for the regular state: the app menu (About, Settings…, Hide, Quit ⌘Q), Edit (Undo, Redo, Cut, Copy, Paste, Select All, so the search field's shortcuts work), Window (Minimize ⌘M, Close ⌘W). This is the ⌘W follow-up story "Review and clean window" left open
-- [ ] Core: the open vnode files of the current user's processes (`proc_pidinfo(PROC_PIDLISTFDS)` sized from `pbi_nfiles` with slack; `proc_pidfdinfo(PROC_PIDFDVNODEPATHINFO)` only for `PROX_FDTYPE_VNODE`; an fd closed in between, EBADF or ENOENT, is skipped; an empty path, an unlinked file, is ignored), in the `sys` tree where `unsafe` is allowed; its own pid and its children excluded. The hidden `diag` command prints the read's duration and fd count
-- [ ] Core: the guard counts open files for `delete` and `native` items; `native-only` items skip the in-use check entirely; Trash moves never count open files. An open-file hit is confirmed by re-reading that one process after about 250 ms. Before each `native` command the open files are read again for that item. The in-use reason names the app bundle when the process lives in one. The dry run (`clean --items --dry-run`, the sheet's check) predicts the same
-- [ ] Core: `NativeCommand` takes optional environment variables; `cache.uv` sets `UV_LOCK_TIMEOUT=10`
-- [ ] Safety ADR: a dated amendment to the in-use definition of §5 (open files for `delete` and `native`; never for a Trash move; `native-only` exempt; the re-read before a tool's command; the confirmation re-read), a dated note on the user-data amendment's sentence about open files, and a note that the scan's default selection does not consult processes (only the clean does)
-- [ ] Menu-bar ADR: a dated amendment to §2 (regular while a titled window is open, accessory after the last one, the main menu)
-- [ ] README ("The menu bar app": the Dock icon while a window is open; Safety: "or has a file open inside it", `native-only` exempt) and release notes `docs/releases/0.2.1.md` (the two fixes, the Docker prune fix, do not upgrade while the app is cleaning)
-- [ ] Version 0.2.1 (Cargo, `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` 3); `make dist`; publish dry run shown to the owner; publish on the owner's approval
+- [x] App: the activation policy follows the app's titled windows (Review, Settings, About; never the popover or the status item). On open: `.regular` first, then `makeKeyAndOrderFront`, then `activate()`. On the last `willClose`: `.accessory`. After the close box or ⌘W, then yield the activation, so the previous app and its menu bar come back; after the Review window's Close button, whose destination is the popover, stay active as today (a yield followed by an immediate re-activation can be refused under cooperative activation). The Settings window gets the close observer it lacks today
+- [x] App: a click on the Dock icon (a reopen event) brings the open windows to the front, in addition to the existing "scan if due"; the reopen cannot be told from the scheduler's `open`, so the effect is additive. `LaunchMode` covers `(.normal, .reopen)` with a window open
+- [x] App: a main menu for the regular state: the app menu (About, Settings…, Hide, Quit ⌘Q), Edit (Undo, Redo, Cut, Copy, Paste, Select All, so the search field's shortcuts work), Window (Minimize ⌘M, Close ⌘W). This is the ⌘W follow-up story "Review and clean window" left open
+- [x] Core: the open vnode files of the current user's processes (`proc_pidinfo(PROC_PIDLISTFDS)` sized from `pbi_nfiles` with slack; `proc_pidfdinfo(PROC_PIDFDVNODEPATHINFO)` only for `PROX_FDTYPE_VNODE`; an fd closed in between, EBADF or ENOENT, is skipped; an empty path, an unlinked file, is ignored), in the `sys` tree where `unsafe` is allowed; its own pid and its children excluded. The hidden `diag` command prints the read's duration and fd count
+- [x] Core: the guard counts open files for `delete` and `native` items; `native-only` items skip the in-use check entirely; Trash moves never count open files. An open-file hit is confirmed by re-reading that one process after about 250 ms. Before each `native` command the open files are read again for that item. The in-use reason names the app bundle when the process lives in one. The dry run (`clean --items --dry-run`, the sheet's check) predicts the same
+- [x] Core: `NativeCommand` takes optional environment variables; `cache.uv` sets `UV_LOCK_TIMEOUT=10`
+- [x] Safety ADR: a dated amendment to the in-use definition of §5 (open files for `delete` and `native`; never for a Trash move; `native-only` exempt; the re-read before a tool's command; the confirmation re-read), a dated note on the user-data amendment's sentence about open files, and a note that the scan's default selection does not consult processes (only the clean does)
+- [x] Menu-bar ADR: a dated amendment to §2 (regular while a titled window is open, accessory after the last one, the main menu)
+- [x] README ("The menu bar app": the Dock icon while a window is open; Safety: "or has a file open inside it", `native-only` exempt) and release notes `docs/releases/0.2.1.md` (the two fixes, the Docker prune fix, do not upgrade while the app is cleaning)
+- [x] Version 0.2.1 (Cargo, `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION` 3); `make dist`; publish dry run shown to the owner; publish on the owner's approval
 
 ## Implementation Plan
 
@@ -75,25 +75,38 @@ No covering spec; the design is the two ADR amendments of 2026-10-20 (safety §5
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] While any titled window of the app is open (Review, Settings, About), its icon is in the Dock and it is in Cmd-Tab; after the last one closes, neither shows it, and the app that was active before is active again with its menu bar (DDCKit test of the policy decision from the open windows; manual check)
-- [ ] A click on the Dock icon brings the open window to the front; Close on the Review window still returns to the popover, and the popover opens from the icon in both states (DDCKit test of `(.normal, .reopen)` with a window open; manual check)
-- [ ] In the regular state the main menu works: ⌘Q quits, ⌘W closes the window, ⌘C / ⌘V / ⌘A work in the search field (manual check)
-- [ ] Rust test (real process: `/bin/sleep` with stdin from a file inside the finding, killed by a drop guard; temp root canonicalized, since the kernel reports `/private/var/…`): `clean --items` skips the deletable finding as `in-use` with that pid and name, and `clean --items --dry-run` predicts the same; once the process exits, the item is cleaned
-- [ ] Rust test: a tool's own command (a fake tool that records whether it ran) is not started for a finding a process holds open, including a process that starts holding it after the clean began (the re-read before the command)
-- [ ] Rust test: a finding bound for the Trash is moved even while a process holds a file open inside it
-- [ ] Rust test: a `native-only` finding whose path a process uses (its working directory or an open file inside it) still runs its prune commands
-- [ ] Rust test: an open-file hit that is gone on the confirming re-read does not skip the item (a fake process table whose second read is empty)
-- [ ] Rust test: the uv rule's command carries `UV_LOCK_TIMEOUT=10`
-- [ ] The open-file read of the user's processes costs at most 1 s on the reference machine (measured with the hidden `diag` command, the number recorded here)
-- [ ] The safety ADR (§5 and the user-data amendment) and the menu-bar ADR (§2) carry the dated amendments of the decomposition
-- [ ] Manual check on the reference machine: with the owner's `uv run` servers running, a clean with `~/.cache/uv` selected skips it as in use by `uv` within seconds and goes on with the rest
-- [ ] Manual check on the reference machine: with Docker Desktop running, a dry run of a selected Docker item no longer says "In use"
-- [ ] 0.2.1 published like 0.2.0: `make dist`, the dry run shown, the publish on the owner's approval, the cask at 0.2.1
+- [x] While any titled window of the app is open (Review, Settings, About), its icon is in the Dock and it is in Cmd-Tab; after the last one closes, neither shows it, and the app that was active before is active again with its menu bar (DDCKit test of the policy decision from the open windows; manual check) — evidence for the policy decision: `DockPresenceTests.firstWindow`, `.lastClose` (`.accessory` and the yield), `.closeToPopover`, `.unknownClose`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the manual half of the criterion above: the Dock icon and Cmd-Tab while a titled window is open, and the previous app active again with its menu bar after the last one closes
+- [x] A click on the Dock icon brings the open window to the front; Close on the Review window still returns to the popover, and the popover opens from the icon in both states (DDCKit test of `(.normal, .reopen)` with a window open; manual check) — evidence for the tested half: `LaunchModeTests.reopenWithAWindowOpen` (`.scanIfDue` and `.frontWindows`), `DockPresenceTests.closeToPopover`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the manual half of the criterion above: the Dock click brings the window forward, Close on the Review window returns to the popover, and the popover opens from the icon with and without a window open
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): in the regular state the main menu works: ⌘Q quits, ⌘W closes the window, ⌘C / ⌘V / ⌘A work in the search field (manual check)
+- [x] Rust test (real process: `/bin/sleep` with stdin from a file inside the finding, killed by a drop guard; temp root canonicalized, since the kernel reports `/private/var/…`): `clean --items` skips the deletable finding as `in-use` with that pid and name, and `clean --items --dry-run` predicts the same; once the process exits, the item is cleaned — evidence: `crates/ddc-cli/tests/clean_items_cli.rs::a_file_held_open_by_a_running_process_is_skipped_until_it_closes`; in the core, `crates/ddc-core/tests/in_use.rs::a_file_held_open_inside_a_deleted_finding_skips_it_and_the_dry_run_says_so`
+- [x] Rust test: a tool's own command (a fake tool that records whether it ran) is not started for a finding a process holds open, including a process that starts holding it after the clean began (the re-read before the command) — evidence: `crates/ddc-core/tests/in_use.rs::a_tool_command_never_starts_while_a_process_holds_its_cache_open` (held from the start, and taken after the snapshot); `crates/ddc-cli/tests/clean_items_cli.rs::a_tool_never_starts_on_a_cache_a_running_process_holds_open`
+- [x] Rust test: a finding bound for the Trash is moved even while a process holds a file open inside it — evidence: `crates/ddc-core/tests/in_use.rs::a_move_to_the_trash_ignores_open_files_and_a_permanent_delete_does_not`
+- [x] Rust test: a `native-only` finding whose path a process uses (its working directory or an open file inside it) still runs its prune commands — evidence: `crates/ddc-core/tests/in_use.rs::a_runtime_prunes_while_its_daemon_works_inside_its_finding`
+- [x] Rust test: an open-file hit that is gone on the confirming re-read does not skip the item (a fake process table whose second read is empty) — evidence: `crates/ddc-core/tests/in_use.rs::a_file_closed_by_the_confirming_read_does_not_skip`
+- [x] Rust test: the uv rule's command carries `UV_LOCK_TIMEOUT=10` — evidence: `crates/ddc-core/tests/in_use.rs::a_tool_command_never_starts_while_a_process_holds_its_cache_open` asserts the environment of `uv cache clean`; the rule sets it in `crates/ddc-core/src/rules/catalog/shared/caches.rs`
+- [x] The open-file read of the user's processes costs at most 1 s on the reference machine (measured with the hidden `diag` command, the number recorded here) — evidence: 2026-10-20, release build: 642 processes, about 7,100 open vnode files, 28 to 76 ms (Technical Notes); 2026-10-31, `deepdrivecleaner diag` of the CLI 0.12.1 on the owner's Mac: `process_snapshot: 443 processes, 4827 open files`, 39 ms, then 14 ms and 14 ms
+- [x] The safety ADR (§5 and the user-data amendment) and the menu-bar ADR (§2) carry the dated amendments of the decomposition — evidence: ADR "Cleanup safety model: risk classes, plan and confirmation": §5's in-use item and its Amendments entry "2026-10-20, decided by the owner (0.2.1)", and the dated note on the user-data amendment; ADR "Menu bar app: Swift shell over the ddc CLI", §2, "Amended 2026-10-20 for 0.2.1"
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): on the reference machine, with the owner's `uv run` servers running, a clean with `~/.cache/uv` selected skips it as in use by `uv` within seconds and goes on with the rest
+- [x] Manual check on the reference machine: with Docker Desktop running, a dry run of a selected Docker item no longer says "In use" — superseded: the owner-checks runbook's check of "VM images: Docker prune runs only while Docker Desktop answers" (DDC-002) runs it against a real Docker Desktop. The automated half: `crates/ddc-core/tests/in_use.rs::a_runtime_prunes_while_its_daemon_works_inside_its_finding` (a fake Docker backend working inside the finding: the dry run predicts `would-run` and the clean runs both prunes)
+- [x] 0.2.1 published like 0.2.0: `make dist`, the dry run shown, the publish on the owner's approval, the cask at 0.2.1 — evidence: tag v0.2.1 at 9f0d970 ("release: prepare 0.2.1 with the app in the Dock and open-file checks"), `docs/releases/0.2.1.md`; the tap has since moved on with every release to 0.12.1
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** Release 0.2.1 (9f0d970), the two fixes the owner asked for after the first day of 0.2.0.
+- The app is a regular app while one of its titled windows is open (Review, Settings, About): in the Dock and in Cmd-Tab, with a main menu (app, Edit, Window). After the last one closes it returns to the menu bar and yields the focus to the app that had it, except when the Review window's Close leads to the popover. A Dock click brings the windows forward (`DockPresence` and `LaunchMode` in DDCKit, `DockPresenceController` and `MainMenu` in the app).
+- Open files count as use for `delete` and `native` items: the core reads the open vnode files of the user's processes, confirms a hit by reading that process again about 250 ms later, and reads again right before each tool command. A move to the Trash never counts open files; `native-only` items skip the in-use check altogether, which fixed Docker's prune being skipped whenever Docker ran. `cache.uv` runs with `UV_LOCK_TIMEOUT=10`.
+- The hidden `diag` command prints the open-file read's process count, file count and time.
+- Dated amendments to the safety ADR's §5 and the menu bar ADR's §2; README and release notes.
+
+**Why.** On 2026-10-20 a clean of 214 items waited the full 10-minute timeout on `uv cache clean`, because running `uv run` servers held uv's cache lock through an open file the in-use check did not see; and the Review window could not be found once another app was in front.
+
+**Tests.** The evidence above; the Rust tests run in the Gate's `gate` job on macOS and the DDCKit tests in its `app` job, both green on main at 2cdae98 (2026-10-31). The open-file read was measured again on 2026-10-31 at 14 to 39 ms. Closed under the owner's rule of 2026-10-30: the manual checks moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- A process that opens a file inside a finding during a tool's command is not seen; uv then fails within `UV_LOCK_TIMEOUT`, any other tool within the 600 s `NATIVE_TIMEOUT`.
+- The Dock and Cmd-Tab behaviour, the main menu and the uv skip on the reference machine are manual checks in the runbook.
 
 ## Technical Notes
 
@@ -121,4 +134,4 @@ No covering spec; the design is the two ADR amendments of 2026-10-20 (safety §5
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-31*

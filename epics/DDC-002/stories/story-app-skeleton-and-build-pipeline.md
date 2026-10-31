@@ -3,17 +3,17 @@ type: story
 id: "story-app-skeleton-and-build-pipeline"
 epic: "DDC-002"
 title: "App skeleton and build pipeline"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-20
+updated: 2026-10-31
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, build, signing]
 code_refs: []
 specs: []
 started_at: "2026-10-18T10:42:53.267Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.223Z"
 plan_updated_at: "2026-10-18T10:42:53.267Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-18T10:42:53.267Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -44,26 +44,26 @@ It implements §1, §2, §3, §4 and §8 of the ADR "Menu bar app: Swift shell o
 
 Rough until the plan gate.
 
-- [ ] **Spike tools** in Debug builds: Probe Full Disk Access (logs the errno), Register and Unregister Scheduler Agent, Post Test Notification, and the `DebugHoldSeconds` default that keeps a `--scheduled` instance alive. The spike's checks moved to the clean-machine check of "Distribution: the 0.2.0 cask with the app" (owner's decision, 2026-10-18, epic Decisions): the app is finished and dogfooded here first, then checked on the work laptop after the brew install
-- [ ] `app/DeepDriveCleaner.xcodeproj`: Swift, deployment target macOS 26 (ADR §3), bundle id `com.smartandpoint.deepdrivecleaner`, `LSUIElement`, hardened runtime, no sandbox; Debug builds signed with the same Developer ID as releases, so one TCC identity covers both (GrammarHelper's rule)
-- [ ] Icons:
+- [x] **Spike tools** in Debug builds: Probe Full Disk Access (logs the errno), Register and Unregister Scheduler Agent, Post Test Notification, and the `DebugHoldSeconds` default that keeps a `--scheduled` instance alive. The spike's checks moved to the clean-machine check of "Distribution: the 0.2.0 cask with the app" (owner's decision, 2026-10-18, epic Decisions): the app is finished and dogfooded here first, then checked on the work laptop after the brew install
+- [x] `app/DeepDriveCleaner.xcodeproj`: Swift, deployment target macOS 26 (ADR §3), bundle id `com.smartandpoint.deepdrivecleaner`, `LSUIElement`, hardened runtime, no sandbox; Debug builds signed with the same Developer ID as releases, so one TCC identity covers both (GrammarHelper's rule)
+- [x] Icons:
   - an `AppIcon` asset in every macOS size (16 to 512 pt at 1x and 2x), compiled by the build into the bundle's `.icns`;
   - a template glyph for the status item;
   - both drawn as on the canvas: a drive outline with a line and a dot
-- [ ] App delegate: `NSStatusItem` with the template glyph, `NSPopover` hosting a SwiftUI placeholder, right-click `NSMenu` (Scan now, Settings…, Quit)
-- [ ] One runner for the CLI (ADR §1):
+- [x] App delegate: `NSStatusItem` with the template glyph, `NSPopover` hosting a SwiftUI placeholder, right-click `NSMenu` (Scan now, Settings…, Quit)
+- [x] One runner for the CLI (ADR §1):
   - locates `Contents/Helpers/deepdrivecleaner` and runs it with `Process`;
   - serialises every run: a scan, a clean, a dry run and `rules --json` never overlap; a scan requested while one runs joins it; a clean requested during a scan starts when the scan ends;
   - reads stdout and stderr concurrently, decodes stdout JSON and forwards stderr progress lines;
   - sends SIGTERM on cancel and maps exit codes 0 / 1 / 2 / 75 to done, error, refused and busy
-- [ ] The scheduler agent's plist at `Contents/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist`
-- [ ] Launch modes as a small state machine (ADR §5):
+- [x] The scheduler agent's plist at `Contents/Library/LaunchAgents/com.smartandpoint.deepdrivecleaner.scheduler.plist`
+- [x] Launch modes as a small state machine (ADR §5):
   - normal: status item, keeps running;
   - `--scheduled`: no status item; quits when its work is done (the work itself belongs to "Background scan and notifications in the app");
   - a reopen or activate event, a further launch (Finder, Spotlight, the login item) or a notification response promotes a `--scheduled` instance to normal: it creates the status item and keeps running, so a scheduled instance never swallows a user launch
-- [ ] Login item through `SMAppService.mainApp`; the toggle shows `SMAppService.status` (including `requiresApproval`, with a button that opens Login Items settings), never a stored bool
-- [ ] Log file `~/Library/Logs/DeepDriveCleaner/app.log`, next to the CLI's logs
-- [ ] `make app`: release-build the CLI, copy it into `Contents/Helpers`, build the app. `make app-dist`: sign the CLI as `com.smartandpoint.deepdrivecleaner.cli`, then the app, notarize, staple, zip, with the `.env` identity, the notary profile and the team of `make dist` (team 8MSDJTBW2D, ADR §8)
+- [x] Login item through `SMAppService.mainApp`; the toggle shows `SMAppService.status` (including `requiresApproval`, with a button that opens Login Items settings), never a stored bool
+- [x] Log file `~/Library/Logs/DeepDriveCleaner/app.log`, next to the CLI's logs
+- [x] `make app`: release-build the CLI, copy it into `Contents/Helpers`, build the app. `make app-dist`: sign the CLI as `com.smartandpoint.deepdrivecleaner.cli`, then the app, notarize, staple, zip, with the `.env` identity, the notary profile and the team of `make dist` (team 8MSDJTBW2D, ADR §8)
 
 ## Implementation Plan
 
@@ -170,19 +170,32 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Manual check on the reference machine with the Debug build: after Register Scheduler Agent, `SMAppService` reports `.enabled` or `.requiresApproval`, and `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner.scheduler` with the app quit logs a `--scheduled` launch in `app.log`; this settles the `open` program against the `--tick` fallback. Probe Full Disk Access logs its errno and Post Test Notification posts. (The attribution checks moved to "Distribution: the 0.2.0 cask with the app", owner's decision 2026-10-18.)
-- [ ] `make app-dist` produces `DeepDriveCleaner-<version>.zip`. The app inside passes `codesign --verify --deep --strict`, `spctl --assess --type execute` (accepted, Notarized Developer ID) and `xcrun stapler validate`. The embedded CLI is signed with identifier `com.smartandpoint.deepdrivecleaner.cli` and the same team. The bundle holds the scheduler plist, and `Info.plist` names the compiled icon
-- [ ] Manual check: Finder, System Settings → Login Items & Extensions, and a test notification show the app's icon, not a generic one; the status item shows the template glyph in light and dark menu bars
-- [ ] Unit test with a fake CLI that counts its runs: two scan requests while a scan runs start one process; a clean requested during a scan starts only after the scan ends; two CLI processes never run at once
-- [ ] Unit test: the runner reads a fake CLI that writes 1 MiB to stderr, then 1 MiB to stdout, and finishes without a deadlock
-- [ ] Unit test of the launch-mode state machine: a `--scheduled` start has no status item and quits when its work is done; a reopen, an activate, a further launch or a notification response during that work promotes it to normal mode, with the status item, and it does not quit afterwards; a normal start never quits on its own
-- [ ] Unit test: the runner decodes a recorded `ddc scan --json` report and treats one with another `schema_version` as unreadable; exit codes 2 and 75 map to refused and busy
-- [ ] Manual check: the app has no Dock icon and shows a status item; Quit in the right-click menu exits it; the open-at-login toggle registers and unregisters `SMAppService.mainApp`, and after a change made in System Settings the app shows the system's state
+- [x] Manual check on the reference machine with the Debug build: after Register Scheduler Agent, `SMAppService` reports `.enabled` or `.requiresApproval`, and `launchctl kickstart gui/<uid>/com.smartandpoint.deepdrivecleaner.scheduler` with the app quit logs a `--scheduled` launch in `app.log`; this settles the `open` program against the `--tick` fallback. (The attribution checks moved to "Distribution: the 0.2.0 cask with the app", owner's decision 2026-10-18.) — superseded: "Background scan and notifications in the app" (DDC-002), decision B6, settled the question the other way round: the primary plist runs the app's own binary (`BundleProgram Contents/MacOS/DeepDriveCleaner`, `--tick`), and `com.smartandpoint.deepdrivecleaner.scheduler-open.plist` with the `open` program is the fallback when the primary is refused; `ScheduledScanTests.bundledPlists`, `.fallback`, `.agentHeals` (commit dad390e, shipped in 0.3.0). The tick that launches the app with `--scheduled` is that story's manual check, already in the owner-checks runbook.
+- [ ] Not checked at close (2026-10-31), a follow-up: Probe Full Disk Access logs its errno and Post Test Notification posts. Both Debug spike tools still live in `app/DeepDriveCleaner/DebugMenu.swift`; what they were for is now covered by the app's own probe (`PopoverModelTests.accessFollowsTheProbe`, `.probe`) and by the scheduled scan's notifications ("Background scan and notifications in the app"). Remove them, or check them once in a Debug build: the check is in the owner-checks runbook under this story.
+- [x] `make app-dist` produces `DeepDriveCleaner-<version>.zip`. The app inside passes `codesign --verify --deep --strict`, `spctl --assess --type execute` (accepted, Notarized Developer ID) and `xcrun stapler validate`. The embedded CLI is signed with identifier `com.smartandpoint.deepdrivecleaner.cli` and the same team. The bundle holds the scheduler plist, and `Info.plist` names the compiled icon — evidence: `scripts/build-app.sh` fails the build on each of these: `sign_code` checks the identifier and team of the CLI and the app, then `codesign --verify --deep --strict` and `scripts/check-signatures.sh`, both scheduler plists in `Contents/Library/LaunchAgents`, `CFBundleIconFile` = `AppIcon` with `AppIcon.icns`; with `--dist`, `stapler validate` and `spctl --assess` with `source=Notarized Developer ID`. Every release from v0.2.0 to v0.12.1 was built through it, with each check the criterion names since v0.2.0 (the fallback-plist check since 0.3.0, `scripts/check-signatures.sh` since 0.8.0); `make app-dist` is now an alias of `make dist`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): Finder, System Settings → Login Items & Extensions, and a test notification show the app's icon, not a generic one; the status item shows the template glyph in light and dark menu bars
+- [x] Unit test with a fake CLI that counts its runs: two scan requests while a scan runs start one process; a clean requested during a scan starts only after the scan ends; two CLI processes never run at once — evidence: `CLIRunnerTests.joinedScans`, `.cleanWaitsForScan`, `.runsNeverOverlap`
+- [x] Unit test: the runner reads a fake CLI that writes 1 MiB to stderr, then 1 MiB to stdout, and finishes without a deadlock — evidence: `CLIRunnerTests.bothPipesDrained`
+- [x] Unit test of the launch-mode state machine: a `--scheduled` start has no status item and quits when its work is done; a reopen, an activate, a further launch or a notification response during that work promotes it to normal mode, with the status item, and it does not quit afterwards; a normal start never quits on its own — evidence: `LaunchModeTests.scheduledQuits`, `.promotion` (parameterised over the three promoting events, `.reopen`, `.activate` and `.notificationResponse`; a further launch of a running app reaches it as a reopen, through `applicationShouldHandleReopen`, so it is the `.reopen` case), `.normalNeverQuits`
+- [x] Unit test: the runner decodes a recorded `ddc scan --json` report and treats one with another `schema_version` as unreadable; exit codes 2 and 75 map to refused and busy — evidence: `ScanReportTests.decodesRecordedReport`, `.otherSchemaIsUnreadable`, `.schemaVersionMatchesTheCLI`; `CLIRunnerTests.exitStatuses` (0, 1, 2, 75)
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the app has no Dock icon and shows a status item (changed by "Release 0.2.1: the Review window in the Dock, and skip what a running process holds open" (DDC-002): while a titled window is open the app is in the Dock, `DockPresenceController`; with none open, no Dock icon); Quit in the right-click menu exits it; the open-at-login toggle registers and unregisters `SMAppService.mainApp`, and after a change made in System Settings the app shows the system's state
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The shell every other story of the epic builds on, shipped in 0.2.0 and built on by every release since.
+- The Xcode project (`app/`), with the logic in the DDCKit package under `swift test`: `CLIRunner` (one queue for every CLI run, a scan joined, a clean queued behind it, both pipes drained, SIGTERM on cancel, exit codes 0 / 1 / 2 / 75 mapped), `ScanReport` (reads `schema_version` first), `LaunchMode` (normal, `--scheduled`, promotion), `HelperLocator`.
+- The app: `main.swift` with `--tick`, the status item with its popover and right-click menu, the login item through `SMAppService.mainApp` read from the system, `app.log`, the icons drawn from one `DriveGlyph`.
+- `scripts/build-app.sh` signs the embedded CLI as `com.smartandpoint.deepdrivecleaner.cli` and the app, checks both, notarizes, staples and zips; `make app` and `make dist` (with `make app-dist` as its alias) run it.
+- The scheduler agent's plist is in the bundle. Which program it runs was settled by "Background scan and notifications in the app" (DDC-002), decision B6: the app's own binary with `--tick`, and the `open` plist as the fallback.
+
+**Why.** ADR "Menu bar app: Swift shell over the ddc CLI", §1 to §5 and §8: one app that runs the CLI it ships, with one Full Disk Access grant.
+
+**Tests.** The evidence above, all on origin/main; the build checks run on every release from v0.2.0 to v0.12.1. Closed under the owner's rule of 2026-10-30: the automated criteria are ticked with evidence, the manual ones moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- The Debug spike tools Probe Full Disk Access and Post Test Notification are still in `app/DeepDriveCleaner/DebugMenu.swift` and were never checked as this story's first criterion asked. Remove them or check them once.
+- The app icon in Finder and in notifications, the status glyph in light and dark menu bars, Quit and the login toggle are manual checks in the owner-checks runbook.
+- The clean-machine check of the access attribution (§5) is still open, under "Distribution: the 0.2.0 cask with the app" (DDC-002).
 
 ## Technical Notes
 
@@ -205,4 +218,4 @@ No spec covers this story; the ADR "Menu bar app: Swift shell over the ddc CLI" 
 
 ---
 
-*Last updated: 2026-10-20*
+*Last updated: 2026-10-31*

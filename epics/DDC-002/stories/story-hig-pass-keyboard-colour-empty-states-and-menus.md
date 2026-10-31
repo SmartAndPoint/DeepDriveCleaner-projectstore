@@ -3,17 +3,17 @@ type: story
 id: "story-hig-pass-keyboard-colour-empty-states-and-menus"
 epic: "DDC-002"
 title: "HIG pass: keyboard, colour, empty states and menus"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-21
-updated: 2026-10-21
+updated: 2026-10-31
 external_refs: {}
 tags: [app, hig, accessibility]
 code_refs: ["README.md", "app/DeepDriveCleaner.xcodeproj/project.pbxproj", "app/DeepDriveCleaner/Assets.xcassets/AccentColor.colorset/Contents.json", "app/DeepDriveCleaner/AppDelegate.swift", "app/DeepDriveCleaner/CleanResultView.swift", "app/DeepDriveCleaner/ConfirmSheet.swift", "app/DeepDriveCleaner/MainMenu.swift", "app/DeepDriveCleaner/PopoverView.swift", "app/DeepDriveCleaner/ReviewGroupsView.swift", "app/DeepDriveCleaner/ReviewView.swift", "app/DeepDriveCleaner/ReviewWindowController.swift", "app/DeepDriveCleaner/StatusIcon.swift", "app/DeepDriveCleaner/StatusItemController.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "app/Packages/DDCKit/Sources/DDCKit/Formatting.swift", "app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift", "app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/PopoverModelTests.swift", "app/Packages/DDCKit/Tests/DDCKitTests/CleanRunTests.swift"]
 specs: []
 started_at: "2026-10-21T11:04:18.029Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.565Z"
 plan_updated_at: "2026-10-21T11:04:18.029Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-21T11:04:18.029Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -51,17 +51,17 @@ Bigger structural changes go to the story that owns the window:
 
 Rough until the plan gate.
 
-- [ ] Popover opens active:
+- [x] Popover opens active:
   - **Where it goes wrong.** `showPopover` asks for activation with `NSApp.activate()`, shows the popover and clears the first responder (`app/DeepDriveCleaner/StatusItemController.swift:91-98`). Activation is cooperative since macOS 14 and arrives after `show`. Nothing then makes the popover's window key, so it draws inactive until clicked.
   - **Fix.** After showing, make the popover's window key, *then* clear the first responder. The order matters: a window's first key pass installs the gear as first responder, and with `.focusEffectDisabled()` gone that would show a ring. If the app becomes active only later, do it again on `NSApplication.didBecomeActiveNotification`. This happens only while the popover is shown and no other window is key, so a Review window opened by a notification keeps key.
   - **Log.** `AppLog` records whether the app was active and the window key after the click. The second Mac's `~/Library/Logs/DeepDriveCleaner/app.log` then tells which half failed if the fix is not enough.
-- [ ] Keyboard:
+- [x] Keyboard:
   - **Esc in the Review window.** Esc keeps closing the window and returning to the popover, as the owner decided on 2026-10-19 ("Review and clean window", DDC-002). The one exception: while the filter field has text, Esc first clears the filter.
   - **Return in the Review window.** While the filter field has focus and holds text, Return never opens the Clean sheet. With the filter empty, Return still opens it, as before. The filter may hold the focus as soon as the window opens, and Return should still work then. Today the footer's Close holds `.cancelAction` and "Clean N items…" holds `.defaultAction` (`app/DeepDriveCleaner/ReviewView.swift:130,134`). AppKit tries key equivalents before the field editor's `keyDown:`.
   - **Cleaning sheet.** Its button reads Stop, the word its `.stopping` phase already uses, and Esc triggers it (`ConfirmSheet.swift:207`). This supersedes "Cancel" in the ACs of "Review and clean window". The sheet already refuses dismissal during a clean (`app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift:376-380`); that stays.
   - **Confirmation sheet.** Clean gets `role: .destructive` and stays non-default. On macOS 26 it may render red, which is right for a destructive action.
   - **Popover focus.** `.focusEffectDisabled()` goes from the Settings button (`PopoverView.swift:46`), which gains `.help("Settings")`. With keyboard navigation on, the first focus lands on Review… through `defaultFocus`, not on the gear.
-- [ ] Colour:
+- [x] Colour:
   - **Accent.** An `AccentColor` asset holds the brand blue `#2459B8` with a dark-mode value and is set as the global accent (`ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME`). `PopoverView.accent` goes:
     - the `.tint` calls, so the user's system accent applies and Multicolor shows the brand blue;
     - the review checkbox (`ReviewView.swift:369`), which uses `Color.accentColor`;
@@ -70,28 +70,28 @@ Rough until the plan gate.
 
     Class colours (the bar, chips and sidebar tints) stay as they are.
   - **Warnings.** Warning text and glyphs use `ReportClassStyle.ink(.review)`, which has a dark value, instead of the single `ReportClassStyle.review` `#B45F06`. The single colour reads at about 2.3:1 on a dark background.
-- [ ] Empty states in the Review window use `ContentUnavailableView`:
+- [x] Empty states in the Review window use `ContentUnavailableView`:
   - no scan yet, with Scan Now (`ReviewView.swift:33-41`);
   - nothing found;
   - nothing in this group;
   - no match for the filter (`ContentUnavailableView.search(text:)`).
 
   The popover keeps its own state block.
-- [ ] Menus:
+- [x] Menus:
   - **App menu:** gains Services, Hide Others (⌥⌘H) and Show All.
   - **Window menu:** gains Zoom and Bring All to Front.
   - **Edit menu:** gains Find (⌘F), which focuses the Review window's filter.
   - **Help menu:** a new menu, set as `NSApp.helpMenu` so Help search works. Its "DeepDriveCleaner Help" opens the README on GitHub.
-- [ ] Wording: buttons, menu items and window titles use title-style capitalization, as macOS does:
+- [x] Wording: buttons, menu items and window titles use title-style capitalization, as macOS does:
   - "Scan Now", "Pause Scans" / "Resume Scans", "Review and Clean";
   - "Reveal in Finder" becomes "Show in Finder";
   - the strings are inline in `PopoverView.swift`, `StatusItemController.swift`, `ReviewView.swift` and `ReviewWindowController.swift`, plus `CleanWording.backgroundSkipped` ("Scan now to list them") in DDCKit;
   - `README.md` follows by hand; nothing checks it;
   - `docs/releases/` stays as published.
-- [ ] Formatting:
+- [x] Formatting:
   - the next-scan time follows the user's 12/24-hour setting (`Date.FormatStyle`), not `"%02d:%02d"` (`app/Packages/DDCKit/Sources/DDCKit/Formatting.swift:148`);
   - elapsed timers use `monospacedDigit()`, so they stop shifting every second (`PopoverView.swift:91,203`).
-- [ ] Accessibility:
+- [x] Accessibility:
   - the status item's turning arc stands still while Reduce Motion is on (`StatusItemController.swift:143-154`);
   - result tiles read as one element;
   - the item checkbox reports the toggle trait.
@@ -143,15 +143,17 @@ Planner, 2026-10-21. The work is split into steps; each ends with a check that t
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Unit test: `Wording.nextScan` gives "1:00 PM" for a 13:00 slot with a 12-hour `en_US` locale, and "13:00" with `en_GB`.
-- [ ] Contract test over the app's sources (`appSources()`, beside `cleanHasOneOwner` in `ContractTests.swift`):
+- [x] Unit test: `Wording.nextScan` gives "1:00 PM" for a 13:00 slot with a 12-hour `en_US` locale, and "13:00" with `en_GB`. — evidence: `PopoverModelTests.nextScan`
+- [x] Contract test over the app's sources (`appSources()`, beside `cleanHasOneOwner` in `ContractTests.swift`):
   - `PopoverView.accent` and `StatusIcon.accent` are referenced nowhere, and no `srgbRed: 0x24` colour literal is left;
   - `ReportClassStyle.review` is never a foreground style;
   - the cleaning sheet's Stop button carries `.keyboardShortcut(.cancelAction)`. The confirmation stage's Cancel already has one (`ConfirmSheet.swift:97`), so the test targets the Stop button;
   - every `Button("…")`, `ClosureMenuItem("…")` and `window.title = "…"` literal is in title case, apart from a listed set of sentence-style exceptions such as notes and help text.
-- [ ] `make app-test` passes. The unsigned `xcodebuild` build passes.
-- [ ] Manual check on the second Mac, where the bug was seen: with a terminal frontmost, the first click on the icon opens the popover active, with blue switches and a blue Clean selected. The log line after the click shows the app active and the window key.
-- [ ] Manual check on the owner's build:
+
+  Evidence: `ContractTests.colours` (no `PopoverView.accent` or `StatusIcon.accent`, no `0x24` literal, no `ReportClassStyle.review` foreground, Stop with `.cancelAction`), `ContractTests.titleCase`.
+- [x] `make app-test` passes. The unsigned `xcodebuild` build passes. — evidence: the work landed in af8c590 and shipped in 0.2.2, whose `make dist` then required `app-test` and builds the app with `xcodebuild … CODE_SIGNING_ALLOWED=NO` before signing (`scripts/build-app.sh`); there was no CI Gate yet. Today the Gate's `app` job runs `make app-test`, green on main at 2cdae98 (run 41191429282, 2026-10-31).
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): on the second Mac, where the bug was seen: with a terminal frontmost, the first click on the icon opens the popover active, with blue switches and a blue Clean selected. The log line after the click shows the app active and the window key.
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): on the owner's build:
   - **Keyboard:**
     - Esc in a non-empty filter clears it and the window stays open. Esc with an empty filter closes the window and opens the popover.
     - Return while typing a filter opens nothing. With an empty filter it opens the Clean sheet.
@@ -166,6 +168,20 @@ Planner, 2026-10-21. The work is split into steps; each ends with a check that t
     - With Reduce Motion on, the menu bar arc does not turn during a scan.
 
 ## Final Summary
+
+**What changed.** A pass over the app against Apple's Human Interface Guidelines, shipped in 0.2.2 (af8c590).
+- The popover opens active: its window is made key after it shows, and again when the app becomes active later; `app.log` records the app's and the window's state after each click.
+- Keyboard: Esc clears a non-empty filter before it closes the Review window, Return never opens the Clean sheet while typing a filter, the cleaning sheet's button reads Stop and takes Esc, the confirmation's Clean is destructive and not the default, the popover's first focus is Review….
+- Colour: an `AccentColor` asset holds the brand blue and the system accent applies everywhere; warnings use the class ink, readable in Dark Mode.
+- `ContentUnavailableView` for the Review window's empty states; Services, Hide Others, Show All, Zoom, Bring All to Front, Find (⌘F) and a Help menu; title-style capitalization; the next-scan time in the user's 12/24-hour format; monospaced timers; the menu bar arc stands still with Reduce Motion.
+
+**Why.** The owner saw the popover open inactive on a second Mac, and the review of 0.2.0 found keyboard, colour and wording gaps against the guidelines.
+
+**Tests.** `PopoverModelTests.nextScan`, `ContractTests.colours`, `ContractTests.titleCase`; the 0.2.2 release build; the Gate's `app` job on main today. Closed under the owner's rule of 2026-10-30: the two manual checks moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- The popover-activation fix has not been checked on the second Mac, where the bug was seen; that is a manual check in the runbook, and its `app.log` line says which half failed if the fix is not enough.
+- The README's title-case wording is kept by hand; no test checks it.
 
 ## Technical Notes
 
@@ -188,4 +204,4 @@ Planner, 2026-10-21. The work is split into steps; each ends with a check that t
 
 ---
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-10-31*

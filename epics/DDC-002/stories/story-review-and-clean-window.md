@@ -3,17 +3,17 @@ type: story
 id: "story-review-and-clean-window"
 epic: "DDC-002"
 title: "Review and clean window"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-21
+updated: 2026-10-31
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui, cleanup]
 code_refs: []
 specs: []
 started_at: "2026-10-19T12:35:13.252Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.874Z"
 plan_updated_at: "2026-10-19T12:35:13.252Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-19T12:35:13.252Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -34,26 +34,26 @@ This story is artboards 4 to 6 of the design canvas. The user browses what was f
 
 ## Decomposition
 
-- [ ] Window: a sidebar of classes and groups, and a table of items with:
+- [x] Window: a sidebar of classes and groups, and a table of items with:
   - the path under `~` (or the volume), the size and the frees estimate;
   - the project's idle days and whether it has a lock file;
   - notes (`no-lockfile`, `app-owned`, `kept-by-marker`, `excluded`) and the `not_selected` reason
-- [ ] Groups / items toggle; search; sort by size, path and idle days; Scan again in the header (artboard 4)
-- [ ] Selection: defaults from the report; `review` items start unselected; `user-data` and `ignored` items cannot be selected, nor items ddc has no command for ("Manual only": `trash`, `vm.colima`, `vm.lima`, `vm.orbstack`); an `incomplete` finding says that part of it could not be read
-- [ ] Reveal in Finder; "Protect this folder" writes `.ddc-keep` after a confirmation
-- [ ] Confirmation sheet:
+- [x] Groups / items toggle; search; sort by size, path and idle days; Scan again in the header (artboard 4)
+- [x] Selection: defaults from the report; `review` items start unselected; `user-data` and `ignored` items cannot be selected, nor items ddc has no command for ("Manual only": `trash`, `vm.colima`, `vm.lima`, `vm.orbstack`); an `incomplete` finding says that part of it could not be read
+- [x] Reveal in Finder; "Protect this folder" writes `.ddc-keep` after a confirmation
+- [x] Confirmation sheet:
   - counts per class;
   - every item with its action (delete, Trash, the tool's command);
   - for each `review` item the Trash would take, Delete permanently, defaulting to the app preference "Delete review items instead of moving them to the Trash" (off: the Trash); a `review` item cleaned by its tool has no such switch;
   - warnings for the Trash and for local snapshots;
   - Cancel and Clean
-- [ ] Live warnings: the sheet opens at once and runs `clean --items --dry-run --json` over the listed items (no rescan); the predicted skips stream in per item ("Spotify is running · will be skipped"); Check again reruns it
-- [ ] Clean: the sheet's Clean action, and nothing else in the app, runs `clean --items <file> --json` with exactly the confirmed items (each with its class, action and `permanent`). It shows two phases:
+- [x] Live warnings: the sheet opens at once and runs `clean --items --dry-run --json` over the listed items (no rescan); the predicted skips stream in per item ("Spotify is running · will be skipped"); Check again reruns it
+- [x] Clean: the sheet's Clean action, and nothing else in the app, runs `clean --items <file> --json` with exactly the confirmed items (each with its class, action and `permanent`). It shows two phases:
   - the preparing phase (the CLI's rescan), with the elapsed time;
   - the cleaning phase, which starts when the CLI saves its rescan to `last-scan.json` (changes with story "Faster clean: re-check only what the selection needs"; note of 2026-10-24 under decision 8).
 
   Item `i` of `n`, the current path and the bytes processed arrive with "CLI: progress events", which feeds the same progress state and adds `--progress json`. Cancel stops after the current item; a clean still waiting behind another run never starts. While the clean and the popover's rescan after it run, the sheet sets the `busy` input of the icon state of "Menu bar popover", so the arc turns as on artboard 3.
-- [ ] Result: deleted, moved to the Trash, tools run, skipped and failed; free space before and after for each volume; skipped items grouped by cause (count and size per cause, the items inside), in plain language; Open journal
+- [x] Result: deleted, moved to the Trash, tools run, skipped and failed; free space before and after for each volume; skipped items grouped by cause (count and size per cause, the items inside), in plain language; Open journal
 
 ## Implementation Plan
 
@@ -184,23 +184,27 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Unit test: the `--items` payload is exactly the confirmed list, each item with its class, action and `permanent`; no item the user did not see in the sheet is sent
-- [ ] Unit test: a `review` item's `permanent` starts from the app preference and changing one item changes only that item; a `review` item cleaned by its tool has no switch and is listed with `permanent` false
-- [ ] Structural test, comment lines stripped:
+- [x] Unit test: the `--items` payload is exactly the confirmed list, each item with its class, action and `permanent`; no item the user did not see in the sheet is sent — evidence: `ReviewSelectionTests.payloadIsTheConfirmedList`, `.lockedNeverListed`, `.bytesSurvive`
+- [x] Unit test: a `review` item's `permanent` starts from the app preference and changing one item changes only that item; a `review` item cleaned by its tool has no switch and is listed with `permanent` false — evidence: `ReviewSelectionTests.permanentFromPreference`
+- [x] Structural test, comment lines stripped:
   - the `.clean` and `.dryRun` run kinds appear in no source but `CLIRunner.swift` and `CleanRun.swift`;
   - `"--items"` appears only in `CleanRun.swift`;
   - `cleanConfirmedItems(` appears only in its definition in `CleanRun.swift` and once in `ConfirmSheet.swift`;
   - no other app or DDCKit source calls it, so notifications, the scheduler and the popover reach only the window or the sheet
-- [ ] Unit test: `user-data` and `ignored` findings cannot be selected, and `review` findings start unselected
-- [ ] Unit test: the popover's review request ("Menu bar popover": a group, the classes switched on, and whether Clean selected… asked for the sheet) seeds the window's group filter and selection, opens the confirmation sheet when asked, and the router reports the window opened so the attention badge clears; opened from Clean selected…, the selection is exactly the popover's "Selected to clean" (same items, same bytes), and the sheet opens without starting a clean
-- [ ] Test with a fake CLI (a script that replays recorded dry-run and result JSON, and replaces `last-scan.json` part-way, as the CLI saves its rescan):
+
+  Evidence: `ContractTests.cleanHasOneOwner`.
+- [x] Unit test: `user-data` and `ignored` findings cannot be selected, and `review` findings start unselected — evidence: `ReviewSelectionTests.locks` (a picked entry of a user-data folder became selectable later, with "User data: pick your own files for the Trash": `UserDataTests.selectable`)
+- [x] Unit test: the popover's review request ("Menu bar popover": a group, the classes switched on, and whether Clean selected… asked for the sheet) seeds the window's group filter and selection, opens the confirmation sheet when asked, and the router reports the window opened so the attention badge clears; opened from Clean selected…, the selection is exactly the popover's "Selected to clean" (same items, same bytes), and the sheet opens without starting a clean — evidence: `CleanRunTests.group`, `.cleanSelected`; `PopoverModelTests.reviewSeam`, `.badge`
+- [x] Test with a fake CLI (a script that replays recorded dry-run and result JSON, and replaces `last-scan.json` part-way, as the CLI saves its rescan):
   - the sheet shows the predicted skips;
   - then the preparing phase, then the cleaning phase within 1 s of the replace;
   - then the result with skips grouped by cause;
   - after Done, no item the report lists as deleted or moved to the Trash can be selected;
   - every skip reason the executor has (`docs/clean.schema.json`) maps to text
-- [ ] Test with a fake CLI that writes its dry-run lines with a delay: the sheet is shown before the first line arrives, and each warning appears on its item as its line arrives
-- [ ] Unit test: Cancel stops only the clean:
+
+  Evidence: `CleanRunTests.flow` (predicted skips, preparing, cleaning, the result with skips by cause, the cleaned rows locked after Done), `.events`; `CleanResultTests.causes`; `ContractTests.skipReasonsHaveText`. The second bullet changed: the cleaning phase now starts on the CLI's `cleaning` event ("CLI: progress events", DDC-002), and since "Faster clean: re-check only what the selection needs" (DDC-002) the CLI no longer replaces `last-scan.json` before it cleans (it edits the report after the clean), so "within 1 s of the replace" has no replace to measure from.
+- [x] Test with a fake CLI that writes its dry-run lines with a delay: the sheet is shown before the first line arrives, and each warning appears on its item as its line arrives — evidence: `CleanRunTests.delayedLines`
+- [x] Unit test: Cancel stops only the clean:
   - a clean still waiting behind a scan never starts, and the scan goes on;
   - a running clean gets SIGTERM;
   - on `.cancelled` the result is read from stdout when it is not empty.
@@ -210,22 +214,36 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
   - one that did (the fake's crash after the save) says the journal lists what was done, and the popover rescans once.
 
   The icon stays busy until that scan ends.
-- [ ] Unit test: Protect this folder writes an empty `.ddc-keep` into the item's folder only after the confirmation, refuses a folder whose `(dev, ino)` changed or that is now a symlink, and the item can no longer be selected
-- [ ] Test with the real CLI over a temporary home, skipped when `target/debug/deepdrivecleaner` is missing:
+
+  Evidence: `CleanRunTests.cancelQueued`, `.cancelRunning`, `.cancelPreparing`, `.crashBeforeCleaningEvent`, `.crashAfterCleaningEvent`. The "saved its rescan" signal became the `cleaning` event with "CLI: progress events" (DDC-002); the tests use it.
+- [x] Unit test: Protect this folder writes an empty `.ddc-keep` into the item's folder only after the confirmation, refuses a folder whose `(dev, ino)` changed or that is now a symlink, and the item can no longer be selected — evidence: `ReviewSelectionTests.protect`
+- [x] Test with the real CLI over a temporary home, skipped when `target/debug/deepdrivecleaner` is missing:
   - a wrapper script sets `HOME` and `DDC_DATA_DIR` for the child;
   - the home holds findings of each action and class: `delete` safe and rebuildable, `native` safe, `native-only` review, `trash` review, and a `review` item deleted permanently;
   - the dry run accepts the list the window builds for every selectable finding: exit 0, no `changed-since-scan`, no `action-not-allowed`
-- [ ] Manual check on the reference machine:
+
+  Evidence: `RealCLIDryRunTests.acceptsTheList`.
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): on the reference machine:
   - cleaning a few selected `safe` items from the window frees space, the before and after values are shown, and the journal lists exactly those items;
   - search, sort, the Groups/Items toggle, Check again and Reveal in Finder work
-- [ ] Manual check: Cancel during a clean stops after the current item, and the result lists what was done
-- [ ] Unit test: while scans are paused Scan again starts nothing, and a clean still asks for its rescan
-- [ ] Manual check: the Close button returns to the popover, which stays open after the window is gone
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): Cancel during a clean stops after the current item, and the result lists what was done (the button reads Stop since "HIG pass: keyboard, colour, empty states and menus")
+- [x] Unit test: while scans are paused Scan again starts nothing, and a clean still asks for its rescan — evidence: `CleanRunTests.whilePaused`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): the Close button returns to the popover, which stays open after the window is gone (the focus decision is tested: `DockPresenceTests.closeToPopover`)
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The Review window and its clean, the only way the app cleans (artboards 4 to 6), shipped in 0.2.0.
+- `ReviewModel` in DDCKit: classes and groups in a sidebar, items with their notes and locks, Groups and Items, search, sort, Scan again; the default selection from the report, `review` unselected, `user-data`, `ignored` and "Manual only" items locked.
+- The confirmation sheet lists every item with its action, a Delete permanently switch per `review` item from the app preference, and live warnings from `clean --items --dry-run`, streamed per item.
+- `CleanRun` is the one owner of a clean: it writes the confirmed list and runs `clean --items` with exactly those items; preparing, cleaning, Cancel, the result with skips grouped by cause and free space per volume. Protect this folder writes `.ddc-keep` after a confirmation, checked against the scan's identity.
+
+**Why.** ADR "Menu bar app: Swift shell over the ddc CLI", §7: the user sees and confirms every item before anything is removed.
+
+**Tests.** The evidence above; the DDCKit tests run in the Gate's `app` job (green on main at 2cdae98, 2026-10-31), the real-CLI dry run against `target/debug/deepdrivecleaner`. Closed under the owner's rule of 2026-10-30: the manual checks moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- "CLI: progress events" (DDC-002) and "Faster clean: re-check only what the selection needs" (DDC-002) replaced how the sheet knows the clean started; criteria 6 and 8 say so.
+- A clean on the reference machine, Stop during a clean and the Close button are manual checks in the runbook.
 
 ## Technical Notes
 
@@ -257,4 +275,4 @@ The `projectstore:reviewer` pass found no blocker. These came out of it:
 
 ---
 
-*Last updated: 2026-10-21*
+*Last updated: 2026-10-31*

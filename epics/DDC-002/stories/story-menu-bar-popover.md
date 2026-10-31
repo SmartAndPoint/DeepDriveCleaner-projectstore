@@ -3,17 +3,17 @@ type: story
 id: "story-menu-bar-popover"
 epic: "DDC-002"
 title: "Menu bar popover"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-19
+updated: 2026-10-31
 external_refs: {design_canvas: "https://claude.ai/artifact/1mdoyc7asMbj2qbtkDG2PV"}
 tags: [app, ui]
 code_refs: []
 specs: []
 started_at: "2026-10-19T07:50:47.300Z"
-closed_at: null
+closed_at: "2026-10-31T10:30:46.668Z"
 plan_updated_at: "2026-10-19T07:50:47.300Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-19T07:50:47.300Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -40,15 +40,15 @@ It also covers the states with no report yet, a scan running, nothing worth clea
 
 ## Decomposition
 
-- [ ] Read `last-scan.json` at launch, when the popover opens (if the file changed) and after every scan; show its age and how long the scan took
-- [ ] Summary: the selected total, the found total, a bar by class, class rows with switches for `safe` and `rebuildable` (in memory; they seed the review request), `review` and `user-data` as information
-- [ ] Types or the minimum size changed in `settings.json` after the report: the same `ignored` rule is applied to the loaded report at once (ADR §6 item 7)
-- [ ] Biggest finds: the top four groups by default-selected size (the `group` labels from `rules --json`); each hands its group to the review seam
-- [ ] Buttons: Review… and Clean selected… hand a review request to the review seam; until "Review and clean window" builds the window, the app's router opens nothing and the popover says so
-- [ ] Footer: Scan now with the elapsed time in place (through the runner, so a second click joins the running scan); Full Disk Access from the live probe, with Open Privacy Settings when it is missing; the next scheduled scan from a schedule seam, "Scheduled scans off" until "Background scan and notifications in the app" provides the due function; while paused, "Scans paused" with Resume in place of Scan now
-- [ ] Moved to "Background scan and notifications in the app", shown through this popover's notice slot: the flag a `--scheduled` instance leaves when notification permission is not yet determined, and the offer to replace the 0.1.0 LaunchAgent
-- [ ] States: no report yet (first scan; when the probe says Full Disk Access is missing, it leads with Open Privacy Settings and says that a scan without it asks for each protected folder), scanning, nothing worth cleaning (under the threshold; "Nothing found to clean" when nothing can be freed, with no Biggest finds), report unreadable; notices for a settings error, a busy lock, a failed scan and a missing CLI
-- [ ] Status item icon, as artboard 3 with the owner's changes of 2026-10-19 (after the first build):
+- [x] Read `last-scan.json` at launch, when the popover opens (if the file changed) and after every scan; show its age and how long the scan took
+- [x] Summary: the selected total, the found total, a bar by class, class rows with switches for `safe` and `rebuildable` (in memory; they seed the review request), `review` and `user-data` as information
+- [x] Types or the minimum size changed in `settings.json` after the report: the same `ignored` rule is applied to the loaded report at once (ADR §6 item 7)
+- [x] Biggest finds: the top four groups by default-selected size (the `group` labels from `rules --json`); each hands its group to the review seam
+- [x] Buttons: Review… and Clean selected… hand a review request to the review seam; until "Review and clean window" builds the window, the app's router opens nothing and the popover says so
+- [x] Footer: Scan now with the elapsed time in place (through the runner, so a second click joins the running scan); Full Disk Access from the live probe, with Open Privacy Settings when it is missing; the next scheduled scan from a schedule seam, "Scheduled scans off" until "Background scan and notifications in the app" provides the due function; while paused, "Scans paused" with Resume in place of Scan now
+- [x] Moved to "Background scan and notifications in the app", shown through this popover's notice slot: the flag a `--scheduled` instance leaves when notification permission is not yet determined, and the offer to replace the 0.1.0 LaunchAgent
+- [x] States: no report yet (first scan; when the probe says Full Disk Access is missing, it leads with Open Privacy Settings and says that a scan without it asks for each protected folder), scanning, nothing worth cleaning (under the threshold; "Nothing found to clean" when nothing can be freed, with no Biggest finds), report unreadable; notices for a settings error, a busy lock, a failed scan and a missing CLI
+- [x] Status item icon, as artboard 3 with the owner's changes of 2026-10-19 (after the first build):
   - idle: the glyph as the menu bar draws it;
   - busy: an arc turns while any CLI run is in flight (a scan here, a clean and its rescan once "Review and clean window" feeds the same input);
   - something to free: no mark on the icon. The size shows next to the icon when "Show the size you can free next to the icon" is on, only while over the notification threshold. The size is the reclaimable amount of the default selection, the number a notification names;
@@ -57,7 +57,7 @@ It also covers the states with no report yet, a scan running, nothing worth clea
   - the attention badge after a notification, if "Show a badge on the menu bar icon" is on, until the Review window opens.
 
   Precedence: the warning over the badge. A paused icon keeps its mark.
-- [ ] Pause and Resume in the right-click menu (owner, 2026-10-19):
+- [x] Pause and Resume in the right-click menu (owner, 2026-10-19):
   - kept in `UserDefaults` as `ScansPaused`, so a relaunch and a `--scheduled` instance see it;
   - the menu item reads "Pause scans" or "Resume scans";
   - while paused, every Scan now is off and says why: the popover's footer shows "Scans paused" with Resume, the right-click item reads "Scan now (paused)" and is off, and the Review window's Scan again gives way to "Scans paused"; a scheduled launch scans nothing;
@@ -65,8 +65,8 @@ It also covers the states with no report yet, a scan running, nothing worth clea
   - the rescan after a clean runs while paused: it is part of the clean (`PopoverModel.scanAfterClean()`). Once story "Faster clean: re-check only what the selection needs" lands, no scan runs after a clean that wrote the report: the CLI leaves it current; after a crash the app still rescans (note, 2026-10-24);
   - Review and its clean stay available: they are the user's own act, behind a confirmation;
   - the 0.1.0 LaunchAgent runs on its own and is not paused (the offer to replace it is in "Background scan and notifications in the app")
-- [ ] The two icon preferences in `UserDefaults`: `ShowSizeNextToIcon` off by default (owner, 2026-10-19: next to the icon the reclaimable amount read as a second total beside "Selected to clean"), `ShowMenuBarBadge` on; the Settings story adds their switches
-- [ ] Under "Selected to clean", "Frees about X" when the selection's reclaimable amount rounds to another size (findings that share blocks with copies elsewhere), so a notification's amount matches something in the popover
+- [x] The two icon preferences in `UserDefaults`: `ShowSizeNextToIcon` off by default (owner, 2026-10-19: next to the icon the reclaimable amount read as a second total beside "Selected to clean"), `ShowMenuBarBadge` on; the Settings story adds their switches
+- [x] Under "Selected to clean", "Frees about X" when the selection's reclaimable amount rounds to another size (findings that share blocks with copies elsewhere), so a notification's amount matches something in the popover
 
 ## Implementation Plan
 
@@ -96,10 +96,10 @@ No spec covers this story; the design is the ADR "Menu bar app: Swift shell over
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Unit test: from a recorded report, with the scan-time `settings.json` and the `rules --json` of the same CLI stored next to it, the view model computes the selected total, the class totals and the top four groups; with the scan-time settings it reproduces the report's own totals; `ignored` findings are left out, and so are findings of a rule switched off, or under a `min_size` raised, after the report was written; a finding whose `bytes` equals `min_size` is kept and one a byte under is left out; a `ddc.tombstone` is never left out; a report without the optional fields decodes, and one with no findings shows "Nothing found to clean" with no Biggest finds
-- [ ] Unit test: pressing Scan now twice while a scan runs asks the runner once, the footer shows the running scan with its elapsed time, and after it ends the popover shows the scan's report
-- [ ] Unit test: the attention badge is set by the notification-posted event, survives a relaunch, and is cleared only when the review seam reports that the Review window opened; with the badge preference off it is never drawn
-- [ ] Unit test: the icon state function covers:
+- [x] Unit test: from a recorded report, with the scan-time `settings.json` and the `rules --json` of the same CLI stored next to it, the view model computes the selected total, the class totals and the top four groups; with the scan-time settings it reproduces the report's own totals; `ignored` findings are left out, and so are findings of a rule switched off, or under a `min_size` raised, after the report was written; a finding whose `bytes` equals `min_size` is kept and one a byte under is left out; a `ddc.tombstone` is never left out; a report without the optional fields decodes, and one with no findings shows "Nothing found to clean" with no Biggest finds — evidence: `ReportSummaryTests.reproducesTheReport`, `.ignoredAreLeftOut`, `.ruleSwitchedOffLater`, `.minSizeBoundary`, `.tombstoneIsNeverIgnored`, `.topGroups`, `.oldReport`; `PopoverModelTests.nothingFound`
+- [x] Unit test: pressing Scan now twice while a scan runs asks the runner once, the footer shows the running scan with its elapsed time, and after it ends the popover shows the scan's report — evidence: `PopoverModelTests.scanNowJoins`
+- [x] Unit test: the attention badge is set by the notification-posted event, survives a relaunch, and is cleared only when the review seam reports that the Review window opened; with the badge preference off it is never drawn — evidence: `PopoverModelTests.badge`, `.badgeOff`
+- [x] Unit test: the icon state function covers:
   - idle and scanning;
   - something to free with and without the size, under, at and over the threshold, with no mark in any of them;
   - needs attention for each of its causes;
@@ -107,18 +107,31 @@ No spec covers this story; the design is the ADR "Menu bar app: Swift shell over
   - the badge on and off, the warning over the badge.
 
   The size label is the reclaimable amount, unchanged by the class switches.
-- [ ] Unit test: Pause turns Scan now off with no runner call, survives a relaunch (a new model on the same defaults), and makes a scheduled launch scan nothing; the rescan after a clean still runs (until story "Faster clean: re-check only what the selection needs" lands; then no scan runs after a clean that wrote the report, note of 2026-10-24); Resume turns Scan now back on
-- [ ] Unit test: each warning cause follows its source: a failed scan shows the warning until its notice is dismissed or the next scan starts; a busy lock shows its notice and no warning
-- [ ] Unit test: the footer's and the icon's Full Disk Access state follow the probe, not the report: a report with `full_disk_access: true` and a probe that fails shows Full Disk Access as missing; the probe, given a path, reports granted for a readable file and missing for a missing or unreadable one; a report with `full_disk_access: false` and a probe that succeeds shows the footer as granted and the summary's without-access note
-- [ ] Unit test: the footer's next scan is the schedule seam's next slot, written as today, tomorrow or a weekday at the hour, and "Scheduled scans off" when there is none
-- [ ] Unit test: Review…, a biggest find and Clean selected… hand the review seam the group and the classes switched on, and Clean selected… asks for the confirmation sheet; structural test: no app or DDCKit source except `CLIRunner.swift` names the clean run kind (the token `.clean` as a whole word; "Review and clean window" later narrows it to exactly one caller)
-- [ ] Unit test: a scan that exits 1 shows the CLI's last `ddc:` line (a malformed `settings.json`, settings roots that do not exist) and keeps the last report on screen; exit 75 shows that a clean holds the lock; a report of another `schema_version` shows that it could not be read, with Scan now; with no embedded CLI (`HelperLocator` throws) the popover shows the notice, Scan now is disabled, and the last report still shows
-- [ ] Manual check (`make app`, the app opened from Finder; before it, Debug → Unregister Scheduler Agent, and Full Disk Access granted to `build/Debug/DeepDriveCleaner.app`, or expect one folder dialog per protected area on the first scan): with no report the popover offers the first scan; with Full Disk Access missing the footer says so and opens the Privacy pane; the icon reads in light and dark menu bars in every state (idle, busy, warning, paused, paused while busy, badge), and the popover reads in dark mode; Pause from the right-click menu greys the icon, turns Scan now off there and in the footer, which shows "Scans paused" with Resume, and Resume restores both
+
+  Evidence: `IconStateTests.iconState` (parameterised over every combination), `.accessibility`, `.cleaning`; `PopoverModelTests.switchesLeaveTheIcon`, `.sizePreference`.
+- [x] Unit test: Pause turns Scan now off with no runner call, survives a relaunch (a new model on the same defaults), and makes a scheduled launch scan nothing; the rescan after a clean still runs (until story "Faster clean: re-check only what the selection needs" lands; then no scan runs after a clean that wrote the report, note of 2026-10-24); Resume turns Scan now back on — evidence: `PopoverModelTests.pause` (a new model on the same defaults stands for the relaunch and the `--scheduled` launch); since "Faster clean: re-check only what the selection needs" (DDC-002) a clean that wrote the report runs no scan after it (`CleanRunTests.flow`)
+- [x] Unit test: each warning cause follows its source: a failed scan shows the warning until its notice is dismissed or the next scan starts; a busy lock shows its notice and no warning — evidence: `PopoverModelTests.attention`, `.busy`
+- [x] Unit test: the footer's and the icon's Full Disk Access state follow the probe, not the report: a report with `full_disk_access: true` and a probe that fails shows Full Disk Access as missing; the probe, given a path, reports granted for a readable file and missing for a missing or unreadable one; a report with `full_disk_access: false` and a probe that succeeds shows the footer as granted and the summary's without-access note — evidence: `PopoverModelTests.accessFollowsTheProbe`, `.probe`
+- [x] Unit test: the footer's next scan is the schedule seam's next slot, written as today, tomorrow or a weekday at the hour, and "Scheduled scans off" when there is none — evidence: `PopoverModelTests.nextScan`
+- [x] Unit test: Review…, a biggest find and Clean selected… hand the review seam the group and the classes switched on, and Clean selected… asks for the confirmation sheet; structural test: no app or DDCKit source except `CLIRunner.swift` names the clean run kind (the token `.clean` as a whole word; "Review and clean window" later narrows it to exactly one caller) — evidence: `PopoverModelTests.reviewSeam`; `CleanRunTests.cleanSelected`; `ContractTests.cleanHasOneOwner`, in the narrowed form: only `CleanRun.swift` runs a clean or its dry run
+- [x] Unit test: a scan that exits 1 shows the CLI's last `ddc:` line (a malformed `settings.json`, settings roots that do not exist) and keeps the last report on screen; exit 75 shows that a clean holds the lock; a report of another `schema_version` shows that it could not be read, with Scan now; with no embedded CLI (`HelperLocator` throws) the popover shows the notice, Scan now is disabled, and the last report still shows — evidence: `PopoverModelTests.scanError`, `.busy`, `.otherSchema`, `.noCLI`, `.malformedSettings`
+- [ ] Manual (owner, moved to the owner-checks runbook at close, 2026-10-31): (`make app`, the app opened from Finder; before it, Debug → Unregister Scheduler Agent, and Full Disk Access granted to `build/Debug/DeepDriveCleaner.app`, or expect one folder dialog per protected area on the first scan): with no report the popover offers the first scan; with Full Disk Access missing the footer says so and opens the Privacy pane; the icon reads in light and dark menu bars in every state (idle, busy, warning, paused, paused while busy, badge), and the popover reads in dark mode; Pause from the right-click menu greys the icon, turns Scan now off there and in the footer, which shows "Scans paused" with Resume, and Resume restores both
 
 ## Final Summary
 
-<!-- Written at the done gate (/projectstore:story close): what changed, why,
-     tests executed, risks and follow-ups. -->
+**What changed.** The popover and the status item's icon states (artboards 1 and 3), shipped in 0.2.0.
+- `PopoverModel` in DDCKit reads `last-scan.json` at launch, on open when the file changed and after each scan, and builds the summary with `ReportSummary`: the selected total, class rows with switches, the top four groups, the `ignored` rule applied again when the types or the minimum size change after the report.
+- The footer: Scan now through the runner (a second press joins the running scan), Full Disk Access from the live probe, the next scan from the schedule seam, Pause and Resume.
+- The icon state function: idle, busy, a warning per cause with its own lifetime, grey while paused, the attention badge; the size next to the icon and the badge behind two preferences.
+- The states without a report, with a failed or unreadable one, a busy lock or a missing CLI, each with its notice.
+
+**Why.** Artboards 1 and 3 of the design canvas and the owner's changes of 2026-10-19 after the first build.
+
+**Tests.** The evidence above, all in DDCKit, run by the Gate's `app` job (green on main at 2cdae98, 2026-10-31). Closed under the owner's rule of 2026-10-30: the manual check moved to the runbook "Owner checks: manual acceptance across stories".
+
+**Risks and follow-ups.**
+- The icon in light and dark menu bars in every state, and Pause from the right-click menu, are manual checks in the runbook.
+- The scheduled path and the notification amounts came with "Background scan and notifications in the app" (DDC-002); this story built only the seams.
 
 ## Technical Notes
 
@@ -147,4 +160,4 @@ No spec covers this story; the design is the ADR "Menu bar app: Swift shell over
 
 ---
 
-*Last updated: 2026-10-19*
+*Last updated: 2026-10-31*
