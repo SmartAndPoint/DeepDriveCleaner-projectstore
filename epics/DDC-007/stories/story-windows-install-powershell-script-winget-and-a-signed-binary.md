@@ -49,14 +49,7 @@ Signing belongs to the owner, as it does on macOS.
 
 ## Decomposition
 
-- [ ] Research note "Installing an unsigned and a signed CLI on Windows 11", verified on a real Windows 11 machine or VM:
-  - what Smart App Control and SmartScreen do with an unsigned `.exe` downloaded by a browser, by `Invoke-WebRequest`, and by winget;
-  - the same for a signed one;
-  - what winget's validation does with unsigned portable packages;
-  - signing routes with eligibility, price and CI integration (signing in GitHub Actions without exposing keys).
-  
-  Run the critic on it.
-- [ ] ADR "Windows distribution route", from the note. The owner chooses the signing route; until then the ADR records the unsigned route and its warnings.
+- Moved on 2026-10-31: the research note and the route ADR are now DDC-008's story "Windows signing and distribution route: research and ADR". The owner chose a signed installer as the first Windows route (DDC-008 story "Windows installer: one signed setup with the CLI and the tray"). This story keeps `install.ps1` and winget, which install the same signed files.
 - [ ] `packaging/install/install.ps1`:
   - `PROCESSOR_ARCHITECTURE` `AMD64` → x86_64; `ARM64` → the x86_64 asset with a note about x64 emulation;
   - latest version via the release redirect;
@@ -71,14 +64,13 @@ Signing belongs to the owner, as it does on macOS.
   - `$env:DDC_INSTALL_BASE_URL` for tests.
 - [ ] CI on `windows-latest` against a local fake release: fresh install, upgrade, checksum mismatch, uninstall.
 - [ ] Once a signing route is chosen: sign `deepdrivecleaner.exe` in `release.yml` (or locally, as on macOS) before packaging. `SHA256SUMS` covers the signed archive.
-- [ ] winget manifest (portable package) submitted to `microsoft/winget-pkgs` by the owner; an update step in the release runbook.
+- [ ] winget manifest submitted to `microsoft/winget-pkgs` by the owner; an update step in the release runbook.
 - [ ] Hosting at `https://ddc.sh/install.ps1` through DDC-004's site, as for `install.sh`.
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] The research note and the ADR exist, critic-approved; the ADR names the chosen route and, if unsigned, the exact warning a user sees.
 - [ ] On a clean Windows runner, `install.ps1` gives working `deepdrivecleaner --version` and `ddc --version`; a rerun with a newer fake release upgrades, and afterwards `ddc --version` equals `deepdrivecleaner --version`; an upgrade while the old binary is running succeeds; a tampered archive installs nothing; `-Uninstall` leaves nothing behind (CI).
 - [ ] Manual (owner, Windows 11 machine or VM): the chosen route installs and runs the release with the warnings the ADR predicts and no others.
 - [ ] If winget is chosen: `winget install SmartAndPoint.DeepDriveCleaner` installs the release (manual, owner).
@@ -92,6 +84,7 @@ Signing belongs to the owner, as it does on macOS.
 
 ## Dependencies
 
+- DDC-008 story "Windows signing and distribution route: research and ADR" (the route and the signing). winget may point at the DDC-008 setup (`InstallerType: inno`, `Scope: user`) rather than a portable zip.
 - Story "Windows scanner and rule catalog" (the Windows archive exists and is supported).
 - Story "Build matrix: every target built, tested and packaged from one tag".
 - DDC-004 story "English and Chinese product website with development runbook" (hosting).

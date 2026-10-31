@@ -105,7 +105,7 @@ Suggested order:
 
 ## Open Questions
 
-- [ ] Scheduled scans and notifications on Linux (systemd user timer, `notify-send`) and Windows (Task Scheduler, toast): in a later epic, or here? Proposal: later. Here `ddc schedule` reports "not supported on this platform" with a stable exit code and JSON.
+- [x] Scheduled scans and notifications on Linux (systemd user timer, `notify-send`) and Windows (Task Scheduler, toast): in a later epic, or here? Proposal: later. Windows: DDC-008, "Native installers and the Windows tray app" (2026-10-31). Linux: still open. Here `ddc schedule` reports "not supported on this platform" with a stable exit code and JSON.
 - [ ] Publishing to crates.io (`cargo install ddc-cli` / `cargo binstall ddc-cli`; PolyForm-Noncommercial-1.0.0 is a valid SPDX id) and Linux package managers (`.deb`/`.rpm`, AUR, Homebrew on Linux): later epics?
 - [x] The `ddc` short name off macOS: no second `[[bin]]`. A second binary on macOS would break the one-binary Full Disk Access design, and macOS TCC keys CLI grants by path. `cargo install` produces `deepdrivecleaner` on every platform. `ddc` is a symlink (Unix) or a hard link (Windows), created by the install scripts, `make install`, the cask, and the README's manual steps. Decided 2026-10-28 at authoring, on the critic's evidence.
 - [x] An Intel Mac (`x86_64-apple-darwin`) asset: no. The cask and every measurement are Apple Silicon only. The script states that Intel Macs are unsupported. Decided 2026-10-28 at authoring; the owner can reopen it.

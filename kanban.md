@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-10-31T14:19:21.623Z
+generated_at: 2026-10-31T14:46:25.031Z
 
 ---
 
@@ -23,6 +23,11 @@ generated_at: 2026-10-31T14:19:21.623Z
 - [ ] [[epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app|DDC-006: SwiftLint with the same limits for the app]] #p3
 - [ ] [[epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary|DDC-007: Windows install: PowerShell script, winget and a signed binary]] #p2
 - [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
+- [ ] [[epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download|DDC-008: macOS: a notarized DMG for direct download]] #p3
+- [ ] [[epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray|DDC-008: Windows installer: one signed setup with the CLI and the tray]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler|DDC-008: Windows scheduled scans through Task Scheduler]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr|DDC-008: Windows signing and distribution route: research and ADR]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon|DDC-008: Windows tray app: a minimal scheduling icon]] #p1
 
 ## ToDo
 
@@ -32,6 +37,7 @@ generated_at: 2026-10-31T14:19:21.623Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
+- [ ] [[epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-003: DEV challenge entry: Ghostbusters for coding agents]] #p1
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
