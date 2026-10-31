@@ -62,7 +62,7 @@ The follow-up of story "Review window: coding agents' data as a group" (DDC-002)
 
 ## Final Summary
 
-**What changed.** Review → Coding agents keeps its rules shape, and the two Claude Code session folders (a project's transcripts, the file-history folder) become subgroups whose rows are their sessions (PR #25: 23bc4cd, 4339059; released in 0.12.0).
+**What changed.** Review → Coding agents keeps its rules shape, and the two Claude Code session folders (a project's transcripts, the file-history folder) become subgroups whose rows are their sessions (PR #25: 23bc4cd, 4339059; released in 0.12.1).
 - A session row shows its id, its size with its companions, its newest change and its lock in the existing wording; a locked session cannot be picked.
 - The folder row is locked with a new reason, "Not cleaned whole · pick its sessions one by one", never selectable, never sent in `--items`. No row of the group reads "Manual only" any more.
 - Sessions are never in Select all; Select all's total counts only its own rows. A session offers no Protect.

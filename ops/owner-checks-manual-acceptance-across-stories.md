@@ -195,14 +195,14 @@ Story: [Protected by you: say what it is, and Remove Protection](../epics/DDC-00
 Story: [Harness data rules](../epics/DDC-003/stories/story-harness-data-rules.md)
 
 - [ ] Manual (owner): on the reference machine, `ddc scan ~` lists each confirmed coding-agent path under "Coding agents", and `python3 -I bench/check_baseline.py` passes.
-- [ ] Manual (owner): in 0.11.0, run `ddc scan`, then `ddc clean --items` with one stale Claude Code session's `<s>.jsonl` from the report: the transcript and its companions are in the Trash; after Put Back, `claude --resume` of it works. (Since 0.12.0 the Review window picks sessions too: story "Review window: pick a coding agent's sessions one by one".)
+- [ ] Manual (owner): in 0.11.0, run `ddc scan`, then `ddc clean --items` with one stale Claude Code session's `<s>.jsonl` from the report: the transcript and its companions are in the Trash; after Put Back, `claude --resume` of it works. (Since 0.12.1 the Review window picks sessions too: story "Review window: pick a coding agent's sessions one by one".)
 - [ ] Manual (owner): with Codex (or its app-server) running, a clean of the Codex folders is refused "Codex is running"; after quitting it, they move to the Trash.
 
 ### Review window: coding agents' data as a group (DDC-002)
 
 Story: [Review window: coding agents' data as a group](../epics/DDC-002/stories/story-review-window-coding-agents-data-as-a-group.md)
 
-- [ ] Manual (owner): in 0.11.0, the Review window shows "Coding agents" under Safe and under Review with sizes; cleaning a scratch row frees it. Since 0.12.0 Claude Code's transcripts and file-history folders are locked "Not cleaned whole · pick its sessions one by one" and open to their sessions (story "Review window: pick a coding agent's sessions one by one").
+- [ ] Manual (owner): in 0.11.0, the Review window shows "Coding agents" under Safe and under Review with sizes; cleaning a scratch row frees it. Since 0.12.1 Claude Code's transcripts and file-history folders are locked "Not cleaned whole · pick its sessions one by one" and open to their sessions (story "Review window: pick a coding agent's sessions one by one").
 - [ ] Manual (owner): with Codex (or opencode, cursor-agent) running, select its folder under Review → Coding agents and clean: the check or the result says "<Harness> is running" and nothing moves. Quit it and clean again: the folder goes to the Trash.
 - [ ] Manual (owner): in the Whole disk view, the Coding Agents section shows "In Review: …" and its Review… link opens the Review window on the Coding agents group: with the window already open it keeps what was selected; closed, it opens with the default selection.
 
@@ -210,7 +210,7 @@ Story: [Review window: coding agents' data as a group](../epics/DDC-002/stories/
 
 Story: [Review window: pick a coding agent's sessions one by one](../epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one.md)
 
-- [ ] Manual (owner): in 0.12.0, open Review → Coding agents, unfold a project's transcripts folder, pick one stale Claude Code session and clean it: its transcript and companions are in the Trash; after Put Back, `claude --resume` of it works.
+- [ ] Manual (owner): in 0.12.1, open Review → Coding agents, unfold a project's transcripts folder, pick one stale Claude Code session and clean it: its transcript and companions are in the Trash; after Put Back, `claude --resume` of it works.
 - [ ] Manual (owner): with a Claude Code session running, its row says why it is locked and cannot be ticked; Select all never ticks a session; the folder row itself cannot be ticked.
 - [ ] Manual (owner): the confirmation for picked sessions offers no Delete permanently and says that `--resume` of a transcript fails until it is put back from the Trash, and that /rewind cannot use moved file history.
 

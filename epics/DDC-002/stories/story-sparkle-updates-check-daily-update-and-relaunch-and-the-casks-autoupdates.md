@@ -120,7 +120,7 @@ One story, in about twelve commits. The planner (opus) placed it; this is the ro
 - `CURRENT_PROJECT_VERSION` must be raised in every release commit.
 - Released in 0.8.0 (tag at 356564c). Its first `make dist` stopped at the zip: `ditto --sequesterRsrc` packed the `com.apple.provenance` attribute into `__MACOSX/`. 356564c zips with `--norsrc --noextattr` instead, and the check refuses `._` entries too.
 
-**Amendment, 2026-10-31 (the owner).** A Check Now that found nothing left Settings → General unchanged, so the press looked like it did nothing. Settings → General now has a "Current version" row above the daily check: the running version and build, and under it what the last check found ("Up to date", "<version> is available", "Checking…", "Not checked yet", "The last check failed"). `UpdateModel.versionStatus(lastCheck:)`; tests `UpdateModelTests.theVersionRowSaysWhatTheLastCheckFound`, `.theVersionRowNamesAKeptUpdateAndAFailedCheck`. PR #26 (d4d674f), shipped in 0.12.0.
+**Amendment, 2026-10-31 (the owner).** A Check Now that found nothing left Settings → General unchanged, so the press looked like it did nothing. Settings → General now has a "Current version" row above the daily check: the running version and build, and under it what the last check found ("Up to date", "<version> is available", "Checking…", "Not checked yet", "The last check failed"). `UpdateModel.versionStatus(lastCheck:)`; tests `UpdateModelTests.theVersionRowSaysWhatTheLastCheckFound`, `.theVersionRowNamesAKeptUpdateAndAFailedCheck`. PR #26 (d4d674f), shipped in 0.12.1.
 
 ## Technical Notes
 
