@@ -91,7 +91,7 @@ As for Linux, a research note comes first: where dev disk space goes on Windows,
   - Fixtures that make symlinks skip without the privilege (`common::try_symlink`): `disk_free.rs` `last_disk_*` and `settings.rs`. `there_is_no_yes` (`disk_free_cli.rs`) failed on Windows on its fixture's symlink too, and skips through `unsupported()`.
   - `no_system_process_owns_a_cache` reads the live process table, which is unported, and checks `/System`, `/usr` and app-bundle paths. It needs a Windows meaning, or a reason to stay macOS-only. On a developer machine that takes Developer Mode; the CI runner (`windows-2025`) has no such privilege.
   - The native job's Tests step sets `TMP` and `TEMP` to `runner.temp`. Under bash the temp folder lies inside `HOME`, and the test trees' guard refuses that.
-- There is no local Windows machine. Two options: a QEMU/KVM VM on the owner's Linux box, or a separate session on a Windows machine working from this vault through PRs. The owner picks when this story starts.
+- There is no local Windows machine. Two options: a Windows VM, or a separate session on a Windows machine working from this vault through PRs. The owner picks when this story starts.
 
 ## Dependencies
 
