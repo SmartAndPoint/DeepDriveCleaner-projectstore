@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-10-31T14:20:20.847Z
+generated_at: 2026-10-31T14:46:25.446Z
 
 ---
 
@@ -73,6 +73,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
+| epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | in-progress |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | planned |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
@@ -101,6 +102,12 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | done |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | Windows install: PowerShell script, winget and a signed binary | story | planned |
 | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | planned |
+| epics/DDC-008/epic.md | Native installers and the Windows tray app | epic | planned |
+| epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | macOS: a notarized DMG for direct download | story | planned |
+| epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md | Windows installer: one signed setup with the CLI and the tray | story | planned |
+| epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | Windows scheduled scans through Task Scheduler | story | planned |
+| epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | Windows signing and distribution route: research and ADR | story | planned |
+| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | Windows tray app: a minimal scheduling icon | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |
 | ops/native-runs-the-linux-and-windows-legs-on-the-owners-machines.md | Native runs: the Linux and Windows legs on the owner's machines | runbook | draft |
@@ -361,6 +368,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-harness-data-rules.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
@@ -387,6 +395,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
+| epics/DDC-003/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
@@ -487,6 +496,29 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md |
+| epics/DDC-008/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-008/epic.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-008/epic.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
+| epics/DDC-008/epic.md | wikilink | epics/DDC-002/epic.md |
+| epics/DDC-008/epic.md | wikilink | epics/DDC-007/epic.md |
+| epics/DDC-008/epic.md | wikilink | research/distribution-through-agents.md |
+| epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
