@@ -38,6 +38,8 @@ The protected-folder list of the safety ADR §6 is also macOS-shaped. This story
 
 ## Decomposition
 
+*Superseded 2026-10-31 by story "Linux scanner and rule catalog" (its Progress note): the IDE, coding-agent, browser, app and Trash rules are shared with per-OS paths, owners stay macOS bundle names, and the load generator builds from the running platform's catalog.*
+
 - [x] Classify every rule: shared (same relative path everywhere), shared with per-OS paths (one rule id, a path per OS, e.g. pip's cache), or OS-only.
 - [x] The catalog becomes `rules/catalog/{shared,macos,linux,windows}.rs`. Linux and Windows start empty except the shared rules. Rule ids are unchanged, so settings that disable rules keep working.
 - [x] The protected-folder list splits the same way. The safety ADR §6 list stays the macOS list.
