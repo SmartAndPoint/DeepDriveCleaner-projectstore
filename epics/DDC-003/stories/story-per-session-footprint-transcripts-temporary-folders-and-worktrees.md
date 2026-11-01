@@ -10,7 +10,7 @@ created: 2026-10-31
 updated: 2026-11-01
 external_refs: {}
 tags: [agents, disk-agents, sessions, worktrees, temp, json]
-code_refs: ["crates/ddc-core/src/agents/footprint.rs", "crates/ddc-core/src/agents/sizes.rs", "crates/ddc-core/src/agents/model.rs", "crates/ddc-core/src/agents/mod.rs", "crates/ddc-core/src/env.rs", "crates/ddc-cli/src/cmd/disk_agents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/render.rs", "docs/agents.schema.json"]
+code_refs: ["crates/ddc-core/src/agents/footprint.rs", "crates/ddc-core/src/agents/sizes.rs", "crates/ddc-core/src/agents/model.rs", "crates/ddc-core/src/agents/mod.rs", "crates/ddc-core/src/env.rs", "crates/ddc-cli/src/cmd/disk_agents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/render.rs", "docs/agents.schema.json", "crates/ddc-core/src/platform/macos/meta.rs", "crates/ddc-core/src/platform/linux/meta.rs", "crates/ddc-core/tests/agents.rs", "crates/ddc-cli/tests/disk_agents_cli.rs"]
 specs: []
 started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
@@ -73,6 +73,10 @@ This reverses one sentence of the agent ADR §3 for reading: "the OS clears them
 - [x] README: `ddc disk agents` section updated, with the "how to clean" wording. — done (PR #58): README `ddc disk agents`
 - [ ] Cleanup half, after the deadline: the rule and ADR amendment of story "Coding agents' temporary folders outside the home", and the Mac app's rows in the "Coding agents" section.
 
+## Notes
+
+- 0.14.1 (PR #59) reads the temporary base only when `claude-<uid>` is a folder owned by the user, judged from its own metadata and never followed; otherwise `temp_root.refused` says why (`symlink`, `not-a-folder`, `not-owned`). `meta::uid` is that read gate only: it never feeds the removal guard, where `meta::owner` stays None on macOS (safety ADR amendment of 2026-10-31).
+
 ## Implementation Plan
 
 Planner, 2026-11-01, against `main` at 1f3f408. Deadline MVP only.
@@ -90,7 +94,7 @@ The rule "`claude-<uid>` is appended under `CLAUDE_CODE_TMPDIR` too" is an assum
 - [x] A session temporary folder whose transcript is already gone (Claude Code's own sweep) gets a row with `transcript: 0`, never folds into the remainder (test). — evidence: `agents.rs` `claude_footprint_per_session` (row C) and `footprint_without_a_transcript_and_under_a_skip`, PR #58
 - [x] With `--system-root` given, the fixture wins over `CLAUDE_CODE_TMPDIR` and `TMPDIR`: no test reads the real temporary folder, even from a shell that sets them (test). — evidence: `disk_agents_cli.rs` (a `CLAUDE_CODE_TMPDIR` decoy loses to `--system-root`), `env.rs` unit tests, PR #58
 - [ ] (Follow-up, after the research) A Codex thread's rollout file is attributed as its transcript, and a worktree inside a session's temporary folder is counted in `worktrees`, not twice (tests).
-- [ ] `--no-sizes` still finishes without measuring any folder (test asserts no size walk). — partly: `disk_agents_cli.rs` and `agents.rs` assert no footprints or temp_root under `--no-sizes`, and the size work is gated on sizes in `agents/mod.rs`; a walk-counter assertion is still to add (PR #58 reviewer)
+- [x] `--no-sizes` still finishes without measuring any folder (test asserts no size walk). — evidence: `crates/ddc-core/tests/agents.rs` `no_sizes_never_lists_the_temporary_folder` (op-stats directory-entry counter: 400 files in the temporary folder and 400 in `~/.claude/file-history` add no entry read under `--no-sizes`), PR #59, released in 0.14.1
 - [x] The JSON validates against the updated schema, `schema_version` is unchanged, and the DDCKit contract test decodes it (test). — evidence: `committed_agents_schema_is_current`, `contract::holds("agents", ..)`, DDCKit `AgentsReportTests` (`app/Packages/DDCKit/Tests/DDCKitTests/AgentsTests.swift`), PR #58
 - [x] No test or run reads the real `/tmp`, the real home, or a transcript's content (review, plus the test seam). — evidence: every agents test sets a fixture root (`with_system_root` / `--system-root`); `footprint.rs` reads listings and `symlink_metadata` only; reviewer, PR #58
 - [ ] Manual (owner, reference Mac), recorded in the owner-checks runbook: the temporary bytes of all sessions plus `bash-edit-diff` equal `du -sk` of `/private/tmp/claude-$(id -u)`, or are within 1 % of it.
