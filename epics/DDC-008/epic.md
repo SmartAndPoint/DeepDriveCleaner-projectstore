@@ -5,7 +5,7 @@ title: "Native installers and the Windows tray app"
 status: planned
 priority: p2
 created: 2026-10-31
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [windows, macos, distribution, installer, signing, tray, schedule, tauri, app]
 code_refs: []
@@ -66,7 +66,7 @@ Success criteria:
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-windows-signing-and-distribution-route-research-and-adr](./stories/story-windows-signing-and-distribution-route-research-and-adr.md) | planned | Research note on what Windows 11 does with signed and unsigned installers, the signing routes (Store MSIX, Artifact Signing, an OV certificate) and the installer formats. Then the ADR. The owner picks the publisher identity |
+| [story-windows-signing-and-distribution-route-research-and-adr](./stories/story-windows-signing-and-distribution-route-research-and-adr.md) | planned | Research note on what Windows 11 does with signed and unsigned setups and the signing routes (Store MSIX, Artifact Signing, an OV certificate); the setup format is settled by the app ADR. Then the ADR. The owner picks the publisher identity |
 | [story-windows-scheduled-scans-through-task-scheduler](./stories/story-windows-scheduled-scans-through-task-scheduler.md) | planned | `ddc schedule` on Windows: a per-user Task Scheduler task running `DeepDriveCleaner.exe --scheduled`, catch-up after a missed run, an hour, pause and resume, `status --json` with the next run. Declares the `schedule` capability |
 | [story-windows-app-tauri-shell-tray-icon-and-the-panel](./stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md) | planned | The app ADR, `crates/ddc-app-model` ported from `DDCKit`, the Tauri shell in `app-windows/`, a static UI, the tray icon and its states, the panel with the last scan and Scan now, single instance, a fake CLI, the Gate's app job |
 | [story-windows-app-review-window-and-clean-with-confirmation](./stories/story-windows-app-review-window-and-clean-with-confirmation.md) | planned | The Review window and the confirmation sheet at parity with DDC-002: groups, sort, selection, agents' sessions, dry-run warnings, Recycle Bin or permanent, held-open skips, the result |
@@ -74,9 +74,10 @@ Success criteria:
 | [story-windows-app-settings-window](./stories/story-windows-app-settings-window.md) | planned | General, Automation, Folders and Types as on macOS; About in place of Permissions |
 | [story-windows-app-whole-disk-and-coding-agents-views](./stories/story-windows-app-whole-disk-and-coding-agents-views.md) | planned | The Whole disk view and the agents section, each shown only when the Windows CLI declares its capability |
 | [story-windows-installer-one-signed-setup-with-the-cli-and-the-tray](./stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md) | planned | One signed per-user setup from Tauri's NSIS bundler: the app, the CLI in `bin\` on `PATH`, a Start menu entry with the AUMID and an Apps entry. Upgrades in place and uninstalls cleanly. Silent switches for winget. Tested in CI |
+| [story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher](./stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher.md) | planned | Download for Windows on the product site and the CLI site (English and Chinese): every release fact read at runtime from the releases API, a plain fallback link, the warnings a person meets and where the publisher shows, verify-yourself commands; reputation builds from downloads under one signing identity |
 | [story-macos-a-notarized-dmg-for-direct-download](./stories/story-macos-a-notarized-dmg-for-direct-download.md) | planned | A signed, notarized, stapled DMG with the app, for the website's download button. The cask and Sparkle keep the zip |
 
-Order (the owner, 2026-11-01): DDC-007 "Windows scanner and rule catalog" first; then the app's shell and panel against a fake CLI, the scheduler, Review and clean, notifications, Settings, the installer; the signing research beside them; the disk and agents views when their CLI stories land.
+Order (the owner, 2026-11-01): DDC-007 "Windows scanner and rule catalog" first; then the app's shell and panel against a fake CLI, the scheduler, Review and clean, notifications, Settings, the installer, the website download (added 2026-11-02); the signing research beside them; the disk and agents views when their CLI stories land.
 
 ## Expected Results
 
@@ -110,4 +111,4 @@ Order (the owner, 2026-11-01): DDC-007 "Windows scanner and rule catalog" first;
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-02*

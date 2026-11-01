@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [windows, installer, distribution, signing, release, ci]
 code_refs: []
@@ -62,7 +62,7 @@ What the installer does:
   - a silent uninstall, then a check that `%LOCALAPPDATA%\Programs\DeepDriveCleaner`, the `Uninstall` key, the `Run` entry, the `PATH` element, the shortcut and the task are gone, and the data folder is still there;
   - a second silent uninstall with the remove-data switch, after which the data folder is gone too.
 - [ ] Release integration: the setup joins the release assets and `SHA256SUMS`. The release runbook "Cutting a release: tag, CI archives, dist and publish" gains the Windows signing step.
-- [ ] The website's Windows download button (`website/`) links the latest setup.
+- [ ] The website's download is story "Windows download from the website: a signed setup from a trusted publisher".
 - [ ] Update DDC-007's story "Windows install: PowerShell script, winget and a signed binary": winget can point at this setup (`InstallerType: nullsoft`, `Scope: user`) instead of a portable zip.
 
 ## Implementation Plan
@@ -70,7 +70,7 @@ What the installer does:
 ## Acceptance Criteria
 
 - [ ] The CI checks in the decomposition pass on `windows-latest`.
-- [ ] The release's setup and the executables it installs carry valid, timestamped signatures from the chosen publisher (`Get-AuthenticodeSignature` in the release job).
+- [ ] The release's setup, its uninstaller and the executables it installs carry valid, timestamped signatures from the chosen publisher, checked where the distribution ADR puts signing (`Get-AuthenticodeSignature` with a non-null `TimeStamperCertificate` on Windows, `osslsigncode verify` on the Mac); an unsigned file or another publisher fails the release. The expected publisher string is a CI or local variable, not in the vault.
 - [ ] `SHA256SUMS` lists the setup, and the release job verifies it.
 - [ ] Manual (owner, lab machine or VM), recorded in the owner-checks runbook:
   - the setup is downloaded by a browser and installed, and the prompts match the ADR;
@@ -99,4 +99,4 @@ What the installer does:
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-02*

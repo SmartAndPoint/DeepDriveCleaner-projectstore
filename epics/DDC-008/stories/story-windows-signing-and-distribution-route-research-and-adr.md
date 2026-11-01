@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-02
 external_refs: {}
 tags: [windows, signing, distribution, installer, research, adr]
 code_refs: []
@@ -43,10 +43,7 @@ Routes to compare:
 | Directly downloaded setup, signed with an OV certificate on a cloud HSM or token | Hundreds of dollars a year. Since 2024 EV gives no immediate SmartScreen reputation, so EV buys nothing here | Vendors and prices, and how CI signs with it without the key leaving the HSM |
 | Unsigned | Free | The exact SmartScreen and Smart App Control prompts. This is the baseline the others are compared against |
 
-Installer formats to compare, for a per-user install without administrator rights:
-- Inno Setup: simple scripts, per-user with `PrivilegesRequired=lowest`, signs the setup and the uninstaller, and winget knows its silent switches (`InstallerType: inno`);
-- WiX (MSI): standard for managed deployment, but a per-user MSI is awkward;
-- MSIX: required for the Store route; also installs directly from a file when that file is signed.
+The installer format is settled (amended 2026-11-02): Tauri's per-user NSIS setup, [[adr/windows-app-tauri-2-shell-over-the-ddc-cli|Windows app: Tauri 2 shell over the ddc CLI]] §7. MSIX stays in scope only as the Store route's package, beside the setup. The website download and its "trusted publisher" promise are story "Windows download from the website: a signed setup from a trusted publisher", which this story's ADR feeds.
 
 ## Decomposition
 
@@ -54,9 +51,10 @@ Installer formats to compare, for a per-user install without administrator right
   - what SmartScreen and Smart App Control show for an unsigned setup and for a signed one from a new publisher, downloaded by a browser (Mark of the Web), by `Invoke-WebRequest` (the `install.ps1` route of DDC-007), and by winget;
   - what winget's validation does with an unsigned package;
   - the Store MSIX limits from the table above. They are tested with a minimal packaged app only if the Store survives the identity question and the owner wants a Store listing at all; otherwise they are recorded from documentation and marked unverified;
+  - whether SmartScreen and Smart App Control reputation survives each route's certificate renewal or rotation (Artifact Signing's certificates last days), since reputation is tied to the signing identity;
   - the signing routes: eligibility, whether an individual can onboard today (Q&A reports of paused individual onboarding for Artifact Signing), price, identity validation, and signing in GitHub Actions without exposing a key;
   - Microsoft Defender false positives: a new publisher's binary that walks the home folder and deletes caches is a typical heuristic hit. How to submit a release to Microsoft Security Intelligence, and how long that takes;
-  - Inno Setup, WiX and MSIX for a per-user install: `PATH`, Start menu, an Apps entry, a sign-in entry, uninstall and silent switches.
+  - how the chosen route signs a Tauri NSIS setup (`bundle.windows.signCommand`) and the five files it ships; MSIX only for the Store route.
 - [ ] ADR "Windows distribution: signing route and installer format", from the note. Run the critic on it. The ADR:
   - names the route, the format, the file names of the release assets, and what a user sees at each prompt;
   - says where signing runs (CI or the owner's machine) and how the key is held;
@@ -82,7 +80,7 @@ Installer formats to compare, for a per-user install without administrator right
   - Microsoft Learn, "Code signing options for Windows app developers" and "SmartScreen reputation";
   - Microsoft Learn, Artifact Signing quickstart (eligibility);
   - Windows Developer Blog, 2025-09-10 (free individual registration) and 2026-05-07 (free company registration);
-  - the winget manifest schema (`InstallerType: inno`, `Scope: user`).
+  - the winget manifest schema (`InstallerType: nullsoft`, `Scope: user`).
 
 ## Dependencies
 
@@ -94,4 +92,4 @@ Installer formats to compare, for a per-user install without administrator right
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-02*
