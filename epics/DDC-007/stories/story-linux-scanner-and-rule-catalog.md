@@ -3,17 +3,17 @@ type: story
 id: "story-linux-scanner-and-rule-catalog"
 epic: "DDC-007"
 title: "Linux scanner and rule catalog"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [rust, linux, scanner, rules, safety]
 code_refs: []
 specs: []
 started_at: "2026-10-31T05:03:08.564Z"
-closed_at: null
+closed_at: "2026-11-01T13:43:23.253Z"
 plan_updated_at: "2026-10-31T05:03:08.564Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-31T05:03:08.564Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -163,15 +163,38 @@ Left in this story: step 14 (Linux load thresholds); the pre-release that publis
 
 ## Acceptance Criteria
 
-- [ ] The research note exists, critic-approved, with measured sizes.
-- [ ] On Ubuntu (CI and a manual VM run), `ddc scan ~ --json` on a seeded home finds the catalog's caches and project artifacts and validates against the schema.
-- [ ] DDC-005's property tests pass on Linux: no protected folder, `user-data` item or VM directory is ever planned; symlinks are never followed.
-- [ ] A folder swapped for a symlink between scan and clean is skipped as changed since the scan, not followed (test).
-- [ ] `ddc clean` moves a selected cache to the freedesktop Trash and the journal records it (integration test in CI).
-- [ ] A pre-release tag publishes both Linux archives, and `install.sh` installs them (story "One-line install on macOS and Linux: ddc.sh/install.sh and cargo").
+- [x] The research note exists, critic-approved, with measured sizes. — evidence: `research/where-developer-disk-space-goes-linux.md`, status `final`, critic-approved; the sizes were measured on two Linux machines and are written without describing them.
+- [x] On Ubuntu (CI and a manual VM run), `ddc scan ~ --json` on a seeded home finds the catalog's caches and project artifacts and validates against the schema. — evidence: `scan_cli::json_report_and_saved_scan` and the cases of `crates/ddc-cli/tests/cases.json` (`scan --json` checked against `docs/scan.schema.json`) run on the Gate's `check-x86_64-unknown-linux-gnu` job, which runs on Ubuntu 24.04. They also run on an aarch64 machine and in WSL Ubuntu 24.04 (744 passed, the listed skips). Read-only scans of two real Linux homes matched `du -skx` to the KiB. The manual VM run is in the owner-checks runbook.
+- [x] DDC-005's property tests pass on Linux: no protected folder, `user-data` item or VM directory is ever planned; symlinks are never followed. — evidence: `ddc-loadgen/tests/properties.rs` `no_plan_holds_a_protected_folder_a_vm_or_a_kept_folder`, `user_data_is_planned_only_as_a_listed_entry_to_the_trash` and `the_executor_refuses_what_the_plan_must_not_hold`, plus `scanner::symlinks_are_not_followed`. None of them is in `.config/native-skips/linux.txt`, and all pass on the Linux leg.
+- [x] A folder swapped for a symlink between scan and clean is skipped as changed since the scan, not followed (test). — evidence: `clean_safety::symlink_swapped_in_after_scan_is_not_followed`, `clean_items::a_user_data_item_is_refused_and_a_swapped_one_is_changed_since_scan` and `platform::linux::bulk::tests::a_swapped_directory_or_a_symlink_is_changed_and_never_read`, all run on Linux.
+- [x] `ddc clean` moves a selected cache to the freedesktop Trash and the journal records it (integration test in CI). — evidence: `clean_items_cli::a_review_item_moves_to_the_freedesktop_trash_and_the_journal_records_it` (`#[cfg(target_os = "linux")]`), green on the Linux leg. A second volume's `.Trash-$uid` is in the owner-checks runbook.
+- [x] A pre-release tag publishes both Linux archives, and `install.sh` installs them (story "One-line install on macOS and Linux: ddc.sh/install.sh and cargo"). — evidence: releases v0.14.0, v0.14.1 and v0.14.4 carry `deepdrivecleaner-<v>-x86_64-unknown-linux-musl.tar.gz` and `…-aarch64-unknown-linux-musl.tar.gz` with `SHA256SUMS`, built by `release.yml`. The install half is the named story's own criterion and is verified there.
 
 ## Final Summary
 
+**What changed.**
+- Linux is a supported platform since 0.13.13: `SUPPORTED = true`, with the in-use check declared.
+- The catalog is split: shared rules resolved per OS (IDEs, agents, apps and the XDG Trash), plus Linux's own rules (`vm.docker-rootless`, the editor server builds). Root-owned container storage is never walked.
+- `RULES_SCHEMA_VERSION` 2 names the platform.
+- The walker counts a folder's own blocks, including those of an unreadable folder, so `ddc du` matches `du -skx`.
+- The process check counts the processes it cannot read in full, and the report says how many.
+- The freedesktop Trash has a copy fallback (safety ADR §5).
+- Release archives exist for x86_64 and aarch64 musl.
+- The load harness builds from the platform's catalog, and the nightly `load-linux` job judges memory and CPU against `bench/load-limits-linux.tsv` (0.14.5).
+- Linux runs on the owner's machines are covered in the native-runs runbook, now including WSL.
+
+**Why.** Developer machines are often Linux. The scanner must find there what it finds on macOS, and never more than is safe to remove.
+
+**Tests executed.**
+- The flipped Linux leg went from 162 failures to 0, with the skips listed and each named by its helper.
+- Full Linux legs passed on Ubuntu 24.04 CI, on an aarch64 machine, and in WSL Ubuntu 24.04: 744 passed, 120 listed skips.
+- The nightly `load-linux` job passed.
+- Read-only scans of two real Linux homes matched `du -skx`.
+
+**Risks and follow-ups.**
+- The VM run and a second volume's Trash are manual, in the owner-checks runbook.
+- `install.sh` on Linux is verified by the one-line install story.
+- Notifications and the schedule are not Linux capabilities yet. The commands that need them refuse with exit 69, and the cases assert that refusal.
 ## Technical Notes
 
 - *(Superseded by the Progress note where they disagree: the skip list after the flip and its count.)*
@@ -197,4 +220,4 @@ Left in this story: step 14 (Linux load thresholds); the pre-release that publis
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-01*
