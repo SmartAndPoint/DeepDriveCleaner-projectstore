@@ -37,7 +37,6 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [ ] [[epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free|DDC-010: Freeing space outside the home on Linux: ddc disk free]] #p2
 - [ ] [[epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup|DDC-010: Homebrew on Linux: ddc disk brew-packages and its cleanup]] #p3
 - [ ] [[epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists|DDC-010: Linux catalog: Flatpak, Snap and the tools only macOS lists]] #p2
-- [ ] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1
 - [ ] [[epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names|DDC-010: Linux file kinds: special files, immutable flags, sparse files and odd names]] #p1
 - [ ] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1
 - [ ] [[epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list|DDC-010: Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list]] #p2
@@ -124,6 +123,7 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [x] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2 #done
 - [x] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1 #done
 - [x] [[epics/DDC-009/stories/story-launch-demo-assets|DDC-009: Launch demo assets]] #p1 #done
+- [x] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1 #done
 
 
 
