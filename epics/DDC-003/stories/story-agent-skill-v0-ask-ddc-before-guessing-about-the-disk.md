@@ -3,16 +3,16 @@ type: story
 id: "story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk"
 epic: "DDC-003"
 title: "Agent skill v0: ask ddc before guessing about the disk"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [agents, skill, agents-md, docs]
-code_refs: []
+code_refs: ["agents/claude-code/ddc/SKILL.md", "agents/AGENTS.snippet.md", "agents/README.md", "crates/ddc-cli/tests/structure.rs"]
 specs: []
-started_at: null
+started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
 plan_updated_at: null
 ---
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-003](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -63,17 +63,17 @@ The full story later replaces v0 with `footprint` and `clean --agent`.
 
 ## Decomposition
 
-- [ ] The three files. Every rule they state cites the ADR section or schema field it comes from.
-- [ ] A structure test in `crates/ddc-cli/tests/structure.rs`: every schema field the skill names exists in the schema it cites, and every `ddc` command line in the skill parses (`--help` of that subcommand succeeds).
-- [ ] README: a "For coding agents" section linking `agents/`.
+- [x] The three files. Every rule they state cites the ADR section or schema field it comes from. — done (PR #58): `agents/claude-code/ddc/SKILL.md`, `agents/AGENTS.snippet.md`, `agents/README.md`
+- [x] A structure test in `crates/ddc-cli/tests/structure.rs`: every schema field the skill names exists in the schema it cites, and every `ddc` command line in the skill parses (`--help` of that subcommand succeeds). — done (PR #58): three tests in `crates/ddc-cli/tests/structure.rs`, schema paths resolved through `$defs`
+- [x] README: a "For coding agents" section linking `agents/`. — done (PR #58)
 - [ ] A try-out in a Claude Code session with the skill installed, in a scratch project on a synthetic home: asked "why is my disk full", it runs `ddc disk agents --json` and `ddc scan`, and proposes rather than cleans. Record the commands it ran, not the transcript.
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] The three files exist; the structure test passes in the gate (CI).
-- [ ] The skill contains no command that removes files, other than in its "what never to do" list and as text for the person to run (a test greps the runnable code blocks).
+- [x] The three files exist; the structure test passes in the gate (CI). — evidence: PR #58's required checks green, main's Gate run on the merge; `cargo test -p ddc-cli --test structure` (18 passed); reviewer
+- [x] The skill contains no command that removes files, other than in its "what never to do" list and as text for the person to run (a test greps the runnable code blocks). — evidence: `the_agent_guidance_runs_nothing_that_removes` (no `ddc clean`, `disk free --actions`, `rm`, `mv`, `--yes`, `--items` in a runnable block), PR #58, reviewer
 - [ ] (After the deadline; it does not block v0) The try-out shows the agent running only read-only `ddc` commands and handing the cleanup to the person (recorded command list).
 
 ## Final Summary

@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-01T05:18:15.930Z
+generated_at: 2026-11-01T05:48:12.941Z
 
 ---
 
@@ -13,7 +13,6 @@ generated_at: 2026-11-01T05:18:15.930Z
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1
-- [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
@@ -42,6 +41,7 @@ generated_at: 2026-11-01T05:18:15.930Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
+- [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1

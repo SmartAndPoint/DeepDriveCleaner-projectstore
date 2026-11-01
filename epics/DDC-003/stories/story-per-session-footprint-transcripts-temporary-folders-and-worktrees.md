@@ -10,7 +10,7 @@ created: 2026-10-31
 updated: 2026-11-01
 external_refs: {}
 tags: [agents, disk-agents, sessions, worktrees, temp, json]
-code_refs: []
+code_refs: ["crates/ddc-core/src/agents/footprint.rs", "crates/ddc-core/src/agents/sizes.rs", "crates/ddc-core/src/agents/model.rs", "crates/ddc-core/src/agents/mod.rs", "crates/ddc-core/src/env.rs", "crates/ddc-cli/src/cmd/disk_agents.rs", "crates/ddc-cli/src/cli.rs", "crates/ddc-cli/src/render.rs", "docs/agents.schema.json"]
 specs: []
 started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
@@ -65,12 +65,12 @@ This reverses one sentence of the agent ADR §3 for reading: "the OS clears them
 ## Decomposition
 
 - [ ] Research: confirm the temporary-folder layout and its location on macOS and Linux (`/tmp` versus `$TMPDIR`; `/tmp` is a symlink to `/private/tmp` on macOS), the `<project-slug>` rule, and whether the folder name equals the transcript's session id. Also how Codex's `~/.codex/worktrees/<id>` maps to a thread, and whether Claude Code keeps worktrees elsewhere. Add it to the research note "Coding-agent harnesses on macOS: where their data lives and how to tell a live session", with the critic.
-- [ ] The ADR amendment for reading (agent ADR §3), with the critic.
-- [ ] `agents/` model: `SessionFootprint { id, project, state, live_by, unknown_cause, modified, transcript, checkpoints, temp, temp_path, total }`, where `state` is a new enum (`live | not-live | unknown`, from `SessionLiveness`), not a new variant of `SessionState`, which would bump the schema version; `worktrees: [{path, repo, bytes}]` joins it in the follow-up. The temporary root comes through the existing `Env::system_root()` ("a fixture root in tests"), so tests never touch the real `/tmp`.
-- [ ] Sizing reuses `agents/sizes.rs` and the parallel walker; `--no-sizes` still skips it. A worktree inside a temporary folder is counted once: in `worktrees`, and excluded from `temp`.
-- [ ] `docs/agents.schema.json`: `sessions.footprints[]`, an optional, additive list beside the session list, and `sessions.temp_root` (the temporary base's path and bytes, so what no session accounts for, such as `bash-edit-diff`, shows as the remainder), with **no** `schema_version` bump. A sibling list, not a field of each session: the session list holds only sessions with a record, and Claude Code removes a record when its session ends, so most finished sessions would get no row. DDCKit's reader rejects any other version (`AgentsReport.swift`). The existing fixture still decodes (contract test). A bump, if ever wanted, is its own PR with both constants.
-- [ ] Text output: the per-session table, top 10 per harness.
-- [ ] README: `ddc disk agents` section updated, with the "how to clean" wording.
+- [x] The ADR amendment for reading (agent ADR §3), with the critic. — done: the amendment of 2026-11-01, vault PR #36
+- [x] `agents/` model: `SessionFootprint { id, project, state, live_by, unknown_cause, modified, transcript, checkpoints, temp, temp_path, total }`, where `state` is a new enum (`live | not-live | unknown`, from `SessionLiveness`), not a new variant of `SessionState`, which would bump the schema version; `worktrees: [{path, repo, bytes}]` joins it in the follow-up. The temporary root comes through the existing `Env::system_root()` ("a fixture root in tests"), so tests never touch the real `/tmp`. — done (PR #58): `crates/ddc-core/src/agents/model.rs`; worktrees follow
+- [x] Sizing reuses `agents/sizes.rs` and the parallel walker; `--no-sizes` still skips it. A worktree inside a temporary folder is counted once: in `worktrees`, and excluded from `temp`. — first sentence done (PR #58): `agents/sizes.rs`, `agents/footprint.rs`; the worktree half follows with worktree attribution
+- [x] `docs/agents.schema.json`: `sessions.footprints[]`, an optional, additive list beside the session list, and `sessions.temp_root` (the temporary base's path and bytes, so what no session accounts for, such as `bash-edit-diff`, shows as the remainder), with **no** `schema_version` bump. A sibling list, not a field of each session: the session list holds only sessions with a record, and Claude Code removes a record when its session ends, so most finished sessions would get no row. DDCKit's reader rejects any other version (`AgentsReport.swift`). The existing fixture still decodes (contract test). A bump, if ever wanted, is its own PR with both constants. — done (PR #58): `docs/agents.schema.json`, version 1
+- [x] Text output: the per-session table, top 10 per harness. — done (PR #58): `crates/ddc-cli/src/render.rs`
+- [x] README: `ddc disk agents` section updated, with the "how to clean" wording. — done (PR #58): README `ddc disk agents`
 - [ ] Cleanup half, after the deadline: the rule and ADR amendment of story "Coding agents' temporary folders outside the home", and the Mac app's rows in the "Coding agents" section.
 
 ## Implementation Plan
@@ -86,13 +86,13 @@ The rule "`claude-<uid>` is appended under `CLAUDE_CODE_TMPDIR` too" is an assum
 
 ## Acceptance Criteria
 
-- [ ] On a synthetic home and system root, with two Claude Code sessions (one named by an injected live record, one with no record and files older than `entries::RECENT`) and a folder of the temporary base that no session owns (`bash-edit-diff`), `ddc disk agents --json` gives `sessions.footprints[]` one row per session with its transcript, checkpoint and temporary bytes and their total, marks the first live and the second not live, and `sessions.temp_root.bytes` minus the rows' `temp` equals the stray folder's bytes (test).
-- [ ] A session temporary folder whose transcript is already gone (Claude Code's own sweep) gets a row with `transcript: 0`, never folds into the remainder (test).
-- [ ] With `--system-root` given, the fixture wins over `CLAUDE_CODE_TMPDIR` and `TMPDIR`: no test reads the real temporary folder, even from a shell that sets them (test).
+- [x] On a synthetic home and system root, with two Claude Code sessions (one named by an injected live record, one with no record and files older than `entries::RECENT`) and a folder of the temporary base that no session owns (`bash-edit-diff`), `ddc disk agents --json` gives `sessions.footprints[]` one row per session with its transcript, checkpoint and temporary bytes and their total, marks the first live and the second not live, and `sessions.temp_root.bytes` minus the rows' `temp` equals the stray folder's bytes (test). — evidence: `crates/ddc-core/tests/agents.rs` `claude_footprint_per_session`; `crates/ddc-cli/tests/disk_agents_cli.rs` (schema contract), PR #58, reviewer
+- [x] A session temporary folder whose transcript is already gone (Claude Code's own sweep) gets a row with `transcript: 0`, never folds into the remainder (test). — evidence: `agents.rs` `claude_footprint_per_session` (row C) and `footprint_without_a_transcript_and_under_a_skip`, PR #58
+- [x] With `--system-root` given, the fixture wins over `CLAUDE_CODE_TMPDIR` and `TMPDIR`: no test reads the real temporary folder, even from a shell that sets them (test). — evidence: `disk_agents_cli.rs` (a `CLAUDE_CODE_TMPDIR` decoy loses to `--system-root`), `env.rs` unit tests, PR #58
 - [ ] (Follow-up, after the research) A Codex thread's rollout file is attributed as its transcript, and a worktree inside a session's temporary folder is counted in `worktrees`, not twice (tests).
-- [ ] `--no-sizes` still finishes without measuring any folder (test asserts no size walk).
-- [ ] The JSON validates against the updated schema, `schema_version` is unchanged, and the DDCKit contract test decodes it (test).
-- [ ] No test or run reads the real `/tmp`, the real home, or a transcript's content (review, plus the test seam).
+- [ ] `--no-sizes` still finishes without measuring any folder (test asserts no size walk). — partly: `disk_agents_cli.rs` and `agents.rs` assert no footprints or temp_root under `--no-sizes`, and the size work is gated on sizes in `agents/mod.rs`; a walk-counter assertion is still to add (PR #58 reviewer)
+- [x] The JSON validates against the updated schema, `schema_version` is unchanged, and the DDCKit contract test decodes it (test). — evidence: `committed_agents_schema_is_current`, `contract::holds("agents", ..)`, DDCKit `AgentsReportTests` (`app/Packages/DDCKit/Tests/DDCKitTests/AgentsTests.swift`), PR #58
+- [x] No test or run reads the real `/tmp`, the real home, or a transcript's content (review, plus the test seam). — evidence: every agents test sets a fixture root (`with_system_root` / `--system-root`); `footprint.rs` reads listings and `symlink_metadata` only; reviewer, PR #58
 - [ ] Manual (owner, reference Mac), recorded in the owner-checks runbook: the temporary bytes of all sessions plus `bash-edit-diff` equal `du -sk` of `/private/tmp/claude-$(id -u)`, or are within 1 % of it.
 
 ## Final Summary
@@ -112,4 +112,4 @@ The rule "`claude-<uid>` is appended under `CLAUDE_CODE_TMPDIR` too" is an assum
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-01*
