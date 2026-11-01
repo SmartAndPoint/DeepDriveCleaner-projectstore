@@ -73,7 +73,7 @@ Success criteria:
 |-------|--------|-------------|
 | [story-dev-challenge-entry-ghostbusters-for-coding-agents](./stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md) | done | The post: draft, real numbers, demo, honesty notes, owner's review, publication before the deadline |
 | [story-repository-storefronts-for-the-launch](./stories/story-repository-storefronts-for-the-launch.md) | planned | Descriptions, topics and the first screen of the READMEs of DeepDriveCleaner, its vault and ProjectStore, linked to each other; an "For coding agents" entry point |
-| [story-launch-demo-assets](./stories/story-launch-demo-assets.md) | in-progress | A synthetic demo home with agent ghosts, a recorded terminal demo, screenshots of the app's Coding agents section, and a cover image |
+| [story-launch-demo-assets](./stories/story-launch-demo-assets.md) | done | A synthetic demo home with agent ghosts, a recorded terminal demo, screenshots of the app's Coding agents section, and a cover image |
 | [story-launch-measurement-and-follow-up](./stories/story-launch-measurement-and-follow-up.md) | in-progress | Baseline and +2/+7-day numbers, answering comments, the ProjectStore post and cross-posts the week after |
 
 The product work the entry depends on lives in DDC-003 "Agent footprint":

@@ -312,6 +312,12 @@ Story: [Linux scanner and rule catalog](../epics/DDC-007/stories/story-linux-sca
 - [ ] Manual (owner): on a clean Ubuntu VM with the released archive, `ddc scan ~ --json` on a seeded home finds the catalog's caches and project artifacts, and the report validates against `docs/scan.schema.json`.
 - [ ] Manual (owner): `ddc clean --items` of an item on a second, writable volume moves it to that volume's `.Trash-$uid` (its `files` and `info`); on a volume whose root you cannot write, the item lands in `~/.local/share/Trash` by a copy, as the safety ADR's §5 Linux text says.
 
+### Launch demo assets (DDC-009)
+
+Story: [Launch demo assets](../epics/DDC-009/stories/story-launch-demo-assets.md).
+
+- [ ] Manual (owner): the published post's GIFs and cover show no project or session name you do not want public The app recording was cut and its user-data names blurred; confirm that the session ids and the public project names DeepDriveCleaner and ProjectStore still visible in it are fine to keep public.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.

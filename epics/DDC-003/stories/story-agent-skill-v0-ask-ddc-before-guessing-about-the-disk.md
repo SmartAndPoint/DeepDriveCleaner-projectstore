@@ -68,6 +68,10 @@ The full story later replaces v0 with `footprint` and `clean --agent`.
 - [x] README: a "For coding agents" section linking `agents/`. — done (PR #58)
 - [ ] A try-out in a Claude Code session with the skill installed, in a scratch project on a synthetic home: asked "why is my disk full", it runs `ddc disk agents --json` and `ddc scan`, and proposes rather than cleans. Record the commands it ran, not the transcript.
 
+## Notes
+
+- 0.14.1 (PR #59): the skill cites the released footprint fields (`sessions.footprints[]`, `sessions.temp_root`, the row fields and `refused`) and the snippet names `sessions.footprints[]`, `state` and `sessions.temp_root`, checked by the structure test; no name is left as "when available".
+
 ## Implementation Plan
 
 ## Acceptance Criteria
