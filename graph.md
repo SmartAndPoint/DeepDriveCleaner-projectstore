@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-01T05:48:13.221Z
+generated_at: 2026-11-01T07:09:39.225Z
 
 ---
 
@@ -111,9 +111,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | Windows signing and distribution route: research and ADR | story | planned |
 | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | Windows tray app: a minimal scheduling icon | story | planned |
 | epics/DDC-009/epic.md | Ghostbusters launch: the DEV challenge and a first audience | epic | in-progress |
-| epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | in-progress |
-| epics/DDC-009/stories/story-launch-demo-assets.md | Launch demo assets | story | planned |
-| epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | Launch measurement and follow-up | story | planned |
+| epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | done |
+| epics/DDC-009/stories/story-launch-demo-assets.md | Launch demo assets | story | in-progress |
+| epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | Launch measurement and follow-up | story | in-progress |
 | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | Repository storefronts for the launch | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |

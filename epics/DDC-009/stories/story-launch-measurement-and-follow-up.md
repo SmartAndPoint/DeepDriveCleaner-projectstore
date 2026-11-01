@@ -3,16 +3,16 @@ type: story
 id: "story-launch-measurement-and-follow-up"
 epic: "DDC-009"
 title: "Launch measurement and follow-up"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [launch, community, metrics, writing]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
 plan_updated_at: null
 ---
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-009](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -54,10 +54,22 @@ A launch without numbers cannot inform the next one. This story records where th
 
 ## Decomposition
 
-- [ ] The baseline numbers, recorded in this story before publication.
+- [x] The baseline numbers, recorded in this story before publication. — recorded ten minutes after publication instead, below.
 - [ ] The +2 and +7-day numbers.
 - [ ] Draft the ProjectStore post. It goes through the critic like any other vault text before the owner publishes it.
 - [ ] A cross-post plan with dates, approved by the owner.
+
+## Baseline, 2026-11-01 (ten minutes after the post went out)
+
+`gh api repos/<repo>` for stars and forks; `gh api repos/<repo>/traffic/views` and `/traffic/clones` (14 days, total and unique):
+
+| Repository | Stars | Forks | Views (unique) | Clones (unique) |
+|---|---:|---:|---:|---:|
+| SmartAndPoint/DeepDriveCleaner | 4 | 0 | 32 (6) | 3412 (457) |
+| SmartAndPoint/DeepDriveCleaner-projectstore | 0 | 0 | 12 (2) | 1183 (312) |
+| SmartAndPoint/ProjectStore | 12 | 1 | 20 (11) | 723 (147) |
+
+Clones are mostly CI and release jobs, not people. +2 days: 2026-11-03; +7 days: 2026-11-08.
 
 ## Implementation Plan
 

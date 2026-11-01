@@ -3,16 +3,16 @@ type: story
 id: "story-launch-demo-assets"
 epic: "DDC-009"
 title: "Launch demo assets"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [launch, demo, screenshots]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
 plan_updated_at: null
 ---
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-009](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -55,13 +55,18 @@ The challenge requires a demo. Readers decide in seconds from one image. The ass
 - [ ] Cover image (SVG source plus PNG), made from the app icon in `scripts/icons/`.
 - [ ] The owner's screenshots, checked for private names.
 
+## Progress, 2026-11-01
+
+- `bench/demo/agent-ghosts.sh` is in the code repository (PR #58). It refuses a folder inside the real home, but created the empty folder before refusing: the fix is in the next patch.
+- The terminal GIF is real output of the released `ddc` 0.12.1 on the demo home: four harnesses and one live session, from its record (0.12.1 lists record-backed sessions; the per-session rows came with 0.14.0); the cover (2000×840, the 1000×420 ratio), the animated ProjectStore loop, and a cut of the owner's screen recording with the user-data names blurred are in the post.
+
 ## Implementation Plan
 
 ## Acceptance Criteria
 
 - [ ] The demo-home script builds the tree twice in a row with the same result, and refuses `$HOME` and any path inside it (test or recorded run).
-- [ ] `ddc disk agents` on the demo home shows all four harnesses and at least one live and one dead session (recorded output).
-- [ ] The cover image is 1000×420 and readable at 50 % size.
+- [x] `ddc disk agents` on the demo home shows all four harnesses and at least one live and one dead session (recorded output). — evidence: on the demo home, 0.12.1 (the GIF in the post) listed the four harnesses with one live session, and the 0.14.0 build added the per-session rows: one live, four not live
+- [x] The cover image is 1000×420 and readable at 50 % size. — evidence: the post's cover, rendered at 2000×840 from an SVG; its labels checked by eye in the rendered PNG
 - [ ] Manual (owner), recorded in the owner-checks runbook: the screenshots show no project or session name the owner does not want public.
 
 ## Final Summary
