@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [windows, schedule, cli, platform]
 code_refs: []
@@ -38,18 +38,19 @@ On macOS, `ddc schedule install --interval daily|weekly [--threshold SIZE]` writ
   - "Run task as soon as possible after a scheduled start is missed", the counterpart of launchd's catch-up after sleep;
   - no administrator rights, and no stored password.
 - **What the task runs.**
-  - When the tray app is installed: `ddc-tray.exe --scheduled`. It runs `scan --background --notify json`, shows the notification and records it, as the macOS app does with its bundled agent.
+  - When the Windows app is installed: `DeepDriveCleaner.exe --scheduled` (amended 2026-11-01, [[adr/windows-app-tauri-2-shell-over-the-ddc-cli|Windows app: Tauri 2 shell over the ddc CLI]] §5). It runs `scan --background --notify json`, shows the notification and records it, as the macOS app does with its bundled agent.
   - Without the tray (a script or cargo install): `deepdrivecleaner.exe scan --background`. It saves `last-scan.json` and logs.
   
-  `schedule install` chooses between them: it writes `ddc-tray.exe --scheduled` as the task's action when `ddc-tray.exe` sits beside the running binary, and otherwise `<this binary> scan --background`. `schedule status` names the program and says whether it notifies.
+  `schedule install` chooses between them: it writes `DeepDriveCleaner.exe --scheduled` as the task's action when the CLI runs from the setup's `bin\` folder and `..\DeepDriveCleaner.exe` exists, and otherwise `<this binary> scan --background`. `schedule status` names the program and says whether it notifies.
   
-  Whether the bare CLI can show a notification itself is decided by the tray story's ADR. A notification from an unpackaged executable needs a registered AppUserModelID. Until then the bare CLI's scheduled scan notifies nobody, and `schedule status` says so.
+  The bare CLI shows no notification on Windows (seam ADR §3, `notifications` absent; app ADR §4): its scheduled scan notifies nobody, and `schedule status` says so.
+- **Hour, pause, remind and status for the app** (added 2026-11-01, app ADR §5): `schedule install --at <hour>` picks the hour (whole hours, as on macOS); `schedule pause` and `schedule resume` disable and enable the task, keeping its trigger; `schedule remind --at <time>` adds a one-shot trigger (the reminder scan after Remind me tomorrow with a weekly schedule); `schedule status --json` prints whether the task exists, is paused, the interval and hour, its next run time and last run time and result from the Task Scheduler API (`IRegisteredTask`, never localized `schtasks` text), and its action.
 - **Capability.** Windows declares `schedule` once this lands. Until then `ddc schedule` refuses with exit 69, as the platform seam ADR requires.
 
 ## Decomposition
 
 - [ ] A scheduler seam in `cmd/schedule.rs`: one trait, with launchd and Task Scheduler behind it, chosen by the platform module. `cmd/schedule.rs` imports launchd directly today. The help text of `schedule` becomes platform-neutral (it says "LaunchAgent" now).
-- [ ] Decide how the task is written, and record it in the tray story's ADR: the Task Scheduler COM API through the `windows` crate, or `schtasks.exe /create /xml` with a generated task XML. The XML is easy to unit-test on every OS; COM avoids a child process.
+- [ ] Decide how the task is written, and record it in an amendment of the app ADR: the Task Scheduler COM API through the `windows` crate, or `schtasks.exe /create /xml` with a generated task XML. The XML is easy to unit-test on every OS; COM avoids a child process. `status` reads the next run time through COM either way: the task XML holds the trigger, not the next run.
 - [ ] `platform/windows/task_scheduler.rs` in `ddc-cli`, beside `launchd.rs`:
   - generate the task (unit-tested on every OS);
   - install, update, uninstall, status;
@@ -63,8 +64,9 @@ On macOS, `ddc schedule install --interval daily|weekly [--threshold SIZE]` writ
 
 ## Acceptance Criteria
 
-- [ ] `ddc schedule install --interval weekly` on Windows creates the task. `schtasks /query /tn "\DeepDriveCleaner\Scheduled scan" /xml` shows a weekly trigger, `StartWhenAvailable` set, and the action the rule above picks. Installing again with `--interval daily` replaces it rather than adding a second task. The task's action is the sibling `ddc-tray.exe --scheduled` when that file exists beside this binary, and otherwise this binary with `scan --background`. CI covers both by placing a stub `ddc-tray.exe` beside the CLI for one case.
+- [ ] `ddc schedule install --interval weekly` on Windows creates the task. `schtasks /query /tn "\DeepDriveCleaner\Scheduled scan" /xml` shows a weekly trigger, `StartWhenAvailable` set, and the action the rule above picks. Installing again with `--interval daily` replaces it rather than adding a second task. The task's action is `..\DeepDriveCleaner.exe --scheduled` when this binary runs from the setup's `bin\` folder and that file exists, and otherwise this binary with `scan --background`. CI covers both by placing a stub `DeepDriveCleaner.exe` one folder above a copy of the CLI in `bin\` for one case.
 - [ ] `ddc schedule uninstall` removes the task. `ddc schedule status` reports it absent (CI).
+- [ ] `schedule pause` disables the task and `schedule resume` enables it with its trigger unchanged; `schedule remind --at` adds one one-shot trigger and a second call replaces it; `schedule status --json` reports each state and validates against its schema (CI).
 - [ ] A forced run of the task writes a fresh `last-scan.json` under the Windows data folder (CI).
 - [ ] The task XML generation has unit tests that run on macOS, Linux and Windows.
 - [ ] On macOS, `schedule` behaves exactly as before: launchd tests and goldens unchanged.
@@ -89,4 +91,4 @@ On macOS, `ddc schedule install --interval daily|weekly [--threshold SIZE]` writ
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-01*
