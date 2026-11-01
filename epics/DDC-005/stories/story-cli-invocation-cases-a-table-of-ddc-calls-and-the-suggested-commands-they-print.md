@@ -1,0 +1,126 @@
+---
+type: story
+id: "story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print"
+epic: "DDC-005"
+title: "CLI invocation cases: a table of ddc calls and the suggested commands they print"
+status: planned
+priority: p1
+assignee: "Evgenii Konev"
+created: 2026-11-01
+updated: 2026-11-01
+external_refs: {}
+tags: [cli, tests, gate]
+code_refs: []
+specs: []
+started_at: null
+closed_at: null
+plan_updated_at: null
+---
+
+# CLI invocation cases: a table of ddc calls and the suggested commands they print
+
+| Field | Value |
+|---|---|
+| **Epic** | [DDC-005](../epic.md) |
+| **Status** | planned |
+| **Priority** | p1 |
+| **Assignee** | Evgenii Konev |
+
+---
+
+## Description
+
+The owner ran `ddc scan .` in `~/Projects`. The scan was right, but its summary said "run `ddc clean`", and `ddc clean` with no path reviews the home (or the folders `settings.json` names), not `~/Projects`. Following the advice would have planned a clean of a different scope. 0.14.2 fixed that one line with a unit test of `render.rs`. Nothing would have caught it: the CLI tests check each flag, mostly through the JSON report, and almost never the text a person reads or the commands it tells them to run. The same pattern is still elsewhere: a background scan's notification says "Run `ddc clean` to review." whatever paths the scan was given.
+
+This story adds one table of `ddc` calls, `crates/ddc-cli/tests/cases.json`, run against a synthetic home. Each case names a call (its arguments and the folder it runs in) and what it must do: exit code, the scanned roots, what it finds, text that must and must not appear (substrings or regexes, since sizes and durations vary). Three rules hold for every case, so a new case is one entry of JSON and no Rust.
+
+1. **Follow-through.** Every suggestion in the output is a backtick span that starts with `ddc ` (the renderer prints suggestions only that way; placeholders such as `<path>` or `ack|snooze` mark a span as never run). The runner splits it with POSIX quoting, expands `~` to the case's home and runs the built binary directly, never through a shell. Each suggestion passes the safety allowlist (rule 3) or is refused by name. A suggested `clean` runs with `--dry-run`. Its scope is read from `<data-dir>/last-scan.json`, which the dry run writes before the plan, and compared with the case's roots as canonical, deduplicated sets. A suggestion that is neither run nor listed in the file's `not_run` patterns with a reason fails the case.
+2. **Coverage.** Every subcommand and every argument of the CLI, hidden ones included, appears in at least one case or in the file's `uncovered` list with a reason. `--help` hides `du`, `diag`, `notify`, `scan --background` and the `--system-root` flags, so the rule walks clap's command tree instead: a `#[cfg(test)]` test in `src/cli.rs` reads `Cli::command()` and `include_str!("../tests/cases.json")`.
+3. **Safety allowlist.** The runner runs only these, and refuses anything else by name, in cases and in follow-through alike:
+   - `scan`, `rules`, `du`. `scan --background` runs only together with `--no-notify` or `--notify json`, because without them it can show a real notification;
+   - `clean` only with `--dry-run`, never with `--yes`, `--items` or `--permanent`;
+   - `keep` and `notify` only with `--data-dir` inside the temporary root;
+   - every `disk` command only with `--system-root` inside the temporary root, and `disk free` never, because its dry run runs each tool's own dry run (brew, conda);
+   - `schedule status`, which with a temporary home stops at "Not installed" and reaches no launchctl.
+   `schedule install` and `schedule uninstall` are in `uncovered`. `uninstall` boots out the real `gui/<uid>` agent whatever `HOME` is. `disk free` and all its flags are in `uncovered` too. Every path argument must lie inside the temporary root, not only inside its home, so a folder beside the home can exercise the outside-home suggestion. `HOME`, `USERPROFILE`, `APPDATA` and `LOCALAPPDATA` point inside it, and so does `DDC_DATA_DIR`, the data folder's fallback when the flag is absent. `--data-dir` is passed too, where the command has the flag; `du`, `rules`, `schedule` and `diag` do not have it. Coverage leaves out clap's built-in `help` and `version` arguments.
+
+The owner asked for this on every build and above all before every commit (2026-11-01). This changes part of the owner's 2026-10-31 tiering, under which pre-commit only checks (fmt and clippy) and builds nothing. The pre-commit hook now also runs the cases when a staged path can change the CLI's behaviour. Pre-push, CI's Gate and the native legs run them with the rest of nextest.
+
+"Every build" here means the hook tiers and CI's Gate. The release smoke in `release.yml` stays as it is.
+
+## Platforms
+
+A case states its expectations for macOS. A platform overlay (`expect.linux`, `expect.windows`) changes only what differs there. Capabilities differ in two ways:
+
+- **Exit.** `Schedule`, `WholeDisk`, `CodingAgents` and `Homebrew` refuse with exit 69 where they are missing (`gate.rs`). The runner derives that from `ddc_core::platform::CAPABILITIES`: a case whose command needs one of them expects 69 and the refusal there, with no overlay needed. This deliberately asserts the refusal rather than skipping the case, as `unported_cli.rs` already does. So no case needs a line in `.config/native-skips`.
+- **Output.** The other capabilities change what a successful run prints, not its exit. Examples: no Full Disk Access hint off macOS, a different rule catalog, no `private_bytes`, and no notifier on Linux. Overlays carry those differences. The fixture uses rules that every catalog lists, found by their paths on this platform. The plan chooses where it reads them from: `ddc_loadgen::fixtures::catalog`, ddc-cli's dev-dependency that the seam ADR's §9 amendment names for per-platform fixtures, or the `rule_path` helpers moved there from `ddc-core/tests/common`.
+
+Windows is not supported yet (`SUPPORTED = false`). Every case but `rules`, `--help` and `--version` therefore expects the unsupported exit there, and that is written down, not skipped.
+
+## Decomposition
+
+- [ ] The case format: a shared fixture (folders and files relative to the temporary root, with the home inside it), the cases with platform overlays, `not_run` and `uncovered`. Unknown keys are an error (`deny_unknown_fields`).
+- [ ] The runner `crates/ddc-cli/tests/cases_cli.rs`. It runs the cases in a few `#[test]`s by group, so no single test nears nextest's 120 s limit under gate load. Each case gets a fresh temporary root. Each `#[test]` gathers every failing case before it fails, naming each case with its call, stdout and stderr.
+- [ ] The allowlist (rule 3), with a test that it refuses each forbidden command and flag.
+- [ ] Follow-through (rule 1): extraction, POSIX splitting (unit-tested on the quoting vectors of `render.rs`'s tests), and the scope comparison. The comparator also gets a unit test on canned output: plain `ddc clean` after a scan of own roots fails, `ddc clean ~/Projects` passes.
+- [ ] Coverage (rule 2) in `src/cli.rs`, with a unit test of the rule on a made-up clap `Command`.
+- [ ] The background run writes the would-be notification text to its log whenever the decision is to notify, whether or not a notifier exists. That text names the scanned paths, the way the summary does. The Linux leg and macOS both check that line in the case. The app's own notification text (`NotificationText.swift`) is out of scope.
+- [ ] Seed cases, at least:
+  - the owner's call: `scan .` in `~/Projects` suggests `ddc clean ~/Projects`;
+  - `scan .` in a project subfolder;
+  - `scan` with no path;
+  - two roots, and nested roots (`scan a a/b`; the walker drops the nested one);
+  - a root with a space and one with a quote;
+  - a root outside the home but inside the temporary root;
+  - the settings' roots given by path;
+  - `--skip`, and `--exclude` including one that drops a settings exclude;
+  - a missing path;
+  - `scan --json`, checked against its schema through `tests/contract`;
+  - `scan --progress json`;
+  - `scan --all`;
+  - `clean --dry-run .`;
+  - `du .`;
+  - `rules`;
+  - `disk` with `--system-root`;
+  - `scan --background --no-notify --threshold 1K` with paths and `notify_low_disk: false` in the fixture's settings, whose logged notification text is checked;
+  - `keep remove`, with the dev and inode of the fixture's `.ddc-keep` folder, which the runner reads itself (the case format has a placeholder for them);
+  - `schedule status`, whose suggestion `ddc schedule install` is a `not_run` entry;
+  - `diag`, checked by exit code only.
+- [ ] `make cases`, which is `$(CARGO) nextest run -p ddc-cli --test cases_cli $(FEATURES) --locked`, so pre-push's `nextest-unit` reuses its build. Then a separate query `scripts/gate-scope.sh staged-cases` answering `yes` or `no`, tested in `scripts/tests/test_gate_scope.py`. `staged` keeps its one-word `rust|skip` contract. Then the pre-commit hook, which fails closed (anything but `no` runs `make cases`), `AGENTS.md` "The gate" and the hook's header comment.
+
+## Implementation Plan
+
+## Acceptance Criteria
+
+- [ ] `crates/ddc-cli/tests/cases.json` and `crates/ddc-cli/tests/cases_cli.rs` exist, with the seed cases. They pass on macOS and on the Gate's Linux and Windows legs. On Linux and Windows, a case whose command needs a refusing capability passes by its exit 69, and an output difference passes by its overlay. No case is skipped and no native-skips line is added.
+- [ ] Follow-through: every suggestion in every case's output is run under the allowlist or matched by a `not_run` pattern, or the case fails. The comparator's unit test shows plain `ddc clean` failing after a scan of own roots. Once, by hand, reverting `clean_command` makes the owner's case fail; the Final Summary records that run.
+- [ ] The allowlist refuses `scan --background` without `--no-notify` or `--notify json`, `clean` without `--dry-run`, `--yes`, `--items`, `--permanent`, `schedule install|uninstall`, `disk free`, a `disk` command without `--system-root`, and any path outside the temporary root. A test shows each refusal.
+- [ ] Coverage: the test in `src/cli.rs` fails when a subcommand or an argument of `Cli::command()`, hidden ones included, is in no case and not in `uncovered`. A unit test on a made-up `Command` shows it failing.
+- [ ] The background scan's logged notification text names the scanned paths, and a case checks it on macOS and Linux.
+- [ ] `make cases` runs the cases alone. The pre-commit hook runs it after `make lint` unless `scripts/gate-scope.sh staged-cases` answers `no`. It answers `yes` when a staged path is under `crates/` or is `Cargo.toml` or `Cargo.lock`, and its tests are in `test_gate_scope.py`. `staged` still answers only `rust` or `skip`. Like lint, it checks the working tree. The hook comment and `AGENTS.md` say so. The Final Summary records the time it adds in four states: cold, warm with no change, after a CLI change, and after a core change.
+- [ ] `make gate-fast`, `make gate` and the native legs run the cases with the rest of nextest, outside the `load` group.
+- [ ] Version bump and release notes in the same PR (`make bump`).
+
+## Final Summary
+
+## Technical Notes
+
+- The runner executes text parsed from program output. It is safe because of the allowlist, not because of the expectation that a dangerous command would never be suggested.
+- `clean --dry-run` takes the exclusive lock and rewrites `last-scan.json`. A case checks its own output first, then runs the follow-throughs in order.
+- On macOS a temporary folder under `/var/folders` resolves through `/private`, so roots are compared canonicalised on both sides.
+- On Windows, `tilde()` prints `\` and `quoted()` puts any path with `\` in single quotes. That is a wrong suggestion for cmd and PowerShell, and the cases will show it when Windows is supported. Until then, Windows cases expect the unsupported exit.
+- The goldens record whole outputs for fixed load profiles. The cases check chosen text for chosen calls and run the advice. They do not replace each other.
+- The cases test binary is not built by `make unported-check`, which names only its own test binaries.
+
+## Dependencies
+
+- Story "Mandatory gate before every commit" (DDC-005): the hooks this extends.
+- Story "Coverage floor and property tests for the safety invariants" (DDC-005): `tests/contract` checks the JSON output against its schema. Cases with `--json` reuse it.
+
+## Attachments
+
+- Code PR #60 (0.14.2): the summary's suggested clean names the scanned paths. That fix is the first regression these cases hold.
+
+---
+
+*Last updated: 2026-11-01*
