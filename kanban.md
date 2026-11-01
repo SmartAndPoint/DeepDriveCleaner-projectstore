@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-01T05:48:12.941Z
+generated_at: 2026-11-01T07:09:38.936Z
 
 ---
 
@@ -29,8 +29,6 @@ generated_at: 2026-11-01T05:48:12.941Z
 - [ ] [[epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler|DDC-008: Windows scheduled scans through Task Scheduler]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr|DDC-008: Windows signing and distribution route: research and ADR]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon|DDC-008: Windows tray app: a minimal scheduling icon]] #p1
-- [ ] [[epics/DDC-009/stories/story-launch-demo-assets|DDC-009: Launch demo assets]] #p1
-- [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
 - [ ] [[epics/DDC-009/stories/story-repository-storefronts-for-the-launch|DDC-009: Repository storefronts for the launch]] #p1
 
 ## ToDo
@@ -48,7 +46,8 @@ generated_at: 2026-11-01T05:48:12.941Z
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-linux-scanner-and-rule-catalog|DDC-007: Linux scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
-- [ ] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1
+- [ ] [[epics/DDC-009/stories/story-launch-demo-assets|DDC-009: Launch demo assets]] #p1
+- [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
 
 ## Review
 
@@ -106,6 +105,7 @@ generated_at: 2026-11-01T05:48:12.941Z
 - [x] [[epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module|DDC-007: Move OS calls behind the platform module]] #p1 #done
 - [x] [[epics/DDC-007/stories/story-platform-seam-adr-and-capability-model|DDC-007: Platform seam: ADR and capability model]] #p2 #done
 - [x] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2 #done
+- [x] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1 #done
 
 
 

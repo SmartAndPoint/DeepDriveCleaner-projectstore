@@ -3,17 +3,17 @@ type: story
 id: "story-dev-challenge-entry-ghostbusters-for-coding-agents"
 epic: "DDC-009"
 title: "DEV challenge entry: Ghostbusters for coding agents"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {challenge: "https://dev.to/challenges/hacktoberfest-week4-2026-10-26"}
 tags: [community, agents, writing, demo]
 code_refs: []
 specs: []
 started_at: "2026-10-31T15:10:00.000Z"
-closed_at: null
+closed_at: "2026-11-01T00:00:00.000Z"
 plan_updated_at: null
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-009](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -57,29 +57,39 @@ Facts the post must keep straight:
 - [x] Read the challenge rules and the submission template (2026-10-31).
 - [x] A demo home folder with synthetic agent data, and `ddc disk agents` output from it.
 - [x] The post draft v1 and v2 (2026-10-31): v2 carries the owner's real numbers as totals only, with no project names or session ids, the `/private/tmp` finding, and links to ProjectStore.
-- [ ] Post v3 in two variants, "released" and "not released" (the default), ready early on the morning before the deadline, following the template:
+- [x] Post v3 in two variants, "released" and "not released" (the default), ready early on the morning before the deadline, following the template:
   - What I Built;
   - Demo;
   - Code;
   - How I Built It;
   - Why Does Open Innovation Matter?;
   - The Spirit of It.
-- [ ] The owner reviews the post, decides the licence wording, adds screenshots or a short screen recording of the app, and publishes it from their DEV account before the deadline.
-- [ ] Before publication, every number and date is re-checked against `git log`, the releases and the vault. A feature that is not released is worded as "next".
-- [ ] Tags: `devchallenge` and `hf26challenge` (both required by the template), plus two of `opensource`, `ai`, `rust`, `macos`. The cover image from story "Launch demo assets".
-- [ ] "My Agent Session": a public link, the vault PR of this epic with the critic's review folded in. No transcript is uploaded, and no third-party session recorder is used.
-- [ ] "Prize Categories": removed (D2: overall only), unless the owner decides otherwise.
-- [ ] The "How I Built It" section names the open-source pieces: Codex CLI and ProjectStore.
-- [ ] The owner's checklist, with minute budgets: D1, D2, screenshots, storefront approvals, the variant to publish, publication, and the post URL recorded here.
+
+  Done: v3 to v5, then the published text; the "released" variant went out, because 0.14.0 was published before the post.
+- [x] The owner reviews the post, decides the licence wording, adds screenshots or a short screen recording of the app, and publishes it from their DEV account before the deadline. — done: the licence stays PolyForm Noncommercial, described as source-available; the owner's screen recording went in as a cut GIF with the user-data names blurred.
+- [x] Before publication, every number and date is re-checked against `git log`, the releases and the vault. A feature that is not released is worded as "next". — done by the critic before publication.
+- [x] Tags: `devchallenge` and `hf26challenge` (both required by the template), plus two of `opensource`, `ai`, `rust`, `macos`. The cover image from story "Launch demo assets". — done: `devchallenge`, `hf26challenge`, `ai`, `rust` (the DEV API), and the cover is set.
+- [x] "My Agent Session": a public link, the vault PR of this epic with the critic's review folded in. No transcript is uploaded, and no third-party session recorder is used.
+- [x] "Prize Categories": removed (D2: overall only), unless the owner decides otherwise.
+- [x] The "How I Built It" section names the open-source pieces: Codex CLI and ProjectStore.
+- [x] The owner's checklist, with minute budgets: D1, D2, screenshots, storefront approvals, the variant to publish, publication, and the post URL recorded here. — the post: https://dev.to/evgeniikonev/ghostbusters-for-coding-agents-12-gib-of-ghosts-on-my-mac-and-15-gib-more-i-didnt-know-about-1ok7
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] The post is published on DEV before 2026-10-31 23:59 PDT, with the tags `devchallenge` and `hf26challenge`. Evidence: the post URL.
-- [ ] Every number and date in the post matches `git log`, the releases and the vault on the day it is published.
+- [x] The post is published on DEV before 2026-10-31 23:59 PDT, with the tags `devchallenge` and `hf26challenge`. Evidence: the post URL. — evidence: https://dev.to/evgeniikonev/ghostbusters-for-coding-agents-12-gib-of-ghosts-on-my-mac-and-15-gib-more-i-didnt-know-about-1ok7; the DEV API gives `published_at` 2026-11-01T06:56:08Z (2026-10-31 23:56 PDT) and the tags `devchallenge`, `hf26challenge`
+- [x] Every number and date in the post matches `git log`, the releases and the vault on the day it is published. — evidence: the critic's pre-publication check; `gh pr list --state merged` gives 58 code and 36 vault pull requests merged before `published_at` (vault #1 was closed, not merged); 0.14.0 was published before the post
 
 ## Final Summary
+
+**What changed.** The entry is published on DEV with the tags `devchallenge`, `hf26challenge`, `ai` and `rust` and a cover, before the deadline. The post frames coding agents as the ghosts and what they leave on disk as their slime, shows the owner's real totals (no project names), the 15 GiB temporary-folder finding, a terminal GIF on the synthetic demo home, a cut of the owner's screen recording of the Mac app, and the ProjectStore loop. "How I Built It" makes the method the story: velocity numbers, the Rust core and Swift app, the test counts, and the benchmark against nine other tools worded as "same league, not fastest". The licence is described as source-available.
+
+**Why.** The goal was an audience for DeepDriveCleaner and for ProjectStore as a method, more than the prize.
+
+**Checks.** Two critic passes on the text (facts against `git log`, the releases and the vault; theme fit; tone), a final check of the rendered preview, and the DEV API after publication.
+
+**Follow-ups.** The README's "Challenge entry" line ships with the next patch; the storefronts, the +2/+7-day numbers and the cross-posts are the other stories of this epic.
 
 ## Technical Notes
 
