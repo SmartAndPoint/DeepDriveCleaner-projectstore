@@ -30,6 +30,21 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [ ] [[epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr|DDC-008: Windows signing and distribution route: research and ADR]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon|DDC-008: Windows tray app: a minimal scheduling icon]] #p1
 - [ ] [[epics/DDC-009/stories/story-repository-storefronts-for-the-launch|DDC-009: Repository storefronts for the launch]] #p1
+- [ ] [[epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities|DDC-010: btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities]] #p1
+- [ ] [[epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable|DDC-010: Cache roots moved by the environment: XDG and each tool's own variable]] #p2
+- [ ] [[epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents|DDC-010: Coding agents on Linux: ddc disk agents]] #p1
+- [ ] [[epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service|DDC-010: Desktop notifications on Linux through the freedesktop notification service]] #p2
+- [ ] [[epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free|DDC-010: Freeing space outside the home on Linux: ddc disk free]] #p2
+- [ ] [[epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup|DDC-010: Homebrew on Linux: ddc disk brew-packages and its cleanup]] #p3
+- [ ] [[epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists|DDC-010: Linux catalog: Flatpak, Snap and the tools only macOS lists]] #p2
+- [ ] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1
+- [ ] [[epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names|DDC-010: Linux file kinds: special files, immutable flags, sparse files and odd names]] #p1
+- [ ] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1
+- [ ] [[epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list|DDC-010: Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list]] #p2
+- [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
+- [ ] [[epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs|DDC-010: Private size on Linux: reflinks on btrfs and XFS]] #p2
+- [ ] [[epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer|DDC-010: Scheduled scans on Linux through a systemd user timer]] #p1
+- [ ] [[epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home|DDC-010: Whole disk on Linux: the areas outside the home]] #p2
 
 ## ToDo
 
