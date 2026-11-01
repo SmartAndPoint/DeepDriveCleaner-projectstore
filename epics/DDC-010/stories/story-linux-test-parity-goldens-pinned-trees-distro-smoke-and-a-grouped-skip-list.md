@@ -53,6 +53,7 @@ The release's musl archives are smoke-tested only on the Ubuntu runner. A static
 - [ ] The skip list.
   - Group `.config/native-skips/linux.txt` by reason, with a comment on each group: capability (shrinks with this epic), macOS subject (Xcode, iOS backups, app bundles, `cp -c` clones, `diskutil`, `tmutil`, the macOS-only rules), and environment (needs the CI mounts, from story "Linux CI mounts: a filesystem matrix job with root-only steps").
   - `scripts/native-skips.sh` refuses a name outside a group.
+- [ ] The local mounts step, moved here from story "Linux CI mounts: a filesystem matrix job with root-only steps". `scripts/native-linux.sh` passes a mounts folder into its container (`-v <base>`, `--env-file`), so the environment group can run on a Linux machine where loop mounts are allowed. That needs a version of `scripts/ci-mounts.sh` that undoes what it sets up (exports, Samba share, zpool), because today it refuses outside CI. The native-runs runbook then describes the step.
 
 ## Implementation Plan
 

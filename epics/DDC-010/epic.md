@@ -2,13 +2,13 @@
 type: epic
 id: "DDC-010"
 title: "Linux at parity with macOS: every command, every file kind"
-status: planned
+status: in-progress
 priority: p1
 created: 2026-11-01
 updated: 2026-11-01
 external_refs: {}
 tags: [linux, cli, platform, parity, scanner, safety]
-code_refs: []
+code_refs: ["scripts/ci-mounts.sh", "scripts/native-skips.sh", "scripts/gate-scope.sh", ".github/workflows/gate.yml", ".github/workflows/nightly.yml", ".config/native-skips/linux.txt", "crates/ddc-core/tests/common/mounts.rs", "crates/ddc-core/tests/common/mod.rs", "crates/ddc-core/tests/mounts.rs", "scripts/tests/test_native_skips.py", "scripts/tests/test_gate_scope.py"]
 review_status: approved
 reviewed_at: 2026-11-01
 ---
@@ -17,7 +17,7 @@ reviewed_at: 2026-11-01
 
 | Field | Value |
 |---|---|
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Created** | 2026-11-01 |
 | **Updated** | 2026-11-01 |
@@ -75,7 +75,7 @@ Code reading and the critic found gaps that are not capability questions:
 
 | Story | Status | Description |
 |-------|--------|-------------|
-| [story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps](./stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md) | planned | A CI job with loopback btrfs, XFS, ZFS, NFS, casefold ext4, exFAT, tmpfs and a bind mount, plus root-only fixtures (`chattr +i`, `mknod`); spike first |
+| [story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps](./stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md) | done | A CI job with loopback btrfs, XFS, ZFS, NFS, casefold ext4, exFAT, tmpfs and a bind mount, plus root-only fixtures (`chattr +i`, `mknod`); spike first |
 | [story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems](./stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md) | planned | `openat2(RESOLVE_NO_XDEV)`, `AT_NO_AUTOMOUNT`, never cross a bind mount; the Trash never copies, it uses the volume's `.Trash-$uid` or refuses |
 | [story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities](./stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md) | planned | Subvolumes and datasets counted, snapshots (by `parent_uuid`, read-only or not) never; saved identities stable across remounts; compression measured |
 | [story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names](./stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md) | planned | FIFOs, sockets and devices never opened; `chattr +i/+a` refused before the rename; sparse files; names past `PATH_MAX`; case and Unicode as each filesystem compares them |
