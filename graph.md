@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-01T08:02:03.922Z
+generated_at: 2026-11-01T16:41:25.359Z
 
 ---
 
@@ -39,7 +39,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | done |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
 | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | done |
+| epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md | Confirmation sheet: Delete permanently for every item at once | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | done |
+| epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | Docker Desktop: what is inside its disk image, and what a clean frees | story | planned |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
@@ -77,9 +79,10 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
-| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | planned |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | in-progress |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
+| epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print.md | CLI invocation cases: a table of ddc calls and the suggested commands they print | story | done |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | Complexity guard: operation counts and scaling exponents | story | in-progress |
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | Coverage floor and property tests for the safety invariants | story | done |
 | epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust.md | Gate by what changed: load at night, one gate per release, app-only pushes skip Rust | story | done |
@@ -97,7 +100,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | SwiftLint with the same limits for the app | story | planned |
 | epics/DDC-007/epic.md | Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers | epic | planned |
 | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | Build matrix: every target built, tested and packaged from one tag | story | in-progress |
-| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | in-progress |
+| epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | done |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | Move OS calls behind the platform module | story | done |
 | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | in-progress |
 | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | Platform seam: ADR and capability model | story | done |
@@ -211,7 +214,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
@@ -288,6 +293,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
 | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
+| epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
@@ -298,6 +304,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | wikilink | epics/DDC-002/stories/story-user-data-pick-your-own-files-for-the-trash.md |
+| epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | mdlink | epics/DDC-002/epic.md |
@@ -420,6 +427,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md |
+| epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust.md |
@@ -442,6 +450,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-005/epic.md | wikilink | epics/DDC-006/epic.md |
 | epics/DDC-005/epic.md | wikilink | epics/DDC-007/epic.md |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | mdlink | epics/DDC-005/epic.md |
+| epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants.md | mdlink | epics/DDC-005/epic.md |
 | epics/DDC-005/stories/story-gate-by-what-changed-load-at-night-one-gate-per-release-app-only-pushes-skip-rust.md | mdlink | epics/DDC-005/epic.md |
@@ -553,6 +562,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |

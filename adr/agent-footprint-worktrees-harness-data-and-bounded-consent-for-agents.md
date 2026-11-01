@@ -9,8 +9,8 @@ tags: [agents, worktrees, safety, cli, contract]
 external_refs: {}
 supersedes: null
 superseded_by: null
-review_status: pending
-reviewed_at: null
+review_status: reviewed
+reviewed_at: 2026-11-01
 ---
 
 # Agent footprint: worktrees, harness data and bounded consent for agents
@@ -79,6 +79,20 @@ The probes of conditions 4, 5 and 6 run only for candidates that passed 1 to 3 f
 `ddc` deletes no branch. The branch `worktree-<name>` is a few bytes and a person's decision; the hint says `git branch -d <branch>`.
 
 `git.worktree-orphan` is `review`, method `trash`, `--permanent` gives `delete`. Rules work inside it too.
+
+*Amendment, 2026-11-01: §1 and §2 accepted at the plan gate of the story "Worktree findings and provenance", with these settlements:*
+- *Provenance.* In `<main>/.git/worktrees/<name>/`, Claude Code's CLI writes `CLAUDE_BASE` (the base commit) and Claude Desktop an empty `claude-desktop-worktree`; either, or the path under `<main>/.claude/worktrees/`, gives `origin.harness: claude-code`. Codex writes `codex-thread.json`, which gives `codex`. Cursor writes no marker. The first Open Question is answered.
+- *Back-pointer.* `git.worktree` also requires `<gitdir>/gitdir` to name `<path>/.git`. A copied worktree points to a live gitdir that names the original; it is `review` and never removed through git.
+- *Location fallback.* "Fallback `none` (report only)" is realised as the existing `skip` fallback with the skip reason `tool-not-ready` (`git`, "no git lists this folder").
+- *The `.git` refusals.* The executor's "no `.git` at the top level" and "not a project root" refusals stay for every rule but two, scoped by action: `git.worktree` with `native`, and `git.worktree-orphan` with `trash` or `delete`.
+- *Listed consent.* A person who lists a `git.worktree` (the Review window, `--items`) waives conditions 1 and 3 (known harness, idle) and nothing else: 2, 4, 5 and 6 are re-checked before the command, because `git worktree remove` would otherwise delete unique ignored content or the only copy of a commit that the person never saw.
+- *No app-owned downgrade.* The `app_owned` downgrade for hidden top-level folders of the home does not apply to the two worktree rules; their class comes from the six conditions alone.
+- *No dialog.* On macOS `/usr/bin/git` is an `xcrun` shim that offers to install the developer tools; `ddc` never runs it. It runs a git from its tool folders other than `/usr/bin`, or the developer directory's git (`xcode-select -p`), else the probe is `unknown`.
+- *Copied or moved.* The back-pointer is compared by file identity, resolved when relative; a mismatch is `review`, never removed, with the hint `git worktree repair`.
+- *Skip reason.* A listed worktree that fails a condition at the executor is skipped with a new reason, `worktree-kept`; the clean report, journal and progress schemas bump for it. An item inside a worktree removed through git is `inside-another-item`.
+- *Activity.* A worktree's idleness is its own, against `--worktree-min-age`; the main checkout's activity and `--min-age` do not hold it back.
+
+*Safety ADR, Amendments, 2026-10-18 (this ADR's §2 amends its §3 and §4): takes effect with this acceptance for §2.*
 
 ### 3. Harness data: known-path rules, a liveness check, and a protected memory
 
@@ -273,7 +287,7 @@ An MCP server over the same contracts is deferred (Alternative C): the CLI's `--
 
 ## Open Questions
 
-- The exact marker Claude Code writes into a worktree's git metadata, and whether Codex and opencode mark theirs. Until confirmed, `<main>/.claude/worktrees/` is the only Claude Code signal, and the other two harnesses have no worktree signal.
+- ~~The exact marker Claude Code writes into a worktree's git metadata, and whether Codex and opencode mark theirs.~~ Answered 2026-11-01 (§2 amendment): `CLAUDE_BASE`, `claude-desktop-worktree`, Codex's `codex-thread.json`; opencode not yet seen.
 - The minimum git version the probe contract is pinned to, and whether `--ignored=matching` and `--porcelain=v1` behave the same on the oldest version Homebrew ships on macOS 26.
 - Whether `--worktree-min-age` should default to 2 days or to the harness's own idea of "old" (`cleanupPeriodDays` is 30). Two days is the proposal; the first weeks of use on the reference machine decide.
 - `claude purge <path> --yes` is non-interactive and per project, but it also deletes `projects/<project>/memory/`, so it can never be the method here. Closed 2026-10-30.
