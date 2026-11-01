@@ -5,7 +5,7 @@ title: "Agent footprint"
 status: in-progress
 priority: p2
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-11-01
 external_refs: {}
 tags: [agents, worktrees, cli, rules]
 code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/rules/entries.rs", "crates/ddc-core/src/rules/catalog/macos.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/plan.rs", "app/Packages/DDCKit/"]
@@ -57,7 +57,7 @@ This ADR and epic were drafted without a critic pass, as a test of the vault as 
 | [story-ddc-footprint-scoped-project-report](./stories/story-ddc-footprint-scoped-project-report.md) | planned | `ddc footprint [ROOT] --json`: main checkout and worktrees with state, artifacts and totals; `docs/footprint.schema.json`; read-only, no lock, under 5 s for ten worktrees |
 | [story-clean-agent-bounded-consent](./stories/story-clean-agent-bounded-consent.md) | planned | `ddc clean --agent --project ROOT [--items -] --json`: `--yes` semantics plus the project's dead worktrees; `not-consented` skips; refusals; `consent: agent` in the journal; needs DDC-002 "CLI: clean an explicit item list" |
 | [story-agent-guidance-skill-and-agents-snippet](./stories/story-agent-guidance-skill-and-agents-snippet.md) | planned | `agents/` in the code repository: a Claude Code skill and an `AGENTS.md` snippet that cite the JSON contracts; README sections for `footprint` and `--agent` |
-| [story-per-session-footprint-transcripts-temporary-folders-and-worktrees](./stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md) | planned | `ddc disk agents` per session: transcript, checkpoints, temporary folder and worktrees, live or dead, sorted by size, in text and JSON; the report half by the DEV deadline (DDC-009) |
+| [story-per-session-footprint-transcripts-temporary-folders-and-worktrees](./stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md) | in-progress | `ddc disk agents` per session: transcript, checkpoints, temporary folder and worktrees, live or dead, sorted by size, in text and JSON; the report half by the DEV deadline (DDC-009) |
 | [story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk](./stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md) | planned | A read-only Claude Code skill and `AGENTS.md` snippet on today's commands (`disk agents`, `scan`, `rules`); agents propose, people clean; replaced later by the full guidance story |
 | [story-coding-agents-temporary-folders-outside-the-home](./stories/story-coding-agents-temporary-folders-outside-the-home.md) | planned | The cleanup half: an `agent.claude-code-temp` rule for dead sessions' folders under `/private/tmp/claude-<uid>` (macOS) or `<tmpdir>/claude-<uid>` (Linux), by amendments of the agent and safety ADRs; after the DEV deadline |
 
