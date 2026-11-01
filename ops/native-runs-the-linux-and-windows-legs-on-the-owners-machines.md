@@ -36,6 +36,12 @@ Use them for every Linux or Windows change of epic DDC-007, in particular storie
   - No sudo and no C compiler on the host are needed: the tests run in `rust:<toolchain>-bookworm`.
   - Both architectures are worth a machine. CI runs clippy and the tests on x86_64 Linux only and builds aarch64 for the release without clippy; an aarch64 run caught a clippy error that only aarch64 has (`st_nlink` is 32 bits there).
   - The target folder grows with every version bump. Runs build without incremental data, as CI does, and print a warning past 40 GiB. They never remove it: what to delete on the owner's machine is the owner's call.
+  - **Or WSL on a Windows machine** (code 0.14.7). Set `DDC_LINUX_WSL=<distribution>` beside `DDC_LINUX_HOST=<the Windows alias>`, and every command goes through `wsl.exe` into that distribution, from its home. Git bash's path conversion is off (`MSYS_NO_PATHCONV=1`). The distribution needs:
+    - a C toolchain (`build-essential`, `pkg-config`);
+    - docker, with the user in the `docker` group;
+    - systemd, so docker starts with the distribution.
+
+    Installing these needs `sudo` inside WSL, which is the owner's to give. Run `--setup` once, as on a Linux machine. If ssh stops answering after the WSL install, Windows may have turned the network Public, and the OpenSSH firewall rule covered Private only. The fix is the owner's: `Set-NetConnectionProfile -InterfaceIndex <n> -NetworkCategory Private`, or the rule widened to `-Profile Any -RemoteAddress LocalSubnet`.
 - [ ] **Each Windows machine**, prepared once by its owner. Copy `scripts/windows-host-setup.ps1` to the machine, open PowerShell as Administrator and run:
 
   ```powershell
