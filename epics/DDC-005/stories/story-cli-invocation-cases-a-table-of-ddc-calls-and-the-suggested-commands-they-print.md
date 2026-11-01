@@ -3,7 +3,7 @@ type: story
 id: "story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print"
 epic: "DDC-005"
 title: "CLI invocation cases: a table of ddc calls and the suggested commands they print"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
@@ -12,9 +12,9 @@ external_refs: {}
 tags: [cli, tests, gate]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-01T12:08:42.744Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-11-01T12:08:42.744Z"
 ---
 
 # CLI invocation cases: a table of ddc calls and the suggested commands they print
@@ -37,7 +37,7 @@ This story adds one table of `ddc` calls, `crates/ddc-cli/tests/cases.json`, run
 1. **Follow-through.** Every suggestion in the output is a backtick span that starts with `ddc ` (the renderer prints suggestions only that way; placeholders such as `<path>` or `ack|snooze` mark a span as never run). The runner splits it with POSIX quoting, expands `~` to the case's home and runs the built binary directly, never through a shell. Each suggestion passes the safety allowlist (rule 3) or is refused by name. A suggested `clean` runs with `--dry-run`. Its scope is read from `<data-dir>/last-scan.json`, which the dry run writes before the plan, and compared with the case's roots as canonical, deduplicated sets. A suggestion that is neither run nor listed in the file's `not_run` patterns with a reason fails the case.
 2. **Coverage.** Every subcommand and every argument of the CLI, hidden ones included, appears in at least one case or in the file's `uncovered` list with a reason. `--help` hides `du`, `diag`, `notify`, `scan --background` and the `--system-root` flags, so the rule walks clap's command tree instead: a `#[cfg(test)]` test in `src/cli.rs` reads `Cli::command()` and `include_str!("../tests/cases.json")`.
 3. **Safety allowlist.** The runner runs only these, and refuses anything else by name, in cases and in follow-through alike:
-   - `scan`, `rules`, `du`. `scan --background` runs only together with `--no-notify` or `--notify json`, because without them it can show a real notification;
+   - `scan`, `rules`, `du`, `diag`, and a bare `--help` or `--version`. `scan --background` runs only together with `--no-notify` or `--notify json`, because without them it can show a real notification;
    - `clean` only with `--dry-run`, never with `--yes`, `--items` or `--permanent`;
    - `keep` and `notify` only with `--data-dir` inside the temporary root;
    - every `disk` command only with `--system-root` inside the temporary root, and `disk free` never, because its dry run runs each tool's own dry run (brew, conda);
@@ -89,6 +89,20 @@ Windows is not supported yet (`SUPPORTED = false`). Every case but `rules`, `--h
 - [ ] `make cases`, which is `$(CARGO) nextest run -p ddc-cli --test cases_cli $(FEATURES) --locked`, so pre-push's `nextest-unit` reuses its build. Then a separate query `scripts/gate-scope.sh staged-cases` answering `yes` or `no`, tested in `scripts/tests/test_gate_scope.py`. `staged` keeps its one-word `rust|skip` contract. Then the pre-commit hook, which fails closed (anything but `no` runs `make cases`), `AGENTS.md` "The gate" and the hook's header comment.
 
 ## Implementation Plan
+
+From the planner's placement plan (2026-11-01), against code at v0.14.4.
+
+1. `regex` as a workspace dev-dependency of ddc-cli (already in Cargo.lock through jsonschema).
+2. Background text: `of_settings_roots` moves from `cmd/scan.rs` to `cmd/mod.rs` as `own_roots`; `render::clean_command` becomes `pub`; `notify::message(d, clean)` prints the given command; `cmd/background.rs` logs `notification: <text>` to `<data>/logs/background.log` whenever the decision is to notify, notifier or not, with a unit test beside its siblings.
+3. `crates/ddc-cli/tests/cases.json`: `fixture` (home, dirs, files, settings), `data_dir_commands`, `cases` (name, group, cwd, args, settings, expect with `linux`/`windows` overlays), `not_run`, `uncovered`; placeholders `{root}`, `{home}`, `{data}`, `{dev:REL}`, `{ino:REL}`, `{rule:ID}` (from `ddc_loadgen::fixtures::catalog`).
+4. `crates/ddc-cli/tests/cases_cli.rs`, one file with inline modules (format, place, split, allow, follow, run). One `#[test]` per group, failures collected. Refusals derived from `SUPPORTED`/`CAPABILITIES` with the core's own messages. Unit tests: the parse, the splitter on `render.rs`'s vectors, each allowlist refusal, the comparator on canned text.
+5. Coverage in `src/cli.rs`'s `#[cfg(test)]`: walk `Cli::command()` with hidden args, a call covers what clap matches from the command line; the rule tested on a made-up `Command`; stale `uncovered` names and `data_dir_commands` checked against clap.
+6. The revert check by hand (`render.rs` printing plain `ddc clean`), recorded at close.
+7. `make cases`; `scripts/gate-scope.sh staged-cases` (`yes|no`, fails to `yes`) with tests in `test_gate_scope.py`; the pre-commit hook runs `make cases` after lint unless the answer is `no`; `AGENTS.md` "The gate".
+8. Linux leg on an aarch64 machine and the Windows leg natively; CI for x86_64 Linux.
+9. Timing in four states, version bump, release notes, reviewer.
+
+`diag` and a bare `--help`/`--version` join rule 3's allowlist: `diag` only reads the I/O policy, limits, statfs and the process table. `clean --json` and `clean --local-snapshots` need `--items`, which the allowlist refuses, so they are in `uncovered`. A follow-up worth its own story: the suggested `ddc clean` after `scan --skip X` drops the `--skip`; the comparator checks roots only, as this story says.
 
 ## Acceptance Criteria
 
