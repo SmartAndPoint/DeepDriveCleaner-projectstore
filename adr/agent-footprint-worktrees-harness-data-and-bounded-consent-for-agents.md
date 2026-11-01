@@ -142,6 +142,8 @@ The probes of conditions 4, 5 and 6 run only for candidates that passed 1 to 3 f
 
 Only a person removes the `review` items: picked in the Review window or listed in `--items`, never inside `--yes` or `--agent`. The `safe` scratch is the one exception: selected by default and inside `--yes`; under `--agent` only behind the Settings opt-in the owner required on 2026-10-28 for agent cleans of the `safe` class, which §5 must adopt as a dated amendment (see Open Questions). Session scratchpads under the system temp directory (`CLAUDE_CODE_TMPDIR`) lie outside `$HOME` and outside the default scan roots; the OS clears them, and `ddc` does not look for them.
 
+*Amendment, 2026-11-01 (reading only), replacing "`ddc` does not look for them" for reading:* `ddc disk agents` now reads the current user's Claude Code temporary base (`<tmp>/claude-<uid>`, or under `CLAUDE_CODE_TMPDIR`), read-only: entry names, sizes and the stat of a session's own files, never their content. It reports each session's temporary folder with that session's liveness, and the base's remainder. Removal stays out of scope until story "Coding agents' temporary folders outside the home" amends this section; story "Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees" carries the reading half.
+
 ### 4. `ddc footprint`: a scoped report for one project, in seconds
 
 `ddc footprint [ROOT] [--json]` answers an agent's question about one project, not the home folder:

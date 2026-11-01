@@ -3,18 +3,18 @@ type: story
 id: "story-per-session-footprint-transcripts-temporary-folders-and-worktrees"
 epic: "DDC-003"
 title: "Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-10-31
+updated: 2026-11-01
 external_refs: {}
 tags: [agents, disk-agents, sessions, worktrees, temp, json]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-01T00:00:00.000Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-11-01T00:00:00.000Z"
 ---
 
 # Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-003](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -66,18 +66,29 @@ This reverses one sentence of the agent ADR §3 for reading: "the OS clears them
 
 - [ ] Research: confirm the temporary-folder layout and its location on macOS and Linux (`/tmp` versus `$TMPDIR`; `/tmp` is a symlink to `/private/tmp` on macOS), the `<project-slug>` rule, and whether the folder name equals the transcript's session id. Also how Codex's `~/.codex/worktrees/<id>` maps to a thread, and whether Claude Code keeps worktrees elsewhere. Add it to the research note "Coding-agent harnesses on macOS: where their data lives and how to tell a live session", with the critic.
 - [ ] The ADR amendment for reading (agent ADR §3), with the critic.
-- [ ] `agents/` model: `SessionFootprint { transcript, checkpoints, temp, worktrees: [{path, repo, bytes}], total }`. The temporary root comes through the existing `Env::system_root()` ("a fixture root in tests"), so tests never touch the real `/tmp`.
+- [ ] `agents/` model: `SessionFootprint { id, project, state, live_by, unknown_cause, modified, transcript, checkpoints, temp, temp_path, total }`, where `state` is a new enum (`live | not-live | unknown`, from `SessionLiveness`), not a new variant of `SessionState`, which would bump the schema version; `worktrees: [{path, repo, bytes}]` joins it in the follow-up. The temporary root comes through the existing `Env::system_root()` ("a fixture root in tests"), so tests never touch the real `/tmp`.
 - [ ] Sizing reuses `agents/sizes.rs` and the parallel walker; `--no-sizes` still skips it. A worktree inside a temporary folder is counted once: in `worktrees`, and excluded from `temp`.
-- [ ] `docs/agents.schema.json`: `sessions[].footprint` as an optional, additive object, with **no** `schema_version` bump. DDCKit's reader rejects any other version (`AgentsReport.swift`). The existing fixture still decodes (contract test). A bump, if ever wanted, is its own PR with both constants.
+- [ ] `docs/agents.schema.json`: `sessions.footprints[]`, an optional, additive list beside the session list, and `sessions.temp_root` (the temporary base's path and bytes, so what no session accounts for, such as `bash-edit-diff`, shows as the remainder), with **no** `schema_version` bump. A sibling list, not a field of each session: the session list holds only sessions with a record, and Claude Code removes a record when its session ends, so most finished sessions would get no row. DDCKit's reader rejects any other version (`AgentsReport.swift`). The existing fixture still decodes (contract test). A bump, if ever wanted, is its own PR with both constants.
 - [ ] Text output: the per-session table, top 10 per harness.
 - [ ] README: `ddc disk agents` section updated, with the "how to clean" wording.
 - [ ] Cleanup half, after the deadline: the rule and ADR amendment of story "Coding agents' temporary folders outside the home", and the Mac app's rows in the "Coding agents" section.
 
 ## Implementation Plan
 
+Planner, 2026-11-01, against `main` at 1f3f408. Deadline MVP only.
+1. `env.rs`: read `CLAUDE_CODE_TMPDIR` (and `TMPDIR` on Linux) in `from_process`, the one place that reads the environment; `Env::claude_temp_base()` resolves the override, else `<system_root>/private/tmp` on macOS or `$TMPDIR`/`<system_root>/tmp` on Linux, then `claude-<uid>`, canonicalised. A given `--system-root` wins over both variables. A hidden `--system-root` on `disk agents`, as `disk` has, and every existing agents test given a fixture root, so no test reads the real `/tmp`.
+2. Model types in `agents/model.rs`, all optional; `AGENTS_SCHEMA_VERSION` stays 1.
+3. Per-session byte counters in `agents/sizes.rs`, fed by the existing walk; the temporary base is walked as one more top-level folder but stays out of the harness's folders and bytes, which remain home-only.
+4. `agents/footprint.rs`: the session ids (a UUID under `projects/<slug>/`), the join with `file-history/<id>` and `<temp base>/<slug>/<id>` by the id alone (the slug rule is not yet confirmed; a temporary folder whose transcript is gone keeps its own row), and liveness through the existing `liveness::claude`, from a metadata-only stat of each session's own files (not the walk's times, which a listing without times leaves empty and which then read as recent).
+5. Wiring in `agents/mod.rs`, the regenerated schema, the text in `render.rs`, the tests, DDCKit's fixture, the README, a minor bump.
+
+The rule "`claude-<uid>` is appended under `CLAUDE_CODE_TMPDIR` too" is an assumption until the research step confirms it; it lives in one pure function with its own test.
+
 ## Acceptance Criteria
 
-- [ ] On a synthetic home and system root, with two Claude Code sessions (one live by an injected record, one stale), `ddc disk agents --json` reports for each session its transcript, checkpoint and temporary bytes and their total, and marks the live one live (test).
+- [ ] On a synthetic home and system root, with two Claude Code sessions (one named by an injected live record, one with no record and files older than `entries::RECENT`) and a folder of the temporary base that no session owns (`bash-edit-diff`), `ddc disk agents --json` gives `sessions.footprints[]` one row per session with its transcript, checkpoint and temporary bytes and their total, marks the first live and the second not live, and `sessions.temp_root.bytes` minus the rows' `temp` equals the stray folder's bytes (test).
+- [ ] A session temporary folder whose transcript is already gone (Claude Code's own sweep) gets a row with `transcript: 0`, never folds into the remainder (test).
+- [ ] With `--system-root` given, the fixture wins over `CLAUDE_CODE_TMPDIR` and `TMPDIR`: no test reads the real temporary folder, even from a shell that sets them (test).
 - [ ] (Follow-up, after the research) A Codex thread's rollout file is attributed as its transcript, and a worktree inside a session's temporary folder is counted in `worktrees`, not twice (tests).
 - [ ] `--no-sizes` still finishes without measuring any folder (test asserts no size walk).
 - [ ] The JSON validates against the updated schema, `schema_version` is unchanged, and the DDCKit contract test decodes it (test).
