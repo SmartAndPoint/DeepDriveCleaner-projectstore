@@ -3,7 +3,7 @@ type: story
 id: "story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print"
 epic: "DDC-005"
 title: "CLI invocation cases: a table of ddc calls and the suggested commands they print"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
@@ -13,7 +13,7 @@ tags: [cli, tests, gate]
 code_refs: []
 specs: []
 started_at: "2026-11-01T12:08:42.744Z"
-closed_at: null
+closed_at: "2026-11-01T12:52:12.821Z"
 plan_updated_at: "2026-11-01T12:08:42.744Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-11-01T12:08:42.744Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-005](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -106,16 +106,45 @@ From the planner's placement plan (2026-11-01), against code at v0.14.4.
 
 ## Acceptance Criteria
 
-- [ ] `crates/ddc-cli/tests/cases.json` and `crates/ddc-cli/tests/cases_cli.rs` exist, with the seed cases. They pass on macOS and on the Gate's Linux and Windows legs. On Linux and Windows, a case whose command needs a refusing capability passes by its exit 69, and an output difference passes by its overlay. No case is skipped and no native-skips line is added.
-- [ ] Follow-through: every suggestion in every case's output is run under the allowlist or matched by a `not_run` pattern, or the case fails. The comparator's unit test shows plain `ddc clean` failing after a scan of own roots. Once, by hand, reverting `clean_command` makes the owner's case fail; the Final Summary records that run.
-- [ ] The allowlist refuses `scan --background` without `--no-notify` or `--notify json`, `clean` without `--dry-run`, `--yes`, `--items`, `--permanent`, `schedule install|uninstall`, `disk free`, a `disk` command without `--system-root`, and any path outside the temporary root. A test shows each refusal.
-- [ ] Coverage: the test in `src/cli.rs` fails when a subcommand or an argument of `Cli::command()`, hidden ones included, is in no case and not in `uncovered`. A unit test on a made-up `Command` shows it failing.
-- [ ] The background scan's logged notification text names the scanned paths, and a case checks it on macOS and Linux.
-- [ ] `make cases` runs the cases alone. The pre-commit hook runs it after `make lint` unless `scripts/gate-scope.sh staged-cases` answers `no`. It answers `yes` when a staged path is under `crates/` or is `Cargo.toml` or `Cargo.lock`, and its tests are in `test_gate_scope.py`. `staged` still answers only `rust` or `skip`. Like lint, it checks the working tree. The hook comment and `AGENTS.md` say so. The Final Summary records the time it adds in four states: cold, warm with no change, after a CLI change, and after a core change.
-- [ ] `make gate-fast`, `make gate` and the native legs run the cases with the rest of nextest, outside the `load` group.
-- [ ] Version bump and release notes in the same PR (`make bump`).
+- [x] `crates/ddc-cli/tests/cases.json` and `crates/ddc-cli/tests/cases_cli.rs` exist, with the seed cases. They pass on macOS and on the Gate's Linux and Windows legs. On Linux and Windows, a case whose command needs a refusing capability passes by its exit 69, and an output difference passes by its overlay. No case is skipped and no native-skips line is added. — evidence: 31 cases; `cargo nextest run -p ddc-cli --test cases_cli` 10/10 on macOS; the Linux leg on an aarch64 machine, 743 tests passed with the listed skips; PR #64's `check-x86_64-unknown-linux-gnu` and `check-x86_64-pc-windows-msvc` green; refusals asserted in `cases_cli.rs` `refusal()`. No case skips. The one line added to `.config/native-skips/windows.txt` is for the new background.rs unit test, which skips on Windows like its siblings, not for a case. No case needs an overlay yet; the merge is tested by `an_overlay_replaces_only_the_keys_it_names_on_its_platform`.
+- [x] Follow-through: every suggestion in every case's output is run under the allowlist or matched by a `not_run` pattern, or the case fails. The comparator's unit test shows plain `ddc clean` failing after a scan of own roots. Once, by hand, reverting `clean_command` makes the owner's case fail; the Final Summary records that run. — evidence: `cases_cli.rs` `follow::follow`; test `plain_ddc_clean_after_a_scan_of_own_roots_fails_the_comparison`; the revert run is in the Final Summary.
+- [x] The allowlist refuses `scan --background` without `--no-notify` or `--notify json`, `clean` without `--dry-run`, `--yes`, `--items`, `--permanent`, `schedule install|uninstall`, `disk free`, a `disk` command without `--system-root`, and any path outside the temporary root. A test shows each refusal. — evidence: test `the_allowlist_refuses_each_forbidden_call`, each row checked with the reason it must give.
+- [x] Coverage: the test in `src/cli.rs` fails when a subcommand or an argument of `Cli::command()`, hidden ones included, is in no case and not in `uncovered`. A unit test on a made-up `Command` shows it failing. — evidence: `cli::tests::every_command_and_argument_is_in_a_case_or_uncovered`, `the_rule_names_what_no_call_covers`, plus `every_uncovered_name_is_a_real_command_or_argument` and `data_dir_commands_are_the_commands_with_data_dir`.
+- [x] The background scan's logged notification text names the scanned paths, and a case checks it on macOS and Linux. — evidence: `cmd/background.rs` logs `notification: …` whenever the decision is to notify; unit test `the_notification_is_logged_with_the_clean_of_the_scanned_paths`; cases "a background scan of a folder logs the notification with the clean of that folder" and "a background scan of the home logs plain ddc clean", green on macOS and on the aarch64 Linux run.
+- [x] `make cases` runs the cases alone. The pre-commit hook runs it after `make lint` unless `scripts/gate-scope.sh staged-cases` answers `no`. It answers `yes` when a staged path is under `crates/` or is `Cargo.toml` or `Cargo.lock`, and its tests are in `test_gate_scope.py`. `staged` still answers only `rust` or `skip`. Like lint, it checks the working tree. The hook comment and `AGENTS.md` say so. The Final Summary records the time it adds in four states: cold, warm with no change, after a CLI change, and after a core change. — evidence: Makefile `cases`; `.githooks/pre-commit`; class `StagedCases` in `scripts/tests/test_gate_scope.py`, 49 tests OK, `test_staged_keeps_its_one_word`; AGENTS.md "The gate"; the hook run by hand ran 10/10 cases; timings in the Final Summary.
+- [x] `make gate-fast`, `make gate` and the native legs run the cases with the rest of nextest, outside the `load` group. — evidence: `make gate-fast` 641 passed with `cases_cli` in it (pre-push of PR #64); the `load` filter of `.config/nextest.toml` does not name it; the native legs run `nextest --workspace` (743 on Linux).
+- [x] Version bump and release notes in the same PR (`make bump`). — evidence: 0.14.6, `docs/releases/0.14.6.md`, PR #64.
 
 ## Final Summary
+
+**What changed.**
+- `crates/ddc-cli/tests/cases.json` holds 31 calls of `ddc`, with a shared fixture (home, folders beside it, settings), per-platform overlays, `not_run` and `uncovered`.
+- `cases_cli.rs` runs each call on a fresh canonical temporary root, then runs the advice its output and logs give. That covers the background log as well as stdout and stderr.
+- The allowlist reads arguments the way clap does and fails closed: a word it cannot classify is a path, and must lie inside the root.
+- `src/cli.rs` checks coverage by walking clap's tree, hidden arguments included.
+- The background notification now prints `render::clean_command` of the scan's own roots, decided by `own_roots`, which moved from `cmd/scan.rs` to `cmd/mod.rs`. It is logged whenever the decision is to notify, so Linux checks it too.
+- `make cases`, `scripts/gate-scope.sh staged-cases` and the pre-commit hook run the table before every commit that touches `crates/` or `Cargo.*`.
+
+**Why.** The owner's `ddc scan .` in `~/Projects` suggested a plain `ddc clean`, which reviews the home. Nothing exercised the printed advice end to end (the owner, 2026-11-01).
+
+**Tests executed.**
+- The revert run: `render.rs` `report()` changed to `clean_command(&[], home)`, then `cargo nextest run -p ddc-cli --test cases_cli -E 'test(roots_cases) | test(scan_cases)'`. Both failed, 5 cases each. Each failed by its expected line (`stdout lacks "`ddc clean ~/Projects`"`) and by follow-through (`` `ddc clean` covers {…/home}, the case scanned {…/home/Projects} ``). The line was then restored.
+- `make cases` timing on the developer machine:
+  - cold (a fresh target folder): 28 s;
+  - warm with no change: 2 s;
+  - after a CLI change: 3 s;
+  - after a core change: 9 s.
+- `make gate-fast`: 641 passed.
+- The Linux leg on an aarch64 machine: 743 passed, native-skips as listed.
+- PR #64's Gate:
+  - the Windows leg first failed only on the unlisted skip of the new background unit test, then passed;
+  - the cases themselves passed there, by the refusal.
+
+**Risks and follow-ups.**
+- `core.hooksPath` is shared by every worktree of the clone and points at the main checkout's `.githooks`. A worktree runs the hook of whatever commit that checkout is on, and gets the cases only after that checkout pulls this change.
+- The suggested `ddc clean` after `scan --skip X` drops the `--skip`. The comparator checks roots only, as this story says, so the cases do not catch it. That is worth a story of its own.
+- The text output of `disk` and `disk agents` is never followed through, because both cases use `--json`. Neither prints a `ddc …` suggestion today.
+- The Windows machine was unreachable over ssh, so Windows was checked by CI only.
 
 ## Technical Notes
 
