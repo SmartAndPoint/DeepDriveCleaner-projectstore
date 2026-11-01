@@ -26,8 +26,16 @@ Use them for every Linux or Windows change of epic DDC-007, in particular storie
 - [ ] An ssh alias for each machine in the developer machine's `~/.ssh/config`, and key login that works without a prompt: `ssh -o BatchMode=yes <alias> true`.
 - [ ] **Linux machine**:
   - docker, with the ssh user in the `docker` group;
-  - rustup, with the toolchain of `rust-toolchain.toml` and cargo-nextest at the version `.config/tools.mk` pins, in the user's `~/.rustup` and `~/.cargo/bin`. Nothing checks the nextest version on Linux. After the pin changes, update it by hand: another version can change the log format, and the skip compare reads that log.
+  - curl. Then, once and again after either pin changes, from the developer machine:
+
+    ```bash
+    DDC_LINUX_HOST=<alias> scripts/native-linux.sh --setup
+    ```
+
+    This installs rustup (with `--no-modify-path`), the toolchain of `rust-toolchain.toml` and the cargo-nextest `.config/tools.mk` pins inside `~/ddc-native`, for the machine's architecture. The host user's own `~/.rustup` and `~/.cargo` are never used or changed (0.14.4; before it, runs used them).
   - No sudo and no C compiler on the host are needed: the tests run in `rust:<toolchain>-bookworm`.
+  - Both architectures are worth a machine. CI runs clippy and the tests on x86_64 Linux only and builds aarch64 for the release without clippy; an aarch64 run caught a clippy error that only aarch64 has (`st_nlink` is 32 bits there).
+  - The target folder grows with every version bump. Runs build without incremental data, as CI does, and print a warning past 40 GiB. They never remove it: what to delete on the owner's machine is the owner's call.
 - [ ] **Each Windows machine**, prepared once by its owner. Copy `scripts/windows-host-setup.ps1` to the machine, open PowerShell as Administrator and run:
 
   ```powershell
