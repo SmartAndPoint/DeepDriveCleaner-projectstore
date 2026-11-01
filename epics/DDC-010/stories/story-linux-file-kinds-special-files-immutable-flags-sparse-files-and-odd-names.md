@@ -69,6 +69,7 @@ The Linux walk and clean were built and tested on regular files, folders, symlin
   - Tests that `Node_Modules` is not `node_modules` on ext4, that `Cache` and `cache` side by side are two entries, and that a protected folder named in NFC does not protect, or fail to protect, its NFD twin. On macOS the tests state what APFS does instead.
   - On the CI mounts job's casefold ext4 and exFAT, a protected folder written in another case is still protected, and a rule name in another case matches as the filesystem resolves it.
   - How the walk knows. `statx` does not expose casefold, and `f_type` is plain ext4. The walk holds each folder's descriptor, so one `ioctl(FS_IOC_GETFLAGS)` per folder reads `FS_CASEFOLD_FL`, and also `FS_IMMUTABLE_FL` and `FS_APPEND_FL` for the folder itself. For exFAT, NTFS and CIFS, `f_type` is enough.
+- [ ] Removal never crosses a mount. `exec/delete.rs` removes a tombstone with `std::fs::remove_dir_all` by path, and `make_dirs_writable` walks by path, so a mount made inside a finding after the guard's check would be descended into. Remove through descriptors with `RESOLVE_NO_XDEV` (from story "Linux mount boundaries: automounts, bind mounts and the Trash across filesystems"), and stop at a mount root.
 - [ ] Amend the safety ADR §5 with the special-file and immutable rules, then run the critic on the amendment.
 
 ## Implementation Plan
