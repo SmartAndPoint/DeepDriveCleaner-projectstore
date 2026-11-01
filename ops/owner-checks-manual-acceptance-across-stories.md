@@ -318,6 +318,12 @@ Story: [Launch demo assets](../epics/DDC-009/stories/story-launch-demo-assets.md
 
 - [ ] Manual (owner): the published post's GIFs and cover show no project or session name you do not want public The app recording was cut and its user-data names blurred; confirm that the session ids and the public project names DeepDriveCleaner and ProjectStore still visible in it are fine to keep public.
 
+### Confirmation sheet: Delete all permanently (DDC-002)
+
+Story: [Confirmation sheet: Delete permanently for every item at once](../epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md).
+
+- [ ] Manual (owner, 0.14.10): in a sheet with several Review items the Trash would take, "Delete all permanently" ticks all; one per-item untick shows it mixed; a click when mixed ticks all; a click when all are ticked unticks all; the title and button change from "Move N items to the Trash?" to "Clean N items?" once any item is permanent; the warnings line shows the check running after each click; VoiceOver reads the checkbox once and says "partly selected" when mixed.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
