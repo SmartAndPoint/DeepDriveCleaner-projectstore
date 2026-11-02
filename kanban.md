@@ -64,7 +64,6 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
-- [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
 - [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
 
@@ -125,6 +124,7 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [x] [[epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print|DDC-005: CLI invocation cases: a table of ddc calls and the suggested commands they print]] #p1 #done
 - [x] [[epics/DDC-007/stories/story-linux-scanner-and-rule-catalog|DDC-007: Linux scanner and rule catalog]] #p2 #done
 - [x] [[epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module|DDC-007: Move OS calls behind the platform module]] #p1 #done
+- [x] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1 #done
 - [x] [[epics/DDC-007/stories/story-platform-seam-adr-and-capability-model|DDC-007: Platform seam: ADR and capability model]] #p2 #done
 - [x] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2 #done
 - [x] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1 #done

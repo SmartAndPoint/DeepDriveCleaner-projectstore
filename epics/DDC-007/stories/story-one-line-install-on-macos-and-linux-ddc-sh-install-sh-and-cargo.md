@@ -3,17 +3,17 @@ type: story
 id: "story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo"
 epic: "DDC-007"
 title: "One-line install on macOS and Linux: ddc.sh/install.sh and cargo"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-28
-updated: 2026-10-30
+updated: 2026-11-02
 external_refs: {}
 tags: [distribution, install, macos, linux, website]
 code_refs: ["packaging/install/", ".github/workflows/install.yml", "crates/ddc-cli/Cargo.toml", "scripts/build-cli.sh", "scripts/build-app.sh", "scripts/publish-release.sh", "Makefile", "README.md"]
 specs: []
 started_at: "2026-10-30T07:37:33.282Z"
-closed_at: null
+closed_at: "2026-11-02T17:31:07.680Z"
 plan_updated_at: "2026-10-30T07:37:33.282Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-10-30T07:37:33.282Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-007](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -92,7 +92,7 @@ Two more install routes need no script:
 - [x] Provenance of `SHA256SUMS`: checksums prove integrity, not origin. A compromised GitHub account could replace both archive and sums. On macOS the team-pinned `codesign` check covers it. For Linux, decide in this story between checksum only (accepted risk, written down), a minisign signature of `SHA256SUMS` with an owner-held key whose public half is on the site, or `gh attestation verify` when `gh` is present.
 
   Decided 2026-10-30: checksum only on Linux, an accepted risk written in the script header and the README. The README's manual route names `gh attestation verify <archive> --repo SmartAndPoint/DeepDriveCleaner` for whoever wants to check provenance by hand.
-- [ ] Hosting, handed to DDC-004: the website build copies `packaging/install/install.sh` from the tagged release into the site, so `https://ddc.sh/install.sh` serves the exact script of the latest release, with no redirect and no drift. Note on DDC-004's story that its install-command criterion gains this script.
+- [x] Hosting, handed to DDC-004: the website build copies `packaging/install/install.sh` from the tagged release into the site, so `https://ddc.sh/install.sh` serves the exact script of the latest release, with no redirect and no drift. Note on DDC-004's story that its install-command criterion gains this script. — done in PR #82 (0.17.3): `website/package.mjs` copies the script to `dist/cli/install.sh` with `Content-Type: text/plain`.
 - [x] CI tests (`install.yml`, on macOS and Ubuntu runners), run against a local fake release served by `python3 -m http.server` through `DDC_INSTALL_BASE_URL`:
   - fresh install;
   - upgrade;
@@ -122,12 +122,28 @@ The macOS half lands now; the Linux half closes after story "Linux scanner and r
 - [x] Running the script again with a newer fake release upgrades in place: same path, new version, and a `ddc schedule install` agent created before the upgrade still points at a working binary (test). — evidence: `packaging/install/test_install.py` `test_an_upgrade_keeps_the_path_a_running_copy_and_the_agent` and `test_the_agent_survives_an_upgrade` (a real `ddc schedule install` plist), in `make install-test` (pre-push gate of 9ce7b80) and Install run 41035955319 `fake-macos`
 - [x] A tampered archive makes the script exit 3 and leaves no file behind (test). — evidence: `packaging/install/test_install.py` `test_a_tampered_archive_installs_nothing`, `test_a_tampered_sums_file_installs_nothing`, `test_a_truncated_download_runs_nothing`, `test_a_tampered_musl_archive_installs_nothing`
 - [x] With `deepdrivecleaner` or `ddc` resolving into a Homebrew prefix, the app or `~/.cargo/bin`, or with `/Applications/DeepDriveCleaner.app` present, the script exits 4 and names the existing install (test). — evidence: `packaging/install/test_install.py` `test_a_homebrew_cask_install_is_named`, `test_a_cargo_install_is_named`, `test_the_app_is_named`, `test_the_app_in_home_applications_is_named`, `test_another_copy_is_named_with_the_prefix_that_manages_it`
-- [ ] On Linux before the Linux archives exist, the script exits 2 with "not released for Linux yet"; after, it installs the musl archive (CI, both states; a pre-release needs `--version`). — evidence, first state only: Install run 41036043868 `real-ubuntu` against v0.8.0 exits 2 with "not released for Linux yet (v0.8.0 has no x86_64-unknown-linux-musl archive)". The second state is tested against fake releases (`test_the_musl_archive_installs`, `test_aarch64_takes_its_own_archive`, `fake-ubuntu`) and waits on real archives from story "Linux scanner and rule catalog".
+- [x] On Linux before the Linux archives exist, the script exits 2 with "not released for Linux yet"; after, it installs the musl archive (CI, both states; a pre-release needs `--version`). — evidence, first state only: Install run 41036043868 `real-ubuntu` against v0.8.0 exits 2 with "not released for Linux yet (v0.8.0 has no x86_64-unknown-linux-musl archive)". The second state is tested against fake releases (`test_the_musl_archive_installs`, `test_aarch64_takes_its_own_archive`, `fake-ubuntu`) and waits on real archives from story "Linux scanner and rule catalog".; second state: Install run 41351864061 `real-ubuntu` (the real 0.16.4 musl archive) and Install run 41491352179 `real-ubuntu` on the v0.25.0 release.
 - [x] The script never calls `sudo`, never writes outside `--prefix` and a temporary folder, and never edits shell profiles without `--modify-path` (review of the script plus a test that runs it with a read-only `$HOME` except `--prefix`). — evidence: `packaging/install/test_install.py` `test_a_read_only_home_is_left_unchanged`, `test_the_script_never_calls_sudo`, `test_modify_path_appends_one_line_once`; `projectstore:reviewer` reviewed the script
-- [x] `cargo install --git … --locked ddc-cli` and `cargo binstall --git … ddc-cli` each give a working `deepdrivecleaner --version` on macOS (CI). — evidence: Install run 41036043868, `cargo-macos` (installed `ddc-cli v0.8.0` from git, `deepdrivecleaner 0.8.0`) and `binstall-macos` (`--disable-strategies quick-install,compile`, so it downloaded the release archive; `deepdrivecleaner 0.8.0`)
-- [ ] Manual (owner): `https://ddc.sh/install.sh` serves the script once DDC-004's site is live.
+- [x] `cargo install --git … --locked ddc-cli` and `cargo binstall --git … ddc-cli` each give a working `deepdrivecleaner --version` on macOS (CI). — evidence: Install run 41036043868, `cargo-macos` (installed `ddc-cli v0.8.0` from git, `deepdrivecleaner 0.8.0`) and `binstall-macos` (`--disable-strategies quick-install,compile`, so it downloaded the release archive; `deepdrivecleaner 0.8.0`); `binstall-macos` green on the v0.25.0 release (Install run 41491352179), with the workflow token since 0.17.6.
+- [x] Manual (owner): `https://ddc.sh/install.sh` serves the script once DDC-004's site is live. — evidence: checked 2026-11-02: `curl -fsSI https://ddc.sh/install.sh` gives HTTP 200 `text/plain`, and its SHA-256 equals `packaging/install/install.sh` at v0.25.0; `curl … | sh` installed and removed the CLI on two Linux machines (x86_64, ARM64) on 2026-11-01.
 
 ## Final Summary
+
+**What changed.**
+- `packaging/install/install.sh` installs `deepdrivecleaner` and `ddc` into `~/.local/bin` on macOS and Linux:
+  - the archive is checked against `SHA256SUMS`;
+  - it never uses sudo and never edits shell profiles unasked;
+  - it refuses (exit 4) next to a Homebrew, app or cargo install, and, since 0.25.0, while a scheduled scan runs its binary.
+- `https://ddc.sh/install.sh` serves it as plain text (PR #82).
+- `ddc-cli` carries `cargo binstall` metadata pointing at the release archives.
+
+**Why.** The CLI alone on macOS and on Linux needs one command, not Homebrew's cask.
+
+**Tests executed.**
+- `packaging/install/test_install.py` (upgrade, tampering, refusals, read-only HOME).
+- The Install workflow on a release: real-macos, real-ubuntu, cargo-macos and binstall-macos, all green on v0.25.0 (run 41491352179).
+
+**Follow-ups.** None open.
 
 ## Technical Notes
 
@@ -150,4 +166,4 @@ The macOS half lands now; the Linux half closes after story "Linux scanner and r
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-11-02*
