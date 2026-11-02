@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-11-02
 external_refs: {}
 tags: [cli, safety, cleanup, agents, contract]
 code_refs: []
@@ -29,6 +29,8 @@ plan_updated_at: null
 ---
 
 ## Description
+
+*Amended 2026-11-02 (ADR "Agent footprint", §7): the command is `ddc agent clean [ROOT] [--items <file|->] [--json]`, not a `--agent` flag on `ddc clean`. Without a person it removes only `safe` items, and only with the Settings opt-in `agents_clean_safe` on; `rebuildable` items (a harness worktree included) are listed with the `ddc clean --items` command for the person. Criteria below that say `--agent` removes `rebuildable` items are superseded by §7 and get rewritten at this story's plan gate.*
 
 `ddc clean --agent --project ROOT [--items <file|->] [--json]` is the one cleanup entry point for a caller that is not a person: §5 of the ADR "Agent footprint: worktrees, harness data and bounded consent for agents". It behaves like `--yes` with a tree: `safe` items, plus `rebuildable` items selected by default that lie inside `ROOT`'s main checkout or its worktrees (the dead worktrees of "Worktree findings and provenance" included). It never removes `review`, never runs `native-only`, never prompts, and journals every action with `consent: agent`. With `--items`, the list filters; it never widens.
 
@@ -77,9 +79,9 @@ Rough until the plan gate.
 
 - `--yes` today: `safe` by default, `rebuildable` only with `--class rebuildable`, `review` in `--class` refused (`cmd/clean.rs`, exit 2). `--agent` is that policy with `rebuildable` turned on and scoped by path, so `PlanOptions` gains a consent enum rather than a flag soup: `Interactive`, `Yes { classes }`, `Items { list }`, `Agent { root, items: Option<list> }`.
 - The amendment to §7 of the menu bar ADR matters here: `--items` without `--agent` keeps its meaning (a person's list); `--items` with `--agent` is a filter. One `--items` parser, two consent modes.
-- A `safe` global cache (`~/.cache/uv`) is removable under `--agent` although it is outside `ROOT`: that is what `--yes` already allows a script, and the ADR keeps the two aligned. If this proves surprising on the reference machine, the fix is a `--only-project` flag, not a change to the default.
+- ~~A `safe` global cache (`~/.cache/uv`) is removable under `--agent`…~~ *Superseded 2026-11-02 (ADR §7): shared caches are never removed by an agent; it may only propose them to the person.*
 - The DDC-002 story's open question (full rescan vs scoped re-walk) decides this story's rescan too; `--agent` is called from inside sessions, so a 40 s rescan is the cost to measure.
-- The `not-consented` reason is new in the clean report's enum; the report is a DDC-002 contract that has not shipped, so no `schema_version` bump, provided both stories land in one release.
+- ~~The `not-consented` reason is new… so no `schema_version` bump~~ *Superseded 2026-11-02 (ADR §7): the clean report ships (schema 6, decoded by the app), so `not-consented` and `agent-opt-in-off` bump the clean report and the journal.*
 
 ## Dependencies
 

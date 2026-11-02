@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-01T16:41:25.000Z
+generated_at: 2026-11-02T05:09:16.726Z
 
 ---
 
@@ -23,12 +23,18 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [ ] [[epics/DDC-006/stories/story-ddc-shape-a-syn-based-checker-for-size-nesting-cohesion-and-boundaries|DDC-006: ddc-shape: a syn-based checker for size, nesting, cohesion and boundaries]] #p2
 - [ ] [[epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app|DDC-006: SwiftLint with the same limits for the app]] #p3
 - [ ] [[epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary|DDC-007: Windows install: PowerShell script, winget and a signed binary]] #p2
-- [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
+- [ ] [[epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents|DDC-007: Coding agents on Windows: ddc disk agents]] #p2
+- [ ] [[epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home|DDC-007: Whole disk on Windows: the areas outside the home]] #p2
 - [ ] [[epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download|DDC-008: macOS: a notarized DMG for direct download]] #p3
 - [ ] [[epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray|DDC-008: Windows installer: one signed setup with the CLI and the tray]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler|DDC-008: Windows scheduled scans through Task Scheduler]] #p1
 - [ ] [[epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr|DDC-008: Windows signing and distribution route: research and ADR]] #p1
-- [ ] [[epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon|DDC-008: Windows tray app: a minimal scheduling icon]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation|DDC-008: Windows app: Review window and clean with confirmation]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications|DDC-008: Windows app: scheduled scans and notifications]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-app-settings-window|DDC-008: Windows app: Settings window]] #p2
+- [ ] [[epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel|DDC-008: Windows app: Tauri shell, tray icon and the panel]] #p1
+- [ ] [[epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views|DDC-008: Windows app: Whole disk and coding agents views]] #p2
+- [ ] [[epics/DDC-008/stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher|DDC-008: Windows download from the website: a signed setup from a trusted publisher]] #p1
 - [ ] [[epics/DDC-009/stories/story-repository-storefronts-for-the-launch|DDC-009: Repository storefronts for the launch]] #p1
 - [ ] [[epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities|DDC-010: btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities]] #p1
 - [ ] [[epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable|DDC-010: Cache roots moved by the environment: XDG and each tool's own variable]] #p2
@@ -38,7 +44,6 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [ ] [[epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup|DDC-010: Homebrew on Linux: ddc disk brew-packages and its cleanup]] #p3
 - [ ] [[epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists|DDC-010: Linux catalog: Flatpak, Snap and the tools only macOS lists]] #p2
 - [ ] [[epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names|DDC-010: Linux file kinds: special files, immutable flags, sparse files and odd names]] #p1
-- [ ] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1
 - [ ] [[epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list|DDC-010: Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list]] #p2
 - [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
 - [ ] [[epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs|DDC-010: Private size on Linux: reflinks on btrfs and XFS]] #p2
@@ -60,7 +65,9 @@ generated_at: 2026-11-01T16:41:25.000Z
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo|DDC-007: One-line install on macOS and Linux: ddc.sh/install.sh and cargo]] #p1
+- [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
+- [ ] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1
 
 ## Review
 

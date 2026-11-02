@@ -24,6 +24,8 @@ reviewed_at: null
 
 ---
 
+*Amended 2026-11-02 (ADR "Agent footprint", §7): agent commands live under `ddc agent` (`status`, `footprint`, `clean`, `skill install|status`). Without a person an agent removes only `safe` items of its own work, behind the Settings opt-in `agents_clean_safe`; `rebuildable` items, its dead worktrees included, are listed for the person to confirm. Read the goals below that say `ddc clean --agent` removes worktrees with that in mind.*
+
 ## Goal
 
 `ddc` cleans up after coding agents, and coding agents use `ddc` to see what their work leaves behind.

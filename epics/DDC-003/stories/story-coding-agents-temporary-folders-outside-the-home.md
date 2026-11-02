@@ -30,6 +30,8 @@ plan_updated_at: null
 
 ## Description
 
+*Amended 2026-11-02 (ADR "Agent footprint", §7): `--agent` is `ddc agent clean`; it removes `safe` items only, behind the opt-in.*
+
 The owner ran `ddc disk agents` on the reference Mac (2026-10-31). It reported about 12 GiB across Claude Code, Codex, Cursor and opencode, all of it under the home folder. The owner noticed what it did not show: "where Claude keeps its worktrees and its work", under `/private/tmp`. On the same day `/private/tmp/claude-<uid>` held about 15 GB, more than everything the report found. `ddc` reads only home-folder paths (`agents::HARNESSES`), so this folder is invisible to both `ddc disk agents` and `ddc scan ~`.
 
 That was deliberate. The agent ADR says "Session scratchpads under the system temp directory (`CLAUDE_CODE_TMPDIR`) lie outside `$HOME` and outside the default scan roots; the OS clears them, and `ddc` does not look for them". The safety ADR's 2026-10-28 amendment says "Outside the home folder ddc still removes nothing by path". This story reverses both, for removal. The report half, which only looks, is DDC-003's story "Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees". This story is the cleanup half, after the DEV deadline. The report-side code (the seam, the schema, the text) lives in the per-session story. This story owns the research, the removal amendments, the rule and the app row.

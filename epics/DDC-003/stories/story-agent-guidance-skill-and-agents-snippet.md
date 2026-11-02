@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-11-02
 external_refs: {}
 tags: [agents, docs, skill]
 code_refs: []
@@ -29,6 +29,8 @@ plan_updated_at: null
 ---
 
 ## Description
+
+*Amended 2026-11-02 (ADR "Agent footprint", §7): `ddc agent skill install` / `status` install and report the skill and the snippet; the skill is also a plugin of the SmartAndPoint marketplace; the guidance names `ddc agent status`, `ddc agent footprint` and `ddc agent clean`, and proposes installing `ddc` only after the person agrees.*
 
 The code repository gets an `agents/` folder with what a coding agent needs to use `ddc` well: §6 of the ADR "Agent footprint: worktrees, harness data and bounded consent for agents". A Claude Code skill (`agents/claude-code/ddc/SKILL.md`) and an `AGENTS.md` snippet (`agents/AGENTS.snippet.md`, for Codex, opencode and any harness that reads `AGENTS.md`) say when to run `ddc footprint`, what `ddc clean --agent` may and may not do, how to read the two JSON contracts, and that a worktree is removed through `ddc`, never through the agent's own `git worktree remove`. The guidance decides nothing: every rule it states cites the ADR section or the schema field it comes from.
 

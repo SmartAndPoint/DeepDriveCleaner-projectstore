@@ -70,6 +70,8 @@ Planned 2026-11-01 with the planner against `origin/main` 1cca33e. Four PRs, eac
 10. **Which git.** `git.rs` resolves its own executable and never runs `/usr/bin/git`, the `xcrun` shim that offers to install the developer tools (a LaunchAgent's `PATH` starts with `/usr/bin`, so `SystemCommands::find` would pick it): candidates are `Env::tool_dirs()` without `/usr/bin`; else `xcode-select -p` (a real binary; it exits 2 without a dialog when unset) and `<developer dir>/usr/bin/git` run directly; else `probe: unknown`. The scan's probes, `Location::GitWorktree` and the removal all go through it.
 7. The ADR is `proposed`; §1 and §2 are accepted at this gate, as §3 was at its own.
 
+*Progress, 2026-11-02: PR 1 shipped in 0.15.2 (code PRs #69, #70). Lesson from it: a test fixture that ran git from the pre-push hook inherited `GIT_DIR` and set `core.bare=true` in the main checkout; the fixture and, in PR 2, every production probe clear inherited `GIT_*` variables.*
+
 **PR 1. Recognition, read-only.**
 - `model.rs`: `WorktreeState { …, probe: known|unknown }`, `Finding.worktree`, `Project.worktree_of`, all optional with `skip_serializing_if`; `SCHEMA_VERSION` stays 4.
 - `rules/mod.rs`: `Matcher::Worktree`, `Matcher::WorktreeOrphan`. New `rules/worktree.rs`: `recognize(path) -> Option<Linked { gitdir, main, harness }>`, reusing `report::project::git_dir`, reading `commondir` (a submodule's gitdir has none, so it never matches) and the back-pointer; `main` from `commondir`, never a literal `.git/worktrees/` string (a bare main repo).

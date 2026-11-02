@@ -107,7 +107,7 @@ The "not released" variant is the default. It shows what 0.12.1 does, describes 
 
 ## Open Questions
 
-- [ ] D1, the owner: keep PolyForm Noncommercial and say "source-available", or relicense before publishing.
+- [x] D1, the owner: keep PolyForm Noncommercial and say "source-available", or relicense before publishing. — answered: the post was published under PolyForm ("source-available"); on 2026-11-01 the owner relicensed to AGPL-3.0-only plus a commercial licence, MIT for the agent guidance and the schemas, released in 0.16.4 (ADR "Licensing: AGPL-3.0 with a commercial licence for the product, MIT for agent guidance and report schemas"). The post's licence paragraph is the owner's to update.
 - [ ] D2, the owner: which prize categories to list. The partner categories need a partner technology; none is used. The proposal is the overall category only.
 
 ## Related

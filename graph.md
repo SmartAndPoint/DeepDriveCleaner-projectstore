@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-01T16:41:25.359Z
+generated_at: 2026-11-02T05:09:17.105Z
 
 ---
 
@@ -18,10 +18,12 @@ full typed neighborhood, both directions, in one call.
 |------|-------|------|--------|
 | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md | Agent footprint: worktrees, harness data and bounded consent for agents | adr | proposed |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | Cleanup safety model: risk classes, plan and confirmation | adr | accepted |
+| adr/licensing-agpl-30-with-a-commercial-licence-for-the-product-mit-for-agent-guidance-and-report-schemas.md | Licensing: AGPL-3.0 with a commercial licence for the product, MIT for agent guidance and report schemas | adr | accepted |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | Menu bar app: Swift shell over the ddc CLI | adr | proposed |
 | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md | Platform seam: one platform module per OS with declared capabilities | adr | accepted |
 | adr/rust-core-library-and-cli-with-json-output.md | Rust core: library + CLI with JSON output | adr | accepted |
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | Updates through Sparkle, alongside the Homebrew cask | adr | accepted |
+| adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | Windows app: Tauri 2 shell over the ddc CLI | adr | accepted |
 | epics/DDC-001/epic.md | Disk space cleaner CLI for developers | epic | in-progress |
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
@@ -100,24 +102,47 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | SwiftLint with the same limits for the app | story | planned |
 | epics/DDC-007/epic.md | Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers | epic | planned |
 | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | Build matrix: every target built, tested and packaged from one tag | story | in-progress |
+| epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents.md | Coding agents on Windows: ddc disk agents | story | planned |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | done |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | Move OS calls behind the platform module | story | done |
 | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | in-progress |
 | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | Platform seam: ADR and capability model | story | done |
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | done |
+| epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home.md | Whole disk on Windows: the areas outside the home | story | planned |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | Windows install: PowerShell script, winget and a signed binary | story | planned |
-| epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | planned |
+| epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | Windows scanner and rule catalog | story | in-progress |
 | epics/DDC-008/epic.md | Native installers and the Windows tray app | epic | planned |
 | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | macOS: a notarized DMG for direct download | story | planned |
+| epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation.md | Windows app: Review window and clean with confirmation | story | planned |
+| epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications.md | Windows app: scheduled scans and notifications | story | planned |
+| epics/DDC-008/stories/story-windows-app-settings-window.md | Windows app: Settings window | story | planned |
+| epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md | Windows app: Tauri shell, tray icon and the panel | story | planned |
+| epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views.md | Windows app: Whole disk and coding agents views | story | planned |
+| epics/DDC-008/stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher.md | Windows download from the website: a signed setup from a trusted publisher | story | planned |
 | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md | Windows installer: one signed setup with the CLI and the tray | story | planned |
 | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | Windows scheduled scans through Task Scheduler | story | planned |
 | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | Windows signing and distribution route: research and ADR | story | planned |
-| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | Windows tray app: a minimal scheduling icon | story | planned |
 | epics/DDC-009/epic.md | Ghostbusters launch: the DEV challenge and a first audience | epic | in-progress |
 | epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md | DEV challenge entry: Ghostbusters for coding agents | story | done |
 | epics/DDC-009/stories/story-launch-demo-assets.md | Launch demo assets | story | done |
 | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | Launch measurement and follow-up | story | in-progress |
 | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | Repository storefronts for the launch | story | planned |
+| epics/DDC-010/epic.md | Linux at parity with macOS: every command, every file kind | epic | in-progress |
+| epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities | story | planned |
+| epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md | Cache roots moved by the environment: XDG and each tool's own variable | story | planned |
+| epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | Coding agents on Linux: ddc disk agents | story | planned |
+| epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md | Desktop notifications on Linux through the freedesktop notification service | story | planned |
+| epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md | Freeing space outside the home on Linux: ddc disk free | story | planned |
+| epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | Homebrew on Linux: ddc disk brew-packages and its cleanup | story | planned |
+| epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | Linux catalog: Flatpak, Snap and the tools only macOS lists | story | planned |
+| epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md | Linux CI mounts: a filesystem matrix job with root-only steps | story | done |
+| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | planned |
+| epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | Linux mount boundaries: automounts, bind mounts and the Trash across filesystems | story | in-progress |
+| epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list | story | planned |
+| epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs | story | planned |
+| epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md | Private size on Linux: reflinks on btrfs and XFS | story | planned |
+| epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md | Scheduled scans on Linux through a systemd user timer | story | planned |
+| epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md | Whole disk on Linux: the areas outside the home | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |
 | ops/native-runs-the-linux-and-windows-legs-on-the-owners-machines.md | Native runs: the Linux and Windows legs on the owner's machines | runbook | draft |
@@ -130,6 +155,7 @@ full typed neighborhood, both directions, in one call.
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
 | research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
+| research/where-developer-disk-space-goes-windows.md | Where a developer's disk space goes (Windows) | research | final |
 
 ## Edges
 
@@ -162,6 +188,10 @@ full typed neighborhood, both directions, in one call.
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | epics/DDC-007/epic.md |
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | wikilink | research/update-check-and-update-in-place.md |
+| adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
+| adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | epics/DDC-008/epic.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
@@ -482,19 +512,23 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-006/stories/story-swiftlint-with-the-same-limits-for-the-app.md | mdlink | epics/DDC-006/epic.md |
 | epics/DDC-007/epic.md | dead | epics/DDC-004/epic |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md |
+| epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md |
 | epics/DDC-007/epic.md | epic-contains | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md |
+| epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md |
 | epics/DDC-007/epic.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | epics/DDC-007/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
@@ -505,6 +539,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/epic.md | wikilink | research/distribution-through-agents.md |
 | epics/DDC-007/epic.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag.md | mdlink | epics/DDC-007/epic.md |
+| epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | wikilink | research/where-developer-disk-space-goes-macos.md |
@@ -517,31 +552,55 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
+| epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-windows-install-powershell-script-winget-and-a-signed-binary.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md | mdlink | epics/DDC-007/epic.md |
 | epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-app-settings-window.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views.md |
+| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher.md |
 | epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md |
 | epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md |
 | epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md |
-| epics/DDC-008/epic.md | epic-contains | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md |
 | epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-app-settings-window.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views.md |
+| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher.md |
 | epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md |
 | epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md |
 | epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md |
-| epics/DDC-008/epic.md | mdlink | epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md |
 | epics/DDC-008/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-008/epic.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-008/epic.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
+| epics/DDC-008/epic.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
 | epics/DDC-008/epic.md | wikilink | epics/DDC-002/epic.md |
 | epics/DDC-008/epic.md | wikilink | epics/DDC-007/epic.md |
 | epics/DDC-008/epic.md | wikilink | research/distribution-through-agents.md |
 | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | mdlink | epics/DDC-008/epic.md |
 | epics/DDC-008/stories/story-macos-a-notarized-dmg-for-direct-download.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-app-review-window-and-clean-with-confirmation.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-app-scheduled-scans-and-notifications.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-app-settings-window.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-app-settings-window.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-app-tauri-shell-tray-icon-and-the-panel.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-app-whole-disk-and-coding-agents-views.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-download-from-the-website-a-signed-setup-from-a-trusted-publisher.md | mdlink | epics/DDC-008/epic.md |
 | epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-installer-one-signed-setup-with-the-cli-and-the-tray.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
 | epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | mdlink | epics/DDC-008/epic.md |
+| epics/DDC-008/stories/story-windows-scheduled-scans-through-task-scheduler.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
 | epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | mdlink | epics/DDC-008/epic.md |
-| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | mdlink | epics/DDC-008/epic.md |
-| epics/DDC-008/stories/story-windows-tray-app-a-minimal-scheduling-icon.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-008/stories/story-windows-signing-and-distribution-route-research-and-adr.md | wikilink | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md |
 | epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents.md |
 | epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-launch-demo-assets.md |
 | epics/DDC-009/epic.md | epic-contains | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md |
@@ -556,6 +615,60 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-009/stories/story-launch-demo-assets.md | mdlink | epics/DDC-009/epic.md |
 | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | mdlink | epics/DDC-009/epic.md |
 | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | mdlink | epics/DDC-009/epic.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md |
+| epics/DDC-010/epic.md | mdlink | epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md |
+| epics/DDC-010/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-010/epic.md | wikilink | epics/DDC-003/epic.md |
+| epics/DDC-010/epic.md | wikilink | epics/DDC-007/epic.md |
+| epics/DDC-010/epic.md | wikilink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
+| epics/DDC-010/epic.md | wikilink | epics/DDC-008/epic.md |
+| epics/DDC-010/epic.md | wikilink | research/where-developer-disk-space-goes-linux.md |
+| epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | wikilink | research/where-developer-disk-space-goes-linux.md |
+| epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | wikilink | research/where-developer-disk-space-goes-linux.md |
+| epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
@@ -613,3 +726,5 @@ full typed neighborhood, both directions, in one call.
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/where-developer-disk-space-goes-linux.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-linux.md |
+| research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-macos.md |

@@ -154,7 +154,7 @@ The probes of conditions 4, 5 and 6 run only for candidates that passed 1 to 3 f
 - **The switch.** A rule whose method is `none` but whose entries go to the Trash can be switched off in Settings, as one with an action can, **unless its class is `user-data`**: Downloads, Pictures, Movies, Music and the iOS backups stay without a switch, as today. "Coding agents" is a switchable group.
 - **Absent here:** `.claude/todos`, `statsig`, `logs` and `usage-data`, `.cursor/plans` and `.cursor/chats`, opencode's `auth.json`. The rules keep them (a rule whose path is gone finds nothing), and fixtures cover them.
 
-Only a person removes the `review` items: picked in the Review window or listed in `--items`, never inside `--yes` or `--agent`. The `safe` scratch is the one exception: selected by default and inside `--yes`; under `--agent` only behind the Settings opt-in the owner required on 2026-10-28 for agent cleans of the `safe` class, which §5 must adopt as a dated amendment (see Open Questions). Session scratchpads under the system temp directory (`CLAUDE_CODE_TMPDIR`) lie outside `$HOME` and outside the default scan roots; the OS clears them, and `ddc` does not look for them.
+Only a person removes the `review` items: picked in the Review window or listed in `--items`, never inside `--yes` or `--agent`. The `safe` scratch is the one exception: selected by default and inside `--yes`; under `--agent` only behind the Settings opt-in the owner required on 2026-10-28 for agent cleans of the `safe` class, which §7 (2026-11-02) adopts. Session scratchpads under the system temp directory (`CLAUDE_CODE_TMPDIR`) lie outside `$HOME` and outside the default scan roots; the OS clears them, and `ddc` does not look for them.
 
 *Amendment, 2026-11-01 (reading only), replacing "`ddc` does not look for them" for reading:* `ddc disk agents` now reads the current user's Claude Code temporary base (`<tmp>/claude-<uid>`, or under `CLAUDE_CODE_TMPDIR`), read-only: entry names, sizes and the stat of a session's own files, never their content. It reports each session's temporary folder with that session's liveness, and the base's remainder. Removal stays out of scope until story "Coding agents' temporary folders outside the home" amends this section; story "Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees" carries the reading half.
 
@@ -171,6 +171,8 @@ Only a person removes the `review` items: picked in the Review window or listed 
 It is read-only. It does not write `last-scan.json`, does not take the scan lock, and does not notify. On the reference machine it must finish within 5 s for a project with ten worktrees; a worktree's `git status` is the slow part and runs in parallel across worktrees.
 
 ### 5. `ddc clean --agent`: bounded consent
+
+*Superseded by §7 (2026-11-02) for the command (`ddc agent clean`) and for what an agent removes without a person (`safe` only, behind the opt-in; `rebuildable` is the person's). The rest of this section (the filter semantics of `--items`, journaling, the re-checks) stands; the tree bound stands as §7 narrows it (no shared caches).*
 
 This **amends** §5 of the safety ADR and §7 of the menu bar ADR, and both record it as a dated amendment.
 
@@ -189,9 +191,49 @@ This **amends** §5 of the safety ADR and §7 of the menu bar ADR, and both reco
 
 ### 6. Guidance ships with the tool, the server comes later
 
+*Command names amended by §7 (2026-11-02): read `ddc footprint` as `ddc agent footprint` and `ddc clean --agent` as `ddc agent clean`.*
+
 The code repository gets an `agents/` folder with the guidance an agent needs to use `ddc` well: a Claude Code skill and an `AGENTS.md` snippet that say when to run `ddc footprint` (at the start of a session in a worktree, before installing dependencies into a new one, on `ENOSPC`, at the end of a session), what `ddc clean --agent` may and may not do, and that worktree removal goes through `ddc`, not through the agent's own `git worktree remove`. The guidance is text that cites the JSON contracts; it decides nothing on its own.
 
 An MCP server over the same contracts is deferred (Alternative C): the CLI's `--json` is the interface, and a server wraps it once a second harness asks for it.
+
+### 7. Amendment, 2026-11-02: one command for agents, `ddc agent`, and the consent the owner set on 2026-10-28
+
+*Decided by the owner on 2026-11-02 (the namespace) and 2026-10-28, reconfirmed 2026-11-02 (the consent). Amends §4, §5 and §6.*
+
+**One namespace.** Everything that serves a coding agent lives under `ddc agent`:
+
+| Command | Was | Section |
+|---|---|---|
+| `ddc agent status [--json]` | `ddc disk agents` | §3 (reading), story "Per-session footprint…" |
+| `ddc agent footprint [ROOT] [--json]` | `ddc footprint` | §4 |
+| `ddc agent clean [ROOT] [--session <id>] [--items <file\|->] [--dry-run] [--json]` | `ddc clean --agent --project ROOT` | §5 |
+| `ddc agent skill install` / `ddc agent skill status` | (new) | §6 |
+
+`ddc disk agents` stays a working alias of `ddc agent status`, hidden from `--help`, with the same output and `docs/agents.schema.json`, until the app and the shipped guidance call the new name; removing it is a later, noted change. The other three were never released, so they have no alias. `ddc clean` gets no `--agent` flag: an agent's clean is its own command, so a person's `ddc clean` keeps one meaning.
+
+**What an agent may remove without a person** (the owner, 2026-10-28, reconfirmed 2026-11-02). This narrows §5:
+
+- `ddc agent clean` removes **only `safe` items**, and only when the person has switched on the Settings opt-in "Let coding agents clean safe items" (`settings.json`: `agents_clean_safe: true`; off by default). The opt-in names the risk and links the disclaimer. Without it, `ddc agent clean` removes nothing and prints the plan.
+- **`rebuildable` items, a harness's worktrees included, are never removed by an agent on its own.** `ddc agent clean` lists them, with the exact `ddc clean --items` command, or the app's Review window, for the person to confirm. A session-end hook may show the person that list and remove what the person approves: that approval is a person's consent through `--items`, the channel of the menu bar ADR §7, not the agent's.
+- **The tree bound is the agent's own work** (the owner, 2026-11-02). `ddc agent clean` removes `safe` items inside `ROOT`'s main checkout and its worktrees only, never the machine's shared caches (`~/.cargo`, uv, Xcode's DerivedData, editor caches), which are not "after itself" and serve every project. With `--session <id>` it narrows to the `safe` items inside that session's worktree, the default a skill uses for cleaning up after itself; the worktree itself and the session's temporary folder are listed for the person. When a person asks an agent about the disk as a whole, the agent may **propose** shared and global items: it shows them with the `ddc clean --items` command or the app's Review window, and the person confirms; it never removes them itself.
+- Everything else in §5 stands: the filter semantics of `--items`, no `review`, no `native-only`, journaling with `consent: agent`, the re-checks. `--class`, `--permanent` and `--yes` do not exist on `ddc agent clean`; `--dry-run` does, and prints the plan without the opt-in.
+- **Without the opt-in, or with settings that fail to load,** `ddc agent clean` removes nothing (fail-closed), exits 0, and its report (text, or `--json`) lists every item it would consider as skipped, with the reason `agent-opt-in-off` for `safe` items and `not-consented` for the rest, and states `agents_clean_safe: false`. These reasons are new values of `skipped[].reason`: the clean report and the journal bump their schema versions, with the DDCKit decoders in the same change. `ddc agent status` reports `agents_clean_safe`, so an agent knows before it asks.
+- **`agents_clean_safe`** is an additive key of `settings.json`; by the precedent of `skips` (2026-10-28) `SETTINGS_SCHEMA_VERSION` stays 1. An older binary reading a file with the key refuses the whole file (fail-closed); a standalone CLI sharing the data directory with a newer app then refuses until updated, which its error message says. The Rust reader, `SharedSettings.keys` and the Settings window's CodingKeys, `docs/settings.schema.json` and the settings fuzz target change together. While the opt-in is on, the app's Settings shows it, the popover names it, and the person can switch it off in one place; switching it goes through the CLI (`ddc settings set agents_clean_safe on|off`, as the app's other writes go through `notify ack`), which records the time in the action journal, its only writer.
+- **The session-end hook** shows the person its list in the app's sheet or a terminal, never only in the agent's chat, so the person's confirmation is the person's.
+
+This answers the Open Question about the Settings opt-in: the safety ADR's 2026-11-02 entry carries it, and `rebuildable` stays a person's decision.
+
+**Installing the guidance.** `ddc agent skill install [--project DIR] [--agents-md FILE] [--replace] [--approved]` and `ddc agent skill status`:
+- It writes the Claude Code skill to `~/.claude/skills/ddc/` (or `<DIR>/.claude/skills/ddc/` with `--project`) and, with `--agents-md`, the `AGENTS.md` snippet between its `ddc:begin`/`ddc:end` markers into that file. It **writes and replaces named files, and deletes nothing**: a file the shipped skill no longer has is left in place and reported. It is not a removal path, so the single-caller rule for removals outside the executor (`DirFd::unlink_child`, `keep remove`) is untouched.
+- It recognises its own skill folder by a marker, `.ddc-skill` (the version and a hash of what it wrote), and overwrites only a folder with that marker, or an absent one; a folder without the marker (a hand copy, a hand edit) or whose files differ from the marker's hash is reported and left alone unless `--replace` is given. `SKILL.md`'s frontmatter carries `metadata.version` too, for a copy installed by hand. `status` compares both with the binary's version.
+- For `AGENTS.md` it refuses a symlink, a begin marker without an end marker, or two blocks; it replaces the block atomically, keeping the file's mode and a trailing newline, and appends a block when there is none.
+- **Consent.** At a terminal it asks before writing. Without a terminal it needs `--approved`, which the guidance passes only after the person has said yes in the chat (the owner, 2026-11-02): this command writes only `ddc`'s own text, removes nothing, and so may run for an agent with the person's chat consent. The guidance's rule "never `--yes`" stays about cleaning; `--approved` is not `--yes`.
+- `.claude/skills` joins §3's never-claimed list beside `.claude/plugins`: `ddc` never offers to remove what it or a person installed there.
+- The skill is also a plugin of the SmartAndPoint Claude Code marketplace. A machine with both the plugin and an installed copy uses one: `status` reports both, and the guidance says to keep the plugin. The skill's `allowed-tools` name the read-only `ddc agent status|footprint` and `ddc agent clean --dry-run`; `ddc agent clean` and `skill install` stay prompts.
+- The guidance tells an agent that finds no `ddc` to propose the install command (Homebrew cask, or the one-line installer) and run it only after the person says yes.
+
+**Where it lands in code (for the plan gates).** `ddc agent status` is the existing `disk agents` handler, with `disk agents` kept as a hidden alias (`#[command(hide = true)]`, still in the cases table's names and in `gate.rs`'s capability map as `CodingAgents`); `agent footprint` and `agent clean` need capability entries and cases (`agent clean` and `skill install` sandboxed, or `uncovered` with reasons); the cases follow-through treats the `ddc clean --items` line `agent clean` prints as shown, not run; `structure.rs` guidance tests move to the new names, and `the_agent_guidance_runs_nothing_that_removes` is re-premised once the guidance runs `ddc agent clean`; `ddc agent`'s help says "coding agents", and the LaunchAgent help strings say "LaunchAgent". A command renamed with a hidden alias is a minor bump.
 
 ## Rationale
 
@@ -263,7 +305,7 @@ An MCP server over the same contracts is deferred (Alternative C): the CLI's `--
 ## Consequences
 
 **Positive**:
-- Dead agent worktrees and the environments inside them are found, grouped under their project, and can go without a person, within two days instead of two weeks.
+- Dead agent worktrees and the environments inside them are found, grouped under their project, and can go without a person, within two days instead of two weeks. *Superseded by §7 (2026-11-02): an agent removes only `safe` items without a person; `rebuildable` items, worktrees included, need the person's confirmation.*
 - An agent sees its own project's footprint in seconds and can act on it through one bounded command.
 - Harness data stops being "outside findings": its size has a name and a knob, and a person can move a stale session's data to the Trash from the Review window (revised 2026-10-30).
 - The safety model is unchanged where it matters: `review` stays a person's choice, the executor's re-checks apply to every `--agent` action, and worktree removal goes through git.
@@ -272,7 +314,7 @@ An MCP server over the same contracts is deferred (Alternative C): the CLI's `--
 - A scan runs git probes on candidate worktrees; on a worktree with a huge tree `status --ignored` and the content comparison can take seconds, bounded by the 30 s timeout and `probe: unknown`, which keeps the worktree `review`.
 - A harness worktree with any unique ignored file, an initialized submodule or a detached `HEAD` on a unique commit is never selected by default; the report says why, and the inner artifacts are still cleaned. Fewer automatic removals than the first draft promised; none that lose data.
 - A person's named worktree, kept clean on purpose and untouched for two days, is `rebuildable` and selected by default if it was created by a harness; `.ddc-keep` in it, or `--worktree-min-age`, keeps it. The README says so.
-- `--agent` lets a script without a person remove `rebuildable` items of one project tree. That is the cost of cleaning after agents; the journal records every such action with `consent: agent`.
+- `--agent` lets a script without a person remove `rebuildable` items of one project tree. That is the cost of cleaning after agents; the journal records every such action with `consent: agent`. *Superseded by §7 (2026-11-02): an agent removes only `safe` items without a person; `rebuildable` items, worktrees included, need the person's confirmation.*
 - Two new CLI contracts with a `schema_version`: the footprint report and the `--agent` clean report (a variant of the DDC-002 clean report).
 - A `--resume` begun in the seconds before a move, before its record is written, can lose its transcript to the Trash mid-session; the record check, the 10-minute rule when the resume writes, and the hint narrow it, the Trash puts it back.
 - Four harnesses' private layouts are now in the catalog and can change under `ddc`; the plan gate confirms paths on the reference machine, and a rule whose path is gone simply finds nothing.
@@ -294,7 +336,7 @@ An MCP server over the same contracts is deferred (Alternative C): the CLI's `--
 - Whether Claude Code writes `sessions/<pid>.json` before it opens a transcript on `--resume`. If not, a resume started between the plan and the move is caught only once the record lands (Consequences). The plan gate checks it with a throwaway session: names and times of `sessions/` and the transcript, never contents.
 - Whether a record's `sessionId` follows `/clear`, which starts a new session id in the same process. If it does not, the live session's current transcript is protected only by the 10-minute rule; the plan gate checks it the same way.
 - Whether a resumed session whose transcript was moved recreates `<session>.jsonl`, so that putting it back conflicts. The hint already says "before it is resumed".
-- The Settings opt-in for agent cleans of the `safe` class (owner, 2026-10-28) is not yet in §5; a dated amendment adds it before `--agent` ships.
+- ~~The Settings opt-in for agent cleans of the `safe` class (owner, 2026-10-28) is not yet in §5; a dated amendment adds it before `--agent` ships.~~ Answered by §7 (2026-11-02).
 - Whether `footprint` should also read `~/.codex` and `~/.local/share/opencode` session data per project, or only report their totals; the per-project mapping of those harnesses is not known.
 
 ## References
