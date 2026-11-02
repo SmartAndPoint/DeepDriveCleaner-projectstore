@@ -310,7 +310,15 @@ Story: [User data: pick your own files for the Trash](../epics/DDC-002/stories/s
 Story: [Linux scanner and rule catalog](../epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md)
 
 - [ ] Manual (owner): on a clean Ubuntu VM with the released archive, `ddc scan ~ --json` on a seeded home finds the catalog's caches and project artifacts, and the report validates against `docs/scan.schema.json`.
-- [ ] Manual (owner): `ddc clean --items` of an item on a second, writable volume moves it to that volume's `.Trash-$uid` (its `files` and `info`); on a volume whose root you cannot write, the item lands in `~/.local/share/Trash` by a copy, as the safety ADR's §5 Linux text says.
+- [ ] ~~Manual (owner): `ddc clean --items` of an item on a second, writable volume moves it to that volume's `.Trash-$uid` (its `files` and `info`); on a volume whose root you cannot write, the item lands in `~/.local/share/Trash` by a copy, as the safety ADR's §5 Linux text says.~~ Superseded by story "Linux mount boundaries: automounts, bind mounts and the Trash across filesystems" (DDC-010): ddc no longer copies to the home Trash.
+
+### Linux mount boundaries (DDC-010)
+
+Story: [Linux mount boundaries: automounts, bind mounts and the Trash across filesystems](../epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md)
+
+- [ ] Manual (owner): `ddc clean --items` of an item on a second, writable volume moves it to that volume's `.Trash-$uid` (its `files` and `info`), and the clean journal names that folder and the name in `files/`. A file manager restores it from there.
+- [ ] Manual (owner): on a volume whose root you cannot write, and that holds no trash folder of yours, the same clean skips the item as `trash-crosses-filesystem`, and the message names `--permanent`. `ddc clean --items <file> --dry-run` predicts the same skip first. Nothing lands in `~/.local/share/Trash`.
+- [ ] Manual (owner): with a real autofs map under your home (an NFS or SMB share that mounts on access), `ddc scan ~` reports the trigger as `automount`, and `findmnt` shows the share still unmounted after the scan.
 
 ### Launch demo assets (DDC-009)
 
