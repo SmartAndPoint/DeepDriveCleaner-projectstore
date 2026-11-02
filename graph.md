@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T18:23:22.204Z
+generated_at: 2026-11-02T19:45:58.719Z
 
 ---
 
@@ -32,6 +32,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | in-progress |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
+| epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md | SwiftPM build folders as rebuildable artifacts | story | planned |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | Workspace skeleton and parallel filesystem scanner | story | done |
 | epics/DDC-002/epic.md | Menu bar app | epic | in-progress |
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | done |
@@ -49,6 +50,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
+| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | Popover: say when used space grew since the last scan | story | planned |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | done |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | done |
@@ -83,7 +85,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | in-progress |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
-| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | in-progress |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | done |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
 | epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print.md | CLI invocation cases: a table of ddc calls and the suggested commands they print | story | done |
@@ -205,6 +207,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-scheduled-background-scan.md |
+| epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-detection-rule-catalog.md |
@@ -213,6 +216,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-scheduled-background-scan.md |
+| epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
 | epics/DDC-001/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-001/epic.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
@@ -241,6 +245,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-scheduled-background-scan.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |
+| epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md | mdlink | epics/DDC-001/epic.md |
+| epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
+| epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
@@ -258,6 +265,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
@@ -351,6 +359,9 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
+| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | wikilink | research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | mdlink | epics/DDC-002/epic.md |
@@ -466,6 +477,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
+| epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-cli-invocation-cases-a-table-of-ddc-calls-and-the-suggested-commands-they-print.md |
 | epics/DDC-005/epic.md | epic-contains | epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents.md |
