@@ -44,7 +44,7 @@ S5 already added `Volume.read_at` (set by the `clean --items` edit) and `ddc spa
 
 ## Decomposition
 
-- [ ] **Report fields** (`crates/ddc-core/src/model.rs`, `ScanReport`), all optional and skipped when absent, so `SCHEMA_VERSION` stays 7 (the rule at the top of `model.rs`):
+- [ ] **Report fields** (`crates/ddc-core/src/model.rs`, `ScanReport`), all optional and skipped when absent, so `SCHEMA_VERSION` stays 8 (as of 0.30.0; the rule at the top of `model.rs`):
   - `written_by`: a strict kebab-case enum `WrittenBy` for the six saves: `scan`, `background`, `clean-recheck` (a terminal `ddc clean`'s re-check, saved before anything is removed), `clean` (that report edited after the clean), `clean-items`, `disk-free`. A new value later bumps `SCHEMA_VERSION`, as every new variant does, so the set is fixed here.
   - `written_at`: RFC 3339 in UTC to the second (`humantime::format_rfc3339_seconds`), like every other time in the report and the journal; set at every save. `generated_at` stays the scan's start, and an edit never changes it.
   - `previous_written_at`: the `written_at` of the report in `previous-scan.json` when this one was saved; absent when there is none. S2 uses it to see that the two files belong together.
@@ -69,7 +69,7 @@ S5 already added `Volume.read_at` (set by the `clean --items` edit) and `ddc spa
 - [ ] **README**: a "Where things live" row for `previous-scan.json`; the `last-scan.json` row says that `ddc clean` and `ddc clean --items` both edit it after cleaning.
 - [ ] **Tests that list the data files**: the load harness's `owner_state` (`crates/ddc-loadgen/src/run.rs`) watches `previous-scan.json` too, so a load run still proves it never touched the owner's files.
 - [ ] **Goldens** (`crates/ddc-cli/tests/golden_cli.rs`): `written_at` and `previous_written_at` normalised as `generated_at` is; `rules_in_force` normalised too (to its count, or left out), or every new rule moves every scan golden. Then `make golden-record`, with a diff that holds only the new fields.
-- [ ] **The disk cost**: the size of one saved report on the load fixture home, measured once with `ddc-loadgen` and written into the Final Summary (a fixture, not an owner machine).
+- [ ] **The disk cost**: the size of one saved report on the load fixture home, measured once with `ddc-loadgen` and written into the Final Summary as a size and a ratio to the report today (a fixture, not an owner machine; no run times).
 - [ ] **The research note follows the story**: its amendment of 2026-11-03 (the rotation rule as settled here).
 
 ## Implementation Plan
@@ -87,7 +87,7 @@ S5 already added `Volume.read_at` (set by the `clean --items` edit) and `ddc spa
 - [ ] Test: with a folder in the place of `previous-scan.json`, a `scan` save still writes `last-scan.json`, prints a `ddc: warning:` that names `previous-scan.json`, exits 0, carries `previous_written_at` forward and leaves no temp file.
 - [ ] Test: each of the six saves writes its own `written_by` and a `written_at` to the second; an edit keeps `generated_at`; `ddc scan --json` prints the same `written_by`, `written_at` and `previous_written_at` as the saved file.
 - [ ] Test: `rules_in_force` equals the sorted ids of `ddc rules --json` for the platform, in a full scan and in a pruned re-check's report (`recheck::pruned`); a rule in `disabled_rules` is still listed; an edit keeps the edited report's list.
-- [ ] Test (CLI, fixture home): `ddc clean --yes` removes the selected `safe` items; afterwards `last-scan.json` lacks them, its totals drop by their bytes, the touched volume has `read_at`, and `written_by` is `clean`; `ddc space --json` then gives `baseline.source: clean`. `ddc clean --dry-run` and a declined prompt save the re-check with `written_by: clean-recheck`, which keeps the report before it by the rule.
+- [ ] Test (CLI, fixture home): `ddc clean --yes` removes the selected `safe` items; afterwards `last-scan.json` lacks them, its totals drop by their bytes, the touched volume has `read_at`, and `written_by` is `clean`; `ddc space --json` then gives `baseline.source: clean`. `ddc clean --dry-run` save the re-check with `written_by: clean-recheck`, which keeps the report before it by the rule.
 - [ ] Test: `--data-dir` and `DDC_DATA_DIR` put `previous-scan.json` in that folder.
 - [ ] Test: the committed `docs/scan.schema.json` and `docs/space.schema.json` equal the generated ones (`committed_*_schema_is_current`), and a report with the new fields validates.
 - [ ] The app needs no change: DDCKit's `ScanReport` decodes by explicit coding keys and ignores the new ones; `make ddckit-test` passes against the regenerated schemas.
@@ -100,6 +100,8 @@ S5 already added `Volume.read_at` (set by the `clean --items` edit) and `ddc spa
 
 ## Technical Notes
 
+- A declined `[y/N]` prompt saves the re-check too, but no CLI test can drive a prompt (none has a terminal, and `ddc clean` refuses a prompt without one), so the ACs cover `--dry-run` and nothing selected; the declined path shares their code (planner, 2026-11-03).
+
 - **Why a clean's edit does not move the old report.** If the `clean --items` edit kept the report it edits, the next comparison would be "the report before the clean against the report after it", and the rows the person did not clean would drop out of "Grew since …" (S4). With the edit not keeping, the comparison after a clean is still "the last scan before against now", and S2 marks the removed items "cleaned by you" from the journal. A terminal `ddc clean` is a scan and a clean in one: its re-check keeps like a scan, and its edit afterwards does not.
 - **Two slots, and an agent's project scan.** The shipped skill tells an agent to run `ddc scan "$PWD" --json`, and that already replaces the app's report (`cmd/mod.rs`, `own_roots`). By the rule, that project scan keeps the home report it replaces. So an agent's project scan after a Scan Now moves that Scan Now into `previous-scan.json`, and the home report before it is gone. The next home scan then compares with the Scan Now, minutes or hours old, and S2 says the age. A second project scan keeps nothing, so a project report never becomes the baseline. Keeping more than two reports is S8. A change of `roots` in Settings makes the next save find "other roots" and keep nothing, and S2 says the roots differ.
 - **The saves today** (`origin/main`): `cmd/scan.rs:48`, `cmd/background.rs:117`, `cmd/clean.rs:90`, `cmd/clean_items.rs:179`, `free/mod.rs:358`; this story adds the sixth, the terminal clean's edit. A terminal `ddc clean` saves its re-check also on `--dry-run`, on a declined prompt and when nothing is selected, since the save comes before the plan is shown. Each of those keeps by the rule, like a Scan Now.
@@ -110,7 +112,7 @@ S5 already added `Volume.read_at` (set by the `clean --items` edit) and `ddc spa
 - **Not in this story:** `ddc changes` and the `ddc scan` block (S2); anything in the app (S4); folder sizes (S3); `ddc disk free` reading the volumes' free space again (it still leaves them as scanned, as S5 notes); keeping the previous whole-disk report (S7); history beyond two reports (S8).
 - **Linux and Windows.** The store, the fields and the clean edit are platform-neutral and reach them with the CLI.
 - First save in a fresh data folder: a missing `last-scan.json` is "nothing to keep", silently, never a keep failure or a `ddc: warning:` (the fresh-home goldens and cases read stderr).
-- `write_last_scan` returns whether it kept a report (`kept: Option<written_at>`) beside the `&mut` stamp; `ddc changes`'s block after `ddc scan` uses it, since `previous_written_at` is also carried forward.
+- `write_last_scan` returns an enum saying whether it kept a report (kept with its `written_at`, kept a report older than this story with none, or kept nothing) beside the `&mut` stamp; `written_at` is `SystemTime::now()` at the save, not `Env::now()` (fixed at process start, so a clean's edit would get the start time); `ddc changes`'s block after `ddc scan` uses it, since `previous_written_at` is also carried forward.
 - After a crash between the renames, the pair is out of step until the next *keeping* save (`scan`, `background`, `clean-recheck`); a `clean-items` or `disk-free` save carries the mismatch forward.
 
 ## Dependencies
