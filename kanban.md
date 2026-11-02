@@ -47,7 +47,6 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [ ] [[epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list|DDC-010: Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list]] #p2
 - [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
 - [ ] [[epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs|DDC-010: Private size on Linux: reflinks on btrfs and XFS]] #p2
-- [ ] [[epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer|DDC-010: Scheduled scans on Linux through a systemd user timer]] #p1
 - [ ] [[epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home|DDC-010: Whole disk on Linux: the areas outside the home]] #p2
 
 ## ToDo
@@ -133,6 +132,7 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [x] [[epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents|DDC-010: Coding agents on Linux: ddc disk agents]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1 #done
+- [x] [[epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer|DDC-010: Scheduled scans on Linux through a systemd user timer]] #p1 #done
 
 
 
