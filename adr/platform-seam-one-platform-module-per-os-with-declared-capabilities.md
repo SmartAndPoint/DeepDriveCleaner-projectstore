@@ -86,6 +86,8 @@ Amended 2026-10-30, story "Move OS calls behind the platform module" (epic DDC-0
 
 Amended 2026-10-31, story "Linux scanner and rule catalog" (epic DDC-007): `platform/linux.rs` becomes the folder `platform/linux/`, and `unsafe_code` is also allowed there, for the calls `rustix` does not wrap (`wait4` with its resource usage, signal handlers), each block with a `// SAFETY:` comment.
 
+Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): `platform/windows.rs` becomes the folder `platform/windows/`, which calls Windows through `windows-sys` and allows `unsafe_code`.
+
 ### 3. Capabilities
 
 `Capability` is a closed enum, kebab-case in JSON, in this declaration order:
@@ -105,6 +107,7 @@ Amended 2026-10-31, story "Linux scanner and rule catalog" (epic DDC-007): `plat
 
 - **Per platform.** macOS declares all ten. Linux and Windows are decided by their catalog stories. The expectation is `in-use-check` on Linux (`/proc`), and on Windows whatever its research note supports. `coding-agents` and `homebrew` are separate from `whole-disk` because they do not depend on APFS, Time Machine or simulators: Linux can declare them without the whole-disk report.
 - **Linux** (amended 2026-10-31, story "Linux scanner and rule catalog"): declares `in-use-check` only, with the limits the safety ADR's 2026-10-31 amendment names. The other nine follow their "when absent" column.
+- **Windows.** Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): declares none, `CAPABILITIES = &[]`. All ten follow their "when absent" column, and the Restart Manager is not used.
 - **`disk free` is gated per action.** Each action needs the capability in the table. A list that names an action whose capability is absent is refused whole, with `capability-absent` naming that capability (§7). At the terminal, `free::available` offers only the actions whose capability is declared. The command itself is refused only when neither `whole-disk` nor `homebrew` is declared.
 - **Where `capability-absent` is checked.** The dispatcher refuses whole commands (`disk`, `disk agents`, `disk brew-packages`, `schedule`). The per-action check for `disk free` lives in the core (`free::run`, `free::dry_run`, `free::available`), so the terminal prompt and the app's list agree. `disk::Sources` (the tool paths: `diskutil`, `tmutil`, `simctl`, `brew`) is macOS-shaped today; each OS module provides its own, so Linux can name Linuxbrew without the others.
 - **A Windows check that answers only sometimes** (the Restart Manager) is declared and reports "unknown" per item, or is not declared. The Windows story picks one; it is never probed per run (next bullet).
@@ -125,7 +128,7 @@ Amended 2026-10-31, story "Linux scanner and rule catalog" (epic DDC-007): `plat
   - the Trash.
 
   Each OS module says in its doc comment what it does for each. A platform that cannot list directories or do verified-parent operations is not supported (§5); these are never "missing capabilities".
-- **`in-use-check` is part of the safety model.** If it is absent, that is no permission to delete without the check. A platform without it can be flipped to supported only together with an amendment of [[adr/cleanup-safety-model-risk-classes-plan-and-confirmation|Cleanup safety model: risk classes, plan and confirmation]] §5 that names the guard replacing it. On Windows that guard is a sharing violation at delete time, reported as held open and skipped.
+- **`in-use-check` is part of the safety model.** If it is absent, that is no permission to delete without the check. A platform without it can be flipped to supported only together with an amendment of [[adr/cleanup-safety-model-risk-classes-plan-and-confirmation|Cleanup safety model: risk classes, plan and confirmation]] §5 that names the guard replacing it. On Windows that guard is a sharing violation at delete time, reported as held open and skipped. Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): the Windows guard is judged by the stage that failed, and a process check runs beside it.
 - **A new capability is a new enum value.** It bumps the schema version of every report that carries the list (§4), under the Rust core ADR's versioning policy. Splitting the disk commands into three capabilities now is meant to keep that rare.
 
 ### 4. The JSON
@@ -150,6 +153,8 @@ Amended 2026-10-31, story "Linux scanner and rule catalog" (epic DDC-007): `plat
   - Windows: the volume serial number and the 64-bit NTFS file id.
 
   A Windows file whose 128-bit id (ReFS) does not fit in 64 bits is never planned for deletion; the Windows story says how it is reported. The `changed-since-scan` check compares the pair, so its width is part of the safety model and is not widened silently.
+
+  Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): a file id whose high half is not zero is refused in the walker and in the guard, never truncated, and so is an id of 0 or all ones.
 - **Unchanged:** the rules, notify, progress, agents, brew-packages and disk-free outputs, the settings file and the journal (the journal has its own version).
   - `NotifyReport` gets no capability list: a background run's decision does not depend on one.
   - `rules --json` gets `platform` in story "Rule catalog split: shared and per-OS sections", which adds `--platform` and bumps the rules schema there. Until then an unported platform prints the macOS catalog, as `rules` is the one command it runs.
@@ -241,7 +246,7 @@ The CLI exits 69 (`exit::UNSUPPORTED`; `EX_UNAVAILABLE` in sysexits.h: "a servic
 - **Never enabled by accident.** The feature is never in the Makefile's `FEATURES`, and nothing builds with `--all-features` (op-stats and dhat-heap already rule that out). Structure tests assert:
   - no `Cargo.toml` dependency enables the feature, and no build or release script passes it;
   - `platform/mod.rs` reads no environment (`env::var`, `env::var_os`, `option_env!`), and its only `cfg!(feature …)` is `simulate-unported`;
-  - in the OS modules, only the folders item (home, data, log) reads the environment, and only these names: `HOME`, `USERPROFILE`, `HOMEDRIVE`, `HOMEPATH`, `LOCALAPPDATA` and `XDG_*`. The test allowlists exactly those. The rule constrains `platform/` only; whether `Env` also carries `APPDATA` or `TEMP` (Windows protected folders, the catalog's temp folder) is decided by the catalog split or Windows story, and the allowlist grows with it;
+  - in the OS modules, only the folders item (home, data, log, cloud roots) reads the environment, and only these names: `HOME`, `USERPROFILE`, `HOMEDRIVE`, `HOMEPATH`, `LOCALAPPDATA` and `XDG_*`. The test allowlists exactly those. The rule constrains `platform/` only; whether `Env` also carries `APPDATA` or `TEMP` (Windows protected folders, the catalog's temp folder) is decided by the catalog split or Windows story, and the allowlist grows with it. Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): `APPDATA` and the three OneDrive variables join the list, and Windows ignores `HOME`;
   - each OS module's `SUPPORTED` is a literal `true` or `false`, and its `CAPABILITIES` a literal slice, never a function call.
 
   A release binary built with the feature would also fail the release smoke test: `release.yml` (from story "Build matrix: every target built, tested and packaged from one tag") requires `scan --json` on a generated tree to succeed. The seam story adds the same scan of a small temporary tree to `scripts/build-cli.sh` (same origin), so the macOS archive is checked too.
@@ -394,6 +399,24 @@ An absent `platform` itself would be unambiguous: only macOS ever wrote version-
 - Each catalog story flips its platform's literal, declares its capabilities, and (if `in-use-check` is absent) amends the safety ADR §5. The Windows story records how a file id wider than 64 bits is reported (§4).
 - The menu bar ADR §6 item 5 and README's exit-code table gain 69.
 
+## Amendments
+
+- **2026-11-02, decided at the story's step-0 gate.** Story "Windows scanner and rule catalog" (epic DDC-007) amends §2, §3, §4 and §8 for Windows. Until the story flips Windows's `SUPPORTED`, `require_supported` refuses every walk and every removal there; these parts take effect with the flip.
+  - **§2, the folder and `unsafe`.** `platform/windows.rs` becomes the folder `platform/windows/`. It calls Windows through `windows-sys`, and its `mod.rs` allows `unsafe_code` for those calls, as `platform/macos/` and `platform/linux/` do. Every `unsafe` block carries a `// SAFETY:` comment.
+    - `NtQueryInformationByName` is looked up at run time (`GetProcAddress`), never linked, so the binary starts on any Windows 10. Where it is missing, the walker falls back to an open (safety ADR, amendment of 2026-11-02).
+    - The minimum supported is Windows 10 22H2 and Windows 11, x86_64. Below it the CLI still starts, and the calls it lacks fail closed.
+  - **§3, capabilities.** Windows declares none at the flip: `CAPABILITIES = &[]`. Each of the ten follows its "when absent" column.
+    - `in-use-check` is not declared. The guard that replaces it, as this section requires, is in the safety ADR's amendment of 2026-11-02: a held-open guard in `DirFd::rename_child`, judged by the stage that failed, and a process check before the rename: executables, command lines, working folders, environments and loaded modules. A sharing violation alone is not enough: a folder with an open file below fails its rename with access denied, not with a sharing violation.
+    - Windows reports still carry `in-use` reasons, although `in-use-check` is not declared. They come from that process check, which is partial by the capability's definition: it reads loaded modules, not open files. An open file is caught only by the held-open stages at the rename.
+    - The Restart Manager is not used: it needs each file registered, answers for files only, not folders, and is slow on large trees. The module snapshot and the held-open stages answer the same question. So the "answers only sometimes" choice above does not arise.
+    - `dataless-files` is not declared, though the walker recognises cloud placeholders and skips them unlisted. The cloud-sync roots are not walked yet (safety ADR §6, Windows), which is that capability's "when absent" column. Walking them, and declaring it, is a later story.
+  - **§4, file identity on Windows.** `(dev, ino)` is the volume serial from `FileIdInfo` and the low 64 bits of its 128-bit file id. A file id whose high half is not zero (ReFS) is refused, never truncated:
+    - in the walker, such an entry is an unreadable entry, so a finding that holds it is incomplete and never planned; a folder whose own id is refused cannot be listed;
+    - in the guard, an item whose id is refused is skipped `changed-since-scan`, never renamed or deleted.
+
+    An id of 0 or all ones is refused for that entry the same way: it is what a file system with no usable id gives every file.
+  - **§8, the environment allowlist.** `APPDATA`, `OneDrive`, `OneDriveConsumer` and `OneDriveCommercial` join the names the folders item may read, so the list is `HOME`, `USERPROFILE`, `HOMEDRIVE`, `HOMEPATH`, `APPDATA`, `LOCALAPPDATA`, `OneDrive`, `OneDriveConsumer`, `OneDriveCommercial` and `XDG_*`. The folders item reads them into `Env`: an `APPDATA` outside the home is protected, and OneDrive's roots are not walked (safety ADR §6, Windows). `TEMP` is not read: the temp rule anchors at `AppData\Local\Temp`, so a redirected `TEMP` is not found. On Windows `HOME` is ignored: the home is `USERPROFILE`, or `HOMEDRIVE` + `HOMEPATH` when it is unset, never the known-folder API.
+
 ## References
 
 - [[epics/DDC-007/epic|DDC-007 · Standalone CLI on macOS, Linux and Windows: portable core, release builds and installers]]
@@ -404,4 +427,4 @@ An absent `platform` itself would be unambiguous: only macOS ever wrote version-
 
 ---
 
-*Last updated: 2026-10-30*
+*Last updated: 2026-11-02*
