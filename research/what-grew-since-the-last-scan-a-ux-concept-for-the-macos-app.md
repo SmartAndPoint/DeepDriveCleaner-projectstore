@@ -90,38 +90,23 @@ The first moment is the one that failed. The person needs to *notice* (the badge
 
 #### Where the rule lives: `ddc space`
 
-ADR "Menu bar app" puts rules in Rust and has the app read JSON. So the signal is a CLI command from the first version:
+Amended 2026-11-03: this section follows the story and the ADR's §6 item 13.
 
-```
-ddc space [--json] [--data-dir DIR]
-```
+ADR "Menu bar app" puts rules in Rust and has the app read JSON. So the signal is a CLI command from the first version, `ddc space [--json] [--data-dir DIR]`. Its contract is settled in the ADR's §6 item 13 and the story "Popover: say when used space grew since the last scan":
 
-- It reads `statfs` for the home volume (and each volume of the saved report's roots), reads only the head of `last-scan.json` (its volumes, `written_at`, `free_read_at`; see the report fields under Rollout), applies the rule below, records the reading in `<data-dir>/space.json`, and prints the decision. It walks nothing, takes no lock and notifies nothing.
-- `--json` follows a new `docs/space.schema.json`, with its own `schema_version`:
-
-```
-SpaceReport {
-  schema_version, checked_at,
-  volume: {mount_point, total_bytes, free_bytes},
-  baseline: {written_at, free_read_at, free_bytes} | null,   // null: no saved report
-  in_use_delta,                                             // signed bytes
-  state: quiet | grew | low-disk,
-  settled: bool,
-  first_for_baseline: bool                                  // true once per baseline: the app sets the badge
-}
-```
-
-- `space.json` (data dir; the CLI is its one writer, replaced atomically): `{schema_version, samples: [{at, mount_point, total, free}], fired_for: <baseline written_at>}`, at most one sample per hour kept for 14 days, plus the latest (about 340 entries, tens of KB) **(inferred size)**.
-- What changes in the ADR: §6 gains an item 13 for `ddc space`, in the shape item 10 gave the whole-disk reports: the command, its schema, `space.json` in the data directory, and its exit codes (0 done; 1 when `statfs` fails; never 75, since it takes no lock). README "Where things live" lists `space.json` and `previous-scan.json`.
-- In the app: called on the hourly tick (a `--scheduled` launch too), on wake (`NSWorkspace.didWakeNotification`, new), when the popover opens, and on every tenth tick of the minute timer. It goes through the runner's queue like `rules`. While a scan or clean runs the app skips the call: the scan will measure anyway.
-- A terminal user gets the same sentence: `ddc space` prints "198 GiB more in use on the startup disk than at the last scan (yesterday 10:04). `ddc scan` shows where."
+- It reads `statfs` for the home folder's volume, reads the head of the saved report (`generated_at` and `volumes`, any version), applies the rule below, appends a sample to `space.json`, and prints the decision. It walks nothing, takes no lock and notifies nothing.
+- `--json`: `{schema_version, checked_at, volume {mount_point, total_bytes, free_bytes}, baseline {source: scan | clean, at, free_bytes} | null, in_use_delta | null, grew, state: quiet | grew | low-disk}`.
+- The baseline time is the volume's `read_at` when a `clean --items` edit read its free space again (the story adds that field), else the report's `generated_at`.
+- "Once per saved report" for the badge is the app's (`GrowthBadgedFor`), not the CLI's, so a terminal call never consumes it. The settle rule waits for S6.
+- `space.json`: `{schema_version, samples: [{at, mount_point, total, free}]}`, at most one sample an hour for 14 days plus the latest.
+- A terminal user gets one sentence: "198 GiB more in use on the startup disk than at the last scan, 26 h ago. `ddc scan` shows where."
 
 #### The rule
 
-- **Baseline:** the saved report's `free_bytes` at the time it was read (`free_read_at`). After a `clean --items` edit, that reading is from the clean, later than the scan. The sentence names that time: "than after your clean at 15:20", or "than at the last scan (yesterday 10:04)" when the scan wrote it.
+- **Baseline:** the saved report's `free_bytes` for the home volume, read at `read_at` after a clean edit, else at `generated_at`. After a `clean --items` edit, that reading is from the clean, later than the scan. The sentence names that time: "than after your clean at 15:20", or "than at the last scan (yesterday 10:04)" when the scan wrote it.
 - **Grew:** in use grew by at least **max(20 GiB, 5 % of the volume)** since the baseline (defaults to confirm; open question 4). **Low disk** (under 10 % free) is its own state and wins.
 - **Settled:** the latest two samples at least an hour apart differ by under 5 GiB. Only a later signal-triggered scan (S6) waits for it. The popover and the badge do not wait, and under 10 % free nothing waits.
-- **Once per baseline:** `first_for_baseline` is true the first time `grew` holds for a given baseline, and `fired_for` records it. The next write of the saved report re-arms it. A disk that keeps filling sets the badge once, not every hour.
+- **Once per baseline:** the app badges the first time `grew` or `low-disk` holds for a saved report and records that report (`GrowthBadgedFor`); a new saved report re-arms it. A disk that keeps filling sets the badge once, not every hour.
 - **Shrinking never fires.** More free space (a clean, a purge, a snapshot dropped) is not a reason to interrupt.
 
 #### What the app does with it
@@ -132,7 +117,7 @@ SpaceReport {
 | B. A background scan (`scan --background --notify json`, 3 threads), then a notification that says where | One notification with the answer | A new reason to scan outside the schedule (§5 amendment); the I/O and battery of a home walk |
 | C. A notification at once, "scan to see where" | Fast | A half answer, then a second message |
 
-**Recommendation: A in the first release, B later (S6).** The badge from the signal is its own flag beside today's `AttentionBadgePending`. It **clears when the popover opens**, because the popover band is where its message is. A notification's badge keeps its own rule (it clears when Review opens). VoiceOver reads "used space grew" for the signal's badge, beside today's "new results to review" (`IconState.swift:77`). Open question 3 asks the owner. B, when it comes: at most one signal-triggered scan per 6 hours, only once `settled`, never while paused, never during a clean (the lock refuses), as scheduled work under "Only notify during working hours". It never cleans: the background path never calls the executor (safety ADR §8), and the owner parked unattended cleaning on 2026-10-28.
+**Recommendation: A in the first release, B later (S6).** The badge from the signal is its own flag beside today's `AttentionBadgePending` (the owner agreed, 2026-11-02). It **clears when the popover opens**, or when the baseline changes, because the popover band is where its message is. A notification's badge keeps its own rule (it clears when Review opens). VoiceOver reads "used space grew" for the signal's badge, beside today's "new results to review" (`IconState.swift:77`). B, when it comes: at most one signal-triggered scan per 6 hours, only once `settled`, never while paused, never during a clean (the lock refuses), as scheduled work under "Only notify during working hours". It never cleans: the background path never calls the executor (safety ADR §8), and the owner parked unattended cleaning on 2026-10-28.
 
 **FSEvents** could say *which* folders changed since a stored event ID, without a walk ([Apple: File System Events Programming Guide](https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/FSEvents_ProgGuide/Introduction/Introduction.html)). But it gives paths, not sizes, a cargo build floods it, and protected folders need Full Disk Access. Later at most, to choose what to rescan first.
 
@@ -182,8 +167,8 @@ Inside the home folder, by what it is:
 ```
 Changes {
   schema_version,
-  baseline {written_at, written_by, generated_at, free_read_at},
-  current  {written_at, written_by, generated_at, free_read_at},
+  baseline {written_at, written_by, generated_at},   // a volume's read_at: ADR §6 item 13
+  current  {written_at, written_by, generated_at},
   disk  {mount_point, in_use_before, in_use_now, delta},
   home  {compared: bool, reasons: [different-roots | different-access | different-not-read | cancelled | skipped-cut],
          before?, now?, delta?},
@@ -446,8 +431,8 @@ Each story ships alone. The app stories belong in DDC-002 "Menu bar app". The CL
 
 | # | Story (working title) | Core/CLI | App | Depends on | Release |
 |---|---|---|---|---|---|
-| S5 | Notice when used space grew: `ddc space`, the badge and the popover band | `ddc space [--json]`, `docs/space.schema.json`, `space.json` (the CLI its one writer); ADR §6 item 13; README "Where things live" | Calls on the tick, wake (new), popover open and every tenth timer tick; the band (four states); the signal's badge flag, cleared when the popover opens; the `f_bavail` check on a real Mac | — | first, its own PR |
-| S1 | Keep the previous report, and say who wrote each | `write_last_scan` moves the old file to `previous-scan.json` (not when the outgoing report is `cancelled`); additive report fields `written_by` (`scan`, `background`, `clean-recheck`, `clean-items`, `disk-free`), `written_at`, `free_read_at`, `previous_written_at`, `rules_in_force`; `free_read_at` changes only when `free_bytes` is read again (a `clean --items` edit does, `ddc disk free`'s edit does not); a terminal `ddc clean` edits the saved report after the clean, as `--items` does, and its pre-clean rescan writes without rotating, so yesterday's report stays the baseline | Decoders gain the fields | — | first |
+| S5 | Notice when used space grew: `ddc space`, the badge and the popover band | `ddc space [--json]`, `docs/space.schema.json`, `space.json` (the CLI its one writer); ADR §6 item 13; README "Where things live" | Calls on the tick (after its scan), wake (new), popover open, and from refresh at most once per 10 minutes; the band (four states, shown only while its baseline is the loaded report's); the signal's badge flag, cleared when the popover opens or the baseline changes; the `f_bavail` check on a real Mac | — | first, its own PR |
+| S1 | Keep the previous report, and say who wrote each | `write_last_scan` moves the old file to `previous-scan.json` (not when the outgoing report is `cancelled`); additive report fields `written_by` (`scan`, `background`, `clean-recheck`, `clean-items`, `disk-free`), `written_at`, `previous_written_at`, `rules_in_force` (the volume's `read_at`, set by the `clean --items` edit, came with S5); a terminal `ddc clean` edits the saved report after the clean, as `--items` does, and its pre-clean rescan writes without rotating, so yesterday's report stays the baseline | Decoders gain the fields | — | first |
 | S2 | `ddc changes`: what grew between the last two reports | The comparison with not-read sets, rules in force, moved, cleaned and trashed from the journal; `docs/changes.schema.json`; the `ddc scan` block | — | S1 | first |
 | S4 | Popover and Review: "Grew since …" | — | `changes --json` after a report load; the band names the group; the Review entry with the Change column, the no-finding and not-read sections and their actions. Lands on today's Groups/Items switch | S2, S5 | first |
 | S3 | Folder sizes in the scan report | `folders` (the roots' children and their large children, with a depth and a size floor), compared in `changes`; a load test | The no-finding rows with Show in Finder | S2 | later |
@@ -466,7 +451,7 @@ Each story ships alone. The app stories belong in DDC-002 "Menu bar app". The CL
 - **Performance.** `ddc space` is a process start and a syscall, a few times an hour. `ddc changes` is a join over two reports in memory, parsed once each. The one real cost is S6's background walk: settle first, rate-limit, let pause win.
 - **Trust.** A false "+30 GiB new" for a folder that was only unread last time would teach people to ignore the band. The not-read and rules-in-force rules ship with S2, not after.
 - **Two numbers that disagree.** "On the startup disk" includes snapshots and system data, "in your home folder" does not. Both are always named, and the remainder line says what it holds.
-- **The badge's two meanings.** A signal badge clears when the popover opens, a notification badge when Review opens. If one icon carries both, VoiceOver names both. The owner decides whether the signal may badge at all (open question 3).
+- **The badge's two meanings.** A signal badge clears when the popover opens, a notification badge when Review opens. If one icon carries both, VoiceOver names both. The owner agreed to the signal's badge (open question 3, 2026-11-02).
 - **Schema churn.** Two new contracts with their own `schema_version` (`space`, `changes`) and additive report fields. The app decodes strictly (ADR §1), so app and CLI change together.
 
 ## Conclusion
@@ -479,7 +464,7 @@ Notice first: `ddc space` compares the disk's free space with the last report an
 |---|---|---|---|
 | 1 | Baseline: the previous report (whatever its age), with "since yesterday / last week" only once history is kept (S8)? | None | Yes; the band says the baseline's age |
 | 2 | May the app start a background scan, outside the schedule, when in-use grows past the threshold? | ADR "Menu bar app" §5: the due function decides from the schedule, a reminder and pause | Yes in S6: settled, at most once per 6 h, never while paused, as scheduled work |
-| 3 | May the signal set the menu bar badge (no notification), cleared when the popover opens? | §5: the badge follows a posted notification and clears when Review opens; `ShowMenuBarBadge` | Yes: it is how a person notices without a notification |
+| 3 | May the signal set the menu bar badge (no notification), cleared when the popover opens? **Decided 2026-11-02: yes.** | §5: the badge follows a posted notification and clears when Review opens; `ShowMenuBarBadge` | Yes: it is how a person notices without a notification |
 | 4 | Threshold: max(20 GiB, 5 % of the disk) since the last report? One field in Settings → Notifications later? | `notify_threshold` (10G) is for reclaimable bytes | Those defaults; the field later |
 | 5 | May a growth notification be posted after a scan? A signal-only one? | §5: "Only scheduled scans notify" | Yes after a scan (S6); no signal-only notification |
 | 6 | Show shrinking anywhere? | None | Only in the Review entry, folded |
@@ -515,4 +500,4 @@ Web:
 
 ---
 
-*Last updated: 2026-11-02*
+*Last updated: 2026-11-03*
