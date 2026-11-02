@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T17:39:44.583Z
+generated_at: 2026-11-02T18:23:22.204Z
 
 ---
 
@@ -156,6 +156,7 @@ full typed neighborhood, both directions, in one call.
 | research/review-window-on-macos-a-ux-audit-and-a-lighter-concept.md | Review window on macOS: a UX audit and a lighter concept | research | draft |
 | research/update-check-and-update-in-place.md | Update check and update in place | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
+| research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md | What grew since the last scan: a UX concept for the macOS app | research | draft |
 | research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 | research/where-developer-disk-space-goes-windows.md | Where a developer's disk space goes (Windows) | research | final |
@@ -739,6 +740,7 @@ full typed neighborhood, both directions, in one call.
 | research/update-check-and-update-in-place.md | wikilink | research/distribution-through-agents.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/what-fills-system-data-on-a-developers-mac.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md | wikilink | epics/DDC-002/epic.md |
 | research/where-developer-disk-space-goes-linux.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-macos.md |
