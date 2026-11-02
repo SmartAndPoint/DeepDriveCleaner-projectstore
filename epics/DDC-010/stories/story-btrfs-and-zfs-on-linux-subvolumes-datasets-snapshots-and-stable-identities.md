@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [linux, scanner, safety, filesystems, btrfs, zfs]
 code_refs: []
@@ -64,6 +64,24 @@ Fedora puts the home on btrfs by default. Ubuntu offers ZFS on root, and Proxmox
   ZFS goes to the owner checks if the spike shows it cannot run on the hosted runner.
 
 ## Implementation Plan
+
+Planned 2026-11-02 with the planner, from origin/main 018060d (0.26.0). The contract is the safety ADR's amendment "btrfs and ZFS on Linux", accepted 2026-11-02 after two critic passes. Three code PRs, each with its own bump:
+1. **btrfs.**
+   - `platform/linux/btrfs.rs` with `GET_SUBVOL_INFO` (a hand-written `#[repr(C)]` struct with a size assert; `unsafe` only under `platform/linux/`).
+   - In `bulk.rs`'s `entry_meta`/`Mounts`, a subvolume is entered or skipped as `snapshot`. The walker's device check compares with the parent folder, not the root.
+   - `holds-subvolume` makes the enclosing finding incomplete. `SkipReason::Snapshot` and `HoldsSubvolume` raise the scan schema, with DDCKit and the contract tests.
+   - CI mounts: a plain and a nested subvolume, read-only, writable and received snapshots, a second btrfs inside.
+2. **ZFS.**
+   - `statfs.rs`'s `Mount` gains the parent id, root, source and mount point.
+   - The five-condition child-dataset rule, hop by hop, with its own anchors in the walk (`Task` carries its anchor) and in the guard.
+   - `.zfs` is skipped by name.
+   - CI: a child and a grandchild, a bind of a dataset's mount point, and `snapdir=visible` with mountinfo unchanged.
+3. **Stable identity.**
+   - Every Linux device producer folds `f_fsid` on btrfs and ZFS: the walk's stat, `stat_child`, `identity`, `meta::lstat`/`stat`/`entry`, `procs::open_vnodes`, and the Trash's device and landed checks. `meta::file_id(&Metadata)` goes.
+   - Tests: a remount on its own loop btrfs keeps a saved scan and a keep record matching, and a file held open inside a subvolume is in use.
+
+The story's premise is corrected: a kept folder does not lose its protection after a remount (the marker is checked by path). The harm is that every saved report goes stale.
+
 
 ## Acceptance Criteria
 
