@@ -7,7 +7,7 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [rules, worktrees, safety, git]
 code_refs: []
@@ -22,7 +22,7 @@ plan_updated_at: "2026-11-01T15:56:14.955Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-003](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -72,6 +72,8 @@ Planned 2026-11-01 with the planner against `origin/main` 1cca33e. Four PRs, eac
 
 *Progress, 2026-11-02: PR 1 shipped in 0.15.2 (code PRs #69, #70). Lesson from it: a test fixture that ran git from the pre-push hook inherited `GIT_DIR` and set `core.bare=true` in the main checkout; the fixture and, in PR 2, every production probe clear inherited `GIT_*` variables.*
 
+*Progress, 2026-11-02: PR 2 (probes, the six conditions, `--worktree-min-age`) went out as 0.18.0. PR 3 (removal through git, `worktree-kept`, `contained`; clean 7, journal 7, progress 5) was tagged 0.19.0 and not published; it went out in 0.21.0, with the Linux Trash work of 0.20.0 (clean 8, journal 8, progress 6). PR 4 (render, README, the reference-machine check) is left.*
+
 **PR 1. Recognition, read-only.**
 - `model.rs`: `WorktreeState { …, probe: known|unknown }`, `Finding.worktree`, `Project.worktree_of`, all optional with `skip_serializing_if`; `SCHEMA_VERSION` stays 4.
 - `rules/mod.rs`: `Matcher::Worktree`, `Matcher::WorktreeOrphan`. New `rules/worktree.rs`: `recognize(path) -> Option<Linked { gitdir, main, harness }>`, reusing `report::project::git_dir`, reading `commondir` (a submodule's gitdir has none, so it never matches) and the back-pointer; `main` from `commondir`, never a literal `.git/worktrees/` string (a bare main repo).
@@ -111,9 +113,9 @@ Planned 2026-11-01 with the planner against `origin/main` 1cca33e. Four PRs, eac
 - [ ] Test (ignored content): a worktree whose only ignored paths are a `.venv` with `pyvenv.cfg` and `uv.lock` (a `rebuildable`/`delete` finding) and a `.env` byte-identical to `<main>/.env` is eligible; the same worktree with (a) a unique ignored `.env`, (b) an ignored `state/local-only.txt`, (c) an ignored `.venv` **without** a lock file (its own rule says `review`) is `review` with `ignored_content` naming the path, the `.venv` of case (c) is still its own `review` finding, and after `ddc clean --yes --class rebuildable` all three files still exist
 - [ ] Test (own commits): named branch merged into `main` with its remote deleted → `own_commits: 0`, eligible; named branch with one commit not on any surviving ref → `own_commits: 1`, `review`; detached `HEAD` on a commit reachable from `main` → eligible; detached `HEAD` on a unique commit → `own_commits: 1`, `review`; each of the four gives the same answer when the probe is run from the main checkout and from another linked worktree; a commit that is only on **another worktree's** detached `HEAD` counts as surviving
 - [ ] Test (`plan.rs`): with the worktree selected, its inner `.venv` item is dropped as `contained` and the plan's total counts the worktree's bytes once; with the worktree `review`, the inner `.venv` is planned on its own as today
-- [ ] Test (`clean_safety.rs`): removing a selected worktree runs exactly one git command through the `CommandRunner`, `git -C <main> worktree remove <path>` under the probe contract, never `prune`, never `--force`; afterwards `git worktree list` does not list it, `<main>/.git/worktrees/<name>` is gone, the branch `worktree-<name>` still exists, and the journal line carries the command's tail. A second worktree whose directory was moved away before the clean keeps its `<main>/.git/worktrees/<other>` entry, `HEAD`, index and reflog intact. With the location probe not listing the path, the item is skipped `tool-not-ready` (program `git`, detail "no git lists this folder") and nothing runs
+- [ ] Test (`worktree_removal.rs`): removing a selected worktree runs exactly one mutating git command through the `CommandRunner`, `git -C <main> worktree remove <path>` under the probe contract (the read-only probes before it, `worktree list --porcelain` and the condition re-check, are not counted), never `prune`, never `--force`; afterwards `git worktree list` does not list it, `<main>/.git/worktrees/<name>` is gone, the branch `worktree-<name>` still exists, and the journal line carries the command's tail. A second worktree whose directory was moved away before the clean keeps its `<main>/.git/worktrees/<other>` entry, `HEAD`, index and reflog intact. With the location probe not listing the path, the item is skipped `tool-not-ready` (program `git`, detail "no git lists this folder") and nothing runs
 - [ ] Test: a `git.worktree` item planned with action `delete` or `trash` is skipped `action-not-allowed`; a directory with `.git` at its top level that is **not** a linked worktree is still refused as before (the existing test in `clean_safety.rs` keeps passing)
-- [ ] Test: the executor's re-check runs all six conditions again through the probe module; a worktree made dirty, given a unique ignored file, or given a commit between scan and clean is skipped `changed-since-scan`
+- [ ] Test: the executor's re-check runs all six conditions again through the probe module; a worktree made dirty, given a unique ignored file, or given a commit between scan and clean is skipped `worktree-kept` naming the failed condition (decision 8). A worktree whose identity changed between scan and clean stays `changed-since-scan` (`exec/guard.rs`, `rules/worktree.rs`); `worktree_removal.rs` has no test for it yet, and PR 4 adds one
 - [ ] Test (schema): `--json` validates against the regenerated `docs/scan.schema.json`, the committed schema equals the generated one, `Note` has no new variant (a test enumerates the variants against a fixed list), and a fixture report written by the current release still decodes with the new model and a report with `origin`/`worktree` still decodes with a strict reader of the fixture's model after unknown fields are dropped
 - [ ] Test (`scan_cli.rs`, `clean_cli.rs`): `--worktree-min-age 0` selects a clean harness worktree touched a minute ago; the default leaves it below the window
 - [ ] On the reference machine: `ddc scan ~/Projects` lists every linked worktree `git worktree list` reports for the projects there, and the selected ones are exactly those a manual check (`git status --ignored`, the surviving-ref `rev-list`, `ls .git/worktrees/*/locked`, `.gitmodules`) agrees are dead; result in the final summary with counts, bytes and the ignored-content reasons that held worktrees back
@@ -157,4 +159,4 @@ Planned 2026-11-01 with the planner against `origin/main` 1cca33e. Four PRs, eac
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-02*

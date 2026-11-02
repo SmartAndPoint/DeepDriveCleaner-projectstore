@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T05:09:17.105Z
+generated_at: 2026-11-02T10:06:55.694Z
 
 ---
 
@@ -37,6 +37,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | done |
 | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | parked |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | done |
+| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | Busy: name the scan or clean that holds the lock, and offer to stop it | story | planned |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | done |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
@@ -47,6 +48,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
+| epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | done |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | done |
@@ -78,7 +80,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | Agent skill v0: ask ddc before guessing about the disk | story | in-progress |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
 | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | Coding agents' temporary folders outside the home | story | planned |
-| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | planned |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | in-progress |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | in-progress |
@@ -137,7 +139,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | Linux catalog: Flatpak, Snap and the tools only macOS lists | story | planned |
 | epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md | Linux CI mounts: a filesystem matrix job with root-only steps | story | done |
 | epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | planned |
-| epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | Linux mount boundaries: automounts, bind mounts and the Trash across filesystems | story | in-progress |
+| epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | Linux mount boundaries: automounts, bind mounts and the Trash across filesystems | story | done |
 | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list | story | planned |
 | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs | story | planned |
 | epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md | Private size on Linux: reflinks on btrfs and XFS | story | planned |
@@ -171,8 +173,10 @@ full typed neighborhood, both directions, in one call.
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
+| adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md | wikilink | research/where-developer-disk-space-goes-windows.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
@@ -240,6 +244,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-progress-events.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
@@ -250,6 +255,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
@@ -310,6 +316,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | wikilink | epics/DDC-002/stories/story-menu-bar-popover.md |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | wikilink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
+| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
@@ -341,6 +348,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-menu-bar-popover.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
+| epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | mdlink | epics/DDC-002/epic.md |
@@ -708,7 +716,9 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-009/stories/story-launch-demo-assets.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | wikilink | epics/DDC-002/epic.md |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
