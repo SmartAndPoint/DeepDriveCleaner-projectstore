@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-18
-updated: 2026-10-18
+updated: 2026-11-02
 external_refs: {}
 tags: [cli, contract, json, agents]
 code_refs: []
@@ -29,6 +29,8 @@ plan_updated_at: null
 ---
 
 ## Description
+
+*Amended 2026-11-02 (ADR "Agent footprint", §7): the command is `ddc agent footprint [ROOT] [--json]`; read `ddc footprint` below as that. It needs the worktree probes of story "Worktree findings and provenance" (its PR 2) first.*
 
 `ddc footprint [ROOT] [--json]` is the report an agent reads about its own project: the main checkout, every linked worktree with its state, the artifacts inside each, and what is reclaimable now and after the running sessions end. It is §4 of the ADR "Agent footprint: worktrees, harness data and bounded consent for agents". It is read-only, takes no lock, writes no `last-scan.json`, and answers in seconds, because it walks only the project's checkouts, not the home folder.
 

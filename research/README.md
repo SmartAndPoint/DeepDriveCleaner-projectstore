@@ -15,6 +15,7 @@ Research notes — investigations, spikes, comparisons, and findings.
 | [removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk](./removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md) | Removal wherever a size is shown: coding agents, protected folders and the whole disk | final | 2026-10-29 |
 | [update-check-and-update-in-place](./update-check-and-update-in-place.md) | Update check and update in place | final | 2026-10-29 |
 | [where-developer-disk-space-goes-linux](./where-developer-disk-space-goes-linux.md) | Where a developer's disk space goes (Linux) | final | 2026-10-31 |
+| [where-developer-disk-space-goes-windows](./where-developer-disk-space-goes-windows.md) | Where a developer's disk space goes (Windows) | final | 2026-11-02 |
 
 ---
 
