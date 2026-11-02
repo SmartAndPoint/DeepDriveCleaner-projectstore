@@ -330,6 +330,16 @@ Story: [Linux mount boundaries: automounts, bind mounts and the Trash across fil
 - [ ] Manual (owner): on a volume whose root you cannot write, and that holds no trash folder of yours, the same clean skips the item as `trash-crosses-filesystem`, and the message names `--permanent`. `ddc clean --items <file> --dry-run` predicts the same skip first. Nothing lands in `~/.local/share/Trash`.
 - [ ] Manual (owner): with a real autofs map under your home (an NFS or SMB share that mounts on access), `ddc scan ~` reports the trigger as `automount`, and `findmnt` shows the share still unmounted after the scan.
 
+### Coding agents on Linux (DDC-010)
+
+Story: [Coding agents on Linux: ddc disk agents](../epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md)
+
+- [ ] Manual (owner): on a Linux machine with native Claude Code in use, `ddc agent status` shows the session `live` and its process as `cli`. Note the key names of one `~/.claude/sessions/*.json` (is `pidDomain` `linux`? the form of `procStart`) and `/proc/<pid>/comm` of the live session, names only.
+- [ ] Manual (owner): the same inside WSL or a devcontainer that shares `~/.claude`: a session started there reads `unknown`, not `stale`, for its first 10 minutes.
+- [ ] Manual (owner): on the Mac, the Review window's "Coding agents" group shows Claude Code's builds folder as "N old builds", the launcher's build and the newest locked with their reason. Pick an old build, clean it: it lands in the Trash, `claude` still works, and Put Back restores it.
+- [ ] Manual (owner): with Cursor's agent installed, its `versions` folder lists its builds as `<date>-<hash>` folders and the launcher's build is locked. Note whether Cursor's updater removes old builds itself.
+- [ ] Manual (owner): optional, on a Linux box with `hidepid=2` or a home on NFS: every build is locked `builds-unknown` with that cause.
+
 ### Launch demo assets (DDC-009)
 
 Story: [Launch demo assets](../epics/DDC-009/stories/story-launch-demo-assets.md).

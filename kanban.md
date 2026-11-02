@@ -39,7 +39,6 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [ ] [[epics/DDC-009/stories/story-repository-storefronts-for-the-launch|DDC-009: Repository storefronts for the launch]] #p1
 - [ ] [[epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities|DDC-010: btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities]] #p1
 - [ ] [[epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable|DDC-010: Cache roots moved by the environment: XDG and each tool's own variable]] #p2
-- [ ] [[epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents|DDC-010: Coding agents on Linux: ddc disk agents]] #p1
 - [ ] [[epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service|DDC-010: Desktop notifications on Linux through the freedesktop notification service]] #p2
 - [ ] [[epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free|DDC-010: Freeing space outside the home on Linux: ddc disk free]] #p2
 - [ ] [[epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup|DDC-010: Homebrew on Linux: ddc disk brew-packages and its cleanup]] #p3
@@ -131,6 +130,7 @@ generated_at: 2026-11-02T10:06:55.371Z
 - [x] [[epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections|DDC-007: Rule catalog split: shared and per-OS sections]] #p2 #done
 - [x] [[epics/DDC-009/stories/story-dev-challenge-entry-ghostbusters-for-coding-agents|DDC-009: DEV challenge entry: Ghostbusters for coding agents]] #p1 #done
 - [x] [[epics/DDC-009/stories/story-launch-demo-assets|DDC-009: Launch demo assets]] #p1 #done
+- [x] [[epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents|DDC-010: Coding agents on Linux: ddc disk agents]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1 #done
 
