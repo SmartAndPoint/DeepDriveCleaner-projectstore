@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T10:06:55.694Z
+generated_at: 2026-11-02T17:39:44.583Z
 
 ---
 
@@ -107,7 +107,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-007/stories/story-coding-agents-on-windows-ddc-disk-agents.md | Coding agents on Windows: ddc disk agents | story | planned |
 | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md | Linux scanner and rule catalog | story | done |
 | epics/DDC-007/stories/story-move-os-calls-behind-the-platform-module.md | Move OS calls behind the platform module | story | done |
-| epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | in-progress |
+| epics/DDC-007/stories/story-one-line-install-on-macos-and-linux-ddc-sh-install-sh-and-cargo.md | One-line install on macOS and Linux: ddc.sh/install.sh and cargo | story | done |
 | epics/DDC-007/stories/story-platform-seam-adr-and-capability-model.md | Platform seam: ADR and capability model | story | done |
 | epics/DDC-007/stories/story-rule-catalog-split-shared-and-per-os-sections.md | Rule catalog split: shared and per-OS sections | story | done |
 | epics/DDC-007/stories/story-whole-disk-on-windows-the-areas-outside-the-home.md | Whole disk on Windows: the areas outside the home | story | planned |
@@ -132,7 +132,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/epic.md | Linux at parity with macOS: every command, every file kind | epic | in-progress |
 | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities | story | planned |
 | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md | Cache roots moved by the environment: XDG and each tool's own variable | story | planned |
-| epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | Coding agents on Linux: ddc disk agents | story | planned |
+| epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | Coding agents on Linux: ddc disk agents | story | done |
 | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md | Desktop notifications on Linux through the freedesktop notification service | story | planned |
 | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md | Freeing space outside the home on Linux: ddc disk free | story | planned |
 | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | Homebrew on Linux: ddc disk brew-packages and its cleanup | story | planned |
@@ -143,7 +143,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list | story | planned |
 | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs | story | planned |
 | epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs.md | Private size on Linux: reflinks on btrfs and XFS | story | planned |
-| epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md | Scheduled scans on Linux through a systemd user timer | story | planned |
+| epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md | Scheduled scans on Linux through a systemd user timer | story | done |
 | epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home.md | Whole disk on Linux: the areas outside the home | story | planned |
 | ops/cutting-a-release-tag-ci-archives-dist-and-publish.md | Cutting a release: tag, CI archives, dist and publish | runbook | draft |
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | First Sparkle releases: shipping the updater, then proving it | runbook | draft |
@@ -153,6 +153,7 @@ full typed neighborhood, both directions, in one call.
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | Coding-agent harnesses on macOS: where their data lives and how to tell a live session | research | final |
 | research/distribution-through-agents.md | Distribution through agents | research | final |
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | Removal wherever a size is shown: coding agents, protected folders and the whole disk | research | final |
+| research/review-window-on-macos-a-ux-audit-and-a-lighter-concept.md | Review window on macOS: a UX audit and a lighter concept | research | draft |
 | research/update-check-and-update-in-place.md | Update check and update in place | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
 | research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
@@ -718,7 +719,9 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-009/stories/story-launch-demo-assets.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | wikilink | epics/DDC-002/epic.md |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
@@ -729,6 +732,7 @@ full typed neighborhood, both directions, in one call.
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | research/removal-wherever-a-size-is-shown-coding-agents-protected-folders-and-the-whole-disk.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
+| research/review-window-on-macos-a-ux-audit-and-a-lighter-concept.md | wikilink | epics/DDC-002/epic.md |
 | research/update-check-and-update-in-place.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | research/update-check-and-update-in-place.md | wikilink | adr/updates-through-sparkle-alongside-the-homebrew-cask.md |
 | research/update-check-and-update-in-place.md | wikilink | epics/DDC-007/epic.md |
