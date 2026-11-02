@@ -206,6 +206,8 @@ The CLI exits 69 (`exit::UNSUPPORTED`; `EX_UNAVAILABLE` in sysexits.h: "a servic
 
 ### 7. The JSON error envelope
 
+Amended 2026-11-02 (story "Windows scanner and rule catalog", see Amendments): a third `code`, `root-not-owned`, an exit-2 refusal that writes this envelope, and error schema version 2.
+
 ```json
 {
   "error_schema_version": 1,
@@ -233,7 +235,7 @@ The CLI exits 69 (`exit::UNSUPPORTED`; `EX_UNAVAILABLE` in sysexits.h: "a servic
   - `disk --json`, `disk agents --json`, `disk free --json`, `disk brew-packages --json`.
 
   `--progress json` on its own is not JSON output: its events go to stderr. The `ddc: …` line goes to stderr in every case. Commands without a JSON mode (`du`, `diag`, `schedule`, `notify`) print only that line.
-- **Scope.** This is the shape for every `--json` refusal from now on. The existing refusals (exit 2) and the busy exit (75) keep their stderr-only output here. Moving them is a later change, reviewed against the menu bar ADR, which documents those paths.
+- **Scope.** This is the shape for every `--json` refusal from now on. The existing refusals (exit 2) and the busy exit (75) keep their stderr-only output here. (Amended 2026-11-02: `root-not-owned` is an exit-2 refusal with the envelope.) Moving them is a later change, reviewed against the menu bar ADR, which documents those paths.
 
 ### 8. A test build with `SUPPORTED = false`
 
@@ -404,6 +406,7 @@ An absent `platform` itself would be unambiguous: only macOS ever wrote version-
 
 - **2026-11-02.** Story "Coding agents on Linux: ddc disk agents" (epic DDC-010) amends §3: Linux declares `coding-agents`, as the "Per platform" bullets say. Takes effect when the story's PR C1 lands.
 - **2026-11-02, decided at the story's step-0 gate.** Story "Windows scanner and rule catalog" (epic DDC-007) amends §2, §3, §4 and §8 for Windows. Until the story flips Windows's `SUPPORTED`, `require_supported` refuses every walk and every removal there; these parts take effect with the flip.
+- **2026-11-02, step 7.** Story "Windows scanner and rule catalog" (epic DDC-007) amends §7: a third `code`, `root-not-owned`, with the optional fields `root`, `owner` and `owner_unreadable`, written when an elevated Windows session is refused a scan root (safety ADR, "§5, elevated sessions"): one another account owns, or one whose owner, or the process's own token, cannot be read (`owner_unreadable: true`). It exits 2 (`exit::REFUSED`), the first exit-2 refusal that writes the envelope, under `scan --json`, `clean --json` and `keep --json` (`du` has no JSON mode). `ERROR_SCHEMA_VERSION` is 2. Only Windows emits it; the app's DDCKit decodes no error envelope, so it needed no change.
   - **§2, the folder and `unsafe`.** `platform/windows.rs` becomes the folder `platform/windows/`. It calls Windows through `windows-sys`, and its `mod.rs` allows `unsafe_code` for those calls, as `platform/macos/` and `platform/linux/` do. Every `unsafe` block carries a `// SAFETY:` comment.
     - `NtQueryInformationByName` is looked up at run time (`GetProcAddress`), never linked, so the binary starts on any Windows 10. Where it is missing, the walker falls back to an open (safety ADR, amendment of 2026-11-02).
     - The minimum supported is Windows 10 22H2 and Windows 11, x86_64. Below it the CLI still starts, and the calls it lacks fail closed.
