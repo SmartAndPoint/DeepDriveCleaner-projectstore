@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T20:02:16.613Z
+generated_at: 2026-11-02T22:03:50.050Z
 
 ---
 
@@ -50,7 +50,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
-| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | Popover: say when used space grew since the last scan | story | planned |
+| epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | Popover: say when used space grew since the last scan | story | done |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | done |
 | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md | Release 0.2.1: the Review window in the Dock, and skip what a running process holds open | story | done |
@@ -703,6 +703,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
