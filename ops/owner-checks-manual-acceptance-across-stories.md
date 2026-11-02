@@ -321,6 +321,7 @@ Windows is still unsupported; these run once the story's step 15 has switched it
 - [ ] Manual (owner): in an elevated terminal, `ddc scan C:\Users\<another account>` is refused with exit 2, and the message names that root and its owner; with `--json`, stdout carries the error envelope with the code `root-not-owned`. The same scan in a terminal that is not elevated is refused by the folder's permissions, not by ddc's owner check.
 - [ ] Manual (owner): in an elevated terminal, `ddc scan ~` on your own profile is not refused. If it is, your profile folder is owned by `SYSTEM`: run ddc in a terminal that is not elevated, and note it in the story.
 - [ ] Manual (owner): in an elevated OpenSSH session, `whoami /priv` shows `SeBackupPrivilege` enabled, while `ddc scan` of a test folder whose ACL denies you with an explicit deny entry (an administrator can list almost anything otherwise) reports it unreadable, as in a terminal that is not elevated.
+- [ ] Manual (owner, step 8b): on a FAT32 or exFAT volume (a USB stick, or a small VHD made in Disk Management, which needs an administrator), a project whose `node_modules` holds files marked read-only (`attrib +R /S`) is cleaned with `ddc clean --yes`: the item is deleted, not failed, and no tombstone `*.ddc-deleting-*` is left. A file outside the item that a link inside it points to keeps its read-only mark. `ddc keep remove` of a read-only `.ddc-keep` there removes it.
 
 ### Linux mount boundaries (DDC-010)
 
@@ -339,6 +340,15 @@ Story: [Coding agents on Linux: ddc disk agents](../epics/DDC-010/stories/story-
 - [ ] Manual (owner): on the Mac, the Review window's "Coding agents" group shows Claude Code's builds folder as "N old builds", the launcher's build and the newest locked with their reason. Pick an old build, clean it: it lands in the Trash, `claude` still works, and Put Back restores it.
 - [ ] Manual (owner): with Cursor's agent installed, its `versions` folder lists its builds as `<date>-<hash>` folders and the launcher's build is locked. Note whether Cursor's updater removes old builds itself.
 - [ ] Manual (owner): optional, on a Linux box with `hidepid=2` or a home on NFS: every build is locked `builds-unknown` with that cause.
+
+### Scheduled scans on Linux (DDC-010)
+
+Story: [Scheduled scans on Linux through a systemd user timer](../epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md)
+
+- [ ] Manual (owner): on a Linux desktop session, `ddc schedule install --interval daily`, then `ddc schedule status` shows the timer enabled and a next run. After the next run, `status` shows the last result as success and a fresh last scan.
+- [ ] Manual (owner): power the machine off across a scheduled run; after boot the missed scan runs (`Persistent=true`), and `status` shows it.
+- [ ] Manual (owner): on WSL without systemd or in a container, `ddc schedule install` refuses with `no-user-systemd`, exit 69, prints a crontab line and writes nothing.
+- [ ] Manual (owner): on an ssh-only box without lingering, `status` says the timer runs only while you are logged in and names `loginctl enable-linger`.
 
 ### Launch demo assets (DDC-009)
 
