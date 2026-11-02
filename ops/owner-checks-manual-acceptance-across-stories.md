@@ -312,6 +312,16 @@ Story: [Linux scanner and rule catalog](../epics/DDC-007/stories/story-linux-sca
 - [ ] Manual (owner): on a clean Ubuntu VM with the released archive, `ddc scan ~ --json` on a seeded home finds the catalog's caches and project artifacts, and the report validates against `docs/scan.schema.json`.
 - [ ] ~~Manual (owner): `ddc clean --items` of an item on a second, writable volume moves it to that volume's `.Trash-$uid` (its `files` and `info`); on a volume whose root you cannot write, the item lands in `~/.local/share/Trash` by a copy, as the safety ADR's §5 Linux text says.~~ Superseded by story "Linux mount boundaries: automounts, bind mounts and the Trash across filesystems" (DDC-010): ddc no longer copies to the home Trash.
 
+### Windows scanner and rule catalog (DDC-007)
+
+Story: [Windows scanner and rule catalog](../epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md)
+
+Windows is still unsupported; these run once the story's step 15 has switched it on, on a lab machine.
+
+- [ ] Manual (owner): in an elevated terminal, `ddc scan C:\Users\<another account>` is refused with exit 2, and the message names that root and its owner; with `--json`, stdout carries the error envelope with the code `root-not-owned`. The same scan in a terminal that is not elevated is refused by the folder's permissions, not by ddc's owner check.
+- [ ] Manual (owner): in an elevated terminal, `ddc scan ~` on your own profile is not refused. If it is, your profile folder is owned by `SYSTEM`: run ddc in a terminal that is not elevated, and note it in the story.
+- [ ] Manual (owner): in an elevated OpenSSH session, `whoami /priv` shows `SeBackupPrivilege` enabled, while `ddc scan` of a test folder whose ACL denies you with an explicit deny entry (an administrator can list almost anything otherwise) reports it unreadable, as in a terminal that is not elevated.
+
 ### Linux mount boundaries (DDC-010)
 
 Story: [Linux mount boundaries: automounts, bind mounts and the Trash across filesystems](../epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md)
