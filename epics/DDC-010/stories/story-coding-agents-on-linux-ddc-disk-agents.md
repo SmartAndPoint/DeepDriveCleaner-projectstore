@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [linux, agents, capability, cli]
 code_refs: []
@@ -46,28 +46,19 @@ Claude Code's temporary folder already resolves per OS (`Env::claude_temp_base`:
 
 ## Decomposition
 
-- [ ] Research: an addendum to the harness research note, "On Linux". For Claude Code, Codex, Cursor's agent CLI and opencode it gives:
-  - where each keeps transcripts, sessions, builds, temporary files and worktrees on Linux;
-  - whether XDG variables move them;
-  - whether Claude Code's native installer prunes `~/.local/share/claude/versions` itself (an open question of the Linux research note);
-  - measurements from one Linux machine with these harnesses in use, written without describing the machine.
-  
-  Run the critic on the addendum.
-- [ ] `HARNESSES` resolves its folders per OS, as the shared catalog resolves rules (`Matcher` per-OS paths). Claude Code gains `~/.local/share/claude` (builds) on Linux and macOS, if the addendum confirms it on macOS.
-- [ ] A rule, or a harness folder entry, for Claude Code's old builds in `versions`.
-  - It keeps the build the `claude` launcher points to, and any build a live process runs (`/proc/*/exe`).
-  - It keeps the newest one, like `NEWEST_KEPT` in `rules/toolchain.rs`.
-  - Class `safe` if the addendum shows the installer re-downloads a missing build. Otherwise class `review`.
-- [ ] Declare `coding-agents` on Linux. Move the `agents.rs` report tests and the `disk agents` CLI tests off `lacks(coding-agents)`, and update the Linux row of ADR "Platform seam" §3.
-- [ ] Cases table: `ddc disk agents` and `ddc disk agents --json` run on Linux and validate against the disk schema. The runner derives the exit-69 expectation from `CAPABILITIES`, so declaring the capability is what flips these cases. Check that they now pass on Linux.
+- [x] Research addendum "On Linux" in the harness note, critic-approved (2026-11-02).
+- [x] The safety ADR amendment of 2026-11-02: old builds as picked entries of their `versions` folder, critic-reviewed (the owner chose to let a single file be cleaned).
+- [ ] PR C1, folding in the old items: `HARNESSES` resolved per OS, `coding-agents` declared on Linux (the agents report tests and the `disk agents` CLI tests leave `lacks(coding-agents)`, and the ADR "Platform seam" §3 Linux row is updated), and the cases flipping to run on Linux and validate against `docs/agents.schema.json`. Also the Linux liveness fixes (`pidDomain` per OS, a native Claude Code process told by its resolved executable, a fresh record of a pid this machine does not see is undecidable), `HARNESSES` per OS, and `coding-agents` declared on Linux.
+- [ ] PR C2: the old-builds entries for Claude Code and Cursor's agent, as the amendment states: the two `versions` folders as `review` findings with the `none` method, their builds as picked entries to the Trash only, the locks `build-in-use` and `builds-unknown` (scan schema raised), the new platform calls (resolved executable, other users' process names, `hidepid`, the home's filesystem type), and the resolved executable in the in-use check.
 
 ## Implementation Plan
 
 ## Acceptance Criteria
 
-- [ ] The research addendum exists with Linux paths for every harness in `HARNESSES`, critic-approved.
-- [ ] `ddc disk agents --json` on Linux lists every harness found in a seeded home, with sizes and live sessions, and validates against `docs/disk.schema.json` (tests and cases).
-- [ ] Claude Code's old builds in `~/.local/share/claude/versions` are found on Linux and macOS. The build in use and the newest build are never planned (tests).
+- [x] The research addendum exists with Linux paths for every harness in `HARNESSES`, critic-approved. — evidence: research note "Coding-agent harnesses on macOS…", section "On Linux (addendum, 2026-11-02)", critic passes 2026-11-02
+- [ ] `ddc disk agents --json` (`ddc agent status` once renamed) on Linux lists every harness found in a seeded home, with sizes and live sessions, and validates against `docs/agents.schema.json` (tests and cases).
+- [ ] Claude Code's old builds (files) and Cursor's agent's (folders) are listed as entries on Linux and macOS. A build a launcher points to, a process runs, a lock names, or the newest, is locked `build-in-use`; each `builds-unknown` condition locks every build; none is ever selected by `--yes` (tests).
+- [ ] A picked build moves to the Trash through its verified parent, a file on both OSes, and the dry run predicts it (tests; on Linux through ddc's own Trash).
 - [ ] `CAPABILITIES` for Linux holds `coding-agents`, and `.config/native-skips/linux.txt` no longer lists the agents report tests.
 
 ## Final Summary

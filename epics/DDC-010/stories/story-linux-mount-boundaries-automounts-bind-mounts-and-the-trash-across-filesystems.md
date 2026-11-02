@@ -3,7 +3,7 @@ type: story
 id: "story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems"
 epic: "DDC-010"
 title: "Linux mount boundaries: automounts, bind mounts and the Trash across filesystems"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
@@ -13,7 +13,7 @@ tags: [linux, scanner, safety, clean, filesystems]
 code_refs: []
 specs: []
 started_at: "2026-11-01T18:37:21.133Z"
-closed_at: null
+closed_at: "2026-11-02T09:02:22.859Z"
 plan_updated_at: "2026-11-02T06:00:00.000Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-11-02T06:00:00.000Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-010](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -125,12 +125,34 @@ Watch: story "Clean: --agent bounded consent" also moves the clean and journal s
 
 ## Acceptance Criteria
 
-- [ ] A bind mount of the same filesystem inside a scanned root is reported as skipped, is never counted, and nothing inside it is ever planned or deleted (test on a real bind mount in the CI mounts job).
-- [ ] An automount point is never triggered or opened, and the scan reports it as `automount`: an autofs direct map, found as a mount root of type `autofs`, and a folder carrying `STATX_ATTR_AUTOMOUNT` (an NFS or SMB referral). Evidence: a test on a real autofs direct map in the CI mounts job, where mountinfo gains no mount, and a unit test of `boundary()`. A real map under a person's home is an owner check.
-- [ ] No clean copies a file into the Trash. A move uses the home trash on its own mount and device, or that filesystem's `.Trash-$uid`, or refuses with `trash-crosses-filesystem`; it works on NFS, which refuses rename flags; the dry run predicts each refusal (tests in the CI mounts job: tmpfs, root-topped tmpfs, btrfs subvolume, NFS).
-- [ ] The safety ADR §5 states the Linux mount rules and the cross-filesystem Trash rule, critic-approved.
+- [x] A bind mount of the same filesystem inside a scanned root is reported as skipped, is never counted, and nothing inside it is ever planned or deleted (test on a real bind mount in the CI mounts job). — evidence: crates/ddc-core/tests/mount_boundaries.rs `a_bind_mount_inside_a_root_is_skipped_never_counted_and_never_claimed`, `a_bind_mount_is_refused_beneath_its_root_with_openat2_and_without`, `the_guards_stat_tells_a_bind_mount_as_a_mount_root`, `a_stale_plan_into_a_bind_mount_is_refused_and_nothing_moves`; CI run 41416834167, job linux-mounts, on main 2cba4cf
+- [x] An automount point is never triggered or opened, and the scan reports it as `automount`: an autofs direct map, found as a mount root of type `autofs`, and a folder carrying `STATX_ATTR_AUTOMOUNT` (an NFS or SMB referral). Evidence: a test on a real autofs direct map in the CI mounts job, where mountinfo gains no mount, and a unit test of `boundary()`. A real map under a person's home is an owner check. — evidence: mount_boundaries.rs `an_autofs_direct_map_is_reported_and_never_triggered_by_a_scan`; platform/linux/bulk.rs `an_automount_point_or_another_mount_is_the_edge_of_the_walk`; CI run 41416834167, job linux-mounts, on main 2cba4cf; the owner check is in ops/owner-checks-manual-acceptance-across-stories.md, "Linux mount boundaries (DDC-010)"
+- [x] No clean copies a file into the Trash. A move uses the home trash on its own mount and device, or that filesystem's `.Trash-$uid`, or refuses with `trash-crosses-filesystem`; it works on NFS, which refuses rename flags; the dry run predicts each refusal (tests in the CI mounts job: tmpfs, root-topped tmpfs, btrfs subvolume, NFS). — evidence: platform/linux/trash.rs unit tests; mount_boundaries.rs trash tests on `Tmpfs`, `TmpfsRootTop`, `BtrfsSubvolume`, `Nfs` with their dry runs; tests/clean_items.rs `the_dry_run_predicts_a_trash_that_would_cross`; tests/harness_clean.rs `a_session_entry_without_a_trash_is_predicted_and_skipped_as_crossing`; CI run 41416834167, job linux-mounts, on main 2cba4cf; the `trash` crate is off the Linux target (crates/ddc-core/Cargo.toml)
+- [x] The safety ADR §5 states the Linux mount rules and the cross-filesystem Trash rule, critic-approved. — evidence: adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md, amendment of 2026-11-01 and its 2026-11-02 paragraph on mount ids without `STATX_MNT_ID`; critic passes 2026-11-01 and 2026-11-02
 
 ## Final Summary
+
+**What changed.** Three code PRs, each with its own release version:
+- **PR A (#79, 0.17.0), the walk.** Each entry is stat'ed with `AT_NO_AUTOMOUNT` and `STATX_MNT_ID`. An automount point is skipped as the new reason `automount` (scan schema 5), and a mount root or another mount id as `other-filesystem`. Folders open beneath the scan root's descriptor with `openat2(RESOLVE_BENEATH | NO_XDEV | NO_SYMLINKS)`, or by path with a mount check.
+- **PR B1 (#87, 0.18.1), the guard.** The clean and the dry run anchor each root once and open every parent beneath it. A mount crossed or a symlink on the way is `parent-changed`, and a mount at the item is `incomplete`. A root replaced since the anchor is refused. Where `statx` gives no mount id, `/proc/self/fdinfo` does. The `Trasher` port takes the verified folder and name.
+- **PR B2 (#91, 0.20.0), the Trash.** ddc's own freedesktop move on Linux, never a copy:
+  - home trash on the same mount and device, else the mount top's `.Trash/$uid` or `.Trash-$uid`;
+  - info file first, `renameat2(NOREPLACE)` with the NFS fallback, the identity checked after the move;
+  - `trash-crosses-filesystem` when no Trash is usable, predicted by the dry run;
+  - the journal records the place;
+  - clean 8, journal 8, progress 6.
+
+**Why.** A bind mount of the same filesystem passed the device check, so the scan counted it and a clean could act through it. A stat could trigger an automount. And the `trash` crate copied an item across filesystems into the home.
+
+**Tests executed.**
+- Unit and integration tests on macOS CI and on a Linux machine: 869/869 at B2.
+- The Gate's `linux-mounts` job on real mounts: bind, autofs, tmpfs, root-topped tmpfs, btrfs subvolume, NFS. Green on PRs #79, #87, #91 and on main (run 41416834167).
+
+**Risks and follow-ups.**
+- `exec/delete.rs`'s by-path `remove_dir_all` moved to story "Linux file kinds…".
+- A symlinked `~/.local/share/Trash` refuses every move on the home mount (conservative, accepted).
+- Main's run 41416834167 failed only `fuzz-lock`: B2's `chrono` dependency was missing from `fuzz/Cargo.lock`. The 0.21.0 release PR refreshes it.
+- The owner checks are in the runbook.
 
 ## Technical Notes
 
@@ -145,6 +167,10 @@ Watch: story "Clean: --agent bounded consent" also moves the clean and journal s
 - **Not this story:** a hard NFS mount whose server is dead can still hang a `statx` on its root. Story "Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs" owns it.
 - `du -x` enters bind mounts of the same filesystem. Here the walk differs from `du` on purpose. The `du -skx` comparison tests need a note where a bind mount is present.
 - WSL's `/mnt/c` is a 9p or drvfs mount. The walk from the home never enters it.
+- **Deviation, PR A:** a folder whose whole path reaches Linux's `PATH_MAX` (4096) is unreadable (`ENAMETOOLONG`), as by path, so its finding is incomplete. Story "Linux file kinds…" takes such paths on.
+- **Follow-up:** Rust std's `symlink_metadata` uses `statx` without `AT_NO_AUTOMOUNT`, so any std stat of an automount trigger mounts it. The walk and the guard avoid std there; the test helpers read mountinfo instead.
+- **Deviations, PR B2:** `XDG_DATA_HOME` is read at call time inside `platform/linux/trash.rs`, not through an `Env` field. A trash folder must also be on the item's `dev`, so the dry run predicts the btrfs-subvolume refusal. Name collisions get `.1`, `.2`, … appended. `EROFS` is `failed`, not crossing.
+- **Evidence runs:** linux-mounts green on PR #79, #87 and #91, and on main 2cba4cf (run 41416834167).
 
 ## Dependencies
 
@@ -156,4 +182,4 @@ Watch: story "Clean: --agent bounded consent" also moves the clean and journal s
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-02*
