@@ -101,6 +101,10 @@ With nextest filter arguments, a script runs only the matching tests. It skips c
 
 Push only after a whole native run is green. The CI job on the pull request is the final check.
 
+### Nothing builds on the developer machine (the owner, 2026-11-02)
+
+Cargo builds, tests and the git hooks run on the owner's machines, never on the developer machine, whose disk filled with target folders. Commit and push from a clone in WSL on the Windows lab machine, inside `ddc-native`, with its own target folder: the hooks (`make lint`, `make gate-fast`) run there and test the Linux leg. The Windows leg still runs natively through `scripts/native-windows.sh`; WSL builds no Windows binary. Each session keeps its own clone and target folder there and shares only the cargo and rustup homes. `scripts/private-scan.sh` needs `.env` and `.local/private-strings`, which stay on the developer machine, where the clone's hook finds nothing to check: run the scan there on the diff and the commit message before they move to the clone. The macOS tests run in CI only.
+
 ## The Windows machines: the build in one folder
 
 The owner sets a rule per Windows machine (2026-10-31):
