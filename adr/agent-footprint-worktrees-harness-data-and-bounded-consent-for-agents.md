@@ -170,6 +170,8 @@ Only a person removes the `review` items: picked in the Review window or listed 
 
 It is read-only. It does not write `last-scan.json`, does not take the scan lock, and does not notify. On the reference machine it must finish within 5 s for a project with ten worktrees; a worktree's `git status` is the slow part and runs in parallel across worktrees.
 
+*Amendment, 2026-11-02 (plan gate of story "ddc footprint: a scoped project report"): an orphan is a directory whose `.git` file names a missing `worktrees/<n>` gitdir, as §2 recognises it; a plain directory under `<main>/.claude/worktrees/` that git does not list and that has no `.git` file is not one. `reclaimable_after_sessions` counts a worktree locked by a live session of the current user. §2 condition 2 still holds for selection: `ddc` cannot tell a lock a person set from one a session left, so a locked worktree stays `review` and is never selected. The footprint only estimates: a live session is a lock whose reason names a pid, `(pid N`, that runs as the current user (Claude Code writes `claude agent <name> (pid N start …)` and `claude session <name> (pid N …)`); a lock with no pid or a dead one is held back. The totals are by class, as §7 needs: `safe` apart from `rebuildable`, since an agent may clean only the first, behind the opt-in.*
+
 ### 5. `ddc clean --agent`: bounded consent
 
 *Superseded by §7 (2026-11-02) for the command (`ddc agent clean`) and for what an agent removes without a person (`safe` only, behind the opt-in; `rebuildable` is the person's). The rest of this section (the filter semantics of `--items`, journaling, the re-checks) stands; the tree bound stands as §7 narrows it (no shared caches).*
