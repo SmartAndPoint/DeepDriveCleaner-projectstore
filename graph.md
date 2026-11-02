@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T22:03:50.050Z
+generated_at: 2026-11-02T23:01:59.022Z
 
 ---
 
@@ -25,10 +25,12 @@ full typed neighborhood, both directions, in one call.
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | Updates through Sparkle, alongside the Homebrew cask | adr | accepted |
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | Windows app: Tauri 2 shell over the ddc CLI | adr | accepted |
 | epics/DDC-001/epic.md | Disk space cleaner CLI for developers | epic | in-progress |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | ddc changes: what grew between the last two scans | story | planned |
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | Homebrew tap and the v0.1.0 release | story | in-progress |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | Keep the previous scan report, and say who wrote each | story | planned |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | in-progress |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
@@ -158,7 +160,7 @@ full typed neighborhood, both directions, in one call.
 | research/review-window-on-macos-a-ux-audit-and-a-lighter-concept.md | Review window on macOS: a UX audit and a lighter concept | research | draft |
 | research/update-check-and-update-in-place.md | Update check and update in place | research | final |
 | research/what-fills-system-data-on-a-developers-mac.md | What fills System Data on a developer's Mac | research | final |
-| research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md | What grew since the last scan: a UX concept for the macOS app | research | draft |
+| research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md | What grew since the last scan: a UX concept for the macOS app | research | final |
 | research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 | research/where-developer-disk-space-goes-windows.md | Where a developer's disk space goes (Windows) | research | final |
@@ -200,19 +202,23 @@ full typed neighborhood, both directions, in one call.
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | adr/platform-seam-one-platform-module-per-os-with-declared-capabilities.md |
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | wikilink | epics/DDC-008/epic.md |
+| epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
+| epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-scheduled-background-scan.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md |
 | epics/DDC-001/epic.md | epic-contains | epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner.md |
+| epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-ddc-scan-report.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md |
+| epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/epic.md | mdlink | epics/DDC-001/stories/story-scheduled-background-scan.md |
@@ -221,6 +227,14 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-001/epic.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-001/epic.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | mdlink | epics/DDC-001/epic.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | wikilink | research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md |
 | epics/DDC-001/stories/story-ddc-scan-report.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-ddc-scan-report.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-001/stories/story-ddc-scan-report.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
@@ -236,6 +250,13 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | wikilink | adr/rust-core-library-and-cli-with-json-output.md |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | wikilink | epics/DDC-001/stories/story-scheduled-background-scan.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | mdlink | epics/DDC-001/epic.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | wikilink | research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | mdlink | epics/DDC-001/epic.md |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | wikilink | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | wikilink | epics/DDC-002/stories/story-cli-progress-events.md |
