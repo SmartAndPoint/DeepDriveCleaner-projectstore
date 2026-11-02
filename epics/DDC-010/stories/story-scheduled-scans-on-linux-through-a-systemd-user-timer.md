@@ -7,7 +7,7 @@ status: planned
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [linux, schedule, cli, capability, systemd]
 code_refs: []
@@ -43,9 +43,9 @@ On Linux the same commands manage a systemd user timer.
   - `deepdrivecleaner-scan.service`: `Type=oneshot`, `ExecStart=<stable path> scan --background [--threshold …]`, `Nice=10`, `IOSchedulingClass=idle`.
   - `deepdrivecleaner-scan.timer`: `OnCalendar=daily` or `weekly`, `Persistent=true` and `RandomizedDelaySec=15min`. `Persistent=true` makes up a run missed while the machine was off. A realtime timer fires on resume after a suspend anyway.
 - **Where the units go.** The user manager's search path is fixed by the manager's own environment when it starts. A client's `XDG_CONFIG_HOME` does not move it, so units written under a shell's `XDG_CONFIG_HOME` can be invisible to `daemon-reload`. To avoid this:
-  - `ddc` keeps both files in its own data folder (`$XDG_STATE_HOME/deepdrivecleaner/systemd/`);
+  - `ddc` keeps both files in its own data folder (`$HOME/.local/state/deepdrivecleaner/systemd/`, which depends on the home alone);
   - it installs them with `systemctl --user link <abs path>` for the service and `systemctl --user enable --now <abs path>` for the timer, so systemd links them into the manager's own configuration folder;
-  - uninstall runs `disable --now`, unlinks both, removes the files and reloads.
+  - uninstall runs `disable --now` on both (which removes the links), removes the files and reloads.
   
   No root is needed.
 - **Status** names:
@@ -54,10 +54,10 @@ On Linux the same commands manage a systemd user timer.
   - the next run (`systemctl --user show -p NextElapseUSecRealtime`);
   - the last result (`Result`, `ExecMainStatus`);
   - whether the scan will notify (story "Desktop notifications on Linux through the freedesktop notification service").
-- **Where no user systemd runs.** This covers containers, WSL without systemd, OpenRC and runit distros, and some ssh-only servers. There, `schedule install` refuses with a stable exit code and a JSON reason, `no-user-systemd`. Its message names the cron line the user can add instead. It never edits a crontab.
+- **Where no user systemd runs.** This covers containers, WSL without systemd, OpenRC and runit distros, and some ssh-only servers. There, `schedule install` refuses with exit 69 and the line `ddc: no-user-systemd: …` on stderr (`schedule` has no JSON mode: ADR "Platform seam" §7). Its message names the cron line the user can add instead. It never edits a crontab.
 - **Lingering.** Without `loginctl enable-linger`, a user timer runs only while the user has a session. `schedule status` says this and prints the command. `ddc` never runs it.
 - **The stable path.** The LaunchAgent refuses a binary inside a cargo `target/` folder (`inside_cargo_target`). On Linux the stable paths are where the install script puts the binary (story "One-line install on macOS and Linux: ddc.sh/install.sh and cargo", DDC-007), `~/.cargo/bin`, and Linuxbrew's prefix.
-- **The data folder.** The service runs with the user manager's `HOME` and environment. A user who installed with `--data-dir` or `DDC_DATA_DIR` would otherwise get a timer that writes somewhere else. So the unit pins what the interactive install knew: `ExecStart=… scan --background --data-dir <path>`, and `schedule status` shows that path. The LaunchAgent's `AgentSpec` carries `log_dir` but no data folder today. Do the same for it here, or record it as an open question for macOS.
+- **The data folder.** The service runs with the user manager's `HOME` and environment. A user who installed with `--data-dir` or `DDC_DATA_DIR` would otherwise get a timer that writes somewhere else. So the unit pins what the interactive install knew: `ExecStart=… scan --background --data-dir <path>`, and `schedule status` shows that path. The LaunchAgent's `AgentSpec` carries `log_dir` but no data folder today. The plan below decides it for both OSes.
 - **Environment.** The service gets the user manager's environment, not the shell's. The decision on which variables go into `Environment=` is made here, early. Story "Cache roots moved by the environment: XDG and each tool's own variable" depends on it. The proposal: `schedule install` writes the honoured cache variables it sees, and `schedule status` lists them.
 
 ## Decomposition
@@ -69,9 +69,9 @@ On Linux the same commands manage a systemd user timer.
   - unit text generation, unit-tested on every OS;
   - `systemctl` behind a trait like `Launchctl`, with a fake for tests;
   - "installed and current" means both files name this binary's stable path and the requested interval, threshold and environment.
-- [ ] Detection of a user systemd: `systemctl --user is-system-running` answers, or `$XDG_RUNTIME_DIR/systemd/private` exists. Otherwise refuse with `no-user-systemd` and print the cron line.
+- [ ] Detection of a user systemd, as plan step S2.5 states: exit 0 or a live state; `offline`, `unknown` or no answer refuse with `no-user-systemd` and print the cron line.
 - [ ] Declare `schedule` on Linux.
-  - Update ADR "Platform seam" §3, and the error and JSON schemas for the new reason.
+  - Update ADR "Platform seam" §3. No error or JSON schema moves: `schedule` has no JSON mode.
   - The cases runner derives the exit-69 expectation from `CAPABILITIES`, so `ddc schedule status` simply runs on Linux. `schedule install` stays in `not_run`, as on macOS.
 - [ ] CI on the Linux runner.
   - Enable lingering for the runner user (`sudo loginctl enable-linger $USER`). Export `XDG_RUNTIME_DIR=/run/user/$(id -u)` and the bus address in the step, since the runner sets neither.
@@ -84,13 +84,61 @@ On Linux the same commands manage a systemd user timer.
 
 ## Implementation Plan
 
+Planned 2026-11-02 with the planner, from origin/main df71852 (0.24.0). Two PRs, each with its own version bump. The Windows session confirmed it is not building Task Scheduler now, so this story builds the seam and leaves a slot for it. The seam lives in `crates/ddc-cli/src/platform/`, not `cmd/`: the structure test forbids OS-specific crates, modules and `cfg`s outside the platform folders. The DDC-008 story's "in cmd/schedule.rs" should be read that way.
+
+**S1, the seam (patch; no change on macOS):**
+1. `platform/scheduler.rs`: `ScheduleSpec` (exe, interval, threshold, log folder, data folder, pinned variables) and `trait Scheduler { install, uninstall, status }`. `launchd::inside_cargo_target`, `scheduled_program`, `same_binary` and `program_state` move here and are shared.
+2. `launchd.rs`: `struct Launchd` implements it, with the existing `Launchctl` and its fake.
+3. `platform/mod.rs`: `scheduler(env)` picks the backend with a runtime `match PLATFORM`, so both backends compile and are used on every target.
+4. `cmd/schedule.rs` goes through the trait. The install, uninstall and status outputs and exits stay unchanged on macOS, and `LABEL` and `plist_path` stay, since the app checks `schedule uninstall`'s exit and reads the plist itself. `cli.rs`'s help and `cases.json`'s reasons stop saying "LaunchAgent".
+5. `tests/structure.rs`'s `background_sources_never_reference_cleanup` lists `platform/scheduler.rs` (and `platform/systemd.rs` in S2) beside `platform/launchd.rs`.
+
+**S2, systemd (minor):**
+1. `platform/systemd.rs`, compiled everywhere:
+   - the unit texts, with `%` written `%%`, and `ExecStart` and `Environment=` values quoted;
+   - `trait Systemctl` with a fake;
+   - the files kept in `$HOME/.local/state/deepdrivecleaner/systemd/`, a folder that depends on the home alone, so status and uninstall find them whatever the shell's `XDG_STATE_HOME` or `DDC_DATA_DIR` says;
+   - `$` written `$$` in `ExecStart`, besides `%` as `%%`.
+2. Install first runs the detection (before anything is written, settings included), then `disable`s any earlier timer and service of ours (a link of the same name may point at a moved or deleted folder), writes the files, links the service, reloads, `enable --now` the timer by path, and restarts it.
+3. Uninstall runs `disable --now` on both (which removes the links; should a dangling link make `disable` fail on some systemd versions, `link`/`enable --force` is the fallback), removes the files and reloads. With nothing installed it says so.
+4. Status with no files makes no `systemctl` call and prints "Not installed": the cases run it. Status reads the last scan from the unit's pinned data folder, not the shell's. A unit that is not current says "run `ddc schedule install` again" (an update through the install script keeps the path but not the unit text). Otherwise it shows:
+   - the units and whether they are current for this binary;
+   - whether the timer is enabled;
+   - the next run;
+   - the last result;
+   - the data folder;
+   - the pinned variables;
+   - the linger line;
+   - whether the scan notifies.
+5. Detection: a manager is there when `systemctl --user is-system-running` exits 0, or prints one of `initializing`, `starting`, `running`, `degraded`, `maintenance`, `stopping`. `offline` (not booted under systemd: WSL without it, containers), `unknown`, no output, a missing binary or a failed connect mean `no-user-systemd`. When `XDG_RUNTIME_DIR` is unset (ssh without `pam_systemd`) the message names that export as well as the cron line.
+6. Linux declares `schedule`, and ADR "Platform seam" §3 says so, naming `no-user-systemd` as a run-time unavailability (`EX_UNAVAILABLE`), distinct from the static `capability-absent`. No schema moves.
+7. `install.sh --uninstall` refuses on Linux too while our systemd units name its binary (today it checks only the macOS plist), so it never removes the binary from under a live timer. This lands with S2 or before it.
+8. A CI job `linux-schedule`, with `timeout-minutes` and `continue-on-error` until it has been green for a week (this story's close flips it, or names who does), runs `scripts/ci-schedule.sh`, which refuses outside CI. The service runs with the runner's own `HOME` (it is never pinned), so the forced run scans the runner's home. The uninstall runs in a trap and in an `if: always()` step, so a failed step leaves no timer. The script:
+   - enables linger;
+   - sets `XDG_RUNTIME_DIR` and the bus address;
+   - copies the binary to a temporary stable path;
+   - runs install, status and a forced run with `DDC_DATA_DIR` set to a temporary folder;
+   - checks `last-scan.json` and `logs/background.log`;
+   - checks `OnCalendar` after a weekly install;
+   - uninstalls twice.
+
+**Decisions made here:**
+- **The data folder.** It is always pinned on Linux, as `--data-dir <path>` in `ExecStart`, because the manager's `XDG_STATE_HOME` can differ from the shell's. On macOS it goes into the plist only when it is not the default (S2), so default plists stay as they are. `schedule install` takes no new flag; it honours `DDC_DATA_DIR`.
+- **`Environment=`.** It lists the variables ddc honours that are set at install: `DOCKER_CONFIG` and `CLAUDE_CODE_TMPDIR` for now. `TMPDIR` is not pinned: a session's value pinned at install may not exist later. Story "Cache roots moved by the environment…" extends the list. Never pinned: `HOME`, `PATH`, `DDC_DATA_DIR`, `XDG_STATE_HOME` (the data folder pin replaces them), `XDG_RUNTIME_DIR` and `DBUS_*`.
+- **`no-user-systemd`.** Exit 69 (`EX_UNAVAILABLE`), the `ddc:` line on stderr, and the cron line on stdout. Nothing is written, settings included. The error envelope comes when `schedule` gets a JSON mode.
+- **Release notes of S2** name the macOS change: a plist now pins `--data-dir` when the data folder is not the default.
+- **"Current".** The unit's program is the same binary as this one, and both files equal what this binary would write for their own parameters.
+
+
+
 ## Acceptance Criteria
 
 - [ ] `ddc schedule install --interval daily` on Linux links both units, enables the timer, and `ddc schedule status` shows its next run (CI test with a real user manager).
 - [ ] A forced run of the service writes `last-scan.json` and logs into the data folder that the install named, and `schedule status` shows that folder (CI test).
-- [ ] `ddc schedule uninstall` disables and unlinks both units and removes the files. Run again, it is a no-op that says so (CI test).
-- [ ] Without a user systemd, `ddc schedule install` refuses with `no-user-systemd`, a stable exit code and a printed cron line, and writes nothing (test with the fake).
+- [ ] `ddc schedule uninstall` disables both units (removing their links) and removes the files. Run again, it is a no-op that says so (CI test).
+- [ ] Without a user systemd, `ddc schedule install` refuses with exit 69, `ddc: no-user-systemd` on stderr and a printed cron line, and writes nothing (test with the fake).
 - [ ] `CAPABILITIES` for Linux holds `schedule`, and the cases table runs `ddc schedule status` on Linux.
+- [ ] On Linux, with our units naming the installed binary, `install.sh --uninstall` exits 4 and removes nothing (shell test of the install script).
 
 ## Final Summary
 
