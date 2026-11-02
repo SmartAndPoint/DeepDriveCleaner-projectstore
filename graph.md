@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T19:45:58.719Z
+generated_at: 2026-11-02T20:02:16.613Z
 
 ---
 
@@ -303,6 +303,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-release-021-the-review-window-in-the-dock-and-skip-what-a-running-process-holds-open.md |
 | epics/DDC-002/epic.md | mdlink | epics/DDC-002/stories/story-review-and-clean-window.md |
