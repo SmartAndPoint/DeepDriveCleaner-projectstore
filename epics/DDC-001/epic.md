@@ -60,6 +60,8 @@ The epic is the foundation of the future Mac app: `ddc-core` and the JSON schema
 | [story-homebrew-tap-and-the-v010-release](./stories/story-homebrew-tap-and-the-v010-release.md) | in-progress | Homebrew tap and the v0.1.0 release: signed, notarized cask in `smartandpoint/tap`, `make dist` and publish script, stable Homebrew link for the LaunchAgent, reference machine moved to the Homebrew install |
 | [story-progress-output-while-ddc-clean-runs](./stories/story-progress-output-while-ddc-clean-runs.md) | in-progress | Progress output while `ddc clean` runs: the preparing phase (keep-marker walk) and items processed, bytes processed and the current item; an idea from the first real clean |
 | [story-swiftpm-build-folders-as-rebuildable-artifacts](./stories/story-swiftpm-build-folders-as-rebuildable-artifacts.md) | planned | `swift.build`: a Swift package's `.build` beside `Package.swift`, `rebuildable`, no lock-file gate; found when it held four worktrees back on the reference machine |
+| [story-keep-the-previous-scan-report-and-say-who-wrote-each](./stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md) | planned | `previous-scan.json` kept by a whole scan of the default roots; `written_by`, `written_at`, `previous_written_at`, `rules_in_force`; a terminal clean edits the report after cleaning (S1 of the growth research) |
+| [story-ddc-changes-what-grew-between-the-last-two-scans](./stories/story-ddc-changes-what-grew-between-the-last-two-scans.md) | planned | `ddc changes [--json]`: what grew between the last two scans, by group and harness, over what both read; cleaned and trashed from the journal (S2 of the growth research) |
 
 ## Expected Results
 

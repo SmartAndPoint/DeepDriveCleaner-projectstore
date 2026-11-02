@@ -2,12 +2,12 @@
 type: research
 slug: "what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app"
 title: "What grew since the last scan: a UX concept for the macOS app"
-status: draft
+status: final
 date: 2026-11-02
 authors: ["Evgenii Konev"]
 tags: [app, macos, ux, growth, disk]
-review_status: pending
-reviewed_at: null
+review_status: reviewed
+reviewed_at: 2026-11-03
 ---
 
 # What grew since the last scan: a UX concept for the macOS app
@@ -36,6 +36,31 @@ The first release ships the signal and attribution together. The signal goes out
 - The session checked the main claims against the code (one saved scan, replaced each time; volume free space already in each report; the notify rule on reclaimable bytes) and wrote the joint verdict.
 - A critic pass (`projectstore:critic`) found one blocker and ten other points: "home vs elsewhere" mixed unread folders into "outside"; the list of writers of the saved report was incomplete; the first version did not yet make anyone *see* the change; the rule sat in the app instead of Rust; rule-set changes and the Trash could read as growth; a simpler storage design was not weighed. The session decided each point. This version applies them, with every code claim checked again on `main` at `018060d` (still the head on 2026-11-02 after a fetch).
 - The owner's answers to the Review window concept bind this one: Whole disk stays useful and must be able to remove what it finds; the group action lives in the group header; "All Items" replaces the Groups/Items switch.
+
+### Amendment, 2026-11-03
+
+S1 and S2 are now the DDC-001 stories "Keep the previous scan report, and say who wrote each" and "ddc changes: what grew between the last two scans". Each code point below was checked on `main` at `04243d9` (0.29.1). Where this note and the stories differ, the stories win.
+
+**The rotation rule, as settled.** A save by `scan`, `background` or `clean-recheck` moves the report it replaces to `previous-scan.json` when that report is whole: its head reads, it is not `cancelled`, and its home and roots are the default ones. The incoming report's roots do not matter. Every other save (`clean`, `clean-items`, `disk-free`) replaces `last-scan.json` and leaves `previous-scan.json` as it is. `last-scan.json` is never written in place, only replaced by a rename. This replaces the TL;DR's "Each write of `last-scan.json` first moves the old file to `previous-scan.json`" and the Rollout row S1. If a clean's edit kept the report before it, the rows the person did not clean would drop out of "Grew since …".
+
+The line in Rollout row S1, "its pre-clean rescan writes without rotating, so yesterday's report stays the baseline", is superseded. It did not hold together: a re-check that replaces `last-scan.json` without keeping it drops yesterday's report. A terminal `ddc clean` is now a scan and a clean in one. Its re-check (`clean-recheck`) keeps like a scan, and its edit after the clean (`clean`) does not.
+
+There are two slots. An agent's `ddc scan "$PWD"` after a Scan Now moves that Scan Now into `previous-scan.json`, and the home report before it is gone. A second project scan keeps nothing, so a project report never becomes the baseline. Keeping more than two reports is S8.
+
+**`written_by`** has six values: `scan`, `background`, `clean-recheck`, `clean`, `clean-items`, `disk-free`. `written_at` is to the second, like every other time in the report and the journal.
+
+**Corrected points:**
+
+- **Group labels.** "Rust build folders", "Node packages", "Xcode DerivedData", "Docker" and "Package caches" are not groups in the code. `ddc changes` uses the labels of `rules/listing.rs` `GROUPS`, the ones `ddc rules --json` gives: `rust.target` is in "Build outputs" (with Maven, Gradle, CMake and CocoaPods outputs), and the others are "node_modules", "Xcode builds", "VM and container images" and "Package downloads". The examples in this note read with those labels.
+- **Harness.** `origin.harness` is set only on a harness rule's findings and on a worktree's own finding (`rules/classify.rs`). An artifact inside a worktree has `project.worktree_of` instead, so "9 in Claude Code worktrees" comes from the `git.worktree` finding at the artifact's `project.root`.
+- **Skip reasons.** `SkipReason` (scan schema 7) also has `snapshot` and `holds-subvolume`, both from Linux. A `snapshot` path is not read. A `holds-subvolume` path was entered and counted, so it is not in the not-read set.
+- **The journal** is `actions.jsonl` in the log folder (`DIR/logs` under `--data-dir`), not the data folder, and nothing reads it yet. A line explains a change when it names a baseline finding by `(path, dev, ino)`, or by a picked entry or a companion of a finding with `contents`. The time window alone is not enough, since journal times are to the second.
+- **The home total** is compared even when the two reports differ only in `changed` paths. Those come up most while builds run. Findings under them are still `not-compared`.
+- **"Out of step" replaces "A scan is saving; try again."** If the two files do not belong together after one re-read, `ddc changes` answers "not compared, out of step" with exit 0. A crash between S1's two renames would otherwise leave that message for good.
+- **The previous report is decoded with today's types** whatever its `schema_version`. Bumps 3 to 7 only added enum variants, so it is refused only when it does not decode.
+- **The cask's `zap`** already trashes the whole `~/Library/Application Support/DeepDriveCleaner` folder, so `previous-scan.json` is covered. Risks marked this as not checked; it is checked now.
+- **The app needs no decoder change in S1.** DDCKit decodes by explicit keys and ignores the new fields; S4 decodes what it needs.
+- **The snapshots count** is not part of `ddc changes`. The app has it from `ddc disk`, and S4 adds the sentence.
 
 ## Findings
 

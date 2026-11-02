@@ -16,7 +16,7 @@ Research notes — investigations, spikes, comparisons, and findings.
 | [update-check-and-update-in-place](./update-check-and-update-in-place.md) | Update check and update in place | final | 2026-10-29 |
 | [where-developer-disk-space-goes-linux](./where-developer-disk-space-goes-linux.md) | Where a developer's disk space goes (Linux) | final | 2026-10-31 |
 | [review-window-on-macos-a-ux-audit-and-a-lighter-concept](./review-window-on-macos-a-ux-audit-and-a-lighter-concept.md) | Review window on macOS: a UX audit and a lighter concept | draft | 2026-11-02 |
-| [what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app](./what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md) | What grew since the last scan: a UX concept for the macOS app | draft | 2026-11-02 |
+| [what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app](./what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md) | What grew since the last scan: a UX concept for the macOS app | final | 2026-11-02 |
 | [where-developer-disk-space-goes-windows](./where-developer-disk-space-goes-windows.md) | Where a developer's disk space goes (Windows) | final | 2026-11-02 |
 
 ---
