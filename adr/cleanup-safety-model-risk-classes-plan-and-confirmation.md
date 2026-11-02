@@ -433,7 +433,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
     - a file inside is open with share read and write: ok, 5, 32;
     - a file inside is open with share read, write and delete: ok, 5, ok;
     - a running executable is inside: ok, ok, then `remove_dir_all` fails with 5 after it deleted the other files;
-    - a read-only file is inside: ok, ok, ok. NTFS needs no attribute clearing. On FAT and exFAT a platform function that step 8 adds clears it; the shared `make_dirs_writable` decides by uid and owner, which Windows does not report.
+    - a read-only file is inside: ok, ok, ok. NTFS needs no attribute clearing. On FAT and exFAT a platform function that step 8b adds clears it; the shared `make_dirs_writable` decides by uid and owner, which Windows does not report.
 
     The mapping:
     - the open fails with 32: skipped `held-open`;
@@ -443,7 +443,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
 
     **The contract.** On Windows `DirFd::rename_child` returns a distinct error for the two held-open stages only: an `io::Error` that carries a platform-neutral marker type (`platform::types::HeldOpen`), recognised by downcast. `exec/delete.rs` maps exactly that error to `Skipped(HeldOpen)`; every other rename error stays `failed`. This is Windows only: Linux's `EBUSY` and every macOS error stay `failed`.
 
-    `held-open` is a new skip reason. Step 8 raises the schema version of the clean report and the action journal, which move together, in its own release, and DDCKit with it. No unbounded wait: besides std's retry inside `remove_dir_all`, there is one bounded retry of three attempts, 50 ms apart, only when the open succeeded and the rename failed with 5; an antivirus scan holds a file inside briefly in that way. A 32 at the open (a process holds the folder itself) is skipped at once.
+    `held-open` is a new skip reason. Step 8 raises the schema version of the clean report and the action journal, which move together, and of the progress events, which carry each item's outcome, in its own release, and DDCKit with it. The dry run cannot predict it: the process check below sees working folders, executables and loaded modules, not open handles, so an open file is seen only at the rename. Every other 5 at the rename is also reported `held-open`, after the same three attempts; the known case is a parent whose ACL lets the child be deleted but no folder be added (`FILE_ADD_SUBDIRECTORY`). A false `held-open` is a skip, never a removal. No unbounded wait: besides std's retry inside `remove_dir_all`, there is one bounded retry of three attempts, 50 ms apart, only when the open succeeded and the rename failed with 5; an antivirus scan holds a file inside briefly in that way. A 32 at the open (a process holds the folder itself) is skipped at once.
   - **§5, the Trash and open files on Windows. Accepted, and stated:** the tombstone rename comes before the move to the Recycle Bin, so a `trash` item with an open file below is skipped `held-open`, where macOS moves it. The 0.2.1 amendment's "a move to the Trash never counts open files" does not hold on Windows.
   - **§5, the process check on Windows** (step 9). It reads the current user's processes. For each:
     - the executable path (`QueryFullProcessImageNameW`);
