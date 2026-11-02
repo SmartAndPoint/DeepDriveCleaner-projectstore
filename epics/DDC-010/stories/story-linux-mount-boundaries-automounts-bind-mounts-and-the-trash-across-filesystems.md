@@ -7,14 +7,14 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-02
 external_refs: {}
 tags: [linux, scanner, safety, clean, filesystems]
 code_refs: []
 specs: []
 started_at: "2026-11-01T18:37:21.133Z"
 closed_at: null
-plan_updated_at: "2026-11-01T18:37:21.133Z"
+plan_updated_at: "2026-11-02T06:00:00.000Z"
 ---
 
 # Linux mount boundaries: automounts, bind mounts and the Trash across filesystems
@@ -95,23 +95,31 @@ Planned 2026-11-01 with the planner, from origin/main 02ddbd8 (0.15.2). The safe
    - on `Mount::Bind`, a scan of the bind root (`inner` skipped, not counted, nothing planned under it);
    - all of them in the environment group.
 
-**PR B, the guard and the Trash** (clean 7, journal 7, progress 5):
-1. The guard and the dry run open the parent with `open_beneath`: `EXDEV` or `ELOOP` gives `parent-changed`. `EntryStat.mount_root` gives `incomplete`.
-2. The Trash port.
-   - `Trasher::trash(&TrashTarget { path, parent, name, id, is_dir })` returns `TrashError::{CrossesFilesystem, Other}`.
-   - Updated: `SystemTrash`, the fakes, the session companions (through their parent), and `exec::trash`, which maps `CrossesFilesystem` to `Skipped(TrashCrossesFilesystem)`.
-3. `platform/linux/trash.rs` becomes ddc's own move, as the amendment lists it: home trash or `$topdir` trash, info first, `renameat2(NOREPLACE)`, the `(dev, ino)` check, and nothing moved on failure. `chrono` is added for Linux, for the local `DeletionDate` (already in the lock file).
-4. The dry run predicts the refusal.
-5. Wording names `--permanent`, in `prompt.rs`, `CleanWording.swift` and `AfterClean` (`.never`). The schemas, DDCKit and fixtures move.
-6. Tests:
-   - unit tests in `linux/trash.rs` with a temporary topdir: the `.trashinfo` text, a name taken, sticky `.Trash`, a symlinked `.Trash-$uid`, info removed on failure, `NAME_MAX`;
-   - unit tests below the trash folder: `files/` as a symlink or another user's is refused; the dry run and the clean choose the same way;
-   - on the CI mounts: `Tmpfs` (moved into `.Trash-$uid`, `(dev, ino)` kept), `TmpfsRootTop` (refused, source intact), `BtrfsSubvolume` (refused), `Nfs` (moved into the export's `.Trash-$uid` with the plain `renameat`), and a guard on `Bind` (stale plan refused). The dry run predicts each refusal;
-   - the journal line names where each item went;
-   - the old crate test that asserted the copy fallback is rewritten.
+**PR B, the guard and the Trash** (clean 7, journal 7, progress 5). Re-planned 2026-11-02 with the planner, from origin/main at 0.17.6, and split in two PRs, each with its own bump. PR A left the guard's re-walk on the anchored walker already (`walk_with_reader`, `read_in`); what is left is the guard's own opens and stats, and the Trash.
 
-7. The owner-checks runbook: the line that says an item lands in the home Trash by a copy becomes the refusal, and a real autofs map under a person's home is added.
-8. `trash` is removed from the Linux target of `ddc-core` (it stays for macOS, and DDC-008's Windows work may use it).
+*PR B1, the guard's boundary and the Trash port, with no change on macOS:*
+1. The mount id without `STATX_MNT_ID` (amendment, 2026-11-02). PR A's `anchor()` and `list_in()` keep no mount id when `statx` gives none, so their by-path fallback checks no mount there. `bulk` gains a `mnt_id(fd)` that reads `/proc/self/fdinfo/<fd>` in that case, and a mount-root test that compares the fd's id with its `..`'s (a folder whose `..` is itself is the root, and a mount root).
+2. `linux/fsops.rs`: `DirFd::open_beneath(anchor, dir)`, built on `bulk`'s `openat2`, `retry` and the by-path fallback's mount check. On macOS and Windows: the path must start with the anchor's, then today's open (Windows also checks `dev`). Pinned in `platform/mod.rs`.
+3. `EntryStat.mount_root`: on Linux `stat_child` uses `bulk::stat` with `AT_NO_AUTOMOUNT`, true on `STATX_ATTR_MOUNT_ROOT` or a mount id other than the parent's; false on macOS and Windows. Without a mount id it is false: the amendment accepts that case.
+4. `exec/guard.rs` opens one anchor per root, and a root whose anchor cannot be opened makes every item under it `parent-changed`, never a by-path walk as the scan does; the parent opens with `open_beneath`, and any error is `parent-changed`. `mount_root` gives `incomplete` in `check()`, and counts as another volume in `check_entry` and for the session companions. `exec/preflight.rs` does the same with the guard's anchors, in place of its own `DirFd::open` of the parent.
+5. The port: `Trasher::trash(&TrashTarget { path, parent, name, id, is_dir }) -> Result<Option<TrashPlace>, TrashError>` and `would_trash` (default `Ok`). `TrashError::{CrossesFilesystem, Other}`. `SystemTrash`, the fakes, the harness and loadgen trashers, `exec::trash` and `trash_session` move to it. Until B2, `CrossesFilesystem` is `failed`.
+6. Tests: `open_beneath` refuses a path outside the anchor and a symlink on the way, with `openat2` and without; on the CI `Bind` mount, `stat_child` reports `mount_root` and a stale plan into the bind mount is refused; the fdinfo mount id equals `statx`'s where both exist.
+
+*PR B2, the Linux move, the schemas and the wording:*
+7. `platform::folders::data_home` reads `XDG_DATA_HOME` (a relative one ignored) into `Env`; `SystemTrash::new(&env)`.
+8. `platform/linux/trash.rs` becomes ddc's own move, as the amendment lists it, through one selection used by the move and by `would_trash`: home trash or `$topdir` trash, info first, `renameat2(NOREPLACE)` from the parent's fd into `files/` (a new `rename_into`; the `EINVAL` fallback works as in `fsops::rename_child`), the `(dev, ino)` check with the rename back, and nothing left on failure. The mount ids come from step 1 when `statx` gives none; mountinfo is read at the move, never kept from the scan; `/proc` with no answer is `failed`. `statfs::point_by_id` finds `$topdir`. `chrono` for `DeletionDate`. The `trash` crate leaves the Linux target.
+9. `SkipReason::TrashCrossesFilesystem`; the journal entry and each moved companion record their `TrashPlace`. `Outcome::Trashed` stays as it is.
+10. The dry run keeps the guard's `Verified` and asks `would_trash` for every `WouldTrash` prediction, the native action's Trash fallback included; `PreflightPorts` gains the trasher.
+11. Clean 7, journal 7, progress 5; the regenerated schemas; wording naming `--permanent` in `prompt.rs`, `CleanWording.swift` and `AfterClean` (`.never`); DDCKit and its fixtures, as commit 18533a1 moved them.
+12. Tests:
+    - unit tests in `linux/trash.rs` with a temporary home: the `.trashinfo` text, a name taken, sticky `.Trash`, a symlinked `.Trash-$uid`, info removed on failure, `NAME_MAX`, `files/` as a symlink or another user's;
+    - the dry run and the clean choose the same way;
+    - on the CI mounts (the `Bind` guard moved to B1): `Tmpfs` (moved into `.Trash-$uid`, `(dev, ino)` kept), `TmpfsRootTop` (refused, source intact), `BtrfsSubvolume` (refused), `Nfs` (moved, with the plain `renameat`). The dry run predicts each refusal;
+    - the journal names where each item went;
+    - the old crate test that asserted the copy fallback is rewritten.
+13. The owner-checks runbook: the line that says an item lands in the home Trash by a copy becomes the refusal, and a real autofs map under a person's home is added.
+
+Watch: story "Clean: --agent bounded consent" also moves the clean and journal schemas; whichever merges second takes the next number.
 
 **Close:** evidence from a green `linux-mounts` run on main.
 
