@@ -21,7 +21,7 @@ Where do the developer tools the catalog knows keep their caches on Windows, whi
 With the owner's go-ahead (2026-11-02), a fixture set was built on the owner's lab machine: portable Node, uv, .NET 8, Go and a user install of Rust, and one small project per tool. Measured, read-only, on those fixtures:
 
 1. **The shared catalog's Windows paths hold** for npm (`%LOCALAPPDATA%\npm-cache`), the pnpm store, the uv cache, pip, Cargo, rustup and Go (`%LOCALAPPDATA%\go-build`, `~\go\pkg\mod`). NuGet, pnpm's metadata cache and uv's managed Pythons have no rule on any OS.
-2. **Hard links are the norm on Windows, not the exception.** A uv virtual environment shared 3,317 of its 3,364 files with the uv cache through hard links; a pnpm `node_modules` shared 1,897 of 1,923 files with the pnpm store. A scan that counts each hard-linked file as freed overstates what removing the venv or `node_modules` frees, by almost all of it. This decides step 6 of the scanner story: link counts are read, or, if that is over the load budget, the overstatement is stated.
+2. **Hard links are the norm on Windows, not the exception.** A uv virtual environment shared 3,317 of its 3,364 files with the uv cache through hard links; a pnpm `node_modules` shared 1,897 of 1,923 files with the pnpm store. A scan that counts each hard-linked file as freed overstates what removing the venv or `node_modules` frees, by almost all of it. Step 6b of the scanner story reads them per file (`NtQueryInformationByName`); the scan takes a few times as long as the listing alone, accepted.
 3. **A cache can be larger than the project it serves.** One npm install of five packages left 214 MB in `npm-cache` beside an 86 MB `node_modules`.
 4. **Toolchains dominate the fixtures:** a minimal Rust toolchain was 591 MB in `~\.rustup\toolchains`, the .NET 8 SDK 714 MB, the Go toolchain 236 MB in 15,657 files. They belong to the `toolchain` rules (newest kept), not to caches.
 5. **WSL keeps each distribution as one disk image `ext4.vhdx`**, in one of two places: `%LOCALAPPDATA%\Packages\<publisher.distro>_<hash>\LocalState\` for Store-installed distributions, and `%LOCALAPPDATA%\wsl\{GUID}\` for the tar-based format of recent WSL releases. The image grows and does not shrink on its own. It is a VM item: reported, never deleted, and never compacted by ddc.
@@ -79,7 +79,7 @@ The `uv` folder under `%LOCALAPPDATA%` held only `cache`; managed Pythons live u
 | `rust-app\target` | 196 | 28 |
 | `py-pip\venv`, `web-npm\node_modules`, npm cache | — | 0 |
 
-uv's default link mode on Windows is a hard link, and pnpm links packages from its store. Removing the venv or `node_modules` frees almost nothing while the cache holds the other link; removing the cache frees almost nothing while a project holds it. Cargo hard-links its uplifted artifacts (from `deps\` to `target\debug\`) inside `target` itself. Every number ddc shows for these trees is overstated unless the walker reads link counts (macOS reads them from `getattrlistbulk`, Linux from `statx`). `FileIdExtdDirectoryInfo` has no link count, so the scanner story's step 6 reads it for the files whose id repeats, measured against the load limits.
+uv's default link mode on Windows is a hard link, and pnpm links packages from its store. Removing the venv or `node_modules` frees almost nothing while the cache holds the other link; removing the cache frees almost nothing while a project holds it. Cargo hard-links its uplifted artifacts (from `deps\` to `target\debug\`) inside `target` itself. Every number ddc shows for these trees is overstated unless the walker reads link counts (macOS reads them from `getattrlistbulk`, Linux from `statx`). `FileIdExtdDirectoryInfo` has no link count, so the scanner story reads it per file with allocated bytes through `NtQueryInformationByName` (step 6b, decided 2026-11-02; the first plan, reading it only for ids that repeat, would have counted a venv's links into an outside cache as freed).
 
 ### 3. Toolchains
 
@@ -102,7 +102,7 @@ WSL keeps a distribution's disk as `ext4.vhdx` under `%LOCALAPPDATA%\Packages\<p
 ## Conclusion
 
 For the scanner story:
-1. Read link counts (step 6): without them, uv and pnpm trees show sizes that cleaning does not free.
+1. Read link counts (step 6b): without them, uv and pnpm trees show sizes that cleaning does not free.
 2. Add shared rules, with a path per OS, for what no OS has yet: NuGet (`~/.nuget/packages` everywhere; the v3 cache in `%LOCALAPPDATA%\NuGet\v3-cache`, `~/.local/share/NuGet/v3-cache`, `~/.local/share/NuGet/http-cache`), pnpm's metadata cache (`%LOCALAPPDATA%\pnpm-cache`, `~/.cache/pnpm`, `~/Library/Caches/pnpm`), uv's managed Pythons (`%APPDATA%\uv\python`, `~/.local/share/uv/python`; toolchain, `review`), and Microsoft Edge's caches.
 3. Both WSL disk locations (`%LOCALAPPDATA%\Packages\*\LocalState\ext4.vhdx`, `%LOCALAPPDATA%\wsl\*\ext4.vhdx`) and `%LOCALAPPDATA%\Docker\wsl` as report-only VM items.
 4. The profile's legacy junctions are links, never descended; cloud roots (OneDrive by its variables, Dropbox, Box) stay not walked.
