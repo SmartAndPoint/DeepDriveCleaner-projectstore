@@ -239,6 +239,13 @@ The recommendation is the joint one. Each row names the story whose decision it 
 | 7 | Keep hand-picked ticks when the window is reopened through "Review…" or a biggest find? "Clean Selected…" keeps opening with exactly the popover's selection ("Review and clean window", `CleanRunTests.cleanSelected`), and the Include switches would then apply only to rows the person has not touched | Left open in "Review window: Deselect All, then pick across groups and clean only that" (DDC-002) | Yes, as its own story with that rule |
 | 8 | No class-level checkbox in the sidebar? | None | Confirm: none |
 
+Owner answers, 2026-11-02:
+
+- **1, Whole disk:** the owner finds Whole disk useful and wants it kept, and adds a requirement: in Whole disk, too, a person must be able to clean and remove what it finds. Where it lives (the Review sidebar or its own window) is left to the story that takes it, with that requirement.
+- **2, the group action in the group header:** yes.
+- **3, "All Items" instead of the Groups/Items switch:** yes.
+- Questions 4 to 8 are still open.
+
 Not decided by the owner but open for the stories:
 
 - The filter field moves into the toolbar band as the same control it is today, so the HIG pass's keyboard rules (Esc clears it first; Return while typing never opens the sheet) keep holding. Moving to `.searchable` would need to know the field's focus, which SwiftUI reports only from macOS 15; story 1 checks the app's deployment target before choosing.
