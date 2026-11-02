@@ -433,7 +433,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
     - a file inside is open with share read and write: ok, 5, 32;
     - a file inside is open with share read, write and delete: ok, 5, ok;
     - a running executable is inside: ok, ok, then `remove_dir_all` fails with 5 after it deleted the other files;
-    - a read-only file is inside: ok, ok, ok. NTFS needs no attribute clearing. On FAT and exFAT a platform function that step 8b adds clears it; the shared `make_dirs_writable` decides by uid and owner, which Windows does not report.
+    - a read-only file is inside: ok, ok, ok. NTFS needs no attribute clearing. On FAT and exFAT a platform function that step 8b adds clears it (not reachable today: those volumes answer no file id, an open item of the story before the flip); the shared `make_dirs_writable` decides by uid and owner, which Windows does not report.
 
     The mapping:
     - the open fails with 32: skipped `held-open`;
