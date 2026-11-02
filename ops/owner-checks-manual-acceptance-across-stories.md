@@ -363,6 +363,13 @@ Story: [Confirmation sheet: Delete permanently for every item at once](../epics/
 
 - [ ] Manual (owner, 0.14.10): in a sheet with several Review items the Trash would take, "Delete all permanently" ticks all; one per-item untick shows it mixed; a click when mixed ticks all; a click when all are ticked unticks all; the title and button change from "Move N items to the Trash?" to "Clean N items?" once any item is permanent; the warnings line shows the check running after each click; VoiceOver reads the checkbox once and says "partly selected" when mixed.
 
+### Used space grew (DDC-002)
+
+Story: [Popover: say when used space grew since the last scan](../epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md).
+
+- [ ] Manual (owner, 0.28.1): after a scan, build something big (a few `cargo build` runs in agents' worktrees) until used space grows by 20 GiB or more; within ten minutes, on wake or when the popover opens, the menu bar icon shows its badge (with "Show a badge on the menu bar icon" on), and the popover shows "↑ N GiB more in use on the startup disk than at the last scan, …" with Scan Now; opening the popover clears the badge; a Scan Now drops the line at once.
+- [ ] Manual (owner): `ddc space --json` on this Mac against the Finder's "Available" and System Settings → Storage; write the difference (purgeable space and local snapshots count as in use for ddc) into the story's Technical Notes.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
