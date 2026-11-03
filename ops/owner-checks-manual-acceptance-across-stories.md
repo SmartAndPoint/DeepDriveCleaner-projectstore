@@ -351,6 +351,17 @@ Story: [Scheduled scans on Linux through a systemd user timer](../epics/DDC-010/
 - [ ] Manual (owner): on WSL without systemd or in a container, `ddc schedule install` refuses with `no-user-systemd`, exit 69, prints a crontab line and writes nothing.
 - [ ] Manual (owner): on an ssh-only box without lingering, `status` says the timer runs only while you are logged in and names `loginctl enable-linger`.
 
+### btrfs and ZFS on Linux (DDC-010)
+
+Story: [btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities](../epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md)
+
+Needs a Fedora machine or VM on btrfs and an Ubuntu machine or VM on ZFS (with or without zsys: Ubuntu dropped zsys after 22.04), each with ddc 0.30.0 or later. sudo below is the owner's own, for setup only; ddc itself never runs with sudo. Read skip reasons from `--json`: the table prints prose, not reason names.
+
+- [ ] Manual (owner), Fedora with Snapper. Setup: put a Snapper config on the subvolume that holds your home (`/home` on stock Fedora, where `~` is a plain folder), with `ALLOW_USERS=<you>` and `SYNC_ACL=yes` so you can read `.snapshots`, and take one snapshot. Then, without sudo, `btrfs subvolume create ~/proj/node_modules` inside a project with a `package.json`, and put a file in it. Check: `ddc scan /home --json` (other users' homes there are skipped as unreadable, which is fine) lists every `.snapshots/N/snapshot` in `skipped` with reason `snapshot`, counts none of them, and the `node_modules` finding is `incomplete` with `holds-subvolume` and is not planned. `ddc scan ~ --json` counts the home's own subvolumes.
+- [ ] Manual (owner), Fedora, stable identity across a reboot: scan, write `item.json` by hand as `{"schema_version": 1, "items": [{"path": …, "dev": …, "ino": …, "rule": …, "class": …, "action": "delete"}]}` with `path`, `dev`, `ino`, `rule` and `class` taken from one finding of the scan's JSON (`action` is `delete` for a rebuildable finding, `trash` for a review one), reboot, then `ddc clean --items item.json --dry-run --json`. The item is planned, not `changed-since-scan`.
+- [ ] Manual (owner), Fedora, compression (the home is mounted `compress=zstd:1`). Setup: a fresh folder `~/ddc-check/` with a real `npm install`; `snapper -c home list` shows no snapshot taken after it (delete any). Check: `ddc clean --min-age 0 ~/ddc-check` and confirm (the root is narrowed to the prepared folder, so the plan holds only its `node_modules`, which is rebuildable and deleted, not moved to the Trash), then `sync; sleep 30; df`. The freed space is less than the finding's `bytes`, as the safety ADR's compression bullet says. For the real ratio, `sudo compsize` on a copy of the folder before the clean. Note the two numbers.
+- [ ] Manual (owner), Ubuntu on ZFS. Setup: `sudo zfs create <your home dataset>/projects` (it inherits the mount point `~/projects`) and `sudo zfs set snapdir=visible <your home dataset>`, with one snapshot of it. Check: `ddc scan ~ --json` counts `~/projects`, lists `~/.zfs` in `skipped` with reason `snapshot`, and `grep '@' /proc/self/mountinfo` is the same before and after the scan.
+
 ### Launch demo assets (DDC-009)
 
 Story: [Launch demo assets](../epics/DDC-009/stories/story-launch-demo-assets.md).
