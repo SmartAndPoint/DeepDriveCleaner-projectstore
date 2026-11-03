@@ -51,6 +51,7 @@ generated_at: 2026-11-02T23:01:58.815Z
 - [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
 - [ ] [[epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs|DDC-010: Private size on Linux: reflinks on btrfs and XFS]] #p2
 - [ ] [[epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home|DDC-010: Whole disk on Linux: the areas outside the home]] #p2
+- [ ] [[epics/DDC-010/stories/story-compressed-btrfs-say-when-a-scan-counts-more-than-a-clean-frees|DDC-010: Compressed btrfs: say when a scan counts more than a clean frees]] #p2
 
 ## ToDo
 
