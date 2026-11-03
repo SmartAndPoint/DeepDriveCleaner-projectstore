@@ -424,6 +424,7 @@ An absent `platform` itself would be unambiguous: only macOS ever wrote version-
 
     An id of 0 or all ones is refused for that entry the same way: it is what a file system with no usable id gives every file.
   - **§8, the environment allowlist.** `APPDATA`, `OneDrive`, `OneDriveConsumer` and `OneDriveCommercial` join the names the folders item may read, so the list is `HOME`, `USERPROFILE`, `HOMEDRIVE`, `HOMEPATH`, `APPDATA`, `LOCALAPPDATA`, `OneDrive`, `OneDriveConsumer`, `OneDriveCommercial` and `XDG_*`. The folders item reads them into `Env`: an `APPDATA` outside the home is protected, and OneDrive's roots are not walked (safety ADR §6, Windows). `TEMP` is not read: the temp rule anchors at `AppData\Local\Temp`, so a redirected `TEMP` is not found. On Windows `HOME` is ignored: the home is `USERPROFILE`, or `HOMEDRIVE` + `HOMEPATH` when it is unset, never the known-folder API.
+- **2026-11-03, step 9c-2.** Story "Windows scanner and rule catalog" (epic DDC-007) amends §5 and §7: a bad argument value that only the OS can check after clap (an `--items` file that cannot be read, a `--cancel-event` that cannot be opened, the flag off Windows) is a usage error of the caller, as clap's are: exit 2, the `ddc:` line on stderr, no envelope under `--json`. §7's "every `--json` refusal" means a refusal of the request's substance (`root-not-owned`), not of a malformed argument.
 
 ## References
 

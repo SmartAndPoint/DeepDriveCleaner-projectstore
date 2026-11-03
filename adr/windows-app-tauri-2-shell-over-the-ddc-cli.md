@@ -42,7 +42,7 @@ The Windows CLI must be supported first: DDC-007 story "Windows scanner and rule
 
 - `DeepDriveCleaner.exe` is a Tauri 2 app. It holds no cleaning logic. It runs `bin\deepdrivecleaner.exe` installed beside it, with `--json`, and reads:
   - the saved report `<data-dir>\last-scan.json` directly, for an instant panel;
-  - the output of `scan`, `clean`, `disk`, `disk agents` and `disk free` on stdout;
+  - the output of `scan`, `clean`, `disk`, `agent status` (once `disk agents`) and `disk free` on stdout;
   - progress events on stderr.
 - Every CLI child is spawned with `CREATE_NO_WINDOW`, so no console flashes.
 - The app and the CLI ship in one setup and one version, so the app reads the `schema_version` it was built for. A mismatch is shown as "the report could not be read", never decoded loosely (macOS ADR §1).
@@ -219,3 +219,12 @@ The first draft. Rejected after review: a button clicked from the Action Center 
 - [[adr/cleanup-safety-model-risk-classes-plan-and-confirmation|Cleanup safety model: risk classes, plan and confirmation]]
 - [[epics/DDC-008/epic|DDC-008 · Native installers and the Windows tray app]]
 - Tauri 2: the Windows installer guide (install modes, installer hooks, WebView2 modes), the NSIS template (`installer.nsi`, `utils.nsh`), the tray icon, the positioner, single-instance and autostart plugins, the notification plugin; `tauri-winrt-notification` (read 2026-11-01).
+
+## Amendments
+
+- **2026-11-03, step 9c-2 of story "Windows scanner and rule catalog" (epic DDC-007).** §1's Stop, as the CLI now implements `--cancel-event`:
+  - The app creates the event as a manual-reset event (an auto-reset one would let another waiter consume the Stop) and passes its name.
+  - A Stop while ddc has its handler installed (a clean from its first item on, `disk`, `disk free`, `agent status`) stops after the current item, ends the running tool's Job Object, writes the journal and the report, and exits 143.
+  - A Stop before that (any scan, and a clean during its re-check walk, which for `clean --items` can be a walk of the whole tree) ends ddc at once with 143 and no report, its running probes' jobs ended first; nothing was changed, as after SIGTERM on macOS before the handler is installed. An event already set when ddc starts does the same, before anything runs.
+  - The app reads 143 after its own Stop as cancelled (with an empty stdout: cancelled before it started, nothing touched) and 143 without a Stop as a crash. `TerminateProcess` after the grace period stays only the fallback for a ddc that does not exit.
+  - A name ddc cannot open is a usage error (exit 2, stderr only): the app's own bug, which its argument test keeps from happening.
