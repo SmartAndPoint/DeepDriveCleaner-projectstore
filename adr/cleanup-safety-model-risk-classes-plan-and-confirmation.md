@@ -574,6 +574,7 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **§5, special files are never opened (PR 1).** A FIFO, a socket, or a character or block device is counted at its allocated size (0 for all four). The walk, the in-use check and a clean never open it. On Linux a clean renames it into ddc's own Trash or unlinks it, and never reads or copies it.
     - Reading a marker file (`pyvenv.cfg`, a `.git` file, `CACHEDIR.TAG`, `CMakeCache.txt`) opens it with `O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_NOCTTY`, then `fstat`s the descriptor. Anything that is not a regular file reads as absent, and its descriptor is closed unread.
     - A marker that is a symlink therefore no longer counts. This is a change: until now `open_read` followed symlinks on purpose. The guard still refuses a folder with any `.git` entry, whatever its kind.
+    - The home pins (`~/.pyenv/version`, `~/.rustup/settings.toml`, `~/.nvm/alias/*`) are read the same way. A pin that exists but cannot be read this way, a symlinked one included, protects everything its tool holds (fail closed); it never reads as "no pin". Accepted: a dotfiles manager's symlinked `~/.pyenv/version` then keeps all of pyenv's versions, with no reason shown.
     - A device node needs `CAP_MKNOD` in the initial namespace to make. A symlink to a device or a FIFO is the case any user can make, and `O_NOFOLLOW` plus the `fstat` close it.
   - **§5, immutable and append-only (PR 3).** A file or folder with the immutable or append-only flag cannot be removed by its owner. A folder that holds one moves to the Trash without an error and can then never be emptied.
     - **The flags.**
@@ -620,8 +621,10 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
       - step 2 `fstat`s `.Trash-$uid` again after its `fchmod`;
       - step 3 checks the mode of `files/` and `info/`.
 
-      A folder still open to group or others makes the move refuse as `trash-crosses-filesystem`, naming `--permanent`.
+      In step 3, a `files/` or `info/` of the user's that is open to group or others is set to 0700 and `fstat`ed again, the home Trash included. Older ddc builds made them with the umask through the `trash` crate (0755 as a rule). GNOME and trash-cli make them 0700. KIO makes only a per-mount trash root 0700, and leaves `files/`, `info/` and the home Trash to the umask. The dry run changes nothing.
+      A folder still open to group or others after that makes the move refuse as `trash-crosses-filesystem`, naming `--permanent`.
     - **The dry run.** It sees the mode of a `.Trash-$uid` that exists. Where none exists yet on an exFAT or FAT volume (`f_type` `EXFAT_SUPER_MAGIC` or `MSDOS_SUPER_MAGIC`), the dry run predicts the refusal without making it. Accepted: with `dmask=0077`, `mkdir` gives 0700 and the clean would pass where the dry run refused. That is the safe side.
+      Accepted as well: CIFS, ntfs-3g and other FUSE filesystems may also ignore `fchmod`. On them the dry run can predict a move into an existing open `.Trash-$uid` that the clean then refuses, which is again the safe side. On a home on such a mount, the home Trash refuses the same way: only `--permanent` works there, and the message names the mount options that fix it (`dir_mode=0700`, `cifsacl`).
   - **The new reason** `immutable` raises the scan, clean, journal and progress schema versions (PR 3).
   - Each part takes effect when its PR lands.
 ---
