@@ -486,6 +486,10 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
     - **A session's companions.** A companion the shell destroyed is journaled `removed-not-recycled` by its path, and the session stops there, as at any companion that fails: what moved stays moved, and the item is `failed` with the companions already moved named.
     - **File systems.** The file-id after-check holds on NTFS and ReFS. FAT and exFAT give no file id (the story's 6b item on them); until that item is settled, a trash item there is refused with the rest of a FAT or exFAT root. A Dev Drive's 128-bit ids are refused earlier, by the walker.
     - **The causes of `recycle-bin-refuses`**, a typed field: `no-bin`, `too-large`, `bin-full` (it fits the maximum, not the free room left; its message says to empty the Recycle Bin or use `--permanent`), `nuke-on-delete`, `no-recycle-files`, `path-refused`, `settings-unreadable`, `would-destroy`. The progress events carry the skip reason and the outcome too, so step 10a raises the clean report, the journal and the progress events together, with DDCKit.
+    - **Settled at 10a's planning (2026-11-04).**
+      - *The size compared.* No stat carries a logical size today: the walk, the guard's re-walk and a session's parts count allocated bytes only. Step 10a's budget takes the allocated size; step 10b adds the logical size to the Windows stat and the ask, and from then the larger of the two counts, as above. On macOS and Linux the size reaches no check.
+      - *`removed-not-recycled` is not `failed`.* `failed` says part of the item may be left; here the space is freed. So the clean report's `failed` count leaves it out, but the clean exits 1, as when an item failed, and the CLI prints a line for each such item: the user asked for the Recycle Bin and did not get it. DDCKit counts it as gone from the last scan.
+      - *One budget per run.* The system trash carries its budget, so a clean and its dry run each start with the bins' free room read once per volume. An ask takes all its bytes or none: a session's key and companions are one ask, before the first companion moves, and nothing is given back when a later move fails. The dry run and the clean take in the same order (picked entries first, then the plan's order), so the clean never refuses for room what its dry run approved.
     - **A stop during a move.** The shell's `PerformOperations` cannot be interrupted: a stop waits for the current item, a large folder included; closing the console then leaves the report lost if the 5 seconds run out, as the command-runner bullet says.
     - **Tests.** The lab machine runs the moves (the owner's go-ahead, 2026-11-04). The small-quota test never runs on the system volume: it sets `MaxCapacity` under HKCU for a test volume of its own (a VHDX the owner's setup mounts, or a second fixed drive; skipped where there is none, a skip listed in `windows.txt`, and step 10b is done only with that volume mounted, since it is the AC's evidence), keeps the original value in a restore file of its own, never in a log (it describes the lab machine), restores it through a guard that runs on a panic, and checks at its next start that no value of an earlier run was left behind. It also checks that the shell reads the value per operation, so it cannot pass for nothing. ddc's own test items are removed from the bin by the names the shell gave them, and the bin is never listed or its totals printed. One move from an interactive desktop session goes to the owner-checks list, since the lab's moves run over OpenSSH in session 0.
   - **Cloud placeholders, §5 and the 2026-10-20 amendment.** An entry with a recall attribute (`RECALL_ON_DATA_ACCESS`, `RECALL_ON_OPEN` in a listing record, `OFFLINE`) carries `SF_DATALESS`, the macOS mark. Then:
@@ -565,6 +569,60 @@ A LaunchAgent runs `ddc scan --background` on a schedule. It saves the report to
   - **Owner checks:** a real Fedora home with Snapper, and an Ubuntu home on ZFS (zsys).
   - **The new reasons** `snapshot` and `holds-subvolume` raise the scan-report schema version. The difference from `du -x` grows: `ddc du` counts entered subvolumes and child datasets, which `du -x` does not.
   - Takes effect when the story's code lands.
+- **2026-11-04, accepted at the story's work-start gate (critic-approved after three passes).** Story "Linux file kinds: special files, immutable flags, sparse files and odd names" (epic DDC-010) amends §5 and §6, and the 2026-11-01 amendment's Trash steps. The Linux walk and clean were tested on regular files, folders, symlinks and hard links. A developer's home also holds FIFOs, sockets, device nodes, immutable and append-only files, sparse files, odd names and case-insensitive folders.
+  - **§5, special files are never opened (PR 1).** A FIFO, a socket, or a character or block device is counted at its allocated size (0 for all four). The walk, the in-use check and a clean never open it. On Linux a clean renames it into ddc's own Trash or unlinks it, and never reads or copies it.
+    - Reading a marker file (`pyvenv.cfg`, a `.git` file, `CACHEDIR.TAG`, `CMakeCache.txt`) opens it with `O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_NOCTTY`, then `fstat`s the descriptor. Anything that is not a regular file reads as absent, and its descriptor is closed unread.
+    - A marker that is a symlink therefore no longer counts. This is a change: until now `open_read` followed symlinks on purpose. The guard still refuses a folder with any `.git` entry, whatever its kind.
+    - A device node needs `CAP_MKNOD` in the initial namespace to make. A symlink to a device or a FIFO is the case any user can make, and `O_NOFOLLOW` plus the `fstat` close it.
+  - **§5, immutable and append-only (PR 3).** A file or folder with the immutable or append-only flag cannot be removed by its owner. A folder that holds one moves to the Trash without an error and can then never be emptied.
+    - **The flags.**
+      - Linux: `STATX_ATTR_IMMUTABLE` and `STATX_ATTR_APPEND`, read from the `statx` the walk already makes for every entry, folders included (ext4, btrfs, xfs, f2fs, and tmpfs from kernel 6.0, set them and their mask), so no `FS_IOC_GETFLAGS` is needed.
+      - macOS: `UF_IMMUTABLE`, `UF_APPEND`, `SF_IMMUTABLE`, `SF_APPEND` and `SF_RESTRICTED`, already in the walk's `st_flags`.
+      - Windows has no such flag; `FILE_ATTRIBUTE_READONLY` is cleared as today.
+    - **What counts.** Any entry inside a finding or a picked entry, the root and every folder below it included. The parent does not count: a rename out of it fails cleanly, with nothing moved.
+    - **The rule.**
+      - Such a finding or picked entry is listed with a new reason, `immutable`, and is never planned, whatever its action (`delete`, `trash`, `native`, a session). The pruned walk of `--items` refuses it the same way.
+      - Before each action, the guard's per-item re-walk (the one that measures the item and looks for `.ddc-keep` below it) also reads these flags, on folders as on files, and the guard reads the item's own root. A flag set after the scan is refused before any rename, with skip reason `immutable`.
+      - Accepted: a flag set between that re-walk and the rename is caught only by the unlink, as below.
+    - **Unknown is not set.** Where `stx_attributes_mask` lacks the bits (NFS, CIFS, FUSE, exFAT, FAT, the `fstatat` fallback), the flag reads as not set. Accepted: a folder there that holds an immutable file is renamed to its tombstone, and its removal stops with `EPERM` part way. The clean reports it `failed`, naming the tombstone, and the next scan lists the tombstone as `safe` again. Which filesystems report the bits is checked on the CI kernel, not assumed.
+    - **ddc never clears a flag.** It runs neither `chflags` on macOS nor `FS_IOC_SETFLAGS` on Linux. The message names the flag and what a person would run:
+      - `chattr -i` or `chattr -a` on Linux, both needing root (`CAP_LINUX_IMMUTABLE`);
+      - `chflags nouchg` or `nouappnd` on macOS for a user flag;
+      - `sudo chflags noschg` for a system one;
+      - nothing for `SF_RESTRICTED`, which System Integrity Protection holds.
+  - **§5, removal never crosses a mount (PR 4).** A tombstone is removed through descriptors, never by path. The first open is the tombstone's name relative to the verified parent's descriptor, which the guard already holds.
+    - **Linux.** Each level is opened from its parent's descriptor with `openat2(RESOLVE_BENEATH | RESOLVE_NO_XDEV | RESOLVE_NO_SYMLINKS)`. Where the kernel has no `openat2` (the 2026-11-01 probe), the open is `openat(O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)`. After each open, a `statx` on the descriptor compares its mount id and `st_dev` with the parent's.
+      - A btrfs subvolume shares the mount, so only the `st_dev` check stops there.
+      - An entry whose `d_type` is `DT_UNKNOWN` is `fstatat(AT_SYMLINK_NOFOLLOW)`ed before the branch.
+    - **macOS.** `openat(O_NOFOLLOW | O_DIRECTORY)` with the same `st_dev` check.
+    - **Making folders writable.** A folder is made writable with `fchmod` on its own descriptor, only when it is the user's. The path-based `make_dirs_writable` goes.
+    - **What stops the descent:**
+      - a mount root, another mount id or another `dev` (a mount, a bind mount, a btrfs subvolume or a ZFS dataset made inside the finding after the guard's check);
+      - running out of descriptors.
+
+      What lies beyond is left untouched, and the tombstone stays. The clean reports the item `failed`, naming the tombstone, including when the last `rmdir` meets `ENOTEMPTY`. The rename is never rolled back.
+    - **Depth.** One descriptor is open per level, with no cap of its own. The walk already admits nothing deeper than `PATH_MAX` (about 2,000 levels), below the raised soft `NOFILE` limit. Accepted: where the limit cannot be raised (a hard limit of 1024), a deeper tree stops as `failed` and keeps its tombstone, as today.
+    - **Before kernel 6.18.** `RESOLVE_NO_XDEV` may trigger an automount before it refuses (the 2026-11-01 kernel limit). That is a side mount, never a removal.
+    - **Windows** keeps its handle-based removal and `clear_read_only`.
+  - **§5, the tombstone name fits (PR 1).** An item with a long name could otherwise never be renamed. So the tombstone's name is cut so that its `.ddc-deleting-<ms>-<pid>` suffix fits:
+    - the cut falls on a character boundary when the name is valid UTF-8;
+    - on `ENAMETOOLONG` the rename is retried with a shorter cut, because the limit differs by filesystem (eCryptfs about 143 bytes, exFAT and NTFS 255 UTF-16 units). When nothing of the name is left but the suffix, the item is `failed`;
+    - the cut keeps the suffix that the scan's `ddc.tombstone` rule looks for.
+  - **§5, long paths.** A finding deeper than `PATH_MAX` stays what it is today: the walk does not open past 4096 bytes, the finding is `incomplete`, and the guard refuses it before any rename. No new reason.
+  - **§6, case and Unicode (PR 2).** Rule names match byte for byte on every filesystem, as on APFS today: `Node_Modules` is not `node_modules`, and an NFC name is not its NFD twin.
+    - A protected folder is matched both by its case-folded path and by the `(dev, ino)` of its `lstat`. On a case-insensitive folder (ext4 casefold, exFAT, FAT, NTFS, CIFS), the filesystem itself resolves `~/.CACHE` to the protected `.cache`.
+    - The `.ddc-keep` marker's name is compared case-insensitively (ASCII) in every listing comparison: the scan's rule visitor, `keep_markers` and the guard's `walk_item`. A `.DDC-KEEP` below an item's root then keeps it on a case-insensitive folder too, on the safe side. On a case-sensitive one it also keeps.
+  - **§5, sparse files.** `bytes` is always the allocated size; the apparent size is never shown or added.
+  - **exFAT and FAT (PR 1).**
+    - **Inode numbers.** They are made up when an inode enters the cache (`iunique`), so the same file can get a new one within one mount after memory pressure. A saved scan or an `--items` list there can read `changed-since-scan` between scan and clean. That fails closed.
+    - **Permissions.** They come from the mount options, and `fchmod` on them succeeds without changing the mode. So the Trash's steps 2 and 3 of 2026-11-01 check the mode:
+      - step 2 `fstat`s `.Trash-$uid` again after its `fchmod`;
+      - step 3 checks the mode of `files/` and `info/`.
+
+      A folder still open to group or others makes the move refuse as `trash-crosses-filesystem`, naming `--permanent`.
+    - **The dry run.** It sees the mode of a `.Trash-$uid` that exists. Where none exists yet on an exFAT or FAT volume (`f_type` `EXFAT_SUPER_MAGIC` or `MSDOS_SUPER_MAGIC`), the dry run predicts the refusal without making it. Accepted: with `dmask=0077`, `mkdir` gives 0700 and the clean would pass where the dry run refused. That is the safe side.
+  - **The new reason** `immutable` raises the scan, clean, journal and progress schema versions (PR 3).
+  - Each part takes effect when its PR lands.
 ---
 
 *Last updated: 2026-11-02*
