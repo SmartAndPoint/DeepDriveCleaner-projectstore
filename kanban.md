@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-04T12:28:42.836Z
+generated_at: 2026-11-04T16:45:47.963Z
 
 ---
 
@@ -13,6 +13,8 @@ generated_at: 2026-11-04T12:28:42.836Z
 - [ ] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2
 - [ ] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2
 - [ ] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2
+- [ ] [[epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read|DDC-002: Scan after an update when the saved report cannot be read]] #p1
+- [ ] [[epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update|DDC-002: Scheduled scans: register the agent again after an update]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2

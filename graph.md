@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-04T12:20:07.404Z
+generated_at: 2026-11-04T16:45:48.074Z
 
 ---
 
@@ -25,7 +25,7 @@ full typed neighborhood, both directions, in one call.
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | Updates through Sparkle, alongside the Homebrew cask | adr | accepted |
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | Windows app: Tauri 2 shell over the ddc CLI | adr | accepted |
 | epics/DDC-001/epic.md | Disk space cleaner CLI for developers | epic | in-progress |
-| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | ddc changes: what grew between the last two scans | story | planned |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | ddc changes: what grew between the last two scans | story | in-progress |
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
@@ -66,6 +66,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | Review window: say when the saved scan is not of the home folder | story | done |
 | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | done |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | done |
+| epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md | Scan after an update when the saved report cannot be read | story | planned |
+| epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update.md | Scheduled scans: register the agent again after an update | story | planned |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | done |
 | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates | story | done |
 | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md | The Trash: its own row, not Your data | story | done |
@@ -301,6 +303,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |
@@ -410,6 +414,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |

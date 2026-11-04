@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-02
-updated: 2026-11-02
+updated: 2026-11-04
 external_refs: {}
 tags: [app, popover, updates]
 code_refs: []
@@ -40,7 +40,7 @@ The popover should say what it knows, not guess. An older-schema report has two 
 - **When the report's version cannot be read** (no `ddc_version` in the older file), the text omits it: "Your last scan was made by an earlier version of ddc".
 - The Whole Disk view's "Scan Whole Disk Again" (0.14.10) uses the same wording family, from `last-disk.json`'s header.
 
-**No automatic scan.** Considered and dropped: the menu bar ADR (§5, §6) knows two kinds of scan, a person's and the scheduled one, and a third, self-started kind would scan at full speed at relaunch and could raise the privacy prompts the background path avoids. The person starts it with Scan Now.
+*Superseded 2026-11-04 by the owner: the story "Scan after an update when the saved report cannot be read" makes the scheduled scan due at once after an update, when scheduled scans are on and not paused; this story keeps the wording for the cases left (scheduled scans off or paused, a report of a newer `ddc`).* **No automatic scan.** Considered and dropped: the menu bar ADR (§5, §6) knows two kinds of scan, a person's and the scheduled one, and a third, self-started kind would scan at full speed at relaunch and could raise the privacy prompts the background path avoids. The person starts it with Scan Now.
 
 ## Decomposition
 
@@ -63,7 +63,7 @@ The popover should say what it knows, not guess. An older-schema report has two 
 - [ ] Test (DDCKit): when the older report's `ddc_version` can be read, the text names it ("made by 0.17.4"); when it cannot, the text omits it
 - [ ] Test (DDCKit): the Whole Disk view's outdated text names the update in the same words
 - [ ] `make ddckit-test` passes and the Gate's `app` job builds the app
-- [ ] The app starts no scan on its own after an update: no test path schedules one, and the menu bar ADR is unchanged
+- [ ] The app starts no scan of its own when scheduled scans are off or paused, or the report is of a newer schema (the story "Scan after an update when the saved report cannot be read" covers the rest)
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): after the next update that changes a report schema, the popover names the version that made the last scan and asks for a new one
 
 ## Final Summary
@@ -74,4 +74,5 @@ The popover should say what it knows, not guess. An older-schema report has two 
 
 ## Dependencies
 
-- None. Follows the 0.14.10 fix "a report from before an update asks for a new scan, not an error".
+- "Scan after an update when the saved report cannot be read" (DDC-002): it narrows this story to the cases left.
+- Follows the 0.14.10 fix "a report from before an update asks for a new scan, not an error".
