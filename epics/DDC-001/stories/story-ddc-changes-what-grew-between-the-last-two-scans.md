@@ -3,18 +3,18 @@ type: story
 id: "story-ddc-changes-what-grew-between-the-last-two-scans"
 epic: "DDC-001"
 title: "ddc changes: what grew between the last two scans"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-03
-updated: 2026-11-03
+updated: 2026-11-04
 external_refs: {}
 tags: [cli, growth, agents]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-04T12:28:25.671Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-11-04T12:28:25.671Z"
 ---
 
 # ddc changes: what grew between the last two scans
@@ -80,6 +80,19 @@ Who uses it: a person in a terminal (`ddc scan` also prints a short block of it 
      codebase. When a spec covers this story, this is a thin route through the
      spec's contracts: which contracts, in what order, which files. -->
 
+From the planner's placement plan (2026-11-03), checked against `main` at 0.32.0, where S1 is done. Two pull requests.
+
+**S2a: the comparison and `ddc changes`.**
+1. `crates/ddc-core/src/changes/`, a folder rather than one file: `mod.rs` (the types, `CHANGES_SCHEMA_VERSION` 1, a pure `compare(baseline, current, cleans, catalog)`), `load.rs` (both files read as bytes, decoded whatever their `schema_version`; the pair check with one re-read; every reason computed, the first in the story's order taken), `journal.rs` (a lenient reader of `actions.jsonl`; `exec/journal.rs` and its coverage floor stay untouched), `not_read.rs` (the kinds; the cloud paths come from the `user.cloud` rule, not from strings), `matching.rs` (`(path, rule)`, then `moved` by `(dev, ino)`, then `not-compared`, then the cleans). The groups come from `rules::listing`, the harness from `origin.harness` or the `git.worktree` finding at `project.root`.
+2. `docs/changes.schema.json` with its drift test, in a new `crates/ddc-core/tests/changes.rs` that also holds the core ACs on hand-built reports and journal lines: the sums test first, with its expected numbers written by hand. These tests scan nothing, so they run on all three systems.
+3. CLI: `Command::Changes` in `cli.rs` and `gate.rs` (no capability, as `space`), `cmd/changes.rs` shaped like `cmd/space.rs` (never a lock; exit 1 with a `ddc:` line and no JSON). `age()` moves from `cmd/space.rs` to `render.rs` with its tests.
+4. `crates/ddc-cli/tests/changes_cli.rs` (AC 6, 10, 11's folding), `cases.json` and `cases_cli.rs`, `unported_cli.rs`, a `structure.rs` test that the command reaches no executor, lock or report write, and the Windows skip names.
+5. README `### ddc changes`; ADR "Menu bar app" §6 item 15. Minor bump.
+
+**S2b: the `ddc scan` block and the guidance.** `cmd/scan.rs` prints the short form after the summary when this save kept a report (`Kept::Kept`), never with `--json` or `--background`; the CLI test of AC 11's block half; README "For coding agents"; the guidance line through the story "Agent skill v0: ask ddc before guessing about the disk" while it is open; ADR "Agent footprint" §7. Patch or minor bump by what it adds.
+
+Decided here: a `brew-cleanup` journal line credits `bytes_before` minus `bytes_after` when both are present, else the whole shrink of the `cache.homebrew` finding. Times in the Final Summary are ratios to a `ddc scan` of the same home only (Technical Notes).
+
 ## Acceptance Criteria
 
 - [ ] Test (core, two fixture reports): a finding under a folder the baseline did not read (`Downloads`, skipped as `excluded` by a scheduled scan without Full Disk Access) and read now is `not-compared`, never `new`; the reverse is `not-compared`, never `gone`; a user skip removed since is `not-compared`; a path skipped as `holds-subvolume` changes nothing in the matching.
@@ -136,4 +149,4 @@ Who uses it: a person in a terminal (`ddc scan` also prints a short block of it 
 
 ---
 
-*Last updated: 2026-11-03*
+*Last updated: 2026-11-04*
