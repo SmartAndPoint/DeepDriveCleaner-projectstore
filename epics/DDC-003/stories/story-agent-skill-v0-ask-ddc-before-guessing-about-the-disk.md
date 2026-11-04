@@ -7,7 +7,7 @@ status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-10-31
-updated: 2026-11-01
+updated: 2026-11-04
 external_refs: {}
 tags: [agents, skill, agents-md, docs]
 code_refs: ["agents/claude-code/ddc/SKILL.md", "agents/AGENTS.snippet.md", "agents/README.md", "crates/ddc-cli/tests/structure.rs"]
@@ -67,6 +67,7 @@ The full story later replaces v0 with `footprint` and `clean --agent`.
 - [x] A structure test in `crates/ddc-cli/tests/structure.rs`: every schema field the skill names exists in the schema it cites, and every `ddc` command line in the skill parses (`--help` of that subcommand succeeds). — done (PR #58): three tests in `crates/ddc-cli/tests/structure.rs`, schema paths resolved through `$defs`
 - [x] README: a "For coding agents" section linking `agents/`. — done (PR #58)
 - [ ] A try-out in a Claude Code session with the skill installed, in a scratch project on a synthetic home: asked "why is my disk full", it runs `ddc disk agents --json` and `ddc scan`, and proposes rather than cleans. Record the commands it ran, not the transcript.
+- [ ] `ddc changes --json` as the first line of "What to run" in `agents/claude-code/ddc/SKILL.md` and `agents/AGENTS.snippet.md`, before `ddc scan "$PWD"`, commented "what grew between the person's last two scans, their own cleans apart; run it before a scan, which replaces the latest report", and one sentence that `status: not-compared` with its `reason` is the normal answer until two whole scans are saved. The bound of ADR "Agent footprint: worktrees, harness data and bounded consent for agents" §7 in plain words: showing what grew is fine, removing it is not the agent's; it lists the whole home, so show the person only what they asked about. `agents/README.md` names it beside the other read-only commands. `every_ddc_line_of_the_agent_guidance_parses` adds `changes` to the questions the skill must ask; the line cites no field of `docs/changes.schema.json`, or `the_agent_guidance_names_only_schema_fields` gains a list of that schema's names. Moved here from the story "ddc changes: what grew between the last two scans" (DDC-001; the command shipped in 0.34.0), since this story is open.
 
 ## Notes
 
@@ -78,6 +79,7 @@ The full story later replaces v0 with `footprint` and `clean --agent`.
 
 - [x] The three files exist; the structure test passes in the gate (CI). — evidence: PR #58's required checks green, main's Gate run on the merge; `cargo test -p ddc-cli --test structure` (18 passed); reviewer
 - [x] The skill contains no command that removes files, other than in its "what never to do" list and as text for the person to run (a test greps the runnable code blocks). — evidence: `the_agent_guidance_runs_nothing_that_removes` (no `ddc clean`, `disk free --actions`, `rm`, `mv`, `--yes`, `--items` in a runnable block), PR #58, reviewer
+- [ ] The guidance runs `ddc changes --json` first, read-only, with the §7 bound and the "show only what was asked" rule. — evidence to come: `every_ddc_line_of_the_agent_guidance_parses` asking for `changes`, `the_agent_guidance_names_only_schema_fields` green
 - [ ] (After the deadline; it does not block v0) The try-out shows the agent running only read-only `ddc` commands and handing the cleanup to the person (recorded command list).
 
 ## Final Summary
@@ -96,4 +98,4 @@ The full story later replaces v0 with `footprint` and `clean --agent`.
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-04*
