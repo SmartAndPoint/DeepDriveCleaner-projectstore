@@ -244,7 +244,13 @@ Owner answers, 2026-11-02:
 - **1, Whole disk:** the owner finds Whole disk useful and wants it kept, and adds a requirement: in Whole disk, too, a person must be able to clean and remove what it finds. Where it lives (the Review sidebar or its own window) is left to the story that takes it, with that requirement.
 - **2, the group action in the group header:** yes.
 - **3, "All Items" instead of the Groups/Items switch:** yes.
-- Questions 4 to 8 are still open.
+Owner answers, 2026-11-04, each the recommendation:
+
+- **4, one "Not scanned" entry:** yes. The not-scanned banner, the background-scan line and the "Cloud folders" entry merge into one entry with the Full Disk Access line (story 1).
+- **5, lighter class sections:** later, after stories 1 to 4. Story 6 waits for the owner to see the window without the repeats.
+- **6, the scan's age and the Full Disk Access state in the window:** yes (story 1).
+- **7, keep hand-picked ticks on reopen:** yes, as its own story with the rule in the question: "Clean Selected…" keeps opening with exactly the popover's selection, and the Include switches apply only to rows the person has not touched.
+- **8, no class-level checkbox in the sidebar:** confirmed, none.
 
 Not decided by the owner but open for the stories:
 
