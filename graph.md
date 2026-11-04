@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-02T23:01:59.022Z
+generated_at: 2026-11-04T12:20:07.404Z
 
 ---
 
@@ -30,7 +30,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
 | epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release.md | Homebrew tap and the v0.1.0 release | story | in-progress |
-| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | Keep the previous scan report, and say who wrote each | story | planned |
+| epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each.md | Keep the previous scan report, and say who wrote each | story | done |
 | epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs.md | Progress output while ddc clean runs | story | in-progress |
 | epics/DDC-001/stories/story-safe-cleanup-ddc-clean.md | Safe cleanup: ddc clean | story | done |
 | epics/DDC-001/stories/story-scheduled-background-scan.md | Scheduled background scan | story | done |
@@ -134,15 +134,16 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-009/stories/story-launch-measurement-and-follow-up.md | Launch measurement and follow-up | story | in-progress |
 | epics/DDC-009/stories/story-repository-storefronts-for-the-launch.md | Repository storefronts for the launch | story | planned |
 | epics/DDC-010/epic.md | Linux at parity with macOS: every command, every file kind | epic | in-progress |
-| epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities | story | planned |
+| epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities | story | done |
 | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md | Cache roots moved by the environment: XDG and each tool's own variable | story | planned |
 | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | Coding agents on Linux: ddc disk agents | story | done |
+| epics/DDC-010/stories/story-compressed-btrfs-say-when-a-scan-counts-more-than-a-clean-frees.md | Compressed btrfs: say when a scan counts more than a clean frees | story | planned |
 | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md | Desktop notifications on Linux through the freedesktop notification service | story | planned |
 | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md | Freeing space outside the home on Linux: ddc disk free | story | planned |
 | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | Homebrew on Linux: ddc disk brew-packages and its cleanup | story | planned |
 | epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | Linux catalog: Flatpak, Snap and the tools only macOS lists | story | planned |
 | epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md | Linux CI mounts: a filesystem matrix job with root-only steps | story | done |
-| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | planned |
+| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | in-progress |
 | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | Linux mount boundaries: automounts, bind mounts and the Trash across filesystems | story | done |
 | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list | story | planned |
 | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs | story | planned |
@@ -662,6 +663,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md |
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md |
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md |
+| epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-compressed-btrfs-say-when-a-scan-counts-more-than-a-clean-frees.md |
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md |
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md |
 | epics/DDC-010/epic.md | epic-contains | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md |
@@ -698,6 +700,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md | mdlink | epics/DDC-010/epic.md |
 | epics/DDC-010/stories/story-cache-roots-moved-by-the-environment-xdg-and-each-tools-own-variable.md | mdlink | epics/DDC-010/epic.md |
 | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md | mdlink | epics/DDC-010/epic.md |
+| epics/DDC-010/stories/story-compressed-btrfs-say-when-a-scan-counts-more-than-a-clean-frees.md | mdlink | epics/DDC-010/epic.md |
 | epics/DDC-010/stories/story-desktop-notifications-on-linux-through-the-freedesktop-notification-service.md | mdlink | epics/DDC-010/epic.md |
 | epics/DDC-010/stories/story-freeing-space-outside-the-home-on-linux-ddc-disk-free.md | mdlink | epics/DDC-010/epic.md |
 | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | mdlink | epics/DDC-010/epic.md |
@@ -755,6 +758,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-009/stories/story-launch-demo-assets.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md |
