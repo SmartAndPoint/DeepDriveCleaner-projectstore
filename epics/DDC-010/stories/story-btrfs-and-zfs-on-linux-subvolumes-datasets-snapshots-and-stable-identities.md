@@ -3,17 +3,17 @@ type: story
 id: "story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities"
 epic: "DDC-010"
 title: "btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities"
-status: planned
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-02
+updated: 2026-11-04
 external_refs: {}
 tags: [linux, scanner, safety, filesystems, btrfs, zfs]
-code_refs: []
+code_refs: [crates/ddc-core/src/platform/linux/btrfs.rs, crates/ddc-core/src/platform/linux/fsid.rs, crates/ddc-core/src/platform/linux/bulk.rs, crates/ddc-core/src/platform/linux/fsops.rs, crates/ddc-core/src/platform/linux/meta.rs, crates/ddc-core/src/platform/linux/procs.rs, crates/ddc-core/src/platform/linux/statfs.rs, crates/ddc-core/src/platform/linux/trash.rs, crates/ddc-core/src/platform/linux/mod.rs, crates/ddc-core/src/platform/mod.rs, crates/ddc-core/src/platform/types.rs, crates/ddc-core/src/scan/walker.rs, crates/ddc-core/src/scan/mod.rs, crates/ddc-core/src/exec/guard.rs, crates/ddc-core/src/agents/liveness.rs, crates/ddc-core/src/model.rs, app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift, docs/scan.schema.json, crates/ddc-core/tests/subvolumes.rs, crates/ddc-core/tests/datasets.rs, crates/ddc-core/tests/common/mounts.rs, scripts/ci-mounts.sh, .config/native-skips/linux.txt]
 specs: []
 started_at: null
-closed_at: null
+closed_at: "2026-11-04T09:36:30.292Z"
 plan_updated_at: null
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-010](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -39,23 +39,23 @@ Fedora puts the home on btrfs by default. Ubuntu offers ZFS on root, and Proxmox
 
 ## Decomposition
 
-- [ ] Decide the subvolume and dataset rule, amend the safety ADR §5 and ADR "Platform seam" §9, and run the critic on the amendment. The proposal:
+- [x] Decide the subvolume and dataset rule, amend the safety ADR §5 and ADR "Platform seam" §9, and run the critic on the amendment. The proposal:
   - enter a btrfs subvolume of the same filesystem whose `parent_uuid` is zero, and a ZFS child dataset of the same pool;
   - never enter a snapshot: a btrfs subvolume with a non-zero `parent_uuid` (read-only or writable), or `.zfs/snapshot`. Report it as skipped with a new reason, `snapshot`, and never count or plan it;
   - keep `other-filesystem` for real other filesystems.
-- [ ] Detection, in this order for each folder.
+- [x] Detection, in this order for each folder.
   - **btrfs, mount check first.** Is the folder on the same mount as its parent? That is the same `stx_mnt_id` on 5.8 and later, or the same `/proc/self/mountinfo` entry. A different mount is another filesystem, even a second btrfs disk mounted at `~/data`, and the mount-boundary rule refuses it before the subvolume rule runs. `statfs.f_fsid` cannot tell "same filesystem" on btrfs: the kernel mixes the subvolume's root id into it.
   - **btrfs, then the subvolume.** Same mount, different `stx_dev` and btrfs: it is a subvolume reached by path. `openat2(RESOLVE_NO_XDEV)` lets it through, because it is no mount crossing. `GET_SUBVOL_INFO` then says whether it is a snapshot.
   - **ZFS.** Datasets are mounts, so the dataset rule runs before `RESOLVE_NO_XDEV`. A mount is allowed only when mountinfo's source is a child dataset of the scanned root's own dataset: its name starts with `<root dataset>/`, in the same pool. `.zfs` is recognised by name at a dataset root.
   - A btrfs folder where `GET_SUBVOL_INFO` is refused is reported as skipped with the existing reason `other-filesystem`, and is not counted. It is never reported as zero.
-- [ ] Persisted identities.
+- [x] Persisted identities.
   - Audit every place that saves or compares `(dev, ino)`: `last-scan.json`, `keep`, the plan and the guard.
   - On btrfs, replace the anonymous `dev` with a stable key. Candidates: `(f_fsid, ino)`, since btrfs derives `f_fsid` from the on-disk fsid and the subvolume id, so it needs no ioctl; or the subvolume id (`GET_SUBVOL_INFO.treeid`).
   - Otherwise, re-verify by path, and say so when a record no longer matches.
   - Test across a remount of the loopback btrfs.
-- [ ] Compression. On btrfs with compression and on ZFS, `st_blocks` may differ from what a delete frees. Measure it on the CI mounts, state the result in the scan schema's description of `bytes`, and decide whether a note is needed.
-- [ ] The new reason `snapshot` and its schema version move belong to this story.
-- [ ] Tests on the CI mounts:
+- [x] Compression. On btrfs with compression and on ZFS, `st_blocks` may differ from what a delete frees. Measure it on the CI mounts, state the result in the scan schema's description of `bytes`, and decide whether a note is needed.
+- [x] The new reason `snapshot` and its schema version move belong to this story.
+- [x] Tests on the CI mounts:
   - a subvolume is counted;
   - a read-only snapshot and a writable snapshot are skipped as `snapshot`;
   - a ZFS child dataset is counted, and `.zfs/snapshot` is skipped;
@@ -85,12 +85,33 @@ The story's premise is corrected: a kept folder does not lose its protection aft
 
 ## Acceptance Criteria
 
-- [ ] On a loopback btrfs, a subvolume inside the root is counted per the decision. Read-only and writable snapshots are never counted or planned, and the scan reports them as `snapshot` (tests in the CI mounts job).
-- [ ] On ZFS, a child dataset is handled per the decision, and `.zfs/snapshot` is never entered (CI test, or an owner check with the reason).
-- [ ] A kept folder and a saved scan on a btrfs subvolume still match after the filesystem is remounted (test).
-- [ ] The safety ADR §5 and ADR "Platform seam" §9 carry the subvolume, dataset and snapshot rules, critic-approved.
+- [x] On a loopback btrfs, a subvolume inside the root is counted per the decision. Read-only and writable snapshots are never counted or planned, and the scan reports them as `snapshot` (tests in the CI mounts job). — evidence: `crates/ddc-core/tests/subvolumes.rs` `a_plain_subvolume_is_entered_and_a_snapshot_never` (read-only, writable and received snapshots skipped as `snapshot`), job `linux-mounts` green on PRs #106, #112, #114 and on main's Gate for 1366228
+- [x] On ZFS, a child dataset is handled per the decision, and `.zfs/snapshot` is never entered (CI test, or an owner check with the reason). — evidence: `crates/ddc-core/tests/datasets.rs` `a_zfs_child_dataset_is_entered_and_a_bind_of_it_never` and `a_visible_snapshot_folder_is_never_entered_and_mounts_nothing`, job `linux-mounts` on PR #110; ZFS runs on the hosted runner, so no owner-check fallback was needed
+- [x] A kept folder and a saved scan on a btrfs subvolume still match after the filesystem is remounted (test). — evidence: `crates/ddc-core/tests/subvolumes.rs` `a_saved_scan_and_a_keep_record_still_match_after_a_remount`, fixture `btrfs-remount` in `scripts/ci-mounts.sh`, job `linux-mounts` on PR #112 and main
+- [x] The safety ADR §5 and ADR "Platform seam" §9 carry the subvolume, dataset and snapshot rules, critic-approved. — evidence: safety ADR amendment "btrfs and ZFS on Linux" (2026-11-02, two critic passes) with its correction and the bullet "Compression, measured (2026-11-03)" (critic-approved, vault PR #92). Correction to this criterion: "Platform seam" §9 is about tests on a platform that is not supported yet, so the reference was wrong; nothing platform-seam changed (no new capability, no new seam function), and the rules live only in the safety ADR.
 
 ## Final Summary
+
+**What changed.** Four code PRs, each released:
+- #106 (0.28.0, musl fix in 0.28.1): btrfs. `platform/linux/btrfs.rs` reads `BTRFS_IOC_GET_SUBVOL_INFO`. A same-mount subvolume is entered; a snapshot (non-zero `parent_uuid`) is skipped as `snapshot`. A finding that holds a subvolume is `holds-subvolume` and not planned.
+- #110 (0.29.0): ZFS. A child dataset is entered only under the five conditions of the ADR, each with its own anchor in the walk and the guard. `.zfs` is skipped by name.
+- #112 (0.30.0): stable identity. Every Linux producer of a device folds `f_fsid` on btrfs and ZFS through `platform/linux/fsid.rs`, cached per (mount id, raw dev). `/proc/pid/fd` links are opened once with O_PATH. The scan schema moved to 8.
+- #114 (0.30.2): compression. Measured on the CI mounts (btrfs zstd: 16 MiB of text counted, 512 KiB freed; ZFS lz4: size on disk). Written in the `bytes` descriptions of the schema and in the ADR.
+
+**Why.** Fedora's home is btrfs and Ubuntu and Proxmox offer ZFS. Before this, ddc stopped at every subvolume and dataset, would have counted snapshots as copies, and lost every saved scan at a remount.
+
+**Tests executed.**
+- CI job `linux-mounts` on real loop btrfs and ZFS on PRs #106, #110, #112 and #114, and on main's Gate.
+- Native Linux runs on the Windows host's WSL: 977 of 977 tests, 151 listed skips.
+- Reviewer passes on PR 3 and PR 4, critic passes on the ADR amendments.
+
+**Risks and follow-ups.**
+- Owner checks: "btrfs and ZFS on Linux (DDC-010)" in the runbook "Owner checks: manual acceptance across stories" (real Snapper home, reboot identity, compression on Fedora, an Ubuntu ZFS home).
+- Story "Compressed btrfs: say when a scan counts more than a clean frees" (DDC-010, p2): the report does not flag compression yet.
+- `execute` does not re-walk a finding before removal.
+- The recent-lock rule reads a file's birth time while `child_times` reads mtime; they can disagree.
+- `linux-schedule` can become a required check after 2026-11-09 if it stays green.
+- A subvolume deleted and re-created inside one process can reuse its anonymous device, and the fold cache then returns the old fsid. The result is a stale scan, never an unsafe one.
 
 ## Technical Notes
 
@@ -108,4 +129,4 @@ The story's premise is corrected: a kept folder does not lose its protection aft
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-04*
