@@ -3,18 +3,18 @@ type: story
 id: "story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names"
 epic: "DDC-010"
 title: "Linux file kinds: special files, immutable flags, sparse files and odd names"
-status: planned
+status: in-progress
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-04
 external_refs: {}
 tags: [linux, scanner, safety, clean, filesystems]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-04T11:05:10.552Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-11-04T11:05:10.552Z"
 ---
 
 # Linux file kinds: special files, immutable flags, sparse files and odd names
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-010](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -49,6 +49,8 @@ The Linux walk and clean were built and tested on regular files, folders, symlin
 
 ## Decomposition
 
+*Superseded on 2026-11-04 by the Implementation Plan and the safety ADR's amendment of that date where they differ: no `FS_IOC_GETFLAGS`, no `path-too-long`, no `trash` crate on Linux, no Linux branch of `common::user_immutable` (a prepared tree instead), and compression moved out.*
+
 - [ ] Special files.
   - A test tree with a FIFO and a Unix socket inside a matched cache. The device node comes from the CI mounts job, which prepares it with `sudo mknod` and passes its path in a variable.
   - The walk counts each one as 0 bytes and never opens it.
@@ -74,22 +76,79 @@ The Linux walk and clean were built and tested on regular files, folders, symlin
 
 ## Implementation Plan
 
+Planned 2026-11-04 with the planner, from origin/main 6a25d00 (0.30.2); main is now 0e0277f (0.31.0), which moved `model.rs`, `rules/listing.rs` and `store.rs` but no schema version. The contract is the safety ADR's amendment of 2026-11-04 for this story, critic-reviewed.
+
+Already in place from the stories "Linux mount boundaries: automounts, bind mounts and the Trash across filesystems" and "btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities":
+- the walk only stats (`statx` with `NO_AUTOMOUNT`), and special files are `EntryKind::Other` at their allocated size;
+- the in-use check opens fd links as `O_PATH`;
+- the Linux Trash only renames, and there is no `trash` crate on Linux;
+- `alloc = stx_blocks × 512`;
+- a path past `PATH_MAX` makes the finding `incomplete`;
+- the CI mounts job has a device node, single `+i`/`+a` files, a casefold ext4 and an exFAT.
+
+Four code PRs, each with its own bump, merged only after the `linux-mounts` job itself is green:
+
+1. **Special files, sparse, names, exFAT/FAT Trash (patch, no schema move).**
+   - `read_found` and both `open_read` open markers with `O_NOFOLLOW | O_NONBLOCK | O_NOCTTY` and `fstat` that they are regular. A symlinked marker no longer counts; test a symlinked worktree `.git` file.
+   - `exec/delete.rs` cuts the tombstone name on a character boundary and retries shorter on `ENAMETOOLONG`.
+   - `render::clean_command`:
+     - keeps a newline or a tab literal inside its single quotes (dash 0.5.12 on Ubuntu 24.04 has no `$'…'`);
+     - suggests no command for any other control character or a non-UTF-8 byte.
+   - `platform/linux/trash.rs` `fstat`s again after its `fchmod`, checks `files/` and `info/`, and refuses as `trash-crosses-filesystem` when a mode stayed open. Where no `.Trash-$uid` exists yet, the dry run predicts the refusal on exFAT and FAT by `f_type`.
+   - Tests:
+     - a FIFO and a socket in a finding (trash and permanent);
+     - a device-node tree from the CI mounts job, with inotify `IN_OPEN` proving nothing opens it;
+     - a 1 GiB sparse file with 4 KiB of data through `scan`, `du` and `clean`;
+     - names through a real `/bin/sh`;
+     - a 255-byte name removed;
+     - cases rows;
+     - the exFAT Trash refusal on `DDC_MOUNT_EXFAT`.
+2. **Case and Unicode (small).**
+   - `.ddc-keep` is compared case-insensitively in `rules/visitor.rs`, `keep_markers` and the guard's `walk_item`.
+   - Tests:
+     - protected folders in another case on casefold ext4 and exFAT;
+     - `Cache`/`cache` and NFC/NFD as two entries on ext4, with APFS stated;
+     - rule names byte for byte.
+3. **Immutable and append-only (minor, schema move).**
+   - The flags come from `statx` in `bulk.rs` (`stat`, `entry_meta`, `stat_child`) and from `st_flags` on macOS.
+   - A folder's own flags reach the visitors, through a field on `DirCtx` or a hook.
+   - The walk and `--items` get a counter and `NotSelected::Immutable`.
+   - Before each action:
+     - the guard's per-item re-walk (`walk_item`, the one a fake reader reaches) refuses with `SkipReason::Immutable`;
+     - the guard checks the root's own flags;
+     - `keep_markers` refuses early.
+   - Schemas, DDCKit and wording change. Goldens move by the version line, re-recorded on the Mac.
+   - `interrupted_deletion_leaves_a_tombstone_found_as_safe` is rewritten on a hand-made tombstone and leaves both skip lists.
+   - Tests:
+     - a fake reader through `scan_with_reader` and `walk_item`;
+     - a CI `chattr` tree (a file `+i`, a file `+a`, a folder `+i`, a finding root `+i`) cleaned through `--items`.
+4. **Removal through descriptors (patch).**
+   - A new `DirFd::remove_tree` in each platform's `fsops.rs`, pinned in `platform/mod.rs` and stubbed in `unported.rs`.
+   - `exec/delete.rs` leaves paths, `make_dirs_writable` included.
+   - A `structure.rs` test checks that `delete.rs` is its only caller.
+   - Tests:
+     - a unit test of `remove_tree` on a tombstone tree that the CI root step prepares, with a tmpfs, a bind mount and a user-made btrfs subvolume inside. The mounts survive, and the error maps to `failed` naming the tombstone;
+     - `interrupt_cli` and loadgen's hostile trees stay green.
+
 ## Acceptance Criteria
 
-- [ ] A FIFO, a socket and a device node inside a finding are counted, never opened, and never copied by a clean (tests; the device node in the CI mounts job).
-- [ ] A finding that holds an immutable or append-only file is never planned. A clean of a stale plan that includes one refuses it before the rename and leaves no tombstone (fake-reader test on every OS, plus the prepared `chattr +i` tree in the CI mounts job).
-- [ ] On casefold ext4 and exFAT, a protected folder in another case stays protected (test in the CI mounts job).
+- [ ] A FIFO, a socket and a device node inside a finding are counted, never opened, and on Linux never copied by a clean. A marker file that is a device, a FIFO, or a symlink to one, reads as absent (tests; the device node in the CI mounts job).
+- [ ] A finding that holds an immutable or append-only file is never planned. A clean of a stale plan that includes one refuses it before the rename and leaves no tombstone (fake-reader test on every OS, plus the prepared `chattr` tree in the CI mounts job, cleaned through `--items`).
+- [ ] On casefold ext4 and exFAT, a protected folder in another case stays protected. Rule names match byte for byte on every filesystem (tests in the CI mounts job).
 - [ ] A sparse file is reported at its allocated size by `scan`, `du` and `clean` (test).
-- [ ] Names with a newline, a tab, a backslash, a leading dash, 255 bytes, or a path past `PATH_MAX` go through scan, JSON, text and clean without a crash. The suggested clean command names the same path (tests and cases).
-- [ ] The safety ADR §5 states the Linux rules for special files and immutable flags, critic-approved.
+- [ ] Names with a newline, a tab, a backslash, a leading dash or 255 bytes, and a path past `PATH_MAX`, go through scan, JSON, text and clean without a crash. The suggested clean command, pasted into `sh`, names the same path, or no command is suggested (tests and cases).
+- [ ] Removing a tombstone with a tmpfs, a bind mount or a btrfs subvolume inside leaves them intact, and the error reports the item `failed`, naming the tombstone (`remove_tree` test on a CI-prepared tree).
+- [ ] On exFAT, a `.Trash-$uid` whose mode stays open refuses the move as `trash-crosses-filesystem`, in the dry run too (CI mounts test).
+- [ ] The safety ADR §5 and §6 state the rules for special files, immutable flags, removal through descriptors, case, and exFAT/FAT, critic-approved.
 
 ## Final Summary
 
 ## Technical Notes
 
 - Setting and clearing `chattr +i` needs `CAP_LINUX_IMMUTABLE`. The prepared file stays on the CI runner, which is discarded after the job. In native runs the test skips in the skip list's environment group.
-- `stx_attributes_mask` says which flags the filesystem reports. tmpfs and NFS report none. There, a rename that fails with `EPERM` is the signal, and it is caught before the removal.
-- The new reasons `immutable` and `path-too-long` and their schema version move belong to this story.
+- `stx_attributes_mask` says which flags the filesystem reports. Where it lacks them, the flag reads as not set. A rename of a folder that holds an immutable file succeeds, and `EPERM` arrives only on the unlink, after a partial removal; the ADR accepts that, and the next scan finds the tombstone. Whether tmpfs reports the bits on the CI kernel is checked there.
+- No `path-too-long` reason: `incomplete` already refuses a finding deeper than `PATH_MAX`. The new reason `immutable` and its schema version move belong to this story.
+- The `trash` crate no longer runs on Linux, and the compression item moved to the story "Compressed btrfs: say when a scan counts more than a clean frees".
 
 ## Dependencies
 
@@ -102,4 +161,4 @@ The Linux walk and clean were built and tested on regular files, folders, symlin
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-04*
