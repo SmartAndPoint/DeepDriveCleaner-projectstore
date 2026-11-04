@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-02T23:01:58.815Z
+generated_at: 2026-11-04T12:20:06.964Z
 
 ---
 
@@ -11,7 +11,6 @@ generated_at: 2026-11-02T23:01:58.815Z
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts|DDC-001: SwiftPM build folders as rebuildable artifacts]] #p2
 - [ ] [[epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans|DDC-001: ddc changes: what grew between the last two scans]] #p2
-- [ ] [[epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each|DDC-001: Keep the previous scan report, and say who wrote each]] #p2
 - [ ] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2
 - [ ] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2
 - [ ] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2
@@ -80,6 +79,7 @@ generated_at: 2026-11-02T23:01:58.815Z
 - [x] [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|DDC-001: Safe cleanup: ddc clean]] #p1 #done
 - [x] [[epics/DDC-001/stories/story-scheduled-background-scan|DDC-001: Scheduled background scan]] #p2 #done
 - [x] [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|DDC-001: Workspace skeleton and parallel filesystem scanner]] #p1 #done
+- [x] [[epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each|DDC-001: Keep the previous scan report, and say who wrote each]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-app-skeleton-and-build-pipeline|DDC-002: App skeleton and build pipeline]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|DDC-002: CLI: clean an explicit item list]] #p1 #done

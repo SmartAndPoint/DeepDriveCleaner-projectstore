@@ -8,7 +8,7 @@ created: 2026-10-17
 updated: 2026-10-17
 external_refs: {}
 tags: [cli, rust, cleanup]
-code_refs: ["Cargo.toml", "Makefile", "rust-toolchain.toml", "clippy.toml", "rustfmt.toml", "crates/ddc-core/", "crates/ddc-cli/", "docs/scan.schema.json", "bench/"]
+code_refs: ["Cargo.toml", "Makefile", "rust-toolchain.toml", "clippy.toml", "rustfmt.toml", "crates/ddc-core/", "crates/ddc-cli/", "docs/scan.schema.json", "docs/space.schema.json", "crates/ddc-loadgen/", "bench/"]
 review_status: reviewed
 reviewed_at: 2026-10-17
 ---
