@@ -35,7 +35,7 @@ Use them for every Linux or Windows change of epic DDC-007, in particular storie
     This installs rustup (with `--no-modify-path`), the toolchain of `rust-toolchain.toml` and the cargo-nextest `.config/tools.mk` pins inside `~/ddc-native`, for the machine's architecture. The host user's own `~/.rustup` and `~/.cargo` are never used or changed (0.14.4; before it, runs used them).
   - No sudo and no C compiler on the host are needed: the tests run in `rust:<toolchain>-bookworm`.
   - Both architectures are worth a machine. CI runs clippy and the tests on x86_64 Linux only and builds aarch64 for the release without clippy; an aarch64 run caught a clippy error that only aarch64 has (`st_nlink` is 32 bits there).
-  - The target folder grows with every version bump. Runs build without incremental data, as CI does, and print a warning past 40 GiB. They never remove it: what to delete on the owner's machine is the owner's call.
+  - The target folder grows with every version bump. Runs build without incremental data, as CI does, and print a warning past 40 GiB. They never remove it themselves; what may go, and how, is in Common Issues, "The target folders fill the disk".
   - **Or WSL on a Windows machine** (code 0.14.7). Set `DDC_LINUX_WSL=<distribution>` beside `DDC_LINUX_HOST=<the Windows alias>`, and every command goes through `wsl.exe` into that distribution, from its home. Git bash's path conversion is off (`MSYS_NO_PATHCONV=1`). The distribution needs:
     - a C toolchain (`build-essential`, `pkg-config`);
     - docker, with the user in the `docker` group;
@@ -190,6 +190,22 @@ A test skipped that the list does not name, or a listed test no longer skips. Ei
 ### Most of the synced tree vanished on the machine
 
 The cause was a locale mismatch in the delete step. Both sides must sort with `LC_ALL=C`, and the scripts set it. Do not drop it from a copy of the script.
+
+### The target folders fill the disk (WSL, 2026-11-05)
+
+The build folders grow without bound, and nothing removes them:
+
+- Each integration test file is its own binary. It is linked statically with every dependency and carries debug info, so it takes tens of MB. The workspace has about 60 of them.
+- Cargo names each build with a hash. The package version is part of it, as are the features, the profile and the compiler version (`RUSTFLAGS` is not). A version bump makes a new set of the workspace's binaries beside the old ones. A toolchain bump makes a new set of everything, the dependencies included. Cargo never deletes an old set. Until 2026-11-04 every pull request bumped the version.
+- Every worktree or clone in WSL with a target of its own builds everything once more: `ddc-native/target` for `native-linux.sh`, each session's clone (see "Nothing builds on the developer machine"), and a worktree's `<name>-target` beside it, where its `CARGO_TARGET_DIR` points. When its work merges, its target stays behind.
+
+What is inactive may go (the owner, 2026-11-05). The script's warning still says to ask the owner; this section is the owner's answer. To clean:
+
+1. Check that no build runs: `ps -eo args | grep -E 'cargo|rustc|nextest' | grep -v grep` and `docker ps -q` print nothing.
+2. For each finished worktree or clone: `git fetch`, then `git cherry origin/main <branch>` must print no `+` line. Remove a worktree with `git worktree remove`, never with `--force`: a refusal means uncommitted work. Then delete the worktree's `<name>-target`. A clone goes with `rm -rf`, its target with it, once inside it `git fetch` is done, `git cherry origin/main <branch>` prints no `+` line for each of its local branches, and `git status --porcelain` and `git stash list` print nothing.
+3. In `ddc-native/target` and in each live session clone's target, move `debug` (and `release`, from `--make`) aside and delete it: `mv debug debug.old && rm -rf debug.old`. The rename is atomic, so a build that starts meanwhile sees either all of it or none. The next run rebuilds it in minutes. The toolchain and the registries stay: `ddc-native/cargo`, `ddc-native/cargo-home` (the Linux container's `CARGO_HOME`) and `ddc-native/rustup`.
+
+After a pull request merges, remove its WSL worktree and its target at once, before the next one starts.
 
 ### Results differ when the Linux container runs as root
 
