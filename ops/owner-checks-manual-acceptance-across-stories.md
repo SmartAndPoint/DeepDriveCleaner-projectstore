@@ -382,6 +382,13 @@ Story: [Popover: say when used space grew since the last scan](../epics/DDC-002/
 - [ ] Manual (owner, 0.28.1): after a scan, build something big (a few `cargo build` runs in agents' worktrees) until used space grows by 20 GiB or more; within ten minutes, on wake or when the popover opens, the menu bar icon shows its badge (with "Show a badge on the menu bar icon" on), and the popover shows "↑ N GiB more in use on the startup disk than at the last scan, …" with Scan Now; opening the popover clears the badge; a Scan Now drops the line at once.
 - [ ] Manual (owner): `ddc space --json` on this Mac against the Finder's "Available" and System Settings → Storage; write the difference (purgeable space and local snapshots count as in use for ddc) into the story's Technical Notes.
 
+### Full Disk Access on macOS 27 (DDC-002)
+
+Story: [Full Disk Access check on macOS 27](../epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md).
+
+- [ ] Manual (owner): on macOS 27 with DeepDriveCleaner switched on under Full Disk Access, the popover shows no "Full Disk Access Needed", and the report of the app's next scan (Scan Now, or a scheduled one; not `ddc scan` in Terminal, whose access is Terminal's) has `full_disk_access: true`; switched off, the popover says "Full Disk Access Needed" again. If it still says "Needed" with the switch on, run `ls -la ~/Library/Application\ Support/com.apple.TCC/ ~/Library/Safari` in Terminal and add both error texts to the story, with whether Terminal itself has Full Disk Access (the errors show Terminal's access, not the app's).
+- [ ] Manual (owner, if a Mac with macOS 26 or older is at hand): the popover's Full Disk Access line answers as before, with the grant on and off.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
@@ -402,4 +409,4 @@ Some checks change the disk (a clean, a Trash move, a runtime delete, a formula 
 
 ---
 
-*Last updated: 2026-10-31*
+*Last updated: 2026-11-05*
