@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-04T16:45:48.074Z
+generated_at: 2026-11-05T06:09:05.818Z
 
 ---
 
@@ -49,6 +49,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | done |
 | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | Docker Desktop: what is inside its disk image, and what a clean frees | story | planned |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
+| epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | Full Disk Access check on macOS 27 | story | in-progress |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
@@ -286,6 +287,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md |
@@ -381,6 +383,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
+| epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
@@ -731,6 +734,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
