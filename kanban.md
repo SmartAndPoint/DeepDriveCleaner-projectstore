@@ -67,7 +67,6 @@ generated_at: 2026-11-05T06:59:17.872Z
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
-- [ ] [[epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names|DDC-010: Linux file kinds: special files, immutable flags, sparse files and odd names]] #p1
 
 ## Review
 
@@ -139,6 +138,7 @@ generated_at: 2026-11-05T06:59:17.872Z
 - [x] [[epics/DDC-010/stories/story-btrfs-and-zfs-on-linux-subvolumes-datasets-snapshots-and-stable-identities|DDC-010: btrfs and ZFS on Linux: subvolumes, datasets, snapshots and stable identities]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-coding-agents-on-linux-ddc-disk-agents|DDC-010: Coding agents on Linux: ddc disk agents]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps|DDC-010: Linux CI mounts: a filesystem matrix job with root-only steps]] #p1 #done
+- [x] [[epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names|DDC-010: Linux file kinds: special files, immutable flags, sparse files and odd names]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems|DDC-010: Linux mount boundaries: automounts, bind mounts and the Trash across filesystems]] #p1 #done
 - [x] [[epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer|DDC-010: Scheduled scans on Linux through a systemd user timer]] #p1 #done
 
