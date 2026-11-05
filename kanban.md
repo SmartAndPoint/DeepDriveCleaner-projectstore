@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-05T09:56:43.863Z
+generated_at: 2026-11-05T10:03:45.235Z
 
 ---
 
@@ -59,7 +59,6 @@ generated_at: 2026-11-05T09:56:43.863Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan|DDC-002: Popover and Review: what grew since the earlier scan]] #p1
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
@@ -121,6 +120,7 @@ generated_at: 2026-11-05T09:56:43.863Z
 - [x] [[epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once|DDC-002: Confirmation sheet: Delete permanently for every item at once]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan|DDC-002: Popover: say when used space grew since the last scan]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-full-disk-access-check-on-macos-27|DDC-002: Full Disk Access check on macOS 27]] #p0 #done
+- [x] [[epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan|DDC-002: Popover and Review: what grew since the earlier scan]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2 #done
 - [x] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1 #done
