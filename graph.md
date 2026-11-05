@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-05T06:59:18.022Z
+generated_at: 2026-11-05T09:56:44.041Z
 
 ---
 
@@ -53,6 +53,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
+| epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md | Popover and Review: what grew since the earlier scan | story | in-progress |
 | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | Popover: say when used space grew since the last scan | story | done |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
 | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md | Protected by you: say what it is, and Remove Protection | story | done |
@@ -146,7 +147,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup.md | Homebrew on Linux: ddc disk brew-packages and its cleanup | story | planned |
 | epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists.md | Linux catalog: Flatpak, Snap and the tools only macOS lists | story | planned |
 | epics/DDC-010/stories/story-linux-ci-mounts-a-filesystem-matrix-job-with-root-only-steps.md | Linux CI mounts: a filesystem matrix job with root-only steps | story | done |
-| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | in-progress |
+| epics/DDC-010/stories/story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names.md | Linux file kinds: special files, immutable flags, sparse files and odd names | story | done |
 | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md | Linux mount boundaries: automounts, bind mounts and the Trash across filesystems | story | done |
 | epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list.md | Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list | story | planned |
 | epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs.md | Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs | story | planned |
@@ -291,6 +292,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-menu-bar-popover.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md |
+| epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | epics/DDC-002/epic.md | epic-contains | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |
@@ -389,6 +391,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | epics/DDC-002/stories/story-menu-bar-popover.md | wikilink | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md | mdlink | epics/DDC-002/epic.md |
+| epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md | wikilink | research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md |
 | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | mdlink | epics/DDC-002/epic.md |
 | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | wikilink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
 | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | wikilink | research/what-grew-since-the-last-scan-a-ux-concept-for-the-macos-app.md |
@@ -737,6 +741,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-protected-by-you-say-what-it-is-and-remove-protection.md |

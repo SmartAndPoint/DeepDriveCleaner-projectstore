@@ -389,6 +389,14 @@ Story: [Full Disk Access check on macOS 27](../epics/DDC-002/stories/story-full-
 - [ ] Manual (owner): on macOS 27 with DeepDriveCleaner switched on under Full Disk Access, the popover shows no "Full Disk Access Needed", and the report of the app's next scan (Scan Now, or a scheduled one; not `ddc scan` in Terminal, whose access is Terminal's) has `full_disk_access: true`; switched off, the popover says "Full Disk Access Needed" again. If it still says "Needed" with the switch on, run `ls -la ~/Library/Application\ Support/com.apple.TCC/ ~/Library/Safari` in Terminal and add both error texts to the story, with whether Terminal itself has Full Disk Access (the errors show Terminal's access, not the app's).
 - [ ] Manual (owner, if a Mac with macOS 26 or older is at hand): the popover's Full Disk Access line answers as before, with the grant on and off.
 
+### What grew since the earlier scan, in the app (DDC-002)
+
+Story: [Popover and Review: what grew since the earlier scan](../epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md).
+
+- [ ] Manual (owner): after a day of builds (20 GiB or more) and a Scan Now, the popover's band says how much more is in use since the earlier scan and names the group that grew most ("Build outputs +… · N new"), or where else it went; See What Grew opens Review on "Grew since …" with those rows, ticked as in their own group, and a tick there shows in the group too.
+- [ ] Manual (owner): the entry's Elsewhere and "In folders ddc did not read, or outside your home folder" numbers match `ddc changes`; Whole Disk… and Scan Now there work; Open Privacy Settings shows only after a scan without Full Disk Access.
+- [ ] Manual (owner): a clean from the entry leaves the window on it, rebuilt; the band then adds "you cleaned … since" when the cleans were big. Say whether the band should go once the popover was opened (it stays until the next scan now).
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
