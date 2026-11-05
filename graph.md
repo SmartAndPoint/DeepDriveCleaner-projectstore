@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-05T10:03:45.392Z
+generated_at: 2026-11-05T10:33:00.961Z
 
 ---
 
@@ -68,7 +68,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md | Review window: say when the saved scan is not of the home folder | story | done |
 | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md | Review window: sort a group's rows by name, size or last change | story | done |
 | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md | Review window: sorted sidebar, Select all and folder groups | story | done |
-| epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md | Scan after an update when the saved report cannot be read | story | planned |
+| epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md | Scan after an update when the saved report cannot be read | story | done |
 | epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update.md | Scheduled scans: register the agent again after an update | story | planned |
 | epics/DDC-002/stories/story-settings-folders-types-notifications.md | Settings: folders, types, notifications | story | done |
 | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md | Sparkle updates: check daily, Update and Relaunch, and the cask's auto_updates | story | done |
@@ -756,6 +756,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-say-when-the-saved-scan-is-not-of-the-home-folder.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-sort-a-groups-rows-by-name-size-or-last-change.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-review-window-sorted-sidebar-select-all-and-folder-groups.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-settings-folders-types-notifications.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-sparkle-updates-check-daily-update-and-relaunch-and-the-casks-autoupdates.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-the-trash-its-own-row-not-your-data.md |

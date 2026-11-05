@@ -397,6 +397,13 @@ Story: [Popover and Review: what grew since the earlier scan](../epics/DDC-002/s
 - [ ] Manual (owner): the entry's Elsewhere and "In folders ddc did not read, or outside your home folder" numbers match `ddc changes`; Whole Disk… and Scan Now there work; Open Privacy Settings shows only after a scan without Full Disk Access.
 - [ ] Manual (owner): a clean from the entry leaves the window on it, rebuilt; the band then adds "you cleaned … since" when the cleans were big. Say whether the band should go once the popover was opened (it stays until the next scan now).
 
+### Scan after an update (DDC-002)
+
+Story: [Scan after an update when the saved report cannot be read](../epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read.md).
+
+- [ ] Manual (owner): after the next update that changes the scan report's schema, with scheduled scans on, the popover shows "Scanning after the update…" within a minute of the relaunch, then the new report, with no "No scan yet" left; `app.log` has "launch: build … update scan due" and one `tick: update scan due`.
+- [ ] Manual (owner): on a Mac whose app lacks Full Disk Access, that scan raises no privacy prompt; a Scan Now pressed right after the relaunch leaves no second scan behind it.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
