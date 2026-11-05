@@ -3,17 +3,45 @@ type: story
 id: "story-popover-and-review-what-grew-since-the-earlier-scan"
 epic: "DDC-002"
 title: "Popover and Review: what grew since the earlier scan"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-05
 updated: 2026-11-05
 external_refs: {}
 tags: [app, growth, review, popover]
-code_refs: []
+code_refs:
+  - app/DeepDriveCleaner/AppDelegate.swift
+  - app/DeepDriveCleaner/PopoverView.swift
+  - app/DeepDriveCleaner/ReviewGrewView.swift
+  - app/DeepDriveCleaner/ReviewView.swift
+  - app/DeepDriveCleaner/ReviewWindowController.swift
+  - app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ChangesReport.swift
+  - app/Packages/DDCKit/Sources/DDCKit/Formatting.swift
+  - app/Packages/DDCKit/Sources/DDCKit/GrewEntry.swift
+  - app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ReviewRouting.swift
+  - app/Packages/DDCKit/Sources/DDCKit/RunnerActivity.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift
+  - app/Packages/DDCKit/Sources/DDCKit/SpaceReport.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/ChangesTests.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/GrewEntryTests.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/changes-compared.json
+  - app/Packages/DDCKit/Tests/DDCKitTests/Fixtures/changes-not-compared.json
+  - app/Packages/DDCKit/Tests/DDCKitTests/PopoverSupport.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/RunnerActivityTests.swift
+  - crates/ddc-cli/src/cmd/changes.rs
+  - crates/ddc-cli/tests/cases.json
+  - crates/ddc-core/src/changes/compare.rs
+  - crates/ddc-core/src/changes/mod.rs
+  - crates/ddc-core/tests/changes.rs
+  - docs/changes.schema.json
 specs: []
 started_at: "2026-11-05T09:56:43.466Z"
-closed_at: null
+closed_at: "2026-11-05T10:01:29.574Z"
 plan_updated_at: "2026-11-05T09:56:43.466Z"
 ---
 
@@ -22,7 +50,7 @@ plan_updated_at: "2026-11-05T09:56:43.466Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -89,18 +117,18 @@ A sidebar row "What grew +191 GiB" above the class sections (its tooltip and Voi
 
 PR 1, the field and the band:
 
-- [ ] Rust: `grew` in `ChangesReport` (`changes/mod.rs`; false in `not_compared`), computed in `compare.rs` from `disk()`'s current total with `space::grew_threshold`, in `i128` as `space::decide`; the schema regenerated; the `cmd/changes.rs` test helper; `cases.json`'s fresh-home case says `"grew": false`; ADR §6 item 15 gains a dated line
-- [ ] Rust test `the_apps_changes_fixtures_are_reports_the_cli_wrote` (as `tests/space.rs` makes the space fixtures): `changes-compared.json` and `changes-not-compared.json` in DDCKit's fixtures, from `scan-report-groups.json` and a baseline edited in memory, validated against the schema; run on the Windows host
-- [ ] DDCKit: `ChangesReport.swift` (strict, the fields above); `ScanReport.writtenAt`; `CLIRunner.Kind.changes`; `RunnerActivity` counts it with the scans; `PopoverModel.checkChanges()` and `attributedChanges`; `growthBand` = S5's band ?? the attributed one, `runSpace` checks S5's only; `GrowthBand.attributed` with the line rules and a `link`; `Wording.since`; `ReviewRequest.grew` (`GrewSection`); `PopoverModel.seeWhatGrew`; `ReviewModel.open`'s branch for a `grew` request (open window: reload, ticks kept)
-- [ ] `PopoverView`: the attributed band and its link, leaving what `ContractTests.spaceCallers` pins as it is
-- [ ] Tests: `ChangesTests.swift` (decoding both fixtures, strictness, the dropped result, every band state and precedence, the line rules, the link's request); `ContractTests.changesContracts` (version, enums against `$defs`, the fixtures validate, every key read is in its `$def`) and `changesCallers`; `RunnerActivityTests`; `FakeRunner` answers `.changes`
+- [x] Rust: `grew` in `ChangesReport` (`changes/mod.rs`; false in `not_compared`), computed in `compare.rs` from `disk()`'s current total with `space::grew_threshold`, in `i128` as `space::decide`; the schema regenerated; the `cmd/changes.rs` test helper; `cases.json`'s fresh-home case says `"grew": false`; ADR §6 item 15 gains a dated line
+- [x] Rust test `the_apps_changes_fixtures_are_reports_the_cli_wrote` (as `tests/space.rs` makes the space fixtures): `changes-compared.json` and `changes-not-compared.json` in DDCKit's fixtures, from `scan-report-groups.json` and a baseline edited in memory, validated against the schema; run on the Windows host
+- [x] DDCKit: `ChangesReport.swift` (strict, the fields above); `ScanReport.writtenAt`; `CLIRunner.Kind.changes`; `RunnerActivity` counts it with the scans; `PopoverModel.checkChanges()` and `attributedChanges`; `growthBand` = S5's band ?? the attributed one, `runSpace` checks S5's only; `GrowthBand.attributed` with the line rules and a `link`; `Wording.since`; `ReviewRequest.grew` (`GrewSection`); `PopoverModel.seeWhatGrew`; `ReviewModel.open`'s branch for a `grew` request (open window: reload, ticks kept)
+- [x] `PopoverView`: the attributed band and its link, leaving what `ContractTests.spaceCallers` pins as it is
+- [x] Tests: `ChangesTests.swift` (decoding both fixtures, strictness, the dropped result, every band state and precedence, the line rules, the link's request); `ContractTests.changesContracts` (version, enums against `$defs`, the fixtures validate, every key read is in its `$def`) and `changesCallers`; `RunnerActivityTests`; `FakeRunner` answers `.changes`
 
 PR 2, the entry:
 
-- [ ] DDCKit: `GrewEntry.swift`, a value from `(ReviewItems, ChangesReport, sort)`: matching, groups, Select all where the layout has it, header, sidebar number, the three sections, its own `Sort` and `filtered(items:query:)`; `ReviewSnapshot.changes`; `ReviewModel` `grewSince` (reset wherever `wholeDisk` and the entry change), `grewSort`, `open` for a `grew` request
-- [ ] Views: `ReviewGrewView.swift` (the entry, its sidebar row, its header, a scroll to the not-read section), `ReviewView` (the row and the branch), `ItemRow`'s Change; the not-read actions passed from `AppDelegate` through `ReviewWindowController` as `wholeDisk` is
-- [ ] Tests: `GrewEntryTests.swift`; `ContractTests.grewEntryReachesNoSheet` (no `openSheet`, `cleanSelected`, `cleanConfirmedItems`, `confirm: true`, `SelectAllRow(` or `PickedRow(` in `ReviewGrewView.swift`; `openSheet(` callers unchanged)
-- [ ] Owner checks in the runbook "Owner checks: manual acceptance across stories"
+- [x] DDCKit: `GrewEntry.swift`, a value from `(ReviewItems, ChangesReport, sort)`: matching, groups, Select all where the layout has it, header, sidebar number, the three sections, its own `Sort` and `filtered(items:query:)`; `ReviewSnapshot.changes`; `ReviewModel` `grewSince` (reset wherever `wholeDisk` and the entry change), `grewSort`, `open` for a `grew` request
+- [x] Views: `ReviewGrewView.swift` (the entry, its sidebar row, its header, a scroll to the not-read section), `ReviewView` (the row and the branch), `ItemRow`'s Change; the not-read actions passed from `AppDelegate` through `ReviewWindowController` as `wholeDisk` is
+- [x] Tests: `GrewEntryTests.swift`; `ContractTests.grewEntryReachesNoSheet` (no `openSheet`, `cleanSelected`, `cleanConfirmedItems`, `confirm: true`, `SelectAllRow(` or `PickedRow(` in `ReviewGrewView.swift`; `openSheet(` callers unchanged)
+- [x] Owner checks in the runbook "Owner checks: manual acceptance across stories"
 
 ## Implementation Plan
 
@@ -117,25 +145,34 @@ From the planner's pass and two critic rounds (2026-11-05), no covering spec. PR
 
 PR 1:
 
-- [ ] Test (core): `grew` is true exactly when the result compared, `disk` is present and `disk.delta` ≥ `grew_threshold(total)` (at the threshold true, a byte under false, on a 1000 GiB and a 100 GiB volume); false when not compared, without `disk`, or on a shrink; the committed schema equals the generated one; the app's fixtures are what `compare` writes and validate against it
-- [ ] Test (DDCKit): both fixtures decode; an unknown enum value and another `schema_version` are refused, an unknown key is skipped; a result whose `current.written_at` is not the loaded report's, or a loaded report without `written_at`, shows nothing
-- [ ] Test (DDCKit): the attributed band shows only with `grew` and its report, not during a scan; low disk and then S5's band win over it; it has no Scan Now and sets no badge; the second line follows the order: mostly not read or outside (with "Where Did It Go?"), mostly elsewhere in the home, one group at ≥ 60 % (new count, or grew count, and the harness), else "in N groups"; the cleans clause at a quarter; the compared-roots clause; "after your clean at" for a clean's baseline; never a shrink; paused keeps the text
-- [ ] Test (DDCKit): the link routes a `grew` request with `keepsSelection`; with the window open, `ReviewModel.open` keeps the person's ticks
-- [ ] Contract tests: the decoder's version and enums equal the schema's; only `PopoverModel` runs `changes`
-- [ ] The Windows and Linux legs, `make ddckit-test` and the Gate pass; a Debug `xcodebuild` of the app target compiles (the Gate builds none)
+- [x] Test (core): `grew` is true exactly when the result compared, `disk` is present and `disk.delta` ≥ `grew_threshold(total)` (at the threshold true, a byte under false, on a 1000 GiB and a 100 GiB volume); false when not compared, without `disk`, or on a shrink; the committed schema equals the generated one; the app's fixtures are what `compare` writes and validate against it — evidence: `grew_is_true_exactly_when_the_disk_grew_by_the_threshold`, `committed_changes_schema_is_current`, `the_apps_changes_fixtures_are_reports_the_cli_wrote` (crates/ddc-core/tests/changes.rs); Windows leg 1026/1026; Gate on #126 and on main for 8930772
+- [x] Test (DDCKit): both fixtures decode; an unknown enum value and another `schema_version` are refused, an unknown key is skipped; a result whose `current.written_at` is not the loaded report's, or a loaded report without `written_at`, shows nothing — evidence: ChangesTests `decodes`, `strict`, `otherReport`
+- [x] Test (DDCKit): the attributed band shows only with `grew` and its report, not during a scan; low disk and then S5's band win over it; it has no Scan Now and sets no badge; the second line follows the order: mostly not read or outside (with "Where Did It Go?"), mostly elsewhere in the home, one group at ≥ 60 % (new count, or grew count, and the harness), else "in N groups"; the cleans clause at a quarter; the compared-roots clause; "after your clean at" for a clean's baseline; never a shrink; paused keeps the text — evidence: ChangesTests `model`, `ownScan` (none during a scan), `precedence`, `lowDiskAndPaused`, `badge`, `firstLine` ("after your clean at" today, a day before), `noBand`, `mostlyOutside`, `mostlyElsewhere` (with no group grown), `groups`, `clauses`
+- [x] Test (DDCKit): the link routes a `grew` request with `keepsSelection`; with the window open, `ReviewModel.open` keeps the person's ticks — evidence: ChangesTests `link`, `reviewKeepsTicks`
+- [x] Contract tests: the decoder's version and enums equal the schema's; only `PopoverModel` runs `changes` — evidence: ContractTests `changesContracts` (version, six enums, every key read, the fixtures, `WrittenBy`), `changesCallers` (one run, from `loadReport` and `runScan`)
+- [x] The Windows and Linux legs, `make ddckit-test` and the Gate pass; a Debug `xcodebuild` of the app target compiles (the Gate builds none) — evidence: Windows leg 1026/1026 with native-skips; Linux gate-fast in the WSL hooks and the PR's check-linux; `make ddckit-test` 513 passed; Debug `xcodebuild` compiled; Gate green on #126 and main 8930772
 
 PR 2:
 
-- [ ] Test (DDCKit): the entry shows on a matched `new`, `grew` or `moved` row or on `grew` alone (then with no rows and its sections), not on `not-compared` or a first scan; rows are matched by path bytes and rule, never a `userEntry`, `typeOff` or `underMinimumSize` row; grouped by the Review row's group (Downloads in its own); sorted by Change with its own sort; a tick in the entry is the same tick in the group's entry; the header checkbox only where the group's layout has Select all; the sections have no item ids; the sidebar number is `home.delta`, else the positive groups' sum, else none
-- [ ] Test (DDCKit): a `grew` request with the window open keeps the person's ticks and shows the entry; Scan Again rebuilds it from the new result; a clean from the entry leaves the window on the entry, rebuilt; leaving it for a group or Whole disk clears it
-- [ ] Structure test: `ReviewGrewView.swift` reaches no sheet, and the `openSheet(` callers are the same files as before
-- [ ] `make ddckit-test` and the Gate pass; a Debug `xcodebuild` of the app target compiles
+- [x] Test (DDCKit): the entry shows on a matched `new`, `grew` or `moved` row or on `grew` alone (then with no rows and its sections), not on `not-compared` or a first scan; rows are matched by path bytes and rule, never a `userEntry`, `typeOff` or `underMinimumSize` row; grouped by the Review row's group (Downloads in its own); sorted by Change with its own sort; a tick in the entry is the same tick in the group's entry; the header checkbox only where the group's layout has Select all; the sections have no item ids; the sidebar number is `home.delta`, else the positive groups' sum, else none — evidence: GrewEntryTests `rows`, `shown`, `matching` (another rule, another spelling, `moved` with "≈"), `filters` (typeOff, underMinimumSize, a user-data entry), `groupsAndSelectAll`, `sort`, `filter`, `amount`, `notReadAndCleans`, `window` (the same ids as the group's rows)
+- [x] Test (DDCKit): a `grew` request with the window open keeps the person's ticks and shows the entry; Scan Again rebuilds it from the new result; a clean from the entry leaves the window on the entry, rebuilt; leaving it for a group or Whole disk clears it — evidence: GrewEntryTests `window`, `rebuilds` (Scan Again, the reload after a clean with the cleaned row gone, a result that compares nothing)
+- [x] Structure test: `ReviewGrewView.swift` reaches no sheet, and the `openSheet(` callers are the same files as before — evidence: ContractTests `grewEntryReachesNoSheet`
+- [x] `make ddckit-test` and the Gate pass; a Debug `xcodebuild` of the app target compiles — evidence: `make ddckit-test` 526 passed (and the pre-push hook's run); Debug `xcodebuild` compiled; #127's checks green (app, scope, the check legs) and main's Gate on 454cb0f
 - [ ] Owner check (runbook): after a day of builds and a Scan Now, the popover names the group that grew and See What Grew opens the entry with those rows, ticked as in their group; Elsewhere and the not-read section match `ddc changes`
 
 ## Final Summary
 
 <!-- Written at the done gate (/projectstore:story close): what changed, why,
      tests executed, risks and follow-ups. -->
+
+
+**What changed.** `ddc changes --json` gains `grew`, `ddc space`'s rule on the two reports' in-use space (schema stays 1). The app runs `ddc changes` after each report load and after its own scan, once per report (`written_at`, now decoded in `ScanReport`). The popover's band, when it grew and S5's signal and low disk have nothing to say, tells how much more is in use since the earlier scan and where: mostly in folders ddc did not read or outside the home folder, mostly elsewhere in the home folder, the group that grew most (with its new count and coding agent), or "in N groups"; with "you cleaned … since" and "compared in … only" when they apply. Its link opens the Review window's new "What grew" entry (PR 1 #126, 8930772): the window's own rows that are new, grew or moved, grouped by their Review group, with a Change column and their own sort, ticks shared with the groups and the footer still the only way to the sheet; then elsewhere in the home folder, what the scan did not read with its actions, and what the person cleaned or what went (PR 2 #127, 454cb0f).
+
+**Why.** S4 of the research "What grew since the last scan: a UX concept for the macOS app": after S2 the terminal could say where the space went, the app could not.
+
+**Tests.** Rust: the `grew` boundary and the fixture test that writes the app's `changes` fixtures from `compare`. DDCKit: `ChangesTests` (decoding, strictness, every band state and line rule, the model's calls, the badge, the link), `GrewEntryTests` (matching, filters, groups, Select all, sort, filter, sections, the window flow, rebuilds), `ContractTests` (`changesContracts`, `changesCallers`, `grewEntryReachesNoSheet`), `RunnerActivityTests`. DDCKit 526 passed; Windows leg 1026/1026; Linux gate-fast; Debug `xcodebuild` of the app target before each push; Gate green on both PRs and on main.
+
+**Risks and follow-ups.** Not seen on a real Mac yet (no release until the owner asks): the owner checks are in the runbook, including whether the band should go once the popover was opened. Open Privacy Settings follows the report's own Full Disk Access, not the app's now. The scroll to the not-read section uses an anchor on a `List` section, which may not land on every macOS. Folder sizes for growth elsewhere are S3; the growth notification S6; Whole disk's Change column S7; "since yesterday / last week" S8. The Gate builds no app target, so the Debug build stays a manual step before a push.
 
 ## Technical Notes
 
