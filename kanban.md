@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-05T06:09:05.635Z
+generated_at: 2026-11-05T06:59:17.872Z
 
 ---
 
@@ -59,8 +59,6 @@ generated_at: 2026-11-05T06:09:05.635Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans|DDC-001: ddc changes: what grew between the last two scans]] #p2
-- [ ] [[epics/DDC-002/stories/story-full-disk-access-check-on-macos-27|DDC-002: Full Disk Access check on macOS 27]] #p0
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
@@ -82,6 +80,7 @@ generated_at: 2026-11-05T06:09:05.635Z
 - [x] [[epics/DDC-001/stories/story-safe-cleanup-ddc-clean|DDC-001: Safe cleanup: ddc clean]] #p1 #done
 - [x] [[epics/DDC-001/stories/story-scheduled-background-scan|DDC-001: Scheduled background scan]] #p2 #done
 - [x] [[epics/DDC-001/stories/story-workspace-skeleton-and-parallel-fs-scanner|DDC-001: Workspace skeleton and parallel filesystem scanner]] #p1 #done
+- [x] [[epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans|DDC-001: ddc changes: what grew between the last two scans]] #p2 #done
 - [x] [[epics/DDC-001/stories/story-keep-the-previous-scan-report-and-say-who-wrote-each|DDC-001: Keep the previous scan report, and say who wrote each]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-app-skeleton-and-build-pipeline|DDC-002: App skeleton and build pipeline]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app|DDC-002: Background scan and notifications in the app]] #p2 #done
@@ -121,6 +120,7 @@ generated_at: 2026-11-05T06:09:05.635Z
 - [x] [[epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one|DDC-002: Review window: pick a coding agent's sessions one by one]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once|DDC-002: Confirmation sheet: Delete permanently for every item at once]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan|DDC-002: Popover: say when used space grew since the last scan]] #p2 #done
+- [x] [[epics/DDC-002/stories/story-full-disk-access-check-on-macos-27|DDC-002: Full Disk Access check on macOS 27]] #p0 #done
 - [x] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2 #done
 - [x] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1 #done

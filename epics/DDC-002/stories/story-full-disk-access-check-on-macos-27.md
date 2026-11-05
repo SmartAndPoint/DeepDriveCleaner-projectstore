@@ -3,17 +3,27 @@ type: story
 id: "story-full-disk-access-check-on-macos-27"
 epic: "DDC-002"
 title: "Full Disk Access check on macOS 27"
-status: in-progress
+status: done
 priority: p0
 assignee: "Evgenii Konev"
 created: 2026-11-05
 updated: 2026-11-05
 external_refs: {}
 tags: [app, cli, permissions, macos, bug]
-code_refs: []
+code_refs:
+  - app/DeepDriveCleaner/AppDelegate.swift
+  - app/DeepDriveCleaner/DebugMenu.swift
+  - app/Packages/DDCKit/Sources/DDCKit/FullDiskAccessProbe.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/ContractTests.swift
+  - app/Packages/DDCKit/Tests/DDCKitTests/FullDiskAccessProbeTests.swift
+  - crates/ddc-core/src/report/mod.rs
+  - crates/ddc-core/tests/report.rs
+  - crates/ddc-cli/tests/background_cli.rs
+  - .config/native-skips/windows.txt
 specs: []
 started_at: "2026-11-05T05:58:03.953Z"
-closed_at: null
+closed_at: "2026-11-05T06:52:17.192Z"
 plan_updated_at: "2026-11-05T05:58:03.953Z"
 ---
 
@@ -22,7 +32,7 @@ plan_updated_at: "2026-11-05T05:58:03.953Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | done |
 | **Priority** | p0 |
 | **Assignee** | Evgenii Konev |
 
@@ -52,11 +62,11 @@ The system database (`/Library/Application Support/com.apple.TCC/TCC.db`, which 
 
 ## Decomposition
 
-- [ ] ddc-core `report/mod.rs`: `FULL_DISK_ACCESS_PROBES` (home-relative path and kind, in order) and `granted_by` over a given list; `full_disk_access_with` builds the list from `Env::home()`; directory reads through `stats::read_dir` (structure test `the_core_reads_directories_only_through_the_counters`); no `std::os::unix` in `src` (structure test `no_file_outside_the_platform_folders_names_an_os`), so an unreadable probe in the unit tests is a file where its folder should be, not mode 000
-- [ ] ddc-cli `tests/background_cli.rs`: a background scan with only a listable `Library/Safari` scans the prompting areas; its name in `.config/native-skips/windows.txt` (gated by `common::unsupported` only, like `with_full_disk_access_prompting_areas_are_scanned`; on Linux it passes because no capability withholds anything); the comment in `tests/report.rs`
-- [ ] DDCKit `FullDiskAccessProbe`: `homeRelative` (the same list), `locations(home:)`, `init(locations:)` (`init(path:)` stays, a one-file list, for the popover tests in `PopoverSupport.swift`, `RealCLISettingsTests.swift` and `PopoverModelTests.swift`), `steps()` (each step's errno, up to the first read) and `check()` (`.missing` carries the last step's errno); `FullDiskAccessProbeTests.swift`; a `ContractTests` case that compares `homeRelative` with `FULL_DISK_ACCESS_PROBES`; the comment in `ScanReport.swift`
-- [ ] App: `AppDelegate.fullDiskAccessProbe` over the real home replaces `tccDatabase`; the Debug menu's "Probe Full Disk Access" logs one line per step
-- [ ] Owner check in the runbook "Owner checks: manual acceptance across stories"
+- [x] ddc-core `report/mod.rs`: `FULL_DISK_ACCESS_PROBES` (home-relative path and kind, in order) and `granted_by` over a given list; `full_disk_access_with` builds the list from `Env::home()`; directory reads through `stats::read_dir` (structure test `the_core_reads_directories_only_through_the_counters`); no `std::os::unix` in `src` (structure test `no_file_outside_the_platform_folders_names_an_os`), so an unreadable probe in the unit tests is a file where its folder should be, not mode 000
+- [x] ddc-cli `tests/background_cli.rs`: a background scan with only a listable `Library/Safari` scans the prompting areas; its name in `.config/native-skips/windows.txt` (gated by `common::unsupported` only, like `with_full_disk_access_prompting_areas_are_scanned`; on Linux it passes because no capability withholds anything); the comment in `tests/report.rs`
+- [x] DDCKit `FullDiskAccessProbe`: `homeRelative` (the same list), `locations(home:)`, `init(locations:)` (`init(path:)` stays, a one-file list, for the popover tests in `PopoverSupport.swift`, `RealCLISettingsTests.swift` and `PopoverModelTests.swift`), `steps()` (each step's errno, up to the first read) and `check()` (`.missing` carries the last step's errno); `FullDiskAccessProbeTests.swift`; a `ContractTests` case that compares `homeRelative` with `FULL_DISK_ACCESS_PROBES`; the comment in `ScanReport.swift`
+- [x] App: `AppDelegate.fullDiskAccessProbe` over the real home replaces `tccDatabase`; the Debug menu's "Probe Full Disk Access" logs one line per step
+- [x] Owner check in the runbook "Owner checks: manual acceptance across stories"
 
 ## Implementation Plan
 
@@ -78,17 +88,26 @@ From the planner's pass (2026-11-05), no covering spec:
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Test (ddc-core, temporary paths, every platform): a readable `TCC.db` is granted; with no `TCC.db`, a listable Safari folder is granted, empty or not; a refused `TCC.db` with a listable Safari folder is granted (the forum's macOS 27 case); none, a refused `TCC.db` alone, and both refused are not granted (no grant, any macOS); without the `full-disk-access` capability it is granted as today
-- [ ] Test (ddc-cli): `ddc scan --background` with no `TCC.db` and a listable `Library/Safari` in the temporary home scans the prompting areas and says `full_disk_access: true`, as `with_full_disk_access_prompting_areas_are_scanned` does with a `TCC.db`
-- [ ] Test (DDCKit): `FullDiskAccessProbe` gives the same answers, with refusals by mode 000 (`EACCES`, which takes the same path as `EPERM`), and stops at the first read (a readable `TCC.db` leaves the Safari folder untried); the contract test holds both lists equal
-- [ ] Every test that expects "not granted" in a temporary home is unchanged and passes: `tests/report.rs`'s `unreadable_folders_are_reported` (`full_disk_access == !tcc`) and `background_cli.rs`'s `tcc_areas_are_never_opened` (a temporary home has neither path); the goldens hold `full_disk_access` as volatile
-- [ ] The Gate passes on all legs and `make ddckit-test` passes
+- [x] Test (ddc-core, temporary paths, every platform): a readable `TCC.db` is granted; with no `TCC.db`, a listable Safari folder is granted, empty or not; a refused `TCC.db` with a listable Safari folder is granted (the forum's macOS 27 case); none, a refused `TCC.db` alone, and both refused are not granted (no grant, any macOS); without the `full-disk-access` capability it is granted as today — evidence: `a_readable_tcc_database_grants_full_disk_access`, `without_a_tcc_database_a_listable_safari_folder_grants_full_disk_access`, `a_refused_tcc_database_and_a_listable_safari_folder_grant_full_disk_access`, `when_no_probe_can_be_read_full_disk_access_is_not_granted`, `full_disk_access_reads_the_probes_in_the_home`, `full_disk_access_is_true_without_the_capability` (crates/ddc-core/src/report/mod.rs); Windows leg 1014/1014, Linux gate-fast, main's Gate on 5b001c1
+- [x] Test (ddc-cli): `ddc scan --background` with no `TCC.db` and a listable `Library/Safari` in the temporary home scans the prompting areas and says `full_disk_access: true`, as `with_full_disk_access_prompting_areas_are_scanned` does with a `TCC.db` — evidence: `without_a_tcc_database_a_listable_safari_folder_scans_the_prompting_areas` (crates/ddc-cli/tests/background_cli.rs), run on macOS by main's Gate on 5b001c1; listed in .config/native-skips/windows.txt
+- [x] Test (DDCKit): `FullDiskAccessProbe` gives the same answers, with refusals by mode 000 (`EACCES`, which takes the same path as `EPERM`), and stops at the first read (a readable `TCC.db` leaves the Safari folder untried); the contract test holds both lists equal — evidence: FullDiskAccessProbeTests.swift (`readableTCC`, `safariAnswers`, `neither`, `refusedTCCThenSafari`, `refusedTCCAlone`, `bothRefused`, `unlistableSafari`, `empty`, `locations`); ContractTests `fullDiskAccessProbes`; `make ddckit-test` 493 passed
+- [x] Every test that expects "not granted" in a temporary home is unchanged and passes: `tests/report.rs`'s `unreadable_folders_are_reported` (`full_disk_access == !tcc`) and `background_cli.rs`'s `tcc_areas_are_never_opened` (a temporary home has neither path); the goldens hold `full_disk_access` as volatile — evidence: `unreadable_folders_are_reported` (crates/ddc-core/tests/report.rs, comment only changed) and `tcc_areas_are_never_opened` (unchanged) pass in main's Gate on 5b001c1; `full_disk_access` in VOLATILE (crates/ddc-cli/tests/golden_cli.rs)
+- [x] The Gate passes on all legs and `make ddckit-test` passes — evidence: PR #123's Gate green on every leg, main's Gate on 5b001c1 success; `make ddckit-test` 493 passed; a Debug `xcodebuild` of the app target compiled (the Gate builds no app target)
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): on macOS 27 with the grant on, the popover shows no "Full Disk Access Needed" and the report of the app's next scan (not `ddc scan` in Terminal, whose access is Terminal's) has `full_disk_access: true`; with the grant switched off, it says "Full Disk Access Needed" again; on a Mac with macOS 26 or older, if one is at hand, nothing changes. If the grant on still says "Needed", the owner runs `ls -la ~/Library/Application\ Support/com.apple.TCC/ ~/Library/Safari` in their own Terminal and sends both error texts with whether Terminal has the grant (the release has no Debug menu), and the next fix is chosen from them: the system database step above, or another folder
 
 ## Final Summary
 
 <!-- Written at the done gate (/projectstore:story close): what changed, why,
      tests executed, risks and follow-ups. -->
+
+
+**What changed.** The app's `FullDiskAccessProbe` and the CLI's `report::full_disk_access` now try, in order, the per-user `TCC.db` (opened) and `~/Library/Safari` (listed); any one read means granted, any error of a step sends the check to the next, none read means not granted. One list in each side (`FULL_DISK_ACCESS_PROBES`, `FullDiskAccessProbe.homeRelative`), held equal by a DDCKit contract test. The Debug menu logs each step's errno. PR #123 (5b001c1).
+
+**Why.** On macOS 27 the per-user `TCC.db` is gone or refused even with the grant, so the popover said "Full Disk Access Needed" with the switch on, and every background scan skipped the prompting areas (the owner, 2026-11-05).
+
+**Tests.** ddc-core unit tests over temporary homes (an unreadable probe is a file in place of its folder, so they run on every platform); a background-scan CLI test with only `Library/Safari`; DDCKit `FullDiskAccessProbeTests` with mode-000 refusals and the contract test. DDCKit 493 passed, Windows leg 1014/1014, Linux gate-fast green, a Debug build of the app target compiled, PR and main Gates green.
+
+**Risks and follow-ups.** Not yet seen on the owner's macOS 27: whether `~/Library/Safari` lists there with the grant (owner check in the runbook; if not, the system database step with a `--system-root` for `ddc scan` is next). An account where Safari never ran keeps today's answer. Older macOS keeps its answer; the app and the CLI need macOS 26 or later. The Gate builds no app target (a follow-up for the build matrix). `bench/make_baseline.py` still reads only `TCC.db`.
 
 ## Technical Notes
 

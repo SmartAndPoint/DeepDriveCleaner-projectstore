@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-05T06:09:05.818Z
+generated_at: 2026-11-05T06:59:18.022Z
 
 ---
 
@@ -25,7 +25,7 @@ full typed neighborhood, both directions, in one call.
 | adr/updates-through-sparkle-alongside-the-homebrew-cask.md | Updates through Sparkle, alongside the Homebrew cask | adr | accepted |
 | adr/windows-app-tauri-2-shell-over-the-ddc-cli.md | Windows app: Tauri 2 shell over the ddc CLI | adr | accepted |
 | epics/DDC-001/epic.md | Disk space cleaner CLI for developers | epic | in-progress |
-| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | ddc changes: what grew between the last two scans | story | in-progress |
+| epics/DDC-001/stories/story-ddc-changes-what-grew-between-the-last-two-scans.md | ddc changes: what grew between the last two scans | story | done |
 | epics/DDC-001/stories/story-ddc-scan-report.md | ddc scan report | story | done |
 | epics/DDC-001/stories/story-detection-rule-catalog.md | Detection rule catalog | story | done |
 | epics/DDC-001/stories/story-duplicates-and-apfs-private-size.md | Duplicates and APFS private size | story | planned |
@@ -49,7 +49,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | done |
 | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | Docker Desktop: what is inside its disk image, and what a clean frees | story | planned |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
-| epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | Full Disk Access check on macOS 27 | story | in-progress |
+| epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | Full Disk Access check on macOS 27 | story | done |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
 | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | planned |
