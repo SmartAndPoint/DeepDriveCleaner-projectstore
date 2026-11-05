@@ -3,17 +3,17 @@ type: story
 id: "story-linux-file-kinds-special-files-immutable-flags-sparse-files-and-odd-names"
 epic: "DDC-010"
 title: "Linux file kinds: special files, immutable flags, sparse files and odd names"
-status: in-progress
+status: done
 priority: p1
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-04
+updated: 2026-11-05
 external_refs: {}
 tags: [linux, scanner, safety, clean, filesystems]
-code_refs: []
+code_refs: [".config/native-skips/linux.txt", ".config/native-skips/windows.txt", "scripts/ci-mounts.sh", "crates/ddc-cli/src/cmd/background.rs", "crates/ddc-cli/src/notify.rs", "crates/ddc-cli/src/render.rs", "crates/ddc-cli/src/prompt.rs", "crates/ddc-cli/tests/cases.json", "crates/ddc-cli/tests/cases_cli.rs", "crates/ddc-cli/tests/clean_cli.rs", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/exec/delete.rs", "crates/ddc-core/src/exec/guard.rs", "crates/ddc-core/src/exec/mod.rs", "crates/ddc-core/src/exec/preflight.rs", "crates/ddc-core/src/keep.rs", "crates/ddc-core/src/model.rs", "crates/ddc-core/src/platform/mod.rs", "crates/ddc-core/src/platform/linux/bulk.rs", "crates/ddc-core/src/platform/linux/fsops.rs", "crates/ddc-core/src/platform/linux/trash.rs", "crates/ddc-core/src/platform/macos/fsops.rs", "crates/ddc-core/src/platform/windows/fsops.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/rules/entries.rs", "crates/ddc-core/src/rules/mod.rs", "crates/ddc-core/src/rules/toolchain.rs", "crates/ddc-core/src/rules/visitor.rs", "crates/ddc-core/src/scan/reader.rs", "crates/ddc-core/src/scan/walker.rs", "crates/ddc-core/src/scan/mod.rs", "app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanReport.swift", "app/Packages/DDCKit/Sources/DDCKit/CleanWording.swift", "crates/ddc-core/tests/file_kinds.rs", "crates/ddc-core/tests/clean_safety.rs", "crates/ddc-core/tests/clean_items.rs", "crates/ddc-core/tests/protection.rs", "crates/ddc-core/tests/scanner.rs", "crates/ddc-core/tests/user_data.rs", "crates/ddc-core/tests/keep.rs", "crates/ddc-core/tests/common/mounts.rs", "crates/ddc-core/tests/common/fakes.rs"]
 specs: []
 started_at: "2026-11-04T11:05:10.552Z"
-closed_at: null
+closed_at: "2026-11-05T08:20:07.866Z"
 plan_updated_at: "2026-11-04T11:05:10.552Z"
 ---
 
@@ -22,7 +22,7 @@ plan_updated_at: "2026-11-04T11:05:10.552Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-010](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p1 |
 | **Assignee** | Evgenii Konev |
 
@@ -132,16 +132,34 @@ Four code PRs, each with its own bump, merged only after the `linux-mounts` job 
 
 ## Acceptance Criteria
 
-- [ ] A FIFO, a socket and a device node inside a finding are counted, never opened, and on Linux never copied by a clean. A marker file that is a device, a FIFO, or a symlink to one, reads as absent (tests; the device node in the CI mounts job).
-- [ ] A finding that holds an immutable or append-only file is never planned. A clean of a stale plan that includes one refuses it before the rename and leaves no tombstone (fake-reader test on every OS, plus the prepared `chattr` tree in the CI mounts job, cleaned through `--items`).
-- [ ] On casefold ext4 and exFAT, a protected folder in another case stays protected. Rule names match byte for byte on every filesystem (tests in the CI mounts job).
-- [ ] A sparse file is reported at its allocated size by `scan`, `du` and `clean` (test).
-- [ ] Names with a newline, a tab, a backslash, a leading dash or 255 bytes, and a path past `PATH_MAX`, go through scan, JSON, text and clean without a crash. The suggested clean command, pasted into `sh`, names the same path, or no command is suggested (tests and cases).
-- [ ] Removing a tombstone with a tmpfs, a bind mount or a btrfs subvolume inside leaves them intact, and the error reports the item `failed`, naming the tombstone (`remove_tree` test on a CI-prepared tree).
-- [ ] On exFAT, a `.Trash-$uid` whose mode stays open refuses the move as `trash-crosses-filesystem`, in the dry run too (CI mounts test).
-- [ ] The safety ADR §5 and §6 state the rules for special files, immutable flags, removal through descriptors, case, and exFAT/FAT, critic-approved.
+- [x] A FIFO, a socket and a device node inside a finding are counted, never opened, and on Linux never copied by a clean. A marker file that is a device, a FIFO, or a symlink to one, reads as absent (tests; the device node in the CI mounts job). — evidence: `crates/ddc-core/tests/file_kinds.rs` a_fifo_and_a_socket_in_a_finding_are_never_opened, a_device_node_in_a_finding_is_counted_never_opened_and_unlinked, a_device_node_moves_into_the_trash_unopened (inotify `IN_OPEN`, CI linux-mounts); `clean_safety.rs` a_fifo_where_a_marker_should_be_never_blocks_the_scan; `mounts.rs` the_prepared_device_is_a_character_device (a device reads as no marker); `worktrees.rs` a_worktree_whose_dot_git_is_a_symlink_is_not_one; PR #117 (0.33.1)
+- [x] A finding that holds an immutable or append-only file is never planned. A clean of a stale plan that includes one refuses it before the rename and leaves no tombstone (fake-reader test on every OS, plus the prepared `chattr` tree in the CI mounts job, cleaned through `--items`). — evidence: `clean_safety.rs` a_flagged_entry_keeps_a_finding_unselected_and_unremoved, `clean_items.rs` a_flag_set_inside_an_item_after_the_review_is_refused_by_the_dry_run, `user_data.rs` a_picked_folder_with_a_flagged_file_inside_is_refused_by_the_dry_run (fake reader; macOS and Linux, skipped on Windows with their unsupported fixtures, where no such flag exists); `clean_safety.rs` a_locked_file_or_folder_keeps_its_finding_out_of_a_plan_and_a_clean (real `chflags uchg`, macOS gate PASS); `file_kinds.rs` findings_holding_a_flag_only_root_sets_are_listed_and_refused_through_items (CI `chattr` tree, stale plan and `--items`, linux-mounts PASS); PR #124
+- [x] On casefold ext4 and exFAT, a protected folder in another case stays protected. Rule names match byte for byte on every filesystem (tests in the CI mounts job). — evidence: `file_kinds.rs` a_protected_folder_in_another_case_is_refused_on_casefold / _on_exfat / _refused, a_rule_name_in_another_case_is_not_the_rule_on_casefold / _on_exfat; `protection.rs` a_rule_name_in_another_case_is_not_the_rule (APFS, ext4); PR #120 (0.34.1)
+- [x] A sparse file is reported at its allocated size by `scan`, `du` and `clean` (test). — evidence: `crates/ddc-cli/tests/clean_cli.rs` a_sparse_file_counts_its_allocated_size_in_scan_du_and_clean; PR #117
+- [x] Names with a newline, a tab, a backslash, a leading dash or 255 bytes, and a path past `PATH_MAX`, go through scan, JSON, text and clean without a crash. The suggested clean command, pasted into `sh`, names the same path, or no command is suggested (tests and cases). — evidence: `crates/ddc-cli/src/render.rs` tests the_clean_command_pasted_into_sh_names_the_same_paths, control_characters_are_escaped; `crates/ddc-cli/tests/cases.json` (eight `"unix": true` rows) via `cases_cli.rs`; `clean_safety.rs` a_tombstone_with_a_255_byte_name_is_removed; `exec/delete.rs` a_long_name_is_cut_on_a_character_so_the_suffix_fits, a_name_too_long_for_the_filesystem_is_tried_shorter_each_time; PR #117
+- [x] Removing a tombstone with a tmpfs, a bind mount or a btrfs subvolume inside leaves them intact, and the error reports the item `failed`, naming the tombstone (`remove_tree` test on a CI-prepared tree). — evidence: `file_kinds.rs` a_removal_never_crosses_a_mount_made_inside_a_tombstone (CI tmpfs, bind mount, user-made btrfs subvolume; linux-mounts PASS); `clean_safety.rs` a_folder_closed_after_the_plan_stops_the_removal_and_keeps_the_tombstone (the `failed` outcome naming the tombstone), a_tombstone_swapped_after_the_check_is_left_whole, a_symlink_inside_a_deleted_finding_is_unlinked_never_followed; `ddc-cli/tests/structure.rs` only_the_tombstone_removal_removes_a_tree; PR #125
+- [x] On exFAT, a `.Trash-$uid` whose mode stays open refuses the move as `trash-crosses-filesystem`, in the dry run too (CI mounts test). — evidence: `file_kinds.rs` an_exfat_trash_that_stays_open_refuses_the_move (linux-mounts PASS); PR #117
+- [x] The safety ADR §5 and §6 state the rules for special files, immutable flags, removal through descriptors, case, and exFAT/FAT, critic-approved. — evidence: `adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md`, amendment of 2026-11-04 (vault PRs #98 and #102), critic-approved after three passes
 
 ## Final Summary
+
+**What changed.** Four code PRs, all on main:
+- #117 (released in 0.33.1): markers open only as regular files (`O_NOFOLLOW | O_NONBLOCK | O_NOCTTY`, then `fstat`); tombstone names cut on a character boundary with an `ENAMETOOLONG` retry; the suggested clean command keeps a newline or tab literal for dash, or suggests none; the Linux Trash re-checks its modes after `fchmod` and refuses an exFAT/FAT Trash that stays open, in the dry run too; device, FIFO, socket, sparse and odd-name tests and CI fixtures.
+- #120 (0.34.1, tagged, not yet published): `.ddc-keep` in any ASCII case in the rule visitor, `keep_markers`, `walk_item` and the checks above an item; protected folders by fold and `(dev, ino)`; `keep remove` names a marker in another case instead of saying none is there.
+- #124: immutable and append-only flags (`STATX_ATTR_IMMUTABLE`/`APPEND` on Linux, `UF_`/`SF_` flags on macOS) keep a finding, a picked entry and a worktree out of every plan, and the clean refuses them before any rename (`immutable`). Schemas: scan 9, clean 12, journal 12, progress 10.
+- #125: a tombstone is removed through descriptors (`DirFd::remove_tree`), never by path: each level opens beneath its parent and must keep its device and mount id; the opened tombstone must be the `(dev, ino)` the guard checked; a stop leaves the tombstone and reports `failed`.
+
+**Why.** A developer's home holds more than regular files: these kinds could hang a scan on a FIFO, read a device, make a folder that never empties from the Trash, or let a removal follow a mount made inside a finding.
+
+**Tests executed.** Full native Linux leg on a Linux machine after each PR (last: 1086 passed, 161 skips as listed); CI Gate on every PR, linux-mounts included and green before each merge; DDCKit 493 passed for #124.
+
+**Risks and follow-ups.**
+- Releases now go in batches (the owner, 2026-11-04): #124 and #125 carry no bump. The 0.34.1 tag is unpublished because the notary keychain item is missing on the owner's Mac; the next release covers 0.34.1, #122, #123, #124 and #125.
+- A folder made unreadable (`0000`) inside a finding after the scan now stops the removal and keeps the tombstone, where the old path-based chmod opened it. Fail-closed and rare; a line in the ADR's "What stops the descent" would make it explicit.
+- The `openat` fallback of `remove_tree` (no `openat2`, as under an old seccomp profile) has no test of its own; the walk's fallback has one.
+- The dry run and the clean can name different reasons for one refused item (the clean's walk before it finds a flag earlier than the dry run's checks); both refuse.
+- `Action::Delete { make_writable }` and `Fallback::DeleteWritable` now mean the same as plain delete; kept so the plan's shape does not move.
+- Manual check for the owner: none beyond the automated ones.
 
 ## Technical Notes
 
@@ -161,4 +179,4 @@ Four code PRs, each with its own bump, merged only after the `linux-mounts` job 
 
 ---
 
-*Last updated: 2026-11-04*
+*Last updated: 2026-11-05*
