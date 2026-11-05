@@ -342,6 +342,7 @@ These changes are additive. One change is visible in the terminal: a held lock e
     - **Exit codes**: 0 when it compared or said why not; 1 when a report or the journal exists but cannot be read, with a `ddc:` line and no JSON; 2 on a usage error; 69 on an unsupported platform; never 75.
     - **Where it differs from the story's Decomposition**, decided while building it: the journal window has an upper bound, the current report's `written_at`, so a clean after the last save is not counted; a rule must be in both reports' `rules_in_force`, not only the baseline's; a matched finding under the other side's not-read path is `not-compared` too; `removed-not-recycled` (journal 11, the Recycle Bin) counts as removed, not trashed; a journaled clean keeps a gone finding out of `moved`; groups count `moved` rows, and rows carry `approximate`.
     - **Known limits.** A finding whose walk was cut short inside it (a `target/` rebuilt during the scan, with a `changed` path inside it) compares at the size read; a `changed` path at the finding itself makes it `not-compared`. A clean from a folder that then grew by more is not credited, since the folder did not shrink; a gone folder with any credit counts as cleaned whole, so "You cleaned" can include what went another way. Area actions of `ddc disk free` other than `brew-cleanup` are not credited. Right after a clean the disk's in-use may not drop yet (APFS frees late, local Time Machine snapshots hold the blocks): the cleaned bytes then read as `rest` until the system frees them; S4 says so beside its snapshots sentence. The app's "Grew since …" entry is S4; the `ddc scan` block is this story's second pull request.
+    - **`grew`** (amended 2026-11-05, story "Popover and Review: what grew since the earlier scan", S4). A top-level `grew: bool`, always written: true when the result compared, `disk` is present and `disk.delta` is at least `space::grew_threshold` of the current volume's total, the rule of item 13. `CHANGES_SCHEMA_VERSION` stays 1 (`#[serde(default)]`, as the scan report's additive fields kept theirs). The app shows its attributed band only on `grew`, and compares no threshold.
 
 ### 7. Consent: the confirmation sheet is interactive consent
 
@@ -511,4 +512,4 @@ The owner's questions (minimum macOS, the notification's second action, the sign
 
 ---
 
-*Last updated: 2026-11-04*
+*Last updated: 2026-11-05*
