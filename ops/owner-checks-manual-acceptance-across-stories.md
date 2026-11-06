@@ -404,6 +404,14 @@ Story: [Scan after an update when the saved report cannot be read](../epics/DDC-
 - [ ] Manual (owner): after the next update that changes the scan report's schema, with scheduled scans on, the popover shows "Scanning after the update…" within a minute of the relaunch, then the new report, with no "No scan yet" left; `app.log` has "launch: build … update scan due" and one `tick: update scan due`.
 - [ ] Manual (owner): on a Mac whose app lacks Full Disk Access, that scan raises no privacy prompt; a Scan Now pressed right after the relaunch leaves no second scan behind it.
 
+### Scheduled scans after an update (DDC-002)
+
+Story: [Scheduled scans: register the agent again after an update](../epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update.md).
+
+- [ ] Manual (owner): after the update that ships this, `launchctl print gui/$(id -u)/com.smartandpoint.deepdrivecleaner.scheduler` shows the new build (`parent bundle version`) and no "spawn failed"; `app.log` has "registering the agent again" once, and a `tick:` line within the hour; say whether macOS showed a Login Items notice or asked for approval again.
+- [ ] Manual (owner): after a logout and login, or a restart, `launchctl print` still shows the new build with no "spawn failed", and a `tick:` arrives within the hour. If not, the story's plan C (a per-build label) is next.
+- [ ] Manual (owner): the login item (`SMAppService.mainApp`) is still on; the popover footer never said "Scheduled scans are not running" while ticks arrived (a night asleep, a logout).
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
