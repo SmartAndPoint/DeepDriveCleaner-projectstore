@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-05T10:33:00.811Z
+generated_at: 2026-11-06T10:44:44.045Z
 
 ---
 
@@ -13,7 +13,6 @@ generated_at: 2026-11-05T10:33:00.811Z
 - [ ] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2
 - [ ] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2
 - [ ] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2
-- [ ] [[epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update|DDC-002: Scheduled scans: register the agent again after an update]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
@@ -119,6 +118,7 @@ generated_at: 2026-11-05T10:33:00.811Z
 - [x] [[epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once|DDC-002: Confirmation sheet: Delete permanently for every item at once]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan|DDC-002: Popover: say when used space grew since the last scan]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read|DDC-002: Scan after an update when the saved report cannot be read]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update|DDC-002: Scheduled scans: register the agent again after an update]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-full-disk-access-check-on-macos-27|DDC-002: Full Disk Access check on macOS 27]] #p0 #done
 - [x] [[epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan|DDC-002: Popover and Review: what grew since the earlier scan]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2 #done
