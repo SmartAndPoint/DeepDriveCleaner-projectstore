@@ -421,6 +421,12 @@ Story: [Busy: name the scan or clean that holds the lock, and offer to stop it](
 - [ ] Manual (owner): with a terminal clean running again, Wait on the sheet's Clean cleans the sheet's items once the terminal clean ends; closing the sheet while it waits cleans nothing.
 - [ ] Manual (owner): Scan now while a terminal clean runs shows the busy notice with the holder, Stop and Wait; Wait scans once it ends.
 
+### Why a new scan is needed after an update (DDC-002)
+
+Story: [Popover: after an update, say why a new scan is needed](../epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md).
+
+- [ ] Manual (owner): after the next update that changes the scan report's schema, with scheduled scans off or paused, the popover names the version that made the last scan ("Your last scan was made by ddc …"), its subtitle reads "Last scan by ddc … · scan again", the icon shows no warning, and Scan Now replaces the report.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.

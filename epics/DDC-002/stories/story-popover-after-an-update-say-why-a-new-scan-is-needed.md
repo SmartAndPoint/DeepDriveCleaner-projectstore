@@ -3,17 +3,27 @@ type: story
 id: "story-popover-after-an-update-say-why-a-new-scan-is-needed"
 epic: "DDC-002"
 title: "Popover: after an update, say why a new scan is needed"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-02
 updated: 2026-11-08
 external_refs: {}
 tags: [app, popover, updates]
-code_refs: []
+code_refs:
+  - app/Packages/DDCKit/Sources/DDCKit/OtherVersion.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ScanReport.swift
+  - app/Packages/DDCKit/Sources/DDCKit/DiskReport.swift
+  - app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/DiskModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/BrewPackagesModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/AgentsModel.swift
+  - app/DeepDriveCleaner/PopoverView.swift
+  - app/DeepDriveCleaner/DiskView.swift
+  - app/DeepDriveCleaner/AppDelegate.swift
 specs: []
 started_at: "2026-11-08T11:35:14.275Z"
-closed_at: null
+closed_at: "2026-11-08T12:02:45.059Z"
 plan_updated_at: "2026-11-08T11:35:14.275Z"
 ---
 
@@ -44,11 +54,11 @@ The popover should say what it knows, not guess. An older-schema report has two 
 
 ## Decomposition
 
-- [ ] DDCKit: `VersionHeader` also decodes `ddc_version` (optional); `ScanReport.ReadError.otherSchema` carries it
-- [ ] `PopoverModel`: a state for an older- or newer-schema report with the maker's version, `Content.otherVersion`, the header subtitle
-- [ ] `PopoverView`: the block with Scan Now and the next scheduled scan from `ScanDue`
-- [ ] `DiskModel`/`DiskView`: the same wording family from `last-disk.json`'s header
-- [ ] DDCKit tests
+- [x] DDCKit: `VersionHeader` also decodes `ddc_version` (optional); `ScanReport.ReadError.otherSchema` carries it
+- [x] `PopoverModel`: a state for an older- or newer-schema report with the maker's version, `Content.otherVersion`, the header subtitle
+- [x] `PopoverView`: the block with Scan Now and the next scheduled scan from `ScanDue`
+- [x] `DiskModel`/`DiskView`: the same wording family from `last-disk.json`'s header
+- [x] DDCKit tests
 
 ## Implementation Plan
 
@@ -79,16 +89,26 @@ Code refs, proposed: `app/Packages/DDCKit/Sources/DDCKit/{ScanReport,DiskReport,
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Test (DDCKit): a `last-scan.json` of an older schema whose `ddc_version` is older than the app's gives the other-version content, not `firstScan`; its text names that version and says "after the update"; the header subtitle is not "No scan yet"; the icon's attention list is empty; Scan Now is offered; the next-scan line comes from `ScanDue`
-- [ ] Test (DDCKit): an older-schema report whose `ddc_version` is newer than the app's (a newer Homebrew CLI) does not say "after the update" and suggests updating the app
-- [ ] Test (DDCKit): no `last-scan.json` at all still gives `firstScan` with today's wording
-- [ ] Test (DDCKit): when the older report's `ddc_version` can be read, the text names it ("made by 0.17.4"); when it cannot, the text omits it
-- [ ] Test (DDCKit): the Whole Disk view's outdated text names the update in the same words
-- [ ] `make ddckit-test` passes, and a Debug build of the app target compiles (the Gate's `app` job runs `make app-test`, not that build)
-- [ ] The app starts no scan of its own when scheduled scans are off or paused, or the report is of a newer schema (the story "Scan after an update when the saved report cannot be read" covers the rest)
+- [x] Test (DDCKit): a `last-scan.json` of an older schema whose `ddc_version` is older than the app's gives the other-version content, not `firstScan`; its text names that version and says "after the update"; the header subtitle is not "No scan yet"; the icon's attention list is empty; Scan Now is offered; the next-scan line comes from `ScanDue` — evidence: `PopoverModelTests.afterTheUpdate` (version, "After the update", title, subtitle "Last scan by ddc 0.17.4 · scan again", empty attention, Scan Now); `ScheduledScanTests.updateScanStaysDue` (the footer's line from `ScanDue`: "Next scan within the hour") (#142)
+- [x] Test (DDCKit): an older-schema report whose `ddc_version` is newer than the app's (a newer Homebrew CLI) does not say "after the update" and suggests updating the app — evidence: `PopoverModelTests.newerMaker`; `PopoverModelTests.newerSchema` for a newer schema, which keeps the icon's warning (#142)
+- [x] Test (DDCKit): no `last-scan.json` at all still gives `firstScan` with today's wording — evidence: `PopoverModelTests.noFileIsFirstScan`, and the first-launch test that has no file (#142)
+- [x] Test (DDCKit): when the older report's `ddc_version` can be read, the text names it ("made by 0.17.4"); when it cannot, the text omits it — evidence: `PopoverModelTests.afterTheUpdate`, `noMakerVersion`; `ScanReportTests.makerReadSoftly` (missing, a number, empty: none, never an error) (#142)
+- [x] Test (DDCKit): the Whole Disk view's outdated text names the update in the same words — evidence: `DiskModelTests.outdatedNamesTheUpdate` (`Wording.otherVersionDiskText`, its title, the popover's sentence) (#142)
+- [x] `make ddckit-test` passes, and a Debug build of the app target compiles (the Gate's `app` job runs `make app-test`, not that build) — evidence: `make ddckit-test` 585 tests on the Mac and in the pre-push; a Debug `xcodebuild` of the app target; PR #142's CI green
+- [x] The app starts no scan of its own when scheduled scans are off or paused, or the report is of a newer schema (the story "Scan after an update when the saved report cannot be read" covers the rest) — evidence: `PopoverModelTests.noScanOfItsOwn`; `ScheduledScanTests.updateScanNotNeeded` (off, paused, newer) (#142)
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): after the next update that changes a report schema, the popover names the version that made the last scan and asks for a new one
 
 ## Final Summary
+
+**What changed.** PR #142. The report header's `ddc_version` is read softly (missing, empty or mistyped is none), and `ScanReport.ReadError.otherSchema` carries it from `ScanReport.read` and `DiskReport.read`. `OtherVersion` compares the maker's version with the app's and keeps the schema's direction; `Wording` gives its title, text and subtitle. The popover shows them in place of "No scan yet" (`Content.otherVersion`, beside an unchanged `ReportState`), with Scan Now, or Open Privacy Settings and a note when Full Disk Access is missing. The Whole Disk view's outdated report uses the same words, now from DDCKit.
+
+**Why.** The owner, 2026-11-02: after most updates the popover said "No scan yet", as on a first launch.
+
+**Tests.** `PopoverModelTests` (after the update, a newer maker, no version, a newer schema, no file, clearing, no scan of its own), `ScanReportTests.makerReadSoftly`, `DiskModelTests.outdatedNamesTheUpdate`, `ScheduledScanTests.updateScanStaysDue`, `ContractTests.otherVersionKeepsTheGrant`.
+
+**Where it differs from the plan.** The words live in `OtherVersion.swift`, not `Formatting.swift`. The block has no next-scan line of its own: the footer's is the due function's (critic). The Whole Disk view's title follows the words too.
+
+**Risks and follow-ups.** An older schema made by a newer ddc (a branch build) advises updating the app, which would not help; left for the owner to decide. The owner check below is open.
 
 ## Technical Notes
 
