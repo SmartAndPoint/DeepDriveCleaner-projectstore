@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-08T08:29:22.939Z
+generated_at: 2026-11-08T11:21:35.945Z
 
 ---
 
@@ -56,7 +56,6 @@ generated_at: 2026-11-08T08:29:22.939Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
@@ -116,6 +115,7 @@ generated_at: 2026-11-08T08:29:22.939Z
 - [x] [[epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that|DDC-002: Review window: Deselect All, then pick across groups and clean only that]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one|DDC-002: Review window: pick a coding agent's sessions one by one]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once|DDC-002: Confirmation sheet: Delete permanently for every item at once]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan|DDC-002: Popover: say when used space grew since the last scan]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-scan-after-an-update-when-the-saved-report-cannot-be-read|DDC-002: Scan after an update when the saved report cannot be read]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update|DDC-002: Scheduled scans: register the agent again after an update]] #p1 #done

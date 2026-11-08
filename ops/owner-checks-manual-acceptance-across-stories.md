@@ -412,6 +412,15 @@ Story: [Scheduled scans: register the agent again after an update](../epics/DDC-
 - [ ] Manual (owner): after a logout and login, or a restart, `launchctl print` still shows the new build with no "spawn failed", and a `tick:` arrives within the hour. If not, the story's plan C (a per-build label) is next.
 - [ ] Manual (owner): the login item (`SMAppService.mainApp`) is still on; the popover footer never said "Scheduled scans are not running" while ticks arrived (a night asleep, a logout).
 
+### Who holds the lock, with Stop and Wait (DDC-002)
+
+Story: [Busy: name the scan or clean that holds the lock, and offer to stop it](../epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md).
+
+- [ ] Manual (owner): run a long `ddc clean --items <list>` in Terminal (items you can spare), then open the Review window's Clean sheet: it names the clean at once ("A clean started from a terminal … on item N of M"), with Stop and Wait.
+- [ ] Manual (owner): Stop ends that terminal clean after its current item (the terminal shows the rest as not run), the sheet shows "Stopping…" until it is gone, then the panel goes.
+- [ ] Manual (owner): with a terminal clean running again, Wait on the sheet's Clean cleans the sheet's items once the terminal clean ends; closing the sheet while it waits cleans nothing.
+- [ ] Manual (owner): Scan now while a terminal clean runs shows the busy notice with the holder, Stop and Wait; Wait scans once it ends.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
@@ -432,4 +441,4 @@ Some checks change the disk (a clean, a Trash move, a runtime delete, a formula 
 
 ---
 
-*Last updated: 2026-11-05*
+*Last updated: 2026-11-08*

@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-08T08:29:23.110Z
+generated_at: 2026-11-08T11:21:36.091Z
 
 ---
 
@@ -40,7 +40,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | done |
 | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | parked |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | done |
-| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | Busy: name the scan or clean that holds the lock, and offer to stop it | story | in-progress |
+| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | Busy: name the scan or clean that holds the lock, and offer to stop it | story | done |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | done |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
@@ -734,6 +734,7 @@ full typed neighborhood, both directions, in one call.
 | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md | mdlink | ops/owner-checks-manual-acceptance-across-stories.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
