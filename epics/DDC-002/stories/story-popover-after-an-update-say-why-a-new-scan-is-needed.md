@@ -3,18 +3,18 @@ type: story
 id: "story-popover-after-an-update-say-why-a-new-scan-is-needed"
 epic: "DDC-002"
 title: "Popover: after an update, say why a new scan is needed"
-status: planned
+status: in-progress
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-02
-updated: 2026-11-04
+updated: 2026-11-08
 external_refs: {}
 tags: [app, popover, updates]
 code_refs: []
 specs: []
-started_at: null
+started_at: "2026-11-08T11:35:14.275Z"
 closed_at: null
-plan_updated_at: null
+plan_updated_at: "2026-11-08T11:35:14.275Z"
 ---
 
 # Popover: after an update, say why a new scan is needed
@@ -22,7 +22,7 @@ plan_updated_at: null
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-002](../epic.md) |
-| **Status** | planned |
+| **Status** | in-progress |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -52,6 +52,28 @@ The popover should say what it knows, not guess. An older-schema report has two 
 
 ## Implementation Plan
 
+Planner run 2026-11-08 against `origin/main` c907b35. One Swift-only PR (DDCKit and the app); the push runs `make ddckit-test`.
+
+What exists: `appVersion` already reaches `PopoverModel` (AppDelegate, `CFBundleShortVersionString`, equal to the CLI's version); an older-schema report becomes `report = .none` (so `.firstScan`, "No scan yet"), a newer one `.unreadable` with the `.unreadableReport` attention; `VersionHeader` reads only `schema_version`; the Whole Disk view's "made by an older version" text is hard-coded in `DiskView.swift`. AC 3 (no file → `firstScan`) holds today and is kept; AC 7 is covered by `ScheduledScanTests.updateScanNotNeeded` and gets one popover-side test.
+
+1. **The header and the error.** `VersionHeader` gains `ddcVersion: String?`, decoded softly (a missing or mistyped `ddc_version` is nil, never an error: about twelve readers share the header). `ScanReport.ReadError.otherSchema(Int, ddcVersion: String? = nil)`; `ScanReport.read` and `DiskReport.read` fill it. Every `case .otherSchema(let version)` pattern (PopoverModel twice, DiskModel twice, BrewPackagesModel, AgentsModel) is rewritten by hand: a one-name pattern on a two-value case binds the tuple and would print "(schema (2, nil))".
+2. **`OtherVersion`** (new `OtherVersion.swift`): the report's schema and the app's, the maker's `ddcVersion` and the app's version. Readability comes from the schema (older or newer than the app's); the words come from the versions, compared with `compare(_:options: .numeric)` as `UpdateModel` does. Pure functions in `Wording`:
+   - maker older than the app: title "Scan again after the update"; text "Your last scan was made by ddc 0.17.4. After the update, this version reads reports differently, so it needs a new scan.";
+   - maker newer than the app: title "Update the app, or scan again"; text "Your last scan was made by ddc 0.19.0, a newer version than this app. Update DeepDriveCleaner to read it, or scan again.";
+   - same version, or no app version (a development build): the number, and the direction from the schema: "… made by ddc 0.34.0 in an older report format, so this version needs a new scan." (title "A new scan is needed") or "… in a newer report format. Update DeepDriveCleaner to read it, or scan again." (title "Update the app, or scan again");
+   - no `ddc_version` in the file: "Your last scan was made by an earlier version of ddc, which this version reads differently, so it needs a new scan." or, for a newer schema, "… by a newer version of ddc. Update DeepDriveCleaner to read it, or scan again." No number, no "after the update". (Every report has had `ddc_version` since the first commit, so this case is rare.)
+   - the header subtitle: "Last scan by ddc 0.17.4 · scan again" ("by an earlier ddc" without a number), "… · update the app" for a newer one;
+   - the Whole Disk view, the same three directions with the verb "scan": "The last whole-disk report was made by ddc 0.17.4. After the update, this version reads it differently, so it needs a new scan. A new scan takes a few minutes."
+3. **`PopoverModel`.** `ReportState` is unchanged (`.none` and `.unreadable` keep the growth band and the attention list as they are). Beside it, `otherVersion: OtherVersion?`, set by both `otherSchema` branches of `apply`, cleared by every other branch and by "no file". `Content.otherVersion(OtherVersion)` wins over `.firstScan` and `.unreadableReport`; `.scanning` still wins over it. The subtitle uses the line above. The next scheduled scan is the footer's line, `nextScanText`, which `ScanDue` computes ("Next scan within the hour" while the update scan is due, "Scheduled scans off" when off, "Scans paused · Resume" when paused): the block adds no second copy of it.
+4. **`PopoverView`.** A block like `FirstScanView`'s: the title, the text, Scan Now `.borderedProminent` (off while `!canScan`, which also covers a waiting update). Without Full Disk Access it keeps `FirstScanView`'s form for that case: Open Privacy Settings prominent, Scan Anyway as the link, and the version text above them, so a scan without the grant never becomes the main action.
+5. **`DiskModel`/`DiskView`/`AppDelegate`.** `ReportState.outdated(OtherVersion)`; `DiskModel` gets `appVersion` (AppDelegate passes it); the outdated title and text move from `DiskView` to DDCKit, so a unit test reads them.
+6. **Tests.** `makeModel` gains `appVersion`; reports through `Fixture.edited` (schema − 1 with `ddc_version` "0.17.4", with it removed, "0.19.0"); `DiskModelTests` with an older `disk-report`. Updated: PopoverModelTests `olderSchema` and `newerSchema`, ScheduledScanTests `updateScanStaysDue`, ScanReportTests and DiskReportTests (`otherSchema` with the maker), DiskModelTests `.outdated`. New: one test per AC; a mistyped `ddc_version` (a number) is read as none, never an error; without Full Disk Access the block keeps Open Privacy Settings as its main action; AC 7 checks that `start()` and `refresh()` with an older report run no scan.
+7. **Builds.** The Gate's `app` job runs `make app-test`, not a build of the app target, and this PR changes three files of it: a Debug `xcodebuild` of the app target runs before the push, as in "Scan after an update when the saved report cannot be read". At close, the runbook "Owner checks: manual acceptance across stories" gets the owner check.
+
+Decisions recorded here: the icon keeps its warning for a newer-schema report (the app cannot read it); only the older-schema case shows none, as since 0.14.10. Equal versions name the number and take the direction from the schema. Without Full Disk Access the grant stays the main action (critic, 2026-11-08).
+
+Code refs, proposed: `app/Packages/DDCKit/Sources/DDCKit/{ScanReport,DiskReport,OtherVersion,PopoverModel,DiskModel,BrewPackagesModel,AgentsModel,Formatting}.swift`, `app/DeepDriveCleaner/{PopoverView,DiskView,AppDelegate}.swift`, and the tests.
+
 ## Acceptance Criteria
 
 <!-- How do we know we're done? Each criterion testable. Checked only with
@@ -62,7 +84,7 @@ The popover should say what it knows, not guess. An older-schema report has two 
 - [ ] Test (DDCKit): no `last-scan.json` at all still gives `firstScan` with today's wording
 - [ ] Test (DDCKit): when the older report's `ddc_version` can be read, the text names it ("made by 0.17.4"); when it cannot, the text omits it
 - [ ] Test (DDCKit): the Whole Disk view's outdated text names the update in the same words
-- [ ] `make ddckit-test` passes and the Gate's `app` job builds the app
+- [ ] `make ddckit-test` passes, and a Debug build of the app target compiles (the Gate's `app` job runs `make app-test`, not that build)
 - [ ] The app starts no scan of its own when scheduled scans are off or paused, or the report is of a newer schema (the story "Scan after an update when the saved report cannot be read" covers the rest)
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): after the next update that changes a report schema, the popover names the version that made the last scan and asks for a new one
 

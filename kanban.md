@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-08T11:21:35.945Z
+generated_at: 2026-11-08T11:44:34.795Z
 
 ---
 
@@ -11,7 +11,6 @@ generated_at: 2026-11-08T11:21:35.945Z
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts|DDC-001: SwiftPM build folders as rebuildable artifacts]] #p2
 - [ ] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2
-- [ ] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2
 - [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
@@ -56,6 +55,7 @@ generated_at: 2026-11-08T11:21:35.945Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
+- [ ] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2
 - [ ] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1
 - [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
