@@ -83,6 +83,8 @@ Rough until the plan gate.
 - The DDC-002 story's open question (full rescan vs scoped re-walk) decides this story's rescan too; `--agent` is called from inside sessions, so a 40 s rescan is the cost to measure.
 - ~~The `not-consented` reason is new… so no `schema_version` bump~~ *Superseded 2026-11-02 (ADR §7): the clean report ships (schema 6, decoded by the app), so `not-consented` and `agent-opt-in-off` bump the clean report and the journal.*
 
+- *2026-11-08, from story "ddc footprint: a scoped project report" (done):* reuse `footprint::Scope::resolve` and a pruned scan over `report::walk_classified` with `scope.reach()` (a new seam beside `recheck::pruned`), keeping `safe`, selected findings inside a checkout. Do not write `last-scan.json` from that scoped walk: its roots are the checkouts' parents, so `same_roots` is false and the app's home report would be replaced by a cut one. The clean assesses in `Scan` mode, so its own process counts as a user of the worktree it runs in (footprint leaves it out): a worktree the agent sits in is never removed, which is the safe side.
+
 ## Dependencies
 
 - [[epics/DDC-002/stories/story-cli-clean-an-explicit-item-list|CLI: clean an explicit item list]]: blocking
