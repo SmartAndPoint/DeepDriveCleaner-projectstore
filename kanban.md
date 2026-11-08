@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-08T12:02:45.435Z
+generated_at: 2026-11-08T15:07:48.289Z
 
 ---
 
@@ -10,7 +10,6 @@ generated_at: 2026-11-08T12:02:45.435Z
 
 - [ ] [[epics/DDC-001/stories/story-duplicates-and-apfs-private-size|DDC-001: Duplicates and APFS private size]] #p3
 - [ ] [[epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts|DDC-001: SwiftPM build folders as rebuildable artifacts]] #p2
-- [ ] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2
 - [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
 - [ ] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
@@ -114,6 +113,7 @@ generated_at: 2026-11-08T12:02:45.435Z
 - [x] [[epics/DDC-002/stories/story-review-window-deselect-all-then-pick-across-groups-and-clean-only-that|DDC-002: Review window: Deselect All, then pick across groups and clean only that]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-review-window-pick-a-coding-agents-sessions-one-by-one|DDC-002: Review window: pick a coding agent's sessions one by one]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once|DDC-002: Confirmation sheet: Delete permanently for every item at once]] #p1 #done
+- [x] [[epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees|DDC-002: Docker Desktop: what is inside its disk image, and what a clean frees]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it|DDC-002: Busy: name the scan or clean that holds the lock, and offer to stop it]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed|DDC-002: Popover: after an update, say why a new scan is needed]] #p2 #done
 - [x] [[epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan|DDC-002: Popover: say when used space grew since the last scan]] #p2 #done

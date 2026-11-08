@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-08T12:02:45.578Z
+generated_at: 2026-11-08T15:07:48.450Z
 
 ---
 
@@ -47,7 +47,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md | Coding agents in the Whole disk view | story | done |
 | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md | Confirmation sheet: Delete permanently for every item at once | story | done |
 | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md | Distribution: the 0.2.0 cask with the app | story | done |
-| epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | Docker Desktop: what is inside its disk image, and what a clean frees | story | planned |
+| epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md | Docker Desktop: what is inside its disk image, and what a clean frees | story | done |
 | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md | Faster clean: re-check only what the selection needs | story | done |
 | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | Full Disk Access check on macOS 27 | story | done |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
@@ -738,6 +738,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-coding-agents-in-the-whole-disk-view.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-confirmation-sheet-delete-permanently-for-every-item-at-once.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-distribution-the-020-cask-with-the-app.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-faster-clean-re-check-only-what-the-selection-needs.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
