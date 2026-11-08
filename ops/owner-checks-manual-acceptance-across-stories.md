@@ -427,6 +427,14 @@ Story: [Popover: after an update, say why a new scan is needed](../epics/DDC-002
 
 - [ ] Manual (owner): after the next update that changes the scan report's schema, with scheduled scans off or paused, the popover names the version that made the last scan ("Your last scan was made by ddc …"), its subtitle reads "Last scan by ddc … · scan again", the icon shows no warning, and Scan Now replaces the report.
 
+### Docker Desktop: what is inside, and what a clean frees (DDC-002)
+
+Story: [Docker Desktop: what is inside its disk image, and what a clean frees](../epics/DDC-002/stories/story-docker-desktop-what-is-inside-its-disk-image-and-what-a-clean-frees.md).
+
+- [ ] Manual (owner): with Docker Desktop running, the Review window's Docker Desktop item lists images, containers, volumes and build cache. Their counts equal the TOTAL column of `docker system df`; the sizes of containers, volumes and the build cache equal its SIZE column as docker rounds it (images show the size unique to each, so they need not equal it).
+- [ ] Manual (owner): the Clean sheet with the Docker item counts its estimate in "frees about" and does not list it under "not counted"; with Docker Desktop quit, the row says to start it and the item stays "not counted".
+- [ ] Manual (owner): after a clean of the item, the result shows "Docker reclaimed …", about the estimate, and the row asks Docker again.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
