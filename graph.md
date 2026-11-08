@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-06T10:44:44.214Z
+generated_at: 2026-11-08T08:29:23.110Z
 
 ---
 
@@ -40,7 +40,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-app-skeleton-and-build-pipeline.md | App skeleton and build pipeline | story | done |
 | epics/DDC-002/stories/story-automatic-cleaning-of-download-caches-after-a-scheduled-scan.md | Automatic cleaning of download caches after a scheduled scan | story | parked |
 | epics/DDC-002/stories/story-background-scan-and-notifications-in-the-app.md | Background scan and notifications in the app | story | done |
-| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | Busy: name the scan or clean that holds the lock, and offer to stop it | story | planned |
+| epics/DDC-002/stories/story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it.md | Busy: name the scan or clean that holds the lock, and offer to stop it | story | in-progress |
 | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md | CLI: clean an explicit item list | story | done |
 | epics/DDC-002/stories/story-cli-progress-events.md | CLI: progress events | story | done |
 | epics/DDC-002/stories/story-cli-shared-settings-types-and-the-notify-decision.md | CLI: shared settings, types and the notify decision | story | done |
