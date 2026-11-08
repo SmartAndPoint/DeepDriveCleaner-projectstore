@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-08T11:44:34.944Z
+generated_at: 2026-11-08T12:02:45.578Z
 
 ---
 
@@ -52,7 +52,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md | Full Disk Access check on macOS 27 | story | done |
 | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md | HIG pass: keyboard, colour, empty states and menus | story | done |
 | epics/DDC-002/stories/story-menu-bar-popover.md | Menu bar popover | story | done |
-| epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | in-progress |
+| epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md | Popover: after an update, say why a new scan is needed | story | done |
 | epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md | Popover and Review: what grew since the earlier scan | story | done |
 | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md | Popover: say when used space grew since the last scan | story | done |
 | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md | Popover: the Next scan line opens the Schedule settings | story | done |
@@ -742,6 +742,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-full-disk-access-check-on-macos-27.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-hig-pass-keyboard-colour-empty-states-and-menus.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-menu-bar-popover.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-after-an-update-say-why-a-new-scan-is-needed.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-say-when-used-space-grew-since-the-last-scan.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-popover-the-next-scan-line-opens-the-schedule-settings.md |
