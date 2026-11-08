@@ -3,17 +3,55 @@ type: story
 id: "story-busy-name-the-scan-or-clean-that-holds-the-lock-and-offer-to-stop-it"
 epic: "DDC-002"
 title: "Busy: name the scan or clean that holds the lock, and offer to stop it"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-02
 updated: 2026-11-08
 external_refs: {}
 tags: [app, cli, lock, clean]
-code_refs: []
+code_refs:
+  - crates/ddc-core/src/holders.rs
+  - crates/ddc-core/src/store.rs
+  - crates/ddc-core/src/refusal.rs
+  - crates/ddc-core/src/lib.rs
+  - crates/ddc-core/src/platform/mod.rs
+  - crates/ddc-core/src/platform/macos/procs.rs
+  - crates/ddc-core/src/platform/macos/signals.rs
+  - crates/ddc-core/src/platform/linux/procs.rs
+  - crates/ddc-core/src/platform/linux/signals.rs
+  - crates/ddc-core/src/platform/windows/procs.rs
+  - crates/ddc-core/src/platform/windows/signals.rs
+  - crates/ddc-cli/src/cmd/lock.rs
+  - crates/ddc-cli/src/cli.rs
+  - crates/ddc-cli/src/cmd/mod.rs
+  - crates/ddc-cli/src/main.rs
+  - crates/ddc-cli/src/gate.rs
+  - crates/ddc-cli/src/render.rs
+  - crates/ddc-cli/src/progress.rs
+  - crates/ddc-cli/src/cmd/scan.rs
+  - crates/ddc-cli/src/cmd/background.rs
+  - crates/ddc-cli/src/cmd/clean.rs
+  - crates/ddc-cli/src/cmd/clean_items.rs
+  - crates/ddc-cli/src/cmd/disk_free.rs
+  - crates/ddc-cli/src/cmd/keep.rs
+  - crates/ddc-cli/src/cmd/disk.rs
+  - crates/ddc-cli/src/cmd/agent_status.rs
+  - docs/lock.schema.json
+  - docs/error.schema.json
+  - README.md
+  - app/Packages/DDCKit/Sources/DDCKit/LockHolders.swift
+  - app/Packages/DDCKit/Sources/DDCKit/CLIRunner.swift
+  - app/Packages/DDCKit/Sources/DDCKit/RunnerActivity.swift
+  - app/Packages/DDCKit/Sources/DDCKit/CleanRun.swift
+  - app/Packages/DDCKit/Sources/DDCKit/ReviewModel.swift
+  - app/Packages/DDCKit/Sources/DDCKit/PopoverModel.swift
+  - app/DeepDriveCleaner/ConfirmSheet.swift
+  - app/DeepDriveCleaner/PopoverView.swift
+  - app/DeepDriveCleaner/LockBusyPanel.swift
 specs: []
 started_at: "2026-11-08T08:03:33.314Z"
-closed_at: null
+closed_at: "2026-11-08T11:15:33.417Z"
 plan_updated_at: "2026-11-08T08:03:33.314Z"
 ---
 
@@ -66,12 +104,12 @@ The owner's rule: **show at once that another process holds the lock, which one,
 
 ## Decomposition
 
-- [ ] Vault: the story's corrections, the plan, and the three ADR amendments; `projectstore:critic`
-- [ ] Core: `holders.rs`, which writes, forgets, reads with an injectable probe, sweeps by pid and start time, and holds `end_by_signal`; `platform::procs::executable` and `platform::signals::interrupt` on each OS; `store::try_lock(env, mode, command)` writes the record, `DataLock`'s `Drop` removes it before unlocking, and `LockError::Busy` carries the holders; all nine callers; a clean's phase and progress in its record, the progress written at most once a second
-- [ ] CLI: `ddc lock status [--json]` and `docs/lock.schema.json`; `ErrorCode::Busy`, error schema 3 and the envelope on 75; busy text names the holders; then `ddc lock stop --pid --started`; gating on `in-use-check`; README; the Windows native skip list
-- [ ] DDCKit: decoding `LockStatus` and the busy envelope, the rule for what blocks, the wording, the Wait loop with its 15-second retry, the runner kinds `lockStatus` and `lockStop`
-- [ ] App: the sheet's check, its Clean and the popover's Scan now show the holders, with Stop, Wait and the stopping state; the single-caller contract test extended to Wait; the owner check in the runbook
-- [ ] Tests (each PR carries its own)
+- [x] Vault: the story's corrections, the plan, and the three ADR amendments; `projectstore:critic`
+- [x] Core: `holders.rs`, which writes, forgets, reads with an injectable probe, sweeps by pid and start time, and holds `end_by_signal`; `platform::procs::executable` and `platform::signals::interrupt` on each OS; `store::try_lock(env, mode, command)` writes the record, `DataLock`'s `Drop` removes it before unlocking, and `LockError::Busy` carries the holders; all nine callers; a clean's phase and progress in its record, the progress written at most once a second
+- [x] CLI: `ddc lock status [--json]` and `docs/lock.schema.json`; `ErrorCode::Busy`, error schema 3 and the envelope on 75; busy text names the holders; then `ddc lock stop --pid --started`; gating on `in-use-check`; README; the Windows native skip list
+- [x] DDCKit: decoding `LockStatus` and the busy envelope, the rule for what blocks, the wording, the Wait loop with its 15-second retry, the runner kinds `lockStatus` and `lockStop`
+- [x] App: the sheet's check, its Clean and the popover's Scan now show the holders, with Stop, Wait and the stopping state; the single-caller contract test extended to Wait; the owner check in the runbook
+- [x] Tests (each PR carries its own)
 
 ## Implementation Plan
 
@@ -164,16 +202,31 @@ Code refs, proposed: `crates/ddc-core/src/holders.rs`, `crates/ddc-core/src/stor
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Test (core, injected probe): two shared holder records are both listed by `holders()`, and forgetting one leaves the other; an exclusive one lists alone. Test (CLI): two real `deepdrivecleaner scan` runs are both listed by `lock status`, and when one ends the other stays
-- [ ] Test (core): a record whose pid is gone or whose start time differs by more than two seconds is ignored and swept by the next holder, and one within two seconds stays; a clean stopped by SIGINT during its items leaves no record (removed before `reraise`)
-- [ ] Test (CLI): `ddc lock status --json` lists live holders and validates against its schema; a second `ddc clean` while one runs exits 75 with the holders in text, and with `--json` an error report with code `busy` (error schema version 3)
-- [ ] Test (CLI): `ddc lock stop --pid P --started T` signals SIGINT to that holder only; it refuses a stale record, a holder whose start time differs, another user's process and a non-ddc pid; it never sends SIGKILL; `interrupt` refuses a pid of 1 or less; it is refused with `capability-absent` where `in-use-check` is not declared (a gate unit test, as Windows declares none)
-- [ ] Test (DDCKit): the busy state with holders shows them with Stop and Wait in the sheet's check, its Clean and Scan now; with none it shows today's line with Wait and no Stop; Wait starts the run once `lock status` shows no blocking holder, and a run that meets 75 again goes back to busy and retries no sooner than 15 seconds later; Stop calls `lock stop` with the shown pid and `start_us` and shows the holder as stopping
-- [ ] A clean stopped this way during its items finishes its current delete or Trash item and reports the rest as not run (existing cancellation tests keep passing)
-- [ ] `make check` and `make ddckit-test` pass
+- [x] Test (core, injected probe): two shared holder records are both listed by `holders()`, and forgetting one leaves the other; an exclusive one lists alone. Test (CLI): two real `deepdrivecleaner scan` runs are both listed by `lock status`, and when one ends the other stays — evidence: `crates/ddc-core/tests/holders.rs` `two_shared_records_are_both_listed_and_forgetting_one_leaves_the_other`, `an_exclusive_record_is_listed_alone_with_its_mode`; `crates/ddc-cli/tests/lock_cli.rs` `two_running_scans_are_both_listed_and_the_one_left_stays_when_the_other_ends` (#133, #138)
+- [x] Test (core): a record whose pid is gone or whose start time differs by more than two seconds is ignored and swept by the next holder, and one within two seconds stays; a clean stopped by SIGINT during its items leaves no record (removed before `reraise`) — evidence: `crates/ddc-core/tests/holders.rs` `a_record_is_stale_when_its_pid_is_gone_or_started_at_another_time`, `the_next_holder_sweeps_stale_records_and_keeps_live_ones`; `crates/ddc-cli/tests/interrupt_cli.rs` `a_clean_interrupted_after_its_kth_item_ends_the_current_one_and_leaves_no_record` (#133)
+- [x] Test (CLI): `ddc lock status --json` lists live holders and validates against its schema; a second `ddc clean` while one runs exits 75 with the holders in text, and with `--json` an error report with code `busy` (error schema version 3) — evidence: `crates/ddc-cli/tests/lock_cli.rs` (`contract::holds("lock")`), `a_clean_that_meets_a_held_lock_names_the_holder`; `clean_cli.rs` `scan_does_not_start_while_a_clean_holds_the_lock`; `ERROR_SCHEMA_VERSION` 3 in `crates/ddc-core/src/refusal.rs` (#138)
+- [x] Test (CLI): `ddc lock stop --pid P --started T` signals SIGINT to that holder only; it refuses a stale record, a holder whose start time differs, another user's process and a non-ddc pid; it never sends SIGKILL; `interrupt` refuses a pid of 1 or less; it is refused with `capability-absent` where `in-use-check` is not declared (a gate unit test, as Windows declares none) — evidence: `crates/ddc-cli/tests/lock_cli.rs` `lock_stop_sends_nothing_without_a_live_record_or_to_a_process_that_is_not_ddc`, `lock_stop_interrupts_a_running_clean_after_its_current_item`; `holders.rs` units `only_a_live_holder_that_runs_ddc_may_be_stopped`; `tests/holders.rs` `interrupt_refuses_a_pid_of_one_or_less`; `structure.rs` `lock_stop_never_kills_or_signals_a_group`; `gate.rs` test `a_command_whose_capability_is_absent_is_refused_with_its_name` (#139)
+- [x] Test (DDCKit): the busy state with holders shows them with Stop and Wait in the sheet's check, its Clean and Scan now; with none it shows today's line with Wait and no Stop; Wait starts the run once `lock status` shows no blocking holder, and a run that meets 75 again goes back to busy and retries no sooner than 15 seconds later; Stop calls `lock stop` with the shown pid and `start_us` and shows the holder as stopping — evidence: `LockHoldersTests` (decoders, blocking, wording, Stop, Wait), `CleanRunTests` `checkBusyNamesHolders`, `cleanBusyThenWaitCleans`, `cleanBusyUnnamedRetries`, `stopHolder`, `stopRefused`, `stopWaitingStartsNothing`, `waitFlagIsSpent`, `checkWaitsAgain`, `closingEndsWait`; `PopoverLockTests`; `ContractTests.lockContracts` and `cleanHasOneOwner` (#140, #141)
+- [x] A clean stopped this way during its items finishes its current delete or Trash item and reports the rest as not run (existing cancellation tests keep passing) — evidence: `crates/ddc-cli/tests/lock_cli.rs` `lock_stop_interrupts_a_running_clean_after_its_current_item`; `interrupt_cli.rs` `a_clean_stopped_after_its_kth_item_ends_the_current_one_and_runs_no_other` still passes (#139)
+- [x] `make check` and `make ddckit-test` pass — evidence: `make gate-fast` in each Rust PR's pre-push and its CI Gate (#133, #137, #138, #139); `make ddckit-test` 576 tests (#141), three runs in a row; the Windows native leg 1069/1069 and the Linux unit tier 1033/1033 on the owner's machines. Main's full `make gate` is red on `script-test` from another story's commit (5170c32, `app/settings.json` in `clean_safety.rs`), not from this one
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): with a terminal `ddc clean --items` running, opening the Review window's sheet names it at once, and Stop ends it after the current item
 
 ## Final Summary
+
+**What changed.** Five PRs.
+- #133: each holder of the data-dir lock writes `<data-dir>/lock.holders/<pid>-<start_us>.json`, forgets it on release and before it ends by a signal (`holders::end_by_signal`, the one caller of `reraise` outside the platform modules), and the next holder sweeps stale ones. `try_lock` takes a `HolderCommand` (nine callers); a clean's phase and progress go to its record. #137 fixed two follow-ups: the record is written after the progress line (an ordering test failed sometimes), and two doc links.
+- #138: `ddc lock status [--json]` (`docs/lock.schema.json`), and exit 75 names the holders on stderr and, under `--json`, prints the error envelope with code `busy` (error schema 3).
+- #139: `ddc lock stop --pid --started`: one SIGINT, only to a live holder of the same user that runs ddc's binary, with the start read again right before the signal; every refusal exits 2.
+- #140: DDCKit's `LockHolders.swift` (decoders, the blocking rule, wording, Stop, the Wait loop) and two queued runner kinds.
+- #141: the sheet's check and Clean, and the popover's Scan now, show the holders with Stop and Wait.
+
+**Why.** The owner, 2026-11-02: a clean from the Review window failed busy while a terminal clean held the lock, and the app could not say what held it or offer anything.
+
+**Tests.** Core `tests/holders.rs`; CLI `lock_cli.rs`, `interrupt_cli.rs` (record checks, a SIGINT variant), the busy envelope in `clean_cli`, `keep_cli`, `disk_free_cli`, gate and unported lists, `cases.json`, structure tests; DDCKit `LockHoldersTests`, `CleanRunTests`, `PopoverLockTests`, `ContractTests`. Linux unit tier and the Windows native leg on the owner's machines for each Rust PR.
+
+**Where it differs from the plan.** The phase is set by the executor's `cleaning` event, not by a lock method; the progress is written at most once a second and a flusher writes a held-back change. `lock status` and `lock stop` tests are `cfg(unix)`, so no Windows skips were needed. `ticket(ofPid:)` was dropped: the app's own runs never meet the lock. A change to the list ends Wait, as does a check.
+
+**Risks and follow-ups.** The owner check below is still open. `disk free` and Remove Protection keep the old busy line. A ddc older than this story writes no record, so during an upgrade a busy lock names nobody. pid reuse between the check and `kill` cannot be closed on macOS; the start is read again just before.
 
 ## Technical Notes
 
