@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-08T15:07:48.450Z
+generated_at: 2026-11-08T17:21:50.900Z
 
 ---
 
@@ -88,7 +88,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | Agent skill v0: ask ddc before guessing about the disk | story | in-progress |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
 | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | Coding agents' temporary folders outside the home | story | planned |
-| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | in-progress |
+| epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | done |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | done |
@@ -774,6 +774,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-in-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |

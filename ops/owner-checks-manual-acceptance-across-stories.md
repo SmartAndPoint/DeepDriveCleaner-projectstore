@@ -435,6 +435,12 @@ Story: [Docker Desktop: what is inside its disk image, and what a clean frees](.
 - [ ] Manual (owner): the Clean sheet with the Docker item counts its estimate in "frees about" and does not list it under "not counted"; with Docker Desktop quit, the row says to start it and the item stays "not counted".
 - [ ] Manual (owner): after a clean of the item, the result shows "Docker reclaimed …", about the estimate, and the row asks Docker again.
 
+### ddc agent footprint on a project with worktrees (DDC-003)
+
+Story: [ddc footprint: a scoped project report](../epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md).
+
+- [ ] Manual (owner): in a project with at least ten worktrees, each with an environment, one of them locked by a live Claude Code session, `ddc agent footprint` finishes within 5 s (median of three runs after a warm-up), lists the live session's worktree under "after its session ends", and selects the same worktrees as `ddc scan <main>`. Record only whether both held: no timings or project names in this vault.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
