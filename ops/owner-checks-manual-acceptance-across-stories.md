@@ -441,6 +441,12 @@ Story: [ddc footprint: a scoped project report](../epics/DDC-003/stories/story-d
 
 - [ ] Manual (owner): in a project with at least ten worktrees, each with an environment, one of them locked by a live Claude Code session, `ddc agent footprint` finishes within 5 s (median of three runs after a warm-up), lists the live session's worktree under "after its session ends", and selects the same worktrees as `ddc scan <main>`. Record only whether both held: no timings or project names in this vault.
 
+### ddc agent clean on a project with dead worktrees (DDC-003)
+
+Story: [Clean: --agent bounded consent](../epics/DDC-003/stories/story-clean-agent-bounded-consent.md).
+
+- [ ] Manual (owner): on a project with dead worktrees, `ddc agent clean --dry-run --json` lists them under `for_person`; with `"agents_clean_safe": true` in `settings.json`, a real run removes only the safe items inside the project's checkouts and lists the rest with a command to paste. Record only whether it held: no timings or project names in this vault.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.

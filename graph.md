@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-14T07:32:52.324Z
+generated_at: 2026-11-14T09:44:30.262Z
 
 ---
 
@@ -86,7 +86,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/epic.md | Agent footprint | epic | in-progress |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
 | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | Agent skill v0: ask ddc before guessing about the disk | story | in-progress |
-| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | in-progress |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | done |
 | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | Coding agents' temporary folders outside the home | story | planned |
 | epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md | ddc agent clean --session: clean up after one session | story | planned |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | done |
@@ -482,9 +482,11 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md |
+| epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/epic.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/epic.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
@@ -784,6 +786,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-in-the-app.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-show-in-finder-and-the-honest-action-for-each-row.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-002/stories/story-whole-disk-what-lies-outside-the-home-folder.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
