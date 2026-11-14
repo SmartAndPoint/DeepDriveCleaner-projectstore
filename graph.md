@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-08T17:21:50.900Z
+generated_at: 2026-11-14T07:32:52.324Z
 
 ---
 
@@ -86,11 +86,13 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/epic.md | Agent footprint | epic | in-progress |
 | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md | Agent guidance: skill and AGENTS.md snippet | story | planned |
 | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md | Agent skill v0: ask ddc before guessing about the disk | story | in-progress |
-| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | planned |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | Clean: --agent bounded consent | story | in-progress |
 | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | Coding agents' temporary folders outside the home | story | planned |
+| epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md | ddc agent clean --session: clean up after one session | story | planned |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | done |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
+| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | Settings: let coding agents clean safe items | story | planned |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | done |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
@@ -470,9 +472,11 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-harness-data-rules.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md |
+| epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md |
 | epics/DDC-003/epic.md | epic-contains | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md |
 | epics/DDC-003/epic.md | mdlink | epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md |
@@ -497,8 +501,12 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-002/stories/story-cli-clean-an-explicit-item-list.md |
+| epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | epics/DDC-003/stories/story-clean-agent-bounded-consent.md | wikilink | epics/DDC-003/stories/story-worktree-findings-and-provenance.md |
 | epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md | wikilink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session.md | wikilink | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | wikilink | epics/DDC-001/stories/story-ddc-scan-report.md |
@@ -508,6 +516,8 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | epics/DDC-001/stories/story-detection-rule-catalog.md |
 | epics/DDC-003/stories/story-harness-data-rules.md | wikilink | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | mdlink | epics/DDC-003/epic.md |
+| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | wikilink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | mdlink | epics/DDC-003/epic.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
