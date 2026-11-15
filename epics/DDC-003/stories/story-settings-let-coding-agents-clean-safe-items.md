@@ -3,7 +3,7 @@ type: story
 id: "story-settings-let-coding-agents-clean-safe-items"
 epic: "DDC-003"
 title: "Settings: let coding agents clean safe items"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-14
@@ -11,13 +11,12 @@ updated: 2026-11-15
 external_refs: {}
 tags: [cli, app, settings, agents, consent]
 code_refs: []
-specs: []
-no_spec: "the contract is this story's decisions D1 to D6 (the retry bound, exit codes and write order included), recorded in the dated notes of 2026-11-15 in ADR 'Agent footprint' §7, the menu bar ADR §1 and §6 item 6, and the safety ADR's journal rule"
+specs: ["settings-file-writers"]
 # variant: test  (a test story; its guide is story.test)
 started_at: "2026-11-15T06:08:06.345Z"
-closed_at: null
+closed_at: "2026-11-15T07:50:54.165Z"
 plan_updated_at: "2026-11-15T06:08:06.345Z"
-status_changed_at: "2026-11-15T06:08:06.345Z"
+status_changed_at: "2026-11-15T07:50:54.165Z"
 ---
 
 # Settings: let coding agents clean safe items
@@ -25,7 +24,7 @@ status_changed_at: "2026-11-15T06:08:06.345Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-003](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -41,11 +40,11 @@ The person's switch for ADR "Agent footprint" §7: `ddc agent clean` removes `sa
 
 ## Decomposition
 
-- [ ] PR 0, vault: the plan and the ADRs' dated notes
-- [ ] PR 1, core: `settings::edit` with `settings.lock`, `set_agents_clean_safe` with its rollback, `write_atomic` keeping the mode, the `settings-set` journal kind (schema 14)
-- [ ] PR 2, CLI: `ddc settings set agents_clean_safe on|off`, the guard on `on`, registries, README
-- [ ] PR 3a, DDCKit: `SettingsStore.update` holds `settings.lock`
-- [ ] PR 3b, DDCKit and app: the toggle, the popover line, ContractTests
+- [x] PR 0, vault: the plan and the ADRs' dated notes (vault #133)
+- [x] PR 1, core: `settings::edit` with `settings.lock`, `set_agents_clean_safe` with its rollback, `write_atomic` keeping the mode, the `settings-set` journal kind (schema 14) (#154)
+- [x] PR 2, CLI: `ddc settings set agents_clean_safe on|off`, the guard on `on`, registries, README (#155)
+- [x] PR 3a, DDCKit: `SettingsStore.update` holds `settings.lock` (#156)
+- [x] PR 3b, DDCKit and app: the toggle, the popover line, ContractTests (#157)
 
 ## Implementation Plan
 
@@ -77,14 +76,24 @@ No version bump: releases are batched and on hold until the owner asks.
 <!-- How do we know we're done? Each criterion testable. Checked only with
      evidence at close: - [x] <criterion> — evidence: <test | command | file:line> -->
 
-- [ ] Test (CLI): `ddc settings set agents_clean_safe on --approved` writes the key, keeps every other key's value and, on Unix, the file's mode, and journals one `settings-set` line (journal schema 14); with no file it writes one holding only the version and the key; `off` removes the key and journals one line; a call that changes nothing writes no `settings.json` and no journal line (the data folder and `settings.lock` may appear); an unreadable `settings.json` or a journal that cannot be opened exits 1 and leaves the file as it was; it exits 0, never 75, while a clean holds the lock
-- [ ] Test (CLI): `on` without a terminal and without `--approved` exits 2, writes nothing, and its message and `--help` never name `--approved`; a declined `[y/N]` exits 1 and writes nothing; `off` never asks; nothing under `agents/` names `settings set`
-- [ ] Test (core): `settings::edit` with `settings.lock` held elsewhere gives `Busy` within its bound and writes nothing; `clear_scheduler` keeps every other field and the mode; a journal that fails on append after `on` leaves the settings as they were (an absent file reads as the defaults)
-- [ ] Test (DDCKit): switching the toggle runs `settings set agents_clean_safe on --approved` or `… off` once, and the toggle then shows the file as the CLI left it, a failed run included; the app's own Settings writes never change the key and hold `settings.lock` (a held lock writes nothing and sets `problem`); the popover line shows only while `settings.json` holds the key; a contract test pins the Automation toggle as the one caller and that no scheduled path, the popover or AppDelegate names the command
-- [ ] The menu bar ADR §1 (the lane rule) and §6 item 6, the Agent footprint ADR §7 and the safety ADR's journal rule carry dated notes for the second writer, `settings.lock`, the lock-free switch, the guard on `on` and the `settings-set` kind
-- [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): the toggle's words and the disclaimer link read right; at a terminal, `on` names the risk and asks; with it on, an agent's `ddc agent clean` removes the safe items, and with it off removes nothing
+- [x] Test (CLI): `ddc settings set agents_clean_safe on --approved` writes the key, keeps every other key's value and, on Unix, the file's mode, and journals one `settings-set` line (journal schema 14); with no file it writes one holding only the version and the key; `off` removes the key and journals one line; a call that changes nothing writes no `settings.json` and no journal line (the data folder and `settings.lock` may appear); an unreadable `settings.json` or a journal that cannot be opened exits 1 and leaves the file as it was; it exits 0, never 75, while a clean holds the lock — evidence: `crates/ddc-cli/tests/settings_set_cli.rs` `on_and_off_change_the_one_key_and_journal_each_change`, `a_fresh_data_folder_gets_no_settings_file_for_nothing`, `an_unreadable_file_or_journal_changes_nothing`, `it_takes_no_ddc_lock_so_a_running_clean_never_holds_it_back` (PR #155)
+- [x] Test (CLI): `on` without a terminal and without `--approved` exits 2, writes nothing, and its message and `--help` never name `--approved`; a declined `[y/N]` exits 1 and writes nothing; `off` never asks; nothing under `agents/` names `settings set` — evidence: `settings_set_cli.rs` `on_without_a_terminal_is_refused_and_names_no_way_around_it`, `at_a_terminal_on_says_what_it_allows_and_asks` (a pseudo-terminal run: a No exits 1, `off` and `--approved` ask nothing), `on_when_it_is_on_already_asks_nothing_and_writes_nothing`, `a_typo_is_never_answered_with_the_hidden_option`; `structure.rs` `the_settings_switch_takes_no_ddc_lock_and_no_guidance_names_it`
+- [x] Test (core): `settings::edit` with `settings.lock` held elsewhere gives `Busy` within its bound and writes nothing; `clear_scheduler` keeps every other field and the mode; a journal that fails on append after `on` leaves the settings as they were (an absent file reads as the defaults) — evidence: `crates/ddc-core/tests/settings.rs` `a_writer_that_holds_the_settings_lock_makes_another_give_up`, `a_writer_that_lets_go_within_the_bound_lets_the_other_write`, `clearing_the_scheduler_keeps_every_other_field`, `a_journal_line_that_fails_after_on_puts_the_settings_back`, `a_rollback_that_fails_says_the_opt_in_is_still_on` (PR #154)
+- [x] Test (DDCKit): switching the toggle runs `settings set agents_clean_safe on --approved` or `… off` once, and the toggle then shows the file as the CLI left it, a failed run included; the app's own Settings writes never change the key and hold `settings.lock` (a held lock writes nothing and sets `problem`); the popover line shows only while `settings.json` holds the key; a contract test pins the Automation toggle as the one caller and that no scheduled path, the popover or AppDelegate names the command — evidence: DDCKit `AgentsOptInTests` (`toggleRunsTheCLI`, `failureShowsTheCLI`, `noCLI`, `popoverLine`, `lane`), `SettingsTests` `editsHoldTheSettingsLock`, `neverWritesTheOptIn`, `keepsTheAgentsOptIn`, ContractTests `agentsOptInCallers`, `settingsLockName`; `make ddckit-test` 608 tests (PRs #156, #157); the SwiftUI control itself is the owner's check
+- [x] The menu bar ADR §1 (the lane rule) and §6 item 6, the Agent footprint ADR §7 and the safety ADR's journal rule carry dated notes for the second writer, `settings.lock`, the lock-free switch, the guard on `on` and the `settings-set` kind — evidence: vault PR #133 (menu bar ADR §1 and §6 item 6, Agent footprint §7, the safety ADR's keep-remove amendment, all dated 2026-11-15)
+- [x] Owner check (runbook "Owner checks: manual acceptance across stories"): the toggle's words and the disclaimer link read right; at a terminal, `on` names the risk and asks; with it on, an agent's `ddc agent clean` removes the safe items, and with it off removes nothing — moved to runbook "Owner checks: manual acceptance across stories", section "The switch for coding agents"
 
 ## Final Summary
+
+**What changed.** The person's switch for ADR "Agent footprint" §7, in five PRs. Core (#154): every writer of `settings.json` holds `<data-dir>/settings.lock` (tried for about a second, then nothing changes; without locks on the file system it writes without one and says so); `settings::set_agents_clean_safe` writes nothing for no change, opens the journal before the file, writes one `settings-set` line (journal schema 14), and puts the settings back when that line fails after `on`; `write_atomic` keeps the mode it replaces. CLI (#155): `ddc settings set agents_clean_safe on|off`, no ddc lock, never 75; at a terminal `on` names the risk and the disclaimer and asks, without one it needs the app's hidden `--approved`; a usage error never suggests an option hidden everywhere; the `agent-opt-in-off` text names the person's settings. App (#156, #157): `SettingsStore.update` holds the same lock with `flock`; Settings → Automation → Coding agents runs the command and shows the file as the CLI left it; the popover names the opt-in while it is on. The spec "Settings file writers" (active) carries the contracts.
+
+**Why.** Story "Clean: --agent bounded consent" reads `agents_clean_safe`; this is its one writer, so the opt-in is a person's choice, journaled, and never lost to a stale write of the app.
+
+**Deviations, decided while building.** (1) The reviewer found clap's typo hint named the hidden flag (`--approve` → `--approved`): `cli::without_hidden_hints` drops such suggestions for every command. (2) The pre-read only skips the question: `on` when it is on already writes nothing, so it cannot undo an `off` that lands in between. (3) A rollback that fails too is its own error, saying the opt-in is still on. (4) The README does not mention the app's toggle; PR #157's own text says where it is. (5) A spec was written at close at the owner's pick (2026-11-15) instead of `no_spec`.
+
+**Tests.** Core: eight tests in `crates/ddc-core/tests/settings.rs` and the errno tests on three platforms. CLI: eight tests in `settings_set_cli.rs` (a pseudo-terminal run among them), the cases, gate, unported and structure tables. DDCKit: `AgentsOptInTests`, three `SettingsTests`, two ContractTests; 608 tests. Linux and the native Windows leg (the new CLI tests skip there with the platform, listed) and each PR's Gate were green; the Debug app built on the Mac.
+
+**Risks and follow-ups.** The owner's checks are in the runbook, the cross-process half of the lock among them. An agent in a pseudo-terminal sees the question meant for the person; `--data-dir` and a hand edit of `settings.json` stay outside the bound (the honest-agent rule). The README describes the command only; the app's toggle is described in the app. One Linux test, `a_venv_interpreter_is_found_by_its_first_argument`, failed once and passed alone: flaky, not this story's.
 
 <!-- Written at the done gate (/projectstore:story close): what changed, why,
      tests executed, risks and follow-ups. -->
@@ -92,6 +101,7 @@ No version bump: releases are batched and on hold until the owner asks.
 ## Status log
 
 - 2026-11-15T06:08:06.345Z status: planned → in-progress — work started (plan gate)
+- 2026-11-15T07:50:54.165Z status: in-progress → done — closed (close gate)
 
 ## Technical Notes
 

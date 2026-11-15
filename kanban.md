@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-15T06:23:49.987Z
+generated_at: 2026-11-15T07:51:37.703Z
 
 ---
 
@@ -56,7 +56,6 @@ generated_at: 2026-11-15T06:23:49.987Z
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
 - [ ] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
-- [ ] [[epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items|DDC-003: Settings: let coding agents clean safe items]] #p2
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
@@ -125,6 +124,7 @@ generated_at: 2026-11-15T06:23:49.987Z
 - [x] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2 #done
 - [x] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1 #done
+- [x] [[epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items|DDC-003: Settings: let coding agents clean safe items]] #p2 #done
 - [x] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1 #done

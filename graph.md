@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-15T06:23:50.159Z
+generated_at: 2026-11-15T07:51:37.861Z
 
 ---
 
@@ -92,7 +92,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | done |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
-| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | Settings: let coding agents clean safe items | story | in-progress |
+| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | Settings: let coding agents clean safe items | story | done |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | done |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
@@ -171,6 +171,7 @@ full typed neighborhood, both directions, in one call.
 | research/where-developer-disk-space-goes-linux.md | Where a developer's disk space goes (Linux) | research | final |
 | research/where-developer-disk-space-goes-macos.md | Where a developer's disk space goes (macOS) | research | final |
 | research/where-developer-disk-space-goes-windows.md | Where a developer's disk space goes (Windows) | research | final |
+| specs/settings-file-writers.md | Settings file writers | spec | active |
 
 ## Edges
 
@@ -789,6 +790,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-harness-data-rules.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-linux-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-007/stories/story-windows-scanner-and-rule-catalog.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-009/stories/story-launch-demo-assets.md |
@@ -797,6 +799,7 @@ full typed neighborhood, both directions, in one call.
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-linux-mount-boundaries-automounts-bind-mounts-and-the-trash-across-filesystems.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | epics/DDC-010/stories/story-scheduled-scans-on-linux-through-a-systemd-user-timer.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | mdlink | ops/first-sparkle-releases-shipping-the-updater-then-proving-it.md |
+| ops/owner-checks-manual-acceptance-across-stories.md | mdlink | specs/settings-file-writers.md |
 | ops/owner-checks-manual-acceptance-across-stories.md | wikilink | epics/DDC-002/epic.md |
 | research/coding-agent-harnesses-on-macos-where-their-data-lives-and-how-to-tell-a-live-session.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/distribution-through-agents.md | dead | epics/DDC-004/epic |
@@ -817,3 +820,12 @@ full typed neighborhood, both directions, in one call.
 | research/where-developer-disk-space-goes-linux.md | wikilink | research/where-developer-disk-space-goes-macos.md |
 | research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-linux.md |
 | research/where-developer-disk-space-goes-windows.md | wikilink | research/where-developer-disk-space-goes-macos.md |
+| specs/settings-file-writers.md | spec-covers | epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md |
+| specs/settings-file-writers.md | spec-implements-adr | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| specs/settings-file-writers.md | spec-implements-adr | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| specs/settings-file-writers.md | spec-implements-adr | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| specs/settings-file-writers.md | wikilink | adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents.md |
+| specs/settings-file-writers.md | wikilink | adr/cleanup-safety-model-risk-classes-plan-and-confirmation.md |
+| specs/settings-file-writers.md | wikilink | adr/menu-bar-app-swift-shell-over-the-ddc-cli.md |
+| specs/settings-file-writers.md | wikilink | epics/DDC-003/stories/story-clean-agent-bounded-consent.md |
+| specs/settings-file-writers.md | wikilink | epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md |
