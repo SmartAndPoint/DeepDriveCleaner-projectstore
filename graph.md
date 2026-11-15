@@ -1,7 +1,7 @@
 ---
 
 projectstore: derived
-generated_at: 2026-11-14T09:44:30.262Z
+generated_at: 2026-11-15T06:23:50.159Z
 
 ---
 
@@ -92,7 +92,7 @@ full typed neighborhood, both directions, in one call.
 | epics/DDC-003/stories/story-ddc-footprint-scoped-project-report.md | ddc footprint: a scoped project report | story | done |
 | epics/DDC-003/stories/story-harness-data-rules.md | Harness data rules | story | done |
 | epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees.md | Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees | story | in-progress |
-| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | Settings: let coding agents clean safe items | story | planned |
+| epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md | Settings: let coding agents clean safe items | story | in-progress |
 | epics/DDC-003/stories/story-worktree-findings-and-provenance.md | Worktree findings and provenance | story | done |
 | epics/DDC-005/epic.md | Production-grade Rust core: mandatory gate and load testing | epic | in-progress |
 | epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings.md | Clean of listed items: look each item up by path, not among all findings | story | planned |
