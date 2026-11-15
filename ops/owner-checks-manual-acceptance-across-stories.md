@@ -447,6 +447,14 @@ Story: [Clean: --agent bounded consent](../epics/DDC-003/stories/story-clean-age
 
 - [ ] Manual (owner): on a project with dead worktrees, `ddc agent clean --dry-run --json` lists them under `for_person`; with `"agents_clean_safe": true` in `settings.json`, a real run removes only the safe items inside the project's checkouts and lists the rest with a command to paste. Record only whether it held: no timings or project names in this vault.
 
+### The switch for coding agents (DDC-003)
+
+Story: [Settings: let coding agents clean safe items](../epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items.md); spec [Settings file writers](../specs/settings-file-writers.md).
+
+- [ ] Manual (owner): Settings → Automation → Coding agents: the toggle's words, the risk line and the older-ddc note read right, and "Read the Disclaimer" opens DISCLAIMER.md. Switching it on shows "Coding agents may clean safe items" in the popover, which opens Settings → Automation; a failed switch (say, while `settings.json` is unreadable) snaps the toggle back and shows why.
+- [ ] Manual (owner): at a terminal, `ddc settings set agents_clean_safe on` names the risk and the disclaimer and asks; a No changes nothing. With it on, an agent's `ddc agent clean` removes the safe items of its project; with it off, it removes nothing.
+- [ ] Manual (owner): with Settings → Automation open and the switch running, a `ddc settings set` from a terminal waits for the app's write or gives up within about a second, and neither change is lost (spec acceptance).
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
