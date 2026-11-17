@@ -5,12 +5,12 @@ alias: settings-writers
 title: "Settings file writers"
 status: active
 date: 2026-11-15
-updated: 2026-11-15
+updated: 2026-11-17
 authors: ["Evgenii Konev"]
 tags: [settings, agents, consent, cli, app]
 external_refs: {}
 adr: ["menu-bar-app-swift-shell-over-the-ddc-cli", "agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents", "cleanup-safety-model-risk-classes-plan-and-confirmation"]
-stories: ["DDC-003/story-settings-let-coding-agents-clean-safe-items"]
+stories: ["DDC-003/story-settings-let-coding-agents-clean-safe-items", "DDC-003/story-agent-guidance-skill-and-agents-snippet"]
 review_status: reviewed
 reviewed_at: "2026-11-15"
 ---
@@ -90,11 +90,15 @@ Spec acceptance is **additive** to the covered stories' own acceptance criteria
    - WHEN `off` runs on a pseudo-terminal
    - THEN no question is shown and the exit is 0
 
-10. **Nothing leads an agent to the approval.** The approval flag is named by no `--help` output, no refusal, no usage error's suggestion and no README text. No file under `agents/` and no text ddc prints for an agent names `settings set`; the skip reason an agent reads names the person's settings, not the file.
-   - WHEN the approval is mistyped as `--approve`, `--aproved` or `--approval` (edge)
+10. **Nothing leads an agent to the approval.** The app's approval flag, `--from-app`, is named by no `--help` output, no refusal, no usage error's suggestion and no README text, and shares no name with a flag another command shows: `ddc agent skill install`'s visible `--approved` is refused by `settings set`. The typo filter works per command, so it drops a flag's name from the hints of a command that hides it even while another command shows a flag of that name. No file under `agents/` and no text ddc prints for an agent names `settings set`; the skip reason an agent reads names the person's settings, not the file.
+   - WHEN the approval is mistyped as `--from-ap`, `--fromapp` or `--app` (edge)
    - THEN the usage error exits 2 and does not suggest it
+   - WHEN `on` is given `--approved` without a terminal (failure)
+   - THEN it exits 2 as a usage error and writes nothing
    - WHEN a visible option is mistyped
    - THEN it is still suggested
+
+   > amended 2026-11-17 by DDC-003/story-agent-guidance-skill-and-agents-snippet: MODIFIED — `ddc agent skill install` shows an `--approved` that an agent passes after a yes in the chat, so the app's flag is renamed and the filter works per command. Replaced: "The approval flag is named by no `--help` output, no refusal, no usage error's suggestion and no README text. No file under `agents/` and no text ddc prints for an agent names `settings set`; the skip reason an agent reads names the person's settings, not the file." with the scenario "WHEN the approval is mistyped as `--approve`, `--aproved` or `--approval` (edge)".
 
 11. **The app shows the file as the CLI left it.** After each run of the switch, whatever its exit, the toggle shows what `settings.json` says. A failed run shows the CLI's last stderr line under it, or that the command-line tool could not switch it, or that it is missing. The switch runs beside the queue, so `off` never waits behind a scan. While the file holds the key, the popover shows "Coding agents may clean safe items", which only opens Settings → Automation; it shows nothing when the file is off, absent or unreadable.
    - WHEN the run fails with a stderr line (failure)
@@ -124,7 +128,7 @@ Spec acceptance is **additive** to the covered stories' own acceptance criteria
 
 - [x] Each of contracts 1 to 11 has at least one automated test named under Testing that fails when its outcome breaks; the half of 2 where the app holds the lock and the CLI writes is the owner check below — evidence: the Testing list, every named test green in PRs #154 to #157
 - [x] The app's lock name and the CLI's are one constant's value, checked by a test (`settingsLockName`); the app's set of errors for a file system without locks is the CLI's macOS set (ENOLCK, ENOTSUP, EOPNOTSUPP), by inspection — evidence: ContractTests `settingsLockName`; `SettingsStore.swift` `takeLock` and `platform/macos/errno.rs` `lock_unsupported`
-- [x] A test proves `settings set`'s usage error never suggests the approval flag for three likely typos, while `scan --jsn` still suggests `--json`; the filter (`without_hidden_hints`) hides a long name only while no command shows it — evidence: `settings_set_cli.rs` `a_typo_is_never_answered_with_the_hidden_option`
+- [ ] A test proves `settings set`'s usage error never suggests the app's approval flag for three likely typos and refuses `--approved`, while `scan --jsn` still suggests `--json`; the filter (`without_hidden_hints`) works per command: it hides a flag's name from the hints of the command that hides it, whatever other commands show (contract 10, amended 2026-11-17) — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories", section "The switch for coding agents"): with Settings → Automation open and the switch running, a `ddc settings set` from a terminal waits for the app's write or gives up within about a second, and neither change is lost — stories: DDC-003/story-settings-let-coding-agents-clean-safe-items
 
 ## References
