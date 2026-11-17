@@ -111,9 +111,9 @@ For the scanner story:
 ## Open questions
 
 - [ ] How large the caches grow on a lived-in Windows developer home; a second measurement once one is available.
-- [ ] Gradle, Maven, JetBrains, VS Code, Visual Studio and Docker Desktop paths on a home that has them.
-- [ ] Confirm the tar-based WSL format's `%LOCALAPPDATA%\wsl\{GUID}` folder against Microsoft's documentation or release notes.
-- [ ] Whether the `%TEMP%` rule plans the folder's contents only, given that running programs hold files there (the held-open guard skips those).
+- [ ] Gradle, Maven, JetBrains, VS Code, Visual Studio and Docker Desktop paths on a home that has them. Visual Studio's `ComponentModelCache` has no rule until a home that has it confirms the path (step 13 of the story "Windows scanner and rule catalog" left it out).
+- [ ] Confirm the tar-based WSL format's `%LOCALAPPDATA%\wsl\{GUID}` folder against Microsoft's documentation or release notes. The rule `vm.wsl` (step 13) takes any folder of `%LOCALAPPDATA%\wsl` holding `ext4.vhdx`, so it does not wait on this.
+- [x] Whether the `%TEMP%` rule plans the folder's contents only, given that running programs hold files there (the held-open guard skips those). Settled 2026-11-17 (safety ADR, "§6, Windows, neither removed nor walked", planned 2026-11-17): `windows.temp` claims the children of `AppData\Local\Temp`, never the folder, as `review` with `trash`, since no age filter exists and Claude Code keeps its temporary folder there until the agents story gives it a rule.
 
 ## References
 
