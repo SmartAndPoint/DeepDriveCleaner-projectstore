@@ -41,7 +41,6 @@ generated_at: 2026-11-15T07:51:37.703Z
 - [ ] [[epics/DDC-010/stories/story-homebrew-on-linux-ddc-disk-brew-packages-and-its-cleanup|DDC-010: Homebrew on Linux: ddc disk brew-packages and its cleanup]] #p3
 - [ ] [[epics/DDC-010/stories/story-linux-catalog-flatpak-snap-and-the-tools-only-macos-lists|DDC-010: Linux catalog: Flatpak, Snap and the tools only macOS lists]] #p2
 - [ ] [[epics/DDC-010/stories/story-linux-test-parity-goldens-pinned-trees-distro-smoke-and-a-grouped-skip-list|DDC-010: Linux test parity: goldens, pinned trees, distro smoke and a grouped skip list]] #p2
-- [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
 - [ ] [[epics/DDC-010/stories/story-private-size-on-linux-reflinks-on-btrfs-and-xfs|DDC-010: Private size on Linux: reflinks on btrfs and XFS]] #p2
 - [ ] [[epics/DDC-010/stories/story-whole-disk-on-linux-the-areas-outside-the-home|DDC-010: Whole disk on Linux: the areas outside the home]] #p2
 - [ ] [[epics/DDC-010/stories/story-compressed-btrfs-say-when-a-scan-counts-more-than-a-clean-frees|DDC-010: Compressed btrfs: say when a scan counts more than a clean frees]] #p2
@@ -61,6 +60,7 @@ generated_at: 2026-11-15T07:51:37.703Z
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
 - [ ] [[epics/DDC-007/stories/story-windows-scanner-and-rule-catalog|DDC-007: Windows scanner and rule catalog]] #p2
 - [ ] [[epics/DDC-009/stories/story-launch-measurement-and-follow-up|DDC-009: Launch measurement and follow-up]] #p2
+- [ ] [[epics/DDC-010/stories/story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs|DDC-010: Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs]] #p2
 
 ## Review
 
