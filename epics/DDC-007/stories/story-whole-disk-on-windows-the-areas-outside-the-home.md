@@ -7,7 +7,7 @@ status: planned
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-17
 external_refs: {}
 tags: [rust, windows, disk, capability]
 code_refs: []
@@ -41,6 +41,8 @@ Candidate areas, to be confirmed by measurement: `Windows` (with `WinSxS`, which
 - [ ] Research: an addendum "On Windows" to the whole-disk research, measured on the lab machine, critic-reviewed.
 - [ ] The Windows areas in `disk::Sources` and the area table.
 - [ ] Declare `whole-disk` on Windows; tests off `lacks(whole-disk)` there; ADR "Platform seam" §3 amended.
+- [ ] The cloud roots the OneDrive variables name (story "Windows scanner and rule catalog", step 13, from the cloud-roots pull request #167's review): once Windows declares `whole-disk`, the disk report lists each cloud root it holds with its path (`HeldKind::Cloud`, `disk/mod.rs`, rendered in `ddc-cli/src/render.rs`), and a business OneDrive's root carries the organisation's name, which the safety ADR's cloud-roots bullet lets only the scan report print: the disk report names such a root without the organisation's name (or the ADR is amended first).
+- [ ] The two areas the safety ADR's bullet "§6, Windows, neither removed nor walked" hands here: Docker Desktop's Hyper-V disk (`C:\ProgramData\DockerDesktop\vm-data`) and a machine-wide conda install under `C:\ProgramData`.
 
 ## Implementation Plan
 
@@ -61,4 +63,4 @@ Candidate areas, to be confirmed by measurement: `Windows` (with `WinSxS`, which
 
 ---
 
-*Last updated: 2026-11-01*
+*Last updated: 2026-11-17*
