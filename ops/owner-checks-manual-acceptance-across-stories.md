@@ -455,6 +455,12 @@ Story: [Settings: let coding agents clean safe items](../epics/DDC-003/stories/s
 - [ ] Manual (owner): at a terminal, `ddc settings set agents_clean_safe on` names the risk and the disclaimer and asks; a No changes nothing. With it on, an agent's `ddc agent clean` removes the safe items of its project; with it off, it removes nothing.
 - [ ] Manual (owner): with Settings → Automation open and the switch running, a `ddc settings set` from a terminal waits for the app's write or gives up within about a second, and neither change is lost (spec acceptance).
 
+### The agent skill v0 in a live session (DDC-003)
+
+Story: [Agent skill v0: ask ddc before guessing about the disk](../epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk.md).
+
+- [ ] Manual (owner): install `agents/claude-code/ddc` as a skill, open a Claude Code session in a scratch project on a synthetic home and ask "why is my disk full". It runs `ddc changes --json`, then `ddc agent status --json` and `ddc scan "$PWD" --json`, and hands the cleanup to the person instead of running it. Record the commands it ran, not the transcript.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
