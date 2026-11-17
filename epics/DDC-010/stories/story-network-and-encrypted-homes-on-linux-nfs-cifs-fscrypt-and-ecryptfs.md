@@ -3,7 +3,7 @@ type: story
 id: "story-network-and-encrypted-homes-on-linux-nfs-cifs-fscrypt-and-ecryptfs"
 epic: "DDC-010"
 title: "Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-01
@@ -13,9 +13,9 @@ tags: [linux, scanner, safety, filesystems, nfs]
 code_refs: []
 specs: []
 started_at: "2026-11-17T07:40:56.185Z"
-closed_at: null
+closed_at: "2026-11-17T16:26:10.052Z"
 plan_updated_at: "2026-11-17T07:40:56.185Z"
-status_changed_at: "2026-11-17T07:40:56.185Z"
+status_changed_at: "2026-11-17T16:26:10.052Z"
 ---
 
 # Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs
@@ -23,7 +23,7 @@ status_changed_at: "2026-11-17T07:40:56.185Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-010](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -41,15 +41,15 @@ University and corporate machines often mount the home over NFS or CIFS. The res
 
 ## Decomposition
 
-- [ ] Detect a network filesystem by mountinfo's filesystem type (`nfs`, `nfs4`, `cifs`, `smb3`, `fuse.sshfs`); every FUSE mount shares one `f_type`, so mountinfo tells sshfs from gocryptfs. Only NFS can be mapped (safety ADR, 2026-11-17).
-- [ ] Ownership.
+- [x] Detect a network filesystem by mountinfo's filesystem type (`nfs`, `nfs4`, `cifs`, `smb3`, `fuse.sshfs`); every FUSE mount shares one `f_type`, so mountinfo tells sshfs from gocryptfs. Only NFS can be mapped (safety ADR, 2026-11-17).
+- [x] Ownership.
   - When a root is mapped (safety ADR, 2026-11-17: an `all_squash` NFS export, observed through the run's own holder file), report it once as a note on the volume ("files are owned by `<uid>`: the server maps ids"), and not as thousands of `foreign-owner` lines.
   - Nothing the user cannot delete is planned.
   - Say in the plan's text and in the clean's text report when `--permanent` may be the only working clean.
-- [ ] Silly renames. `.nfs*` files are never counted as new findings after a clean. The clean report names a delete that left one.
-- [ ] Measure a scan on the loopback NFS export of the CI mounts job, and record the latency in the research note's open question.
-- [ ] Encrypted homes: the eCryptfs lower folder (`~/.Private`, `/home/.ecryptfs`) is never walked. Add `~/.Private` to the Linux protected folders through the safety ADR §6, unless it is already covered.
-- [ ] Tests on the CI mounts job's NFS export, plain and `all_squash`:
+- [x] Silly renames. `.nfs*` files are never counted as new findings after a clean. The clean report names a delete that left one.
+- [x] Measure a scan on the loopback NFS export of the CI mounts job, and record the latency in the research note's open question.
+- [x] Encrypted homes: the eCryptfs lower folder (`~/.Private`, `/home/.ecryptfs`) is never walked. Add `~/.Private` to the Linux protected folders through the safety ADR §6, unless it is already covered.
+- [x] Tests on the CI mounts job's NFS export, plain and `all_squash`:
   - a scan finishes and reports the mapping once;
   - a clean of a selected cache either removes it or refuses it with a reason, and leaves no tombstone except a folder that holds a silly rename, named as `left_open`.
 
@@ -76,17 +76,36 @@ Every new mounts test goes into the `[environment]` group of `.config/native-ski
 
 ## Acceptance Criteria
 
-- [ ] On a loopback NFS export with `all_squash`, a scan finishes and reports the id mapping once, not per entry (test in the CI mounts job).
-- [ ] A clean on that export removes a selected cache or refuses it with a reason, and leaves no tombstone. On the plain export, a clean whose cache holds an open file leaves only the folder that holds the silly rename, named as `left_open`; that `.nfs*` file is not counted later, and after it is closed the next clean removes the folder (tests).
-- [ ] The research note records the measured NFS latency, without describing any owner machine.
-- [ ] `~/.Private` is never walked (test).
-- [ ] On the plain NFS export and on the CIFS mount no mapping is reported, and an entry of a third uid on a mapped root stays `foreign-owner` and is refused before any rename (tests).
+- [x] On a loopback NFS export with `all_squash`, a scan finishes and reports the id mapping once, not per entry (test in the CI mounts job). — evidence: `crates/ddc-core/tests/network_homes.rs` `a_squashed_nfs_home_is_reported_once_as_mapped` (linux-mounts green on #165 and #166); fakes in `tests/report.rs` `a_squashed_home_is_reported_once_as_mapped_on_its_volume`; main 58a61b3, 38e880f
+- [x] A clean on that export removes a selected cache or refuses it with a reason, and leaves no tombstone. On the plain export, a clean whose cache holds an open file leaves only the folder that holds the silly rename, named as `left_open`; that `.nfs*` file is not counted later, and after it is closed the next clean removes the folder (tests). — evidence: `tests/network_homes.rs` `a_squashed_home_clean_removes_a_read_only_cache_whole`, `a_squashed_exports_trash_is_refused_and_nothing_moves` (linux-mounts on #166), `a_file_held_open_on_nfs_is_left_open_in_its_tombstone_and_goes_once_closed` (linux-mounts on #168, ran and passed on the real export); `tests/report.rs` `a_silly_rename_on_nfs_holds_its_finding_and_a_tombstone_of_them_is_none`; Linux unit tests in `platform/linux/bulk.rs`; main 38e880f, f80a3ea, d0d98e8, be7860e
+- [x] The research note records the measured NFS latency, without describing any owner machine. — evidence: [[research/where-developer-disk-space-goes-linux|Where a developer's disk space goes (Linux)]], open question answered from CI run 44051015005 (vault #139); `scripts/ci-mounts.sh` latency step, main abbd7ce
+- [x] `~/.Private` is never walked (test). — evidence: `tests/clean_safety.rs` `ecryptfs_folders_in_the_home_are_never_walked_or_removed`, `tests/changes.rs` for `ddc changes`; main b24206d, ac861d7
+- [x] On the plain NFS export and on the CIFS mount no mapping is reported, and an entry of a third uid on a mapped root stays `foreign-owner` and is refused before any rename (tests). — evidence: `tests/network_homes.rs` `a_plain_nfs_or_cifs_home_is_not_mapped` (linux-mounts); `tests/clean_safety.rs` `on_a_mapped_root_the_mapped_owners_findings_are_planned_and_a_third_uid_is_not`; main 58a61b3, 38e880f
 
 ## Final Summary
+
+**What changed.** Five code PRs, all merged with the `linux-mounts` job itself green, no version bump (batched releases):
+1. #163 (b24206d, ac861d7): eCryptfs's `~/.Private`, `~/.ecryptfs` and `/home/.ecryptfs` are never walked and protected; `ddc changes` no longer lists them as behind a prompt.
+2. #164 (abbd7ce): the CI mounts job measures a scan of about 20k entries on the NFS export and on local disk, cold and warm; the numbers went into the research note (vault #139).
+3. #165 (58a61b3, 263a78a, f16d770): the scan reads the server's owner of this run's own holder record; a home on an NFS root mapped to that owner gets one `id_mapping` note on its volume.
+4. #166 (38e880f): on a mapped root the mapped owner's files count as the user's (the owner's decision), decided per root before the walk; they are planned, made writable on their way out, and a third uid stays `foreign-owner`; the scan's text says the Trash is not private there.
+5. #168 (f80a3ea, d0d98e8, be7860e): an NFS silly rename left by a delete is reported as `left_open` on a `deleted` item; the scan counts such files as `held-open` (scan schema 10), a tombstone of them is no finding, and a worktree holding one is held too.
+Also #162 (2b126e7): `scripts/native-linux.sh` removes files git no longer tracks.
+
+**Why.** University and corporate homes live on NFS or CIFS; before this story an `all_squash` home showed thousands of `foreign-owner` lines and removed nothing, and a delete with a file still open left a tombstone that came back as a finding.
+
+**Tests executed.** The full native Linux leg in WSL before each push; DDCKit's 608 tests on the Mac for PR 5; the Gate on every PR, including `linux-mounts`, whose NFS (plain and `all_squash`) and CIFS tests ran against the real mounts. The silly-rename test first failed in CI because the holder was the test's own child (the process table leaves the clean's own children unread, by design); fixed in be7860e and green.
+
+**Risks and follow-ups.**
+- Manual checks are in the owner-checks runbook, section "Network and encrypted homes on Linux (DDC-010)": an `all_squash` NFS home, an NFSv4 idmap mismatch (not mapped, as the ADR says), a CIFS home, a file held open on NFS by the user and by another account, an Ubuntu eCryptfs home, fscrypt, a dead hard mount.
+- Accepted in the safety ADR (2026-11-17): a dead hard mount hangs a scan as `ls` does; `ddc agent footprint` does not know NFS roots; an `EBUSY` in the first listing stays `failed`.
+- Not in the ADR, a known gap: a delete that left a silly rename reports the item's whole `bytes` as freed, though the server frees the open file's space only when it is closed.
+- NFSv4.1 servers that preserve unlinked files would give no silly rename; the CI kernel did rename, so the test holds there, and the product then simply deletes.
 
 ## Status log
 
 - 2026-11-17T07:40:56.185Z status: planned → in-progress — work started (plan gate)
+- 2026-11-17T16:26:10.052Z status: in-progress → done — closed (close gate)
 
 ## Technical Notes
 
