@@ -161,7 +161,11 @@ For the Linux section of the catalog and the Linux scanner:
 
 ## Open questions
 
-- NFS and CIFS homes (common on university and corporate machines): uid mapping, `stx_dev` and latency were not measured.
+- NFS and CIFS homes (common on university and corporate machines). Answered in part on 2026-11-17, by story "Network and encrypted homes on Linux: NFS, CIFS, fscrypt and eCryptfs" and the safety ADR's amendment of that date:
+  - **uid mapping.** An `all_squash` export shows the user's own files as `nobody`. ddc tells it from the owner the server gives a file ddc itself just made (its lock holder record), and reports it once per volume. A plain NFSv3 numeric mismatch and an NFSv4 owner the client cannot map (shown as 4294967294) are not mapped.
+  - **Latency**, measured on the CI mounts job: a GitHub ubuntu-24.04 runner, a loopback NFSv4.2 export, Gate run 44051015005. A scan of 20,203 entries took 795 ms cold (39.4 µs per entry) and 74 ms warm (3.7 µs) on NFS, against 707 ms (35.0 µs) and 60 ms (3.0 µs) on the runner's own disk. The server is the same machine, so this is a lower bound: a real network adds its round trip to each uncached `statx`.
+  - **`stx_dev`.** The export's anonymous device was 89 before and after one remount in that run. One run cannot tell whether it stays stable.
+  - Still open: a real network home with an id mismatch, which is an owner check.
 - The uv release in which the Linux default moved from `hardlink` to `clone`.
 - Whether current Remote-SSH still removes old `bin/<commit>` installs itself.
 - Whether Claude Code's native installer prunes its `versions` folder.
