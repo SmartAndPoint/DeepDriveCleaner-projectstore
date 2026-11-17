@@ -8,7 +8,7 @@ created: 2026-10-18
 updated: 2026-11-01
 external_refs: {}
 tags: [agents, worktrees, cli, rules]
-code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/rules/entries.rs", "crates/ddc-core/src/rules/catalog/macos.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/plan.rs", "app/Packages/DDCKit/", "crates/ddc-core/src/footprint/", "crates/ddc-core/src/rules/worktree.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/refusal.rs", "crates/ddc-cli/src/cmd/agent_footprint.rs", "crates/ddc-cli/src/render.rs", "docs/footprint.schema.json", "docs/error.schema.json"]
+code_refs: ["crates/ddc-core/src/agents/", "crates/ddc-core/src/rules/entries.rs", "crates/ddc-core/src/rules/catalog/macos.rs", "crates/ddc-core/src/rules/listing.rs", "crates/ddc-core/src/report/contents.rs", "crates/ddc-core/src/report/recheck.rs", "crates/ddc-core/src/exec/", "crates/ddc-core/src/plan.rs", "app/Packages/DDCKit/", "crates/ddc-core/src/footprint/", "crates/ddc-core/src/rules/worktree.rs", "crates/ddc-core/src/report/mod.rs", "crates/ddc-core/src/refusal.rs", "crates/ddc-cli/src/cmd/agent_footprint.rs", "crates/ddc-cli/src/render.rs", "docs/footprint.schema.json", "docs/error.schema.json", "agents/", "crates/ddc-cli/tests/structure.rs", "crates/ddc-core/src/guidance/", "crates/ddc-cli/src/cmd/agent_skill.rs", "docs/skill.schema.json"]
 review_status: pending
 reviewed_at: null
 ---
