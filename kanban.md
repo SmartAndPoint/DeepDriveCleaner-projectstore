@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-18T06:33:23.899Z
+generated_at: 2026-11-18T06:52:11.759Z
 
 ---
 
@@ -12,8 +12,13 @@ generated_at: 2026-11-18T06:33:23.899Z
 - [ ] [[epics/DDC-001/stories/story-swiftpm-build-folders-as-rebuildable-artifacts|DDC-001: SwiftPM build folders as rebuildable artifacts]] #p2
 - [ ] [[epics/DDC-003/stories/story-coding-agents-temporary-folders-outside-the-home|DDC-003: Coding agents' temporary folders outside the home]] #p2
 - [ ] [[epics/DDC-003/stories/story-ddc-agent-clean-session-clean-up-after-one-session|DDC-003: ddc agent clean --session: clean up after one session]] #p3
+- [ ] [[epics/DDC-003/stories/story-antigravity-ddcs-skill-where-agy-reads-it|DDC-003: Antigravity: ddc's skill where agy reads it]] #p3
+- [ ] [[epics/DDC-003/stories/story-claude-code-plugin-ddcs-skill-from-a-marketplace-in-this-repository|DDC-003: Claude Code plugin: ddc's skill from a marketplace in this repository]] #p2
+- [ ] [[epics/DDC-003/stories/story-codex-rules-and-opencode-permissions-ddcs-read-only-commands-without-a-prompt|DDC-003: Codex rules and opencode permissions: ddc's read-only commands without a prompt]] #p3
+- [ ] [[epics/DDC-003/stories/story-session-hooks-a-coding-agents-cleanup-offered-at-the-end-of-a-session|DDC-003: Session hooks: a coding agent's cleanup offered at the end of a session]] #p3
 - [ ] [[epics/DDC-005/stories/story-load-run-on-the-reference-machine-including-system-folders|DDC-005: Load run on the reference machine, including system folders]] #p2
 - [ ] [[epics/DDC-005/stories/story-clean-of-listed-items-look-each-item-up-by-path-not-among-all-findings|DDC-005: Clean of listed items: look each item up by path, not among all findings]] #p2
+- [ ] [[epics/DDC-005/stories/story-humantime-to-jiff-rfc-3339-times-without-an-unmaintained-crate|DDC-005: humantime to jiff: RFC 3339 times without an unmaintained crate]] #p2
 - [ ] [[epics/DDC-006/stories/story-agents-and-editors-see-violations-as-they-write|DDC-006: Agents and editors see violations as they write]] #p2
 - [ ] [[epics/DDC-006/stories/story-burn-down-the-baseline-split-long-files-and-functions|DDC-006: Burn down the baseline: split long files and functions]] #p2
 - [ ] [[epics/DDC-006/stories/story-clippy-at-full-strength-curated-lints-with-reasons|DDC-006: Clippy at full strength: curated lints with reasons]] #p2
@@ -53,7 +58,6 @@ generated_at: 2026-11-18T06:33:23.899Z
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
-- [ ] [[epics/DDC-003/stories/story-agent-skill-install-the-shared-agentsskills-folder|DDC-003: Agent skill install: the shared ~/.agents/skills folder]] #p2
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
 - [ ] [[epics/DDC-007/stories/story-build-matrix-every-target-built-tested-and-packaged-from-one-tag|DDC-007: Build matrix: every target built, tested and packaged from one tag]] #p1
@@ -125,6 +129,7 @@ generated_at: 2026-11-18T06:33:23.899Z
 - [x] [[epics/DDC-003/stories/story-worktree-findings-and-provenance|DDC-003: Worktree findings and provenance]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-agent-skill-v0-ask-ddc-before-guessing-about-the-disk|DDC-003: Agent skill v0: ask ddc before guessing about the disk]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-settings-let-coding-agents-clean-safe-items|DDC-003: Settings: let coding agents clean safe items]] #p2 #done
+- [x] [[epics/DDC-003/stories/story-agent-skill-install-the-shared-agentsskills-folder|DDC-003: Agent skill install: the shared ~/.agents/skills folder]] #p2 #done
 - [x] [[epics/DDC-005/stories/story-coverage-floor-and-property-tests-for-the-safety-invariants|DDC-005: Coverage floor and property tests for the safety invariants]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-mandatory-gate-before-every-commit|DDC-005: Mandatory gate before every commit]] #p1 #done
 - [x] [[epics/DDC-005/stories/story-synthetic-load-trees-large-wide-deep-and-hostile|DDC-005: Synthetic load trees: large, wide, deep and hostile]] #p1 #done

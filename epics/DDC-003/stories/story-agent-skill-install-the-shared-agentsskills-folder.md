@@ -3,19 +3,19 @@ type: story
 id: "story-agent-skill-install-the-shared-agentsskills-folder"
 epic: "DDC-003"
 title: "Agent skill install: the shared ~/.agents/skills folder"
-status: in-progress
+status: done
 priority: p2
 assignee: "Evgenii Konev"
 created: 2026-11-18
 updated: 2026-11-18
 external_refs: {}
 tags: [agents, skill, codex, opencode, gemini, qwen, cli]
-code_refs: []
+code_refs: ["crates/ddc-core/src/guidance/", "crates/ddc-cli/src/cmd/agent_skill.rs", "crates/ddc-core/src/rules/catalog/shared/agents.rs", "docs/skill.schema.json", "agents/"]
 specs: ["agent-skill-install"]
 started_at: "2026-11-18T06:17:42.156Z"
-closed_at: null
+closed_at: "2026-11-18T06:47:42.905Z"
 plan_updated_at: "2026-11-18T06:17:42.156Z"
-status_changed_at: "2026-11-18T06:17:42.156Z"
+status_changed_at: "2026-11-18T06:47:42.905Z"
 ---
 
 # Agent skill install: the shared ~/.agents/skills folder
@@ -23,7 +23,7 @@ status_changed_at: "2026-11-18T06:17:42.156Z"
 | Field | Value |
 |---|---|
 | **Epic** | [DDC-003](../epic.md) |
-| **Status** | in-progress |
+| **Status** | done |
 | **Priority** | p2 |
 | **Assignee** | Evgenii Konev |
 
@@ -39,13 +39,13 @@ So `install` writes the same skill into `~/.agents/skills/ddc` too, and `status`
 
 ## Decomposition
 
-- [ ] PR 0, vault: this story, its plan, the spec's amendment and the ADR's dated note
-- [ ] PR 1, step 1: the families in the core (`guidance::Family`, its folder under a root) and `family` in each folder's status
-- [ ] PR 1, step 2: `--family` and the all-or-nothing plan in `install`; `status` over both families
-- [ ] PR 1, step 3: the rule `agent.shared-skills-sealed`, with its group, the app's wording and the rule tests
-- [ ] PR 1, step 4: `docs/skill.schema.json` regenerated, the cases, the macOS golden `rules.json`
-- [ ] PR 1, step 5: the guidance and both READMEs say where the skill lands
-- [ ] The owner's try-out in Codex and opencode goes to the runbook at close
+- [x] PR 0, vault: this story, its plan, the spec's amendment and the ADR's dated note (vault #148)
+- [x] PR 1, step 1: the families in the core (`guidance::Family`, its folder under a root) and `family` in each folder's status (#176)
+- [x] PR 1, step 2: `--family` and the all-or-nothing plan in `install`; `status` over both families (#176)
+- [x] PR 1, step 3: the rule `agent.shared-skills-sealed`, with its group, the app's wording and the rule tests (#176)
+- [x] PR 1, step 4: `docs/skill.schema.json` regenerated, the cases, the macOS golden `rules.json` (#176)
+- [x] PR 1, step 5: the guidance and both READMEs say where the skill lands (#176)
+- [x] The owner's try-out in Codex and opencode goes to the runbook at close — done: runbook section "The shared skills folder"
 
 ## Implementation Plan
 
@@ -61,15 +61,25 @@ Files: `crates/ddc-core/src/guidance/mod.rs` (the families), `crates/ddc-cli/src
 
 ## Acceptance Criteria
 
-- [ ] Test: by default `install` writes `SKILL.md` and the marker into both `.claude/skills/ddc` and `.agents/skills/ddc` (home, and a project with `--project`); `--family agents` writes only the shared one
-- [ ] Test: an edited or linked shared folder refuses the whole install, and nothing is written in either folder
-- [ ] Test: `status --json` lists both folders with their `family` and state; the committed schema is current
-- [ ] Test (`agent_rules.rs`): a scan of a home with `~/.agents/skills/ddc/` has no finding at or under `~/.agents/skills`
-- [ ] The acceptance of spec "Agent skill install" still holds, with contracts 1 and 9 as amended
-- [ ] The PR's Gate is green, the Linux and native Windows legs included
-- [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): after `ddc agent skill install`, a Codex session and an opencode session each list the `ddc` skill and use it when asked why the disk is full
+- [x] Test: by default `install` writes `SKILL.md` and the marker into both `.claude/skills/ddc` and `.agents/skills/ddc` (home, and a project with `--project`); `--family agents` writes only the shared one — evidence: `agent_skill_cli.rs` `without_a_terminal_it_needs_approved_and_then_writes_once`, `a_project_gets_its_skill_and_its_agents_md_block`, `family_narrows_the_install_and_one_refusal_stops_both` (PR #176)
+- [x] Test: an edited or linked shared folder refuses the whole install, and nothing is written in either folder — evidence: `family_narrows_the_install_and_one_refusal_stops_both` (edited), `a_linked_shared_folder_refuses_the_whole_install` (linked) (PR #176)
+- [x] Test: `status --json` lists both folders with their `family` and state; the committed schema is current — evidence: `status_reports_each_place_and_writes_nothing`, `status_with_a_project_reports_both_families_of_both_places`, `guidance.rs` `the_shared_agents_folder_is_one_more_skill_folder`, `committed_skill_schema_is_current` (PR #176)
+- [x] Test (`agent_rules.rs`): a scan of a home with `~/.agents/skills/ddc/` has no finding at or under `~/.agents/skills` — evidence: `agent_rules.rs` `sealed_folders_and_auto_memory_are_never_findings` with `.agents/skills`, the rule `agent.shared-skills-sealed` in `rules.rs` and `rules_cli.rs` (PR #176)
+- [x] The acceptance of spec "Agent skill install" still holds, with contracts 1 and 9 as amended — evidence: the spec's acceptance item for contracts 1 and 9, checked in this vault PR
+- [x] The PR's Gate is green, the Linux and native Windows legs included — evidence: PR #176's required checks green; native Windows leg 1186 tests passed, the skips as listed; `make golden-record` (rules.json only) and `make ddckit-test` 608 on the Mac
+- [x] Owner check (runbook "Owner checks: manual acceptance across stories"): after `ddc agent skill install`, a Codex session and an opencode session each list the `ddc` skill and use it when asked why the disk is full — moved to runbook "Owner checks: manual acceptance across stories", section "The shared skills folder"
 
 ## Final Summary
+
+**What changed.** PR #176: `ddc agent skill install` writes the skill into `~/.agents/skills/ddc` as well as `~/.claude/skills/ddc` (or both under `--project`), both by default, `--family claude-code|agents` narrowing it; every folder is planned before the question and one refusal refuses the install. `status` reports both families of the home and the project, each with `family`. The rule `agent.shared-skills-sealed` keeps the shared folder out of every scan; the app names it. The guidance and both READMEs say where the skill lands.
+
+**Why.** The owner works in Codex, opencode and Antigravity too and wants the guidance in every harness (2026-11-17); Codex, opencode, Gemini CLI and Qwen Code read `~/.agents/skills`, so one folder reaches four of them.
+
+**Deviations, decided while building.** (1) The critic renamed `harness` to `family` (the scan report's `origin.harness` names harnesses) and moved the sealing into a rule of its own; both done before 0.38.0, their first release. (2) A new rule touched the catalogs' counts, the listing group, DDCKit's wording and fixture and the macOS golden `rules.json`; all in the PR.
+
+**Tests.** `guidance.rs` (the shared folder), `agent_skill_cli.rs` (both families, `--family`, an edited and a linked shared folder, status with a project), `agent_rules.rs`, `rules.rs`, `rules_cli.rs`, a case. A Linux machine: clippy and the unit tier (1176); the native Windows leg (1186); the Mac: the golden and DDCKit (608).
+
+**Risks and follow-ups.** Whether Codex and opencode pick the skill up is the owner's check (runbook). Antigravity, the Claude Code plugin and hooks are backlog stories.
 
 <!-- Written at the done gate (/projectstore:story close): what changed, why,
      tests executed, risks and follow-ups. -->
@@ -77,6 +87,7 @@ Files: `crates/ddc-core/src/guidance/mod.rs` (the families), `crates/ddc-cli/src
 ## Status log
 
 - 2026-11-18T06:17:42.156Z status: planned → in-progress — work started (plan gate)
+- 2026-11-18T06:47:42.905Z status: in-progress → done — closed (close gate)
 
 ## Technical Notes
 
