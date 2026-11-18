@@ -484,6 +484,13 @@ Story: [Agent guidance: skill and AGENTS.md snippet](../epics/DDC-003/stories/st
 - [ ] Manual (owner): asked to update the guidance, the agent asks you first and then runs `ddc agent skill install --approved`.
 - [ ] Manual (owner): the app's "Let coding agents clean safe items" still switches on and off (the app now passes `--from-app`).
 
+### The shared skills folder (DDC-003)
+
+Story: [Agent skill install: the shared ~/.agents/skills folder](../epics/DDC-003/stories/story-agent-skill-install-the-shared-agentsskills-folder.md).
+
+- [ ] Manual (owner): after `ddc agent skill install`, a new Codex session lists the `ddc` skill and, asked why the disk is full, runs `ddc changes --json` and the read-only commands before it proposes anything.
+- [ ] Manual (owner): the same in opencode; it reads both `~/.claude/skills` and `~/.agents/skills` and should list `ddc` once.
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.
