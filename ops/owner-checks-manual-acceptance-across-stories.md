@@ -475,6 +475,15 @@ Story: [Agent skill v0: ask ddc before guessing about the disk](../epics/DDC-003
 
 - [ ] Manual (owner): install `agents/claude-code/ddc` as a skill, open a Claude Code session in a scratch project on a synthetic home and ask "why is my disk full". It runs `ddc changes --json`, then `ddc agent status --json` and `ddc scan "$PWD" --json`, and hands the cleanup to the person instead of running it. Record the commands it ran, not the transcript.
 
+### Agent guidance and ddc agent skill install (DDC-003)
+
+Story: [Agent guidance: skill and AGENTS.md snippet](../epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet.md); spec [Agent skill install](../specs/agent-skill-install.md).
+
+- [ ] Manual (owner): at a terminal, `ddc agent skill install` lists the files and asks; after a yes, a new Claude Code session lists the `ddc` skill; `ddc agent skill status` says `current`.
+- [ ] Manual (owner): a Claude Code session with the skill, in a fresh worktree and asked to install the project's dependencies, runs `ddc agent footprint` first; a second one asked to "free some space in this project" runs `ddc agent clean` (a dry run first) and nothing else that removes files. Record the commands, not the transcript.
+- [ ] Manual (owner): asked to update the guidance, the agent asks you first and then runs `ddc agent skill install --approved`.
+- [ ] Manual (owner): the app's "Let coding agents clean safe items" still switches on and off (the app now passes `--from-app`).
+
 ## Verification
 
 - [ ] A passed check is ticked and stamped with the date and the version it was checked on, for example `- [x] Manual (owner): … — checked 2026-11-02 on 0.7.0`.

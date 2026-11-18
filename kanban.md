@@ -2,7 +2,7 @@
 
 kanban-plugin: board
 projectstore: derived
-generated_at: 2026-11-17T17:05:56.050Z
+generated_at: 2026-11-18T06:15:18.554Z
 
 ---
 
@@ -52,7 +52,6 @@ generated_at: 2026-11-17T17:05:56.050Z
 
 - [ ] [[epics/DDC-001/stories/story-homebrew-tap-and-the-v010-release|DDC-001: Homebrew tap and the v0.1.0 release]] #p1
 - [ ] [[epics/DDC-001/stories/story-progress-output-while-ddc-clean-runs|DDC-001: Progress output while ddc clean runs]] #p2
-- [ ] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2
 - [ ] [[epics/DDC-003/stories/story-per-session-footprint-transcripts-temporary-folders-and-worktrees|DDC-003: Per-session footprint: what each agent session keeps in its transcripts, temporary folders and worktrees]] #p1
 - [ ] [[epics/DDC-005/stories/story-complexity-guard-operation-counts-and-scaling-exponents|DDC-005: Complexity guard: operation counts and scaling exponents]] #p1
 - [ ] [[epics/DDC-005/stories/story-memory-and-cpu-under-load-peak-memory-leaks-and-cpu-time|DDC-005: Memory and CPU under load: peak memory, leaks and CPU time]] #p1
@@ -118,6 +117,7 @@ generated_at: 2026-11-17T17:05:56.050Z
 - [x] [[epics/DDC-002/stories/story-scheduled-scans-register-the-agent-again-after-an-update|DDC-002: Scheduled scans: register the agent again after an update]] #p1 #done
 - [x] [[epics/DDC-002/stories/story-full-disk-access-check-on-macos-27|DDC-002: Full Disk Access check on macOS 27]] #p0 #done
 - [x] [[epics/DDC-002/stories/story-popover-and-review-what-grew-since-the-earlier-scan|DDC-002: Popover and Review: what grew since the earlier scan]] #p1 #done
+- [x] [[epics/DDC-003/stories/story-agent-guidance-skill-and-agents-snippet|DDC-003: Agent guidance: skill and AGENTS.md snippet]] #p2 #done
 - [x] [[epics/DDC-003/stories/story-clean-agent-bounded-consent|DDC-003: Clean: --agent bounded consent]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-ddc-footprint-scoped-project-report|DDC-003: ddc footprint: a scoped project report]] #p1 #done
 - [x] [[epics/DDC-003/stories/story-harness-data-rules|DDC-003: Harness data rules]] #p2 #done
