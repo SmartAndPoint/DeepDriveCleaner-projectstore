@@ -5,12 +5,12 @@ alias: skill-install
 title: "Agent skill install"
 status: active
 date: 2026-11-17
-updated: 2026-11-17
+updated: 2026-11-18
 authors: ["Evgenii Konev"]
 tags: [agents, skill, agents-md, cli, consent]
 external_refs: {}
 adr: ["agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents"]
-stories: ["DDC-003/story-agent-guidance-skill-and-agents-snippet"]
+stories: ["DDC-003/story-agent-guidance-skill-and-agents-snippet", "DDC-003/story-agent-skill-install-the-shared-agentsskills-folder"]
 review_status: reviewed
 reviewed_at: "2026-11-17"
 ---
@@ -30,15 +30,21 @@ Spec acceptance is **additive** to the covered stories' own acceptance criteria
 
 ## How we solve
 
-[[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]] §7, "Installing the guidance", decides `ddc agent skill install` and `ddc agent skill status`. They write the Claude Code skill and the `AGENTS.md` snippet that ship in `agents/`, from copies built into the binary. They write and replace only files they name, delete nothing, and recognise their own skill folder by a marker. At a terminal they ask before writing. Without a terminal they need `--approved`, which an agent passes only after the person said yes in the chat. That flag is not `--yes`: it approves writing `ddc`'s own text, never a removal. The ADR's note of 2026-11-17 records what the plan gate of the covered story settled: the plugin waits for a later story, the marker's hash protects against no one, the app's hidden flag of `ddc settings set` is renamed so the two approvals never share a name, and Windows refuses the command until the port is done. Two neighbouring rules live elsewhere: `.claude/skills` on §3's never-claimed list (the ADR and a rule test), and the typo filter per command ([[specs/settings-file-writers|Settings file writers]], contract 10).
+[[adr/agent-footprint-worktrees-harness-data-and-bounded-consent-for-agents|Agent footprint: worktrees, harness data and bounded consent for agents]] §7, "Installing the guidance", decides `ddc agent skill install` and `ddc agent skill status`. They write the skill (for Claude Code, and since 2026-11-18 into the folder Codex, opencode, Gemini CLI and Qwen Code share) and the `AGENTS.md` snippet that ship in `agents/`, from copies built into the binary. They write and replace only files they name, delete nothing, and recognise their own skill folder by a marker. At a terminal they ask before writing. Without a terminal they need `--approved`, which an agent passes only after the person said yes in the chat. That flag is not `--yes`: it approves writing `ddc`'s own text, never a removal. The ADR's note of 2026-11-17 records what the plan gate of the covered story settled: the plugin waits for a later story, the marker's hash protects against no one, the app's hidden flag of `ddc settings set` is renamed so the two approvals never share a name, and Windows refuses the command until the port is done. Two neighbouring rules live elsewhere: `.claude/skills` and `.agents/skills` on §3's never-claimed list (the ADR, the rules `agent.claude-code-sealed` and `agent.shared-skills-sealed`, and a rule test), and the typo filter per command ([[specs/settings-file-writers|Settings file writers]], contract 10).
 
-Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills/ddc/` with `--project DIR`. The **shipped files** are the files of `agents/claude-code/ddc/` built into the binary (`SKILL.md` today). The **marker** is `.ddc-skill` in the skill folder. A **marker line** is `<!-- ddc:begin -->` or `<!-- ddc:end -->` alone on its line; the **block** runs from a begin line to the next end line, both included. **This copy** is what this binary would write.
+Terms: a **skill folder** is `~/.claude/skills/ddc/` or `~/.agents/skills/ddc/`, or the same under `<DIR>` with `--project DIR` (contract 1, amended 2026-11-18). The **shipped files** are the files of `agents/claude-code/ddc/` built into the binary (`SKILL.md` today). The **marker** is `.ddc-skill` in the skill folder. A **marker line** is `<!-- ddc:begin -->` or `<!-- ddc:end -->` alone on its line; the **block** runs from a begin line to the next end line, both included. **This copy** is what this binary would write.
 
 ## Behavioral contracts
 
-1. **Where it writes.** `install` writes the skill folder under the home folder, or under `DIR` with `--project DIR`. With `--agents-md FILE` it also writes the block into `FILE`. It writes nowhere else: not the data folder, not `settings.json`, not any other skill. `DIR` must be an existing folder, and `FILE`'s parent folder must exist; otherwise `install` and `status` exit 2, name the path and write nothing. `.claude` and `.claude/skills` are created when missing.
+1. **Where it writes.** `install` writes a skill folder for each harness family, under the home folder or under `DIR` with `--project DIR`: `claude-code` (`.claude/skills/ddc`) and `agents` (`.agents/skills/ddc`, the folder Codex, opencode, Gemini CLI and Qwen Code share). `--family claude-code|agents`, repeatable, narrows it to those; without it, both. Every folder is planned before anything is written, and a refusal in one refuses the install. With `--agents-md FILE` it also writes the block into `FILE`. It writes nowhere else: not the data folder, not `settings.json`, not any other skill. `DIR` must be an existing folder, and `FILE`'s parent folder must exist; otherwise `install` and `status` exit 2, name the path and write nothing. The folders above a skill folder are created when missing.
    - WHEN `install --project DIR` runs where DIR does not exist (failure)
    - THEN it exits 2, names DIR, and nothing is written
+   - WHEN `install --approved` runs in a home with neither folder (edge)
+   - THEN both `.claude/skills/ddc` and `.agents/skills/ddc` hold the skill and its marker
+   - WHEN the shared folder was edited by hand (failure)
+   - THEN `install` exits 2 and neither folder is written
+
+   > amended 2026-11-18 by DDC-003/story-agent-skill-install-the-shared-agentsskills-folder: MODIFIED — the shared `.agents/skills` folder, read by four harnesses, joins Claude Code's. Replaced: "`install` writes the skill folder under the home folder, or under `DIR` with `--project DIR`." and "`.claude` and `.claude/skills` are created when missing."
 
 2. **It writes the shipped files and the marker, and deletes nothing.** In the skill folder it writes each shipped file, then the marker last. Each is replaced atomically and keeps the mode of the file it replaces. No file or folder is ever removed, renamed away or moved to the Trash. A file that is not a shipped file stays as it is, and the output names it: as no longer shipped when the old marker listed it, else as extra. A temporary file an interrupted install left is extra too, left for the person.
    - WHEN the skill folder holds `notes.md` beside an older `SKILL.md` and its marker
@@ -82,11 +88,13 @@ Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills
    - WHEN this copy is installed already (edge)
    - THEN it exits 0, asks nothing, and no file's modification time changes
 
-9. **`status`: the skill folder.** `ddc agent skill status [--project DIR] [--agents-md FILE] [--json]` writes nothing and asks nothing. For the home skill folder, and the project's with `--project`, it reports one state: `absent`; `current` (unedited, and every file equals this copy's); `older` (unedited, written by another version or from another copy); `edited`; `not-ours`; or `link`. With `not-ours` it reports the `metadata.version` of a `SKILL.md` there, when it has one, so a copy installed by hand shows its version. It lists the extra and no-longer-shipped files.
+9. **`status`: the skill folders.** `ddc agent skill status [--project DIR] [--agents-md FILE] [--json]` writes nothing and asks nothing. For each skill folder of both families, the home's and with `--project` the project's, it reports its `family` (`claude-code` or `agents`) and one state: `absent`; `current` (unedited, and every file equals this copy's); `older` (unedited, written by another version or from another copy); `edited`; `not-ours`; or `link`. With `not-ours` it reports the `metadata.version` of a `SKILL.md` there, when it has one, so a copy installed by hand shows its version. It lists the extra and no-longer-shipped files.
    - WHEN the home folder has no skill (edge)
    - THEN `status --json` says `absent` and exits 0
    - WHEN a hand copy of an older release is there (edge)
    - THEN it says `not-ours` with that copy's version
+
+   > amended 2026-11-18 by DDC-003/story-agent-skill-install-the-shared-agentsskills-folder: MODIFIED — the shared folder is reported beside Claude Code's. Replaced: "For the home skill folder, and the project's with `--project`, it reports one state:"
 
 10. **`status`: the `AGENTS.md` file.** For `FILE` with `--agents-md` it reports `absent` (no file, or no block), `current` (the block equals this copy's), `differs`, `malformed` (what contract 6 refuses) or `link`. `--json` for both follows `docs/skill.schema.json`. `status` exits 0 for every state, 2 for a path contract 1 rejects, and 1 only when a file cannot be read.
     - WHEN `FILE` holds an older block (edge)
@@ -107,8 +115,8 @@ Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills
 
 ## Testing
 
-- Core, `crates/ddc-core/tests/guidance.rs`: 2 to 7, 9 and 10 on temporary folders (`an_absent_folder_gets_the_files_then_the_marker`, `an_older_copy_is_replaced_and_other_files_stay`, `an_edited_or_hand_copied_folder_is_refused_unless_replaced`, `a_broken_marker_a_missing_file_or_an_unlisted_one_is_refused`, `links_are_refused_even_with_replace`, `a_malformed_agents_md_is_refused`, `the_block_is_replaced_and_everything_else_kept`, `a_block_is_appended_after_one_empty_line`, `an_agents_md_reports_its_state`, `the_status_report_names_each_state` and more), and the embedded copies equal the files in `agents/` (`the_built_in_copies_are_the_files_in_agents`).
-- CLI, `crates/ddc-cli/tests/agent_skill_cli.rs`: 1 (`a_project_gets_its_skill_and_its_agents_md_block`), 3 (`an_edited_skill_is_refused_until_replace`), 4 (`a_linked_agents_md_is_refused_and_nothing_is_written`), 8 (`without_a_terminal_it_needs_approved_and_then_writes_once`, `at_a_terminal_it_lists_the_files_and_asks`), 9 and 10 (`status_reports_each_place_and_writes_nothing`).
+- Core, `crates/ddc-core/tests/guidance.rs`: 2 to 7, 9 and 10 on temporary folders (`an_absent_folder_gets_the_files_then_the_marker`, `an_older_copy_is_replaced_and_other_files_stay`, `an_edited_or_hand_copied_folder_is_refused_unless_replaced`, `a_broken_marker_a_missing_file_or_an_unlisted_one_is_refused`, `links_are_refused_even_with_replace`, `a_malformed_agents_md_is_refused`, `the_block_is_replaced_and_everything_else_kept`, `a_block_is_appended_after_one_empty_line`, `an_agents_md_reports_its_state`, `the_status_report_names_each_state` and more), and the embedded copies equal the files in `agents/` (`the_built_in_copies_are_the_files_in_agents`); 1 and 9 for the shared folder (`the_shared_agents_folder_is_one_more_skill_folder`).
+- CLI, `crates/ddc-cli/tests/agent_skill_cli.rs`: 1 (`a_project_gets_its_skill_and_its_agents_md_block`, `family_narrows_the_install_and_one_refusal_stops_both`, both families in `without_a_terminal_it_needs_approved_and_then_writes_once`), 3 (`an_edited_skill_is_refused_until_replace`), 4 (`a_linked_agents_md_is_refused_and_nothing_is_written`), 8 (`without_a_terminal_it_needs_approved_and_then_writes_once`, `at_a_terminal_it_lists_the_files_and_asks`), 9 and 10 (`status_reports_each_place_and_writes_nothing`).
 - `crates/ddc-cli/tests/structure.rs`: 2 and 11 (`the_guidance_installer_deletes_locks_and_runs_nothing`: no removal, rename, lock, journal or command in the installer), 5 (`the_skill_allows_only_what_reads_and_carries_the_version`); `src/gate.rs` `an_unported_platform_runs_only_rules` (12).
 - Each test names the contract it covers in a comment beside it.
 
@@ -117,6 +125,8 @@ Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills
 - [x] Each of contracts 1 to 12 has at least one automated test named under Testing that fails when its outcome breaks — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet — evidence: the Testing list, every named test green in PRs #173 and #175
 - [x] A test checks that the copies built into the binary are byte for byte the files in `agents/`, so a change to the guidance cannot ship without the binary carrying it — evidence: `guidance.rs` `the_built_in_copies_are_the_files_in_agents` (PR #173)
 - [x] `install` and `status` run on Linux and macOS in the Gate; on Windows they are refused and their tests skip, as listed in `.config/native-skips/windows.txt` — evidence: PR #175's Gate; the native Windows leg, 1183 tests, the skips as listed
+- [ ] Contract 1 and 9 as amended on 2026-11-18 have tests named under Testing: both families written by default, `--family` narrowing, one refusal stopping both, `family` in the status — stories: DDC-003/story-agent-skill-install-the-shared-agentsskills-folder
+- [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): after `ddc agent skill install`, a Codex session and an opencode session list the `ddc` skill — stories: DDC-003/story-agent-skill-install-the-shared-agentsskills-folder
 - [ ] Owner check (runbook "Owner checks: manual acceptance across stories", section "Agent guidance and ddc agent skill install"): `ddc agent skill install` at a terminal lists the files and asks; after a yes, a new Claude Code session finds the skill — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet
 
 ## References
