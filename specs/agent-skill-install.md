@@ -46,11 +46,13 @@ Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills
    - WHEN the old marker lists a file this copy no longer ships (edge)
    - THEN that file stays and is named as no longer shipped
 
-3. **It overwrites only its own unedited folder.** `install` writes into a skill folder when the folder is absent, or when the marker parses and every file it lists has the hash the marker gives or equals this copy's file (so an install stopped before its marker counts as unedited). Otherwise the folder is not ours (no marker, or a marker that does not parse) or edited (a listed file is missing or differs from both). Then `install` writes nothing anywhere, exits 2, and names the folder, the reason and `--replace`. With `--replace` it writes the shipped files and the marker over it, and still deletes nothing; on a folder of its own, `--replace` changes nothing.
+3. **It overwrites only its own unedited folder.** `install` writes into a skill folder when the folder is absent, or when the marker parses, every file it lists has the hash the marker gives or equals this copy's file (so an install stopped before its marker counts as unedited), and no shipped file it does not list is there with other bytes. Otherwise the folder is not ours (no marker, or a marker that does not parse) or edited (a listed file is missing or differs from both, or an unlisted shipped file is someone's own). Then `install` writes nothing anywhere, exits 2, and names the folder, the reason and `--replace`. With `--replace` it writes the shipped files and the marker over it, and still deletes nothing; on a folder of its own, `--replace` changes nothing.
    - WHEN `SKILL.md` was edited by hand after an install (edge)
    - THEN `install` exits 2 with "edited", and `install --replace` writes it
    - WHEN the folder was copied by hand and has no marker (edge)
    - THEN `install` exits 2 with "not installed by ddc"
+
+   > amended 2026-11-17 by DDC-003/story-agent-guidance-skill-and-agents-snippet: MODIFIED — the reviewer found a file a later ddc ships, already there as the person's own, would be overwritten. Replaced: "or when the marker parses and every file it lists has the hash the marker gives or equals this copy's file (so an install stopped before its marker counts as unedited). Otherwise the folder is not ours (no marker, or a marker that does not parse) or edited (a listed file is missing or differs from both)."
 
 4. **Symbolic links are refused.** The skill folder, a shipped file or the marker inside it, or `FILE`, when it is a symbolic link, is refused: exit 2, nothing written, even with `--replace`. A link higher up (`~/.claude` itself, say) is followed like any other folder.
    - WHEN `FILE` is a symbolic link to another file (failure)
@@ -105,17 +107,17 @@ Terms: the **skill folder** is `~/.claude/skills/ddc/`, or `<DIR>/.claude/skills
 
 ## Testing
 
-- Core, `crates/ddc-core/tests/guidance.rs`: 2 to 7, 9 and 10 on temporary folders, one test or more each.
-- CLI, `crates/ddc-cli/tests/agent_skill_cli.rs`: 1, 3, 8 (a pseudo-terminal run: a No writes nothing; no terminal without `--approved` is refused), 9, 10 and 11 (a held ddc lock stops neither command).
-- `crates/ddc-cli/tests/structure.rs`: 5 (`metadata.version` equals the crate's version), the embedded copies equal the files in `agents/` (2), the cases and the gate's command list name both commands (12).
+- Core, `crates/ddc-core/tests/guidance.rs`: 2 to 7, 9 and 10 on temporary folders (`an_absent_folder_gets_the_files_then_the_marker`, `an_older_copy_is_replaced_and_other_files_stay`, `an_edited_or_hand_copied_folder_is_refused_unless_replaced`, `a_broken_marker_a_missing_file_or_an_unlisted_one_is_refused`, `links_are_refused_even_with_replace`, `a_malformed_agents_md_is_refused`, `the_block_is_replaced_and_everything_else_kept`, `a_block_is_appended_after_one_empty_line`, `an_agents_md_reports_its_state`, `the_status_report_names_each_state` and more), and the embedded copies equal the files in `agents/` (`the_built_in_copies_are_the_files_in_agents`).
+- CLI, `crates/ddc-cli/tests/agent_skill_cli.rs`: 1 (`a_project_gets_its_skill_and_its_agents_md_block`), 3 (`an_edited_skill_is_refused_until_replace`), 4 (`a_linked_agents_md_is_refused_and_nothing_is_written`), 8 (`without_a_terminal_it_needs_approved_and_then_writes_once`, `at_a_terminal_it_lists_the_files_and_asks`), 9 and 10 (`status_reports_each_place_and_writes_nothing`).
+- `crates/ddc-cli/tests/structure.rs`: 2 and 11 (`the_guidance_installer_deletes_locks_and_runs_nothing`: no removal, rename, lock, journal or command in the installer), 5 (`the_skill_allows_only_what_reads_and_carries_the_version`); `src/gate.rs` `an_unported_platform_runs_only_rules` (12).
 - Each test names the contract it covers in a comment beside it.
 
 ## Acceptance
 
-- [ ] Each of contracts 1 to 12 has at least one automated test named under Testing that fails when its outcome breaks — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet
-- [ ] A test checks that the copies built into the binary are byte for byte the files in `agents/`, so a change to the guidance cannot ship without the binary carrying it
-- [ ] `install` and `status` run on Linux and macOS in the Gate; on Windows they are refused and their tests skip, as listed in `.config/native-skips/windows.txt`
-- [ ] Owner check (runbook "Owner checks: manual acceptance across stories"): `ddc agent skill install` at a terminal lists the files and asks; after a yes, a new Claude Code session finds the skill — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet
+- [x] Each of contracts 1 to 12 has at least one automated test named under Testing that fails when its outcome breaks — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet — evidence: the Testing list, every named test green in PRs #173 and #175
+- [x] A test checks that the copies built into the binary are byte for byte the files in `agents/`, so a change to the guidance cannot ship without the binary carrying it — evidence: `guidance.rs` `the_built_in_copies_are_the_files_in_agents` (PR #173)
+- [x] `install` and `status` run on Linux and macOS in the Gate; on Windows they are refused and their tests skip, as listed in `.config/native-skips/windows.txt` — evidence: PR #175's Gate; the native Windows leg, 1183 tests, the skips as listed
+- [ ] Owner check (runbook "Owner checks: manual acceptance across stories", section "Agent guidance and ddc agent skill install"): `ddc agent skill install` at a terminal lists the files and asks; after a yes, a new Claude Code session finds the skill — stories: DDC-003/story-agent-guidance-skill-and-agents-snippet
 
 ## References
 
